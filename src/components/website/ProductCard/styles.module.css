@@ -1,0 +1,18 @@
+.productCard {
+  width: calc(50% - 4px);
+  min-width: calc(50% - 4px);
+}
+
+@media (min-width: 480px) {
+  .productCard {
+    width: calc(33.33% - 6px);
+    min-width: calc(33.33% - 6px);
+  }
+}
+
+@media (min-width: 768px) {
+  .productCard {
+    width: 33.33%;
+    min-width: 33.33%;
+  }
+}

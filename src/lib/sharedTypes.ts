@@ -1,0 +1,11 @@
+export enum AlertMessageType {
+  SUCCESS = "SUCCESS",
+  ERROR = "ERROR",
+  NEUTRAL = "NEUTRAL",
+}
+
+export enum EmailType {
+  ORDER_CONFIRMED = "ORDER_CONFIRMED",
+  ORDER_SHIPPED = "ORDER_SHIPPED",
+  ORDER_DELIVERED = "ORDER_DELIVERED",
+}

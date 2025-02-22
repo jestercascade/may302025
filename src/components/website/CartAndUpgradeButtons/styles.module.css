@@ -1,0 +1,21 @@
+/* text-xs */
+.button {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+/* text-sm */
+@media (min-width: 375px) {
+  .button {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
+}
+
+/* text-base */
+@media (min-width: 896px) {
+  .button {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+}
