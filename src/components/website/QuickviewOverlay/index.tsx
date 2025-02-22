@@ -2,7 +2,7 @@
 
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 import { formatThousands } from "@/lib/utils/common";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { SizeChartOverlay } from "../ProductDetails/SizeChartOverlay";
 import { CartAndUpgradeButtons } from "../CartAndUpgradeButtons";
 import { QuickviewOptions } from "../Options/QuickviewOptions";
@@ -11,7 +11,7 @@ import { X, ChevronRight, Check } from "lucide-react";
 import styles from "./styles.module.css";
 import Image from "next/image";
 import clsx from "clsx";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export function QuickviewButton({
   onClick,
@@ -59,9 +59,8 @@ export function QuickviewOverlay() {
   const cart = useQuickviewStore((state) => state.cart);
   const selectedProduct = useQuickviewStore((state) => state.selectedProduct);
 
-  useEffect(() => {
-    hideOverlay();
-  }, [hideOverlay]);
+  const pathname = usePathname();
+  const initialRender = useRef(true);
 
   useEffect(() => {
     document.body.style.overflow = isVisible ? "hidden" : "visible";
@@ -69,6 +68,15 @@ export function QuickviewOverlay() {
       document.body.style.overflow = "visible";
     };
   }, [isVisible]);
+
+  useEffect(() => {
+    // Close overlay on route change, skipping initial render
+    if (initialRender.current) {
+      initialRender.current = false;
+    } else {
+      hideOverlay();
+    }
+  }, [pathname, hideOverlay]);
 
   if (!isVisible || !selectedProduct) {
     return null;
