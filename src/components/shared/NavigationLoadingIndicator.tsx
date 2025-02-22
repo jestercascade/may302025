@@ -33,8 +33,8 @@ function LoadingOverlay({ showOverlay }: { showOverlay: boolean }) {
 
   return (
     <div
-      className={`fixed inset-0 z-[99999999999] flex items-center justify-center transition-opacity duration-300 ease-in-out ${
-        !showOverlay ? "opacity-100" : "opacity-0 pointer-events-none"
+      className={`fixed inset-0 z-[99999999999] flex items-center justify-center transition-opacity duration-200 ease-in-out ${
+        showOverlay ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
       style={{
         backdropFilter: "blur(4px)",
