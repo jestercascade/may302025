@@ -60,6 +60,10 @@ export function QuickviewOverlay() {
   const selectedProduct = useQuickviewStore((state) => state.selectedProduct);
 
   useEffect(() => {
+    hideOverlay();
+  }, [hideOverlay]);
+
+  useEffect(() => {
     document.body.style.overflow = isVisible ? "hidden" : "visible";
     return () => {
       document.body.style.overflow = "visible";
