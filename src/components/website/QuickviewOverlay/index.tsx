@@ -43,7 +43,7 @@ export function QuickviewButton({
       className="outline-none border-none rounded-full w-[40px] h-[26px] flex items-center justify-center relative before:content-[''] before:absolute before:top-0 before:bottom-0 before:left-0 before:right-0 before:border before:border-black before:rounded-full before:transition before:duration-100 before:ease-in-out active:before:scale-105 md:hover:before:scale-105"
     >
       <Image
-        src="/icons/cart_plus.svg"
+        src="/icons/cart-plus.svg"
         alt="Add to cart"
         width={16}
         height={16}

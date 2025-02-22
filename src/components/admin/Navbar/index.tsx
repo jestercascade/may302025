@@ -159,7 +159,7 @@ function DesktopNavbar() {
           className="h-12 min-w-[168px] w-[168px] flex items-center justify-center"
         >
           <Image
-            src="/images/logos/cherlygood_wordmark.svg"
+            src="/images/logos/cherlygood-wordmark.svg"
             alt="Cherly Good"
             width={160}
             height={40}
@@ -282,7 +282,7 @@ function MobileNavbar() {
         className="h-12 min-w-[168px] w-[168px] flex items-center justify-center"
       >
         <Image
-          src="/images/logos/cherlygood_wordmark.svg"
+          src="/images/logos/cherlygood-wordmark.svg"
           alt="Cherly Good"
           width={160}
           height={40}

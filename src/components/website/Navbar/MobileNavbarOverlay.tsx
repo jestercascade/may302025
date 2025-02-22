@@ -99,7 +99,7 @@ export function MobileNavbarOverlay() {
               className="h-12 min-w-[168px] w-[168px] ml-[2px] flex items-center justify-center"
             >
               <Image
-                src="/images/logos/cherlygood_wordmark.svg"
+                src="/images/logos/cherlygood-wordmark.svg"
                 alt="Cherly Good"
                 width={160}
                 height={40}
