@@ -105,7 +105,7 @@ export function ProductDetailsWrapper({
               className="h-10 min-w-[168px] w-[168px] pl-2 flex items-center"
             >
               <Image
-                src="/images/logos/cherlygood_wordmark.svg"
+                src="/images/logos/cherlygood-wordmark.svg"
                 alt="Cherly Good"
                 width={160}
                 height={40}
