@@ -12,6 +12,7 @@ import styles from "./styles.module.css";
 import Image from "next/image";
 import clsx from "clsx";
 import { useEffect, useRef } from "react";
+import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 
 export function QuickviewButton({
   onClick,
@@ -408,7 +409,7 @@ function DesktopProductDetails({
   cart: CartType | null;
   hideOverlay: () => void;
 }) {
-  const router = useRouter();
+  const { push } = useNavigation();
   const hasColor = selectedProduct.options.colors.length > 0;
   const hasSize = Object.keys(selectedProduct.options.sizes).length > 0;
 
@@ -655,7 +656,7 @@ function DesktopProductDetails({
               <button
                 className="flex items-center text-sm hover:underline"
                 onClick={() =>
-                  router.push(`/${selectedProduct.slug}-${selectedProduct.id}`)
+                  push(`/${selectedProduct.slug}-${selectedProduct.id}`)
                 }
               >
                 <span>All details</span>

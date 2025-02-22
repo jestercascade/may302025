@@ -11,7 +11,7 @@ import { UpsellReviewButton } from "../UpsellReviewOverlay";
 import { useScrollStore } from "@/zustand/website/scrollStore";
 import Image from "next/image";
 import clsx from "clsx";
-import { useRouter } from "next/navigation";
+import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 
 export function StickyBar({
   productInfo,
@@ -26,7 +26,7 @@ export function StickyBar({
   cart: CartType | null;
   productInfo: ProductInfoType;
 }) {
-  const router = useRouter();
+  const { push } = useNavigation();
   const [isPending, startTransition] = useTransition();
   const [isInCart, setIsInCart] = useState(false);
   const selectedColor = useOptionsStore((state) => state.selectedColor);
@@ -198,7 +198,7 @@ export function StickyBar({
           )}
           {(isInCart || isSimpleProductInCart) && !hasColor && !hasSize && (
             <button
-              onClick={() => router.push("/cart")}
+              onClick={() => push("/cart")}
               className="flex items-center justify-center w-max px-9 rounded-full cursor-pointer border border-[#c5c3c0] text-blue font-semibold h-[44px] shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,_#faf9f8_5%,_#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear-gradient(to_bottom,_#eae8e6_5%,_#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)] min-[896px]:h-12"
             >
               In Cart - See Now

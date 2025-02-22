@@ -8,10 +8,11 @@ import { AddToCartAction } from "@/actions/cart";
 import { Spinner } from "@/ui/Spinners/Default";
 import clsx from "clsx";
 import { useUpsellReviewStore } from "@/zustand/website/upsellReviewStore";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 import styles from "./styles.module.css";
 import { UpsellReviewButton } from "../UpsellReviewOverlay";
+import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 
 export function CartAndUpgradeButtons({
   product,
@@ -21,7 +22,7 @@ export function CartAndUpgradeButtons({
 }: CartAndUpgradeButtonsType) {
   const [isPending, startTransition] = useTransition();
   const pathname = usePathname();
-  const router = useRouter();
+  const { push } = useNavigation();
   const showAlert = useAlertStore((state) => state.showAlert);
   const selectedColor = useOptionsStore((state) => state.selectedColor);
   const selectedSize = useOptionsStore((state) => state.selectedSize);
@@ -101,7 +102,7 @@ export function CartAndUpgradeButtons({
         });
       }
     } else {
-      router.push("/cart");
+      push("/cart");
     }
   };
 

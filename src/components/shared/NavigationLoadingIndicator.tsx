@@ -37,9 +37,9 @@ function LoadingOverlay({ showOverlay }: { showOverlay: boolean }) {
         showOverlay ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
       style={{
-        backdropFilter: "blur(4px)",
-        WebkitBackdropFilter: "blur(4px)",
-        backgroundColor: "rgba(250, 250, 250, 0.5)",
+        backdropFilter: "blur(2px)",
+        WebkitBackdropFilter: "blur(2px)",
+        backgroundColor: "rgba(244, 244, 244, 0.45)",
       }}
     >
       <div className="w-full h-[3px] absolute top-0 left-0 overflow-hidden">
@@ -60,7 +60,7 @@ function LoadingOverlay({ showOverlay }: { showOverlay: boolean }) {
 export function NavigationProvider({ children }: { children: ReactNode }) {
   const [showOverlay, setShowOverlay] = useState(false);
   const pathname = usePathname();
-  const DELAY_MS = 0; // Show overlay after 500ms delay
+  const DELAY_MS = 300; // Show overlay after 300ms delay
 
   const handleLinkClick = useCallback(
     (e: MouseEvent) => {

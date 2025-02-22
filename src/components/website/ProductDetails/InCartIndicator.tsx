@@ -1,12 +1,13 @@
 import { useUpsellReviewStore } from "@/zustand/website/upsellReviewStore";
 import { usePathname, useRouter } from "next/navigation";
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
+import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 
 export function InCartIndicator() {
   const hideOverlay = useUpsellReviewStore((state) => state.hideOverlay);
   const hideQuickviewOverlay = useQuickviewStore((state) => state.hideOverlay);
   const pathname = usePathname();
-  const router = useRouter();
+  const { push } = useNavigation();
 
   const handleInCartButtonClick = () => {
     if (pathname === "/cart") {
@@ -21,7 +22,7 @@ export function InCartIndicator() {
         });
       }
     } else {
-      router.push("/cart");
+      push("/cart");
     }
   };
 
