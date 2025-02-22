@@ -2,7 +2,7 @@
 
 import { useProductColorImageStore } from "@/zustand/website/ProductColorImageStore";
 import { useOptionsStore } from "@/zustand/website/optionsStore";
-import { memo, useCallback } from "react";
+import { memo, useCallback, useMemo } from "react";
 import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 
@@ -41,7 +41,13 @@ export const ProductColors = memo(function ProductColors({
             }`}
           >
             <div className="w-full h-full flex items-center justify-center relative overflow-hidden bg-lightgray border rounded">
-              <Image src={image} alt={name} width={40} height={40} priority />
+              <Image
+                src={image}
+                alt={name}
+                width={40}
+                height={40}
+                priority={selectedColor === name} // Prioritize only the selected color
+              />
             </div>
           </div>
         ))}
@@ -70,7 +76,34 @@ export const ProductSizes = memo(function ProductSizes({
   const setSelectedSize = useOptionsStore((state) => state.setSelectedSize);
 
   const { columns, rows } = sizeChart.inches;
-  const sizes = rows.map((row) => row[columns[0].label]);
+
+  // Memoize sizes array
+  const sizes = useMemo(
+    () => rows.map((row) => row[columns[0].label]),
+    [rows, columns]
+  );
+
+  // Memoize filtered and sorted columns
+  const filteredColumns = useMemo(
+    () =>
+      columns
+        .filter(
+          (column) =>
+            column.label !== "Size" &&
+            !["US", "EU", "UK", "NZ", "AU", "DE"].includes(column.label)
+        )
+        .sort((a, b) => a.order - b.order),
+    [columns]
+  );
+
+  // Memoize selected row
+  const selectedRow = useMemo(
+    () =>
+      selectedSize
+        ? rows.find((row) => row[columns[0].label] === selectedSize)
+        : null,
+    [selectedSize, rows, columns]
+  );
 
   const isFeetInchFormat = (value: string) =>
     /\d+'(?:\d{1,2}")?-?\d*'?(?:\d{1,2}")?/.test(value);
@@ -92,45 +125,28 @@ export const ProductSizes = memo(function ProductSizes({
           </div>
         ))}
       </div>
-      {selectedSize && (
+      {selectedSize && selectedRow && (
         <div
           onClick={onSizeChartClick}
           className="w-full py-3 pl-[14px] pr-8 mt-2 rounded-lg relative cursor-pointer bg-neutral-100"
         >
           <div>
-            {rows.find((row) => row[columns[0].label] === selectedSize) && (
-              <ul className="leading-3 max-w-[calc(100%-20px)] flex flex-row flex-wrap gap-2">
-                {columns
-                  .filter(
-                    (column) =>
-                      column.label !== "Size" &&
-                      !["US", "EU", "UK", "NZ", "AU", "DE"].includes(
-                        column.label
-                      )
-                  )
-                  .sort((a, b) => a.order - b.order)
-                  .map((column) => {
-                    const selectedRow = rows.find(
-                      (row) => row[columns[0].label] === selectedSize
-                    );
-                    const measurement = selectedRow
-                      ? selectedRow[column.label]
-                      : "";
-
-                    return (
-                      <li key={column.label} className="text-nowrap">
-                        <span className="text-xs font-medium text-gray">{`${column.label}: `}</span>
-                        <span className="text-xs font-semibold">
-                          {measurement}
-                          {!isFeetInchFormat(measurement) && measurement !== ""
-                            ? " in"
-                            : ""}
-                        </span>
-                      </li>
-                    );
-                  })}
-              </ul>
-            )}
+            <ul className="leading-3 max-w-[calc(100%-20px)] flex flex-row flex-wrap gap-2">
+              {filteredColumns.map((column) => {
+                const measurement = selectedRow[column.label] || "";
+                return (
+                  <li key={column.label} className="text-nowrap">
+                    <span className="text-xs font-medium text-gray">{`${column.label}: `}</span>
+                    <span className="text-xs font-semibold">
+                      {measurement}
+                      {!isFeetInchFormat(measurement) && measurement !== ""
+                        ? " in"
+                        : ""}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
           <ChevronRight
             color="#828282"
