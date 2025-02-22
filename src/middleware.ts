@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import appConfig from "@/lib/config";
 
+// Constants
 const COOKIE_NAME = "cherlygood_session";
 const ADMIN_ENTRY_KEY = process.env.ADMIN_ENTRY_KEY || "";
 if (!ADMIN_ENTRY_KEY) {
@@ -14,12 +15,13 @@ if (!ADMIN_EMAIL) {
   throw new Error("ADMIN_EMAIL environment variable is required");
 }
 
+// Define protected routes (simplified, as "/admin/:path*" includes "/admin")
 const PROTECTED_ROUTES = [
-  "/admin",
   "/admin/:path*", // All admin subpaths
   "/demo", // Example of another protected route
 ] as const;
 
+// Custom error classes
 class SessionVerificationError extends Error {
   constructor(message: string) {
     super(message);
@@ -34,6 +36,7 @@ class NetworkError extends Error {
   }
 }
 
+// Helper functions
 const isAdmin = (decodedClaims: DecodedIdToken): boolean => {
   return (
     decodedClaims.email === ADMIN_EMAIL &&
@@ -54,6 +57,7 @@ const isProtectedRoute = (pathname: string): boolean => {
 };
 
 const isValidAdminEntryKey = (pathname: string): boolean => {
+  // Use escaped slashes for clarity
   const adminEntryPattern = /^\/auth\/admin\/(.*)$/;
   const match = pathname.match(adminEntryPattern);
 
@@ -68,10 +72,10 @@ const signOutAndRedirect = async (
   request: NextRequest
 ): Promise<NextResponse> => {
   try {
-    // Call the logout endpoint to properly clean up the session
+    // Call the logout endpoint to clean up the session
     const response = await fetch(`${appConfig.BASE_URL}/api/auth/logout`, {
       method: "POST",
-      signal: AbortSignal.timeout(5000), // 5 second timeout
+      signal: AbortSignal.timeout(5000), // 5-second timeout
     });
 
     if (!response.ok) {
@@ -95,7 +99,7 @@ const verifySessionWithAPI = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ sessionCookie }),
-      signal: AbortSignal.timeout(5000), // 5 second timeout
+      signal: AbortSignal.timeout(5000), // 5-second timeout
     });
 
     if (!response.ok) {
@@ -116,6 +120,7 @@ const verifySessionWithAPI = async (
   }
 };
 
+// Middleware function
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -162,14 +167,11 @@ export async function middleware(request: NextRequest) {
   }
 }
 
+// Middleware configuration
 export const config = {
   matcher: [
-    // Protected routes including demo
-    "/admin/:path*",
-    "/demo",
-    // Add admin entry key route pattern
-    "/auth/admin/:key*",
-    // Exclude all static files and API routes except admin paths
-    "/((?!api/auth|_next/static|_next/image|favicon.ico|public|images).*)",
+    "/admin/:path*", // All admin routes
+    "/demo", // Example protected route
+    "/auth/admin/:key*", // Admin entry key route
   ],
 };

@@ -1,7 +1,8 @@
-import type { Metadata } from "next";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { NavigationProvider } from "@/components/shared/NavigationLoadingIndicator";
 import ShowAlert from "@/components/website/ShowAlert";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { Inter } from "next/font/google";
+import type { Metadata } from "next";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -19,8 +20,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} body-scrollbar`}>
-        <AuthProvider>{children}</AuthProvider>
-        <ShowAlert />
+        <NavigationProvider>
+          <AuthProvider>
+            {children}
+            <ShowAlert />
+          </AuthProvider>
+        </NavigationProvider>
       </body>
     </html>
   );

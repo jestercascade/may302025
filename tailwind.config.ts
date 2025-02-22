@@ -49,6 +49,19 @@ const spinnerAnimation = {
   },
 };
 
+const navigationLoadingIndicatorAnimation = {
+  keyframes: {
+    navigationLoadingIndicatorAnimation: {
+      "0%": { transform: "translateX(-100%)" },
+      "100%": { transform: "translateX(400%)" },
+    },
+  },
+  animation: {
+    navigationLoadingIndicatorAnimation:
+      "navigationLoadingIndicatorAnimation 1.2s infinite ease-in-out",
+  },
+};
+
 export default {
   content: [
     "./src/ui/**/*.{js,ts,jsx,tsx,mdx}",
@@ -58,26 +71,26 @@ export default {
   theme: {
     extend: {
       colors: customColors,
-      stroke: {
-        gray: customColors.gray,
-      },
-      fill: {
-        gray: customColors.gray,
-      },
+      stroke: { gray: customColors.gray },
+      fill: { gray: customColors.gray },
       textColor: {
         gray: customColors.gray,
         amber: { DEFAULT: "#A86400" },
       },
-      borderColor: {
-        DEFAULT: "#dcdfe4",
-      },
+      borderColor: { DEFAULT: "#dcdfe4" },
       boxShadow: {
         DEFAULT: "0px 1.8px 4px rgba(0,0,0,0.2), 0px 0px 3px rgba(0,0,0,0.1)",
         "thick-bottom": "#21212140 0px 3px 2px 0px, #E5E5E5 0px 0px 1px 1px",
         dropdown: "#00000040 0px 4px 8px -2px, #00000014 0px 0px 0px 1px",
       },
-      keyframes: spinnerAnimation.keyframes,
-      animation: spinnerAnimation.animation,
+      keyframes: {
+        ...spinnerAnimation.keyframes,
+        ...navigationLoadingIndicatorAnimation.keyframes,
+      },
+      animation: {
+        ...spinnerAnimation.animation,
+        ...navigationLoadingIndicatorAnimation.animation,
+      },
     },
   },
   plugins: [require("tailwindcss-animated")],

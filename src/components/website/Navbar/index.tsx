@@ -1,13 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { MobileNavbarButton } from "./MobileNavbarOverlay";
 import { ShoppingCart, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
+import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 
 export default function Navbar({
   itemsInCart,
@@ -26,7 +26,7 @@ export default function Navbar({
   const categoriesRef = useRef<HTMLDivElement>(null);
 
   // Router and store hooks
-  const router = useRouter();
+  const { push } = useNavigation();
   const isQuickviewOverlayVisible = useQuickviewStore(
     (state) => state.isVisible
   );
@@ -37,7 +37,7 @@ export default function Navbar({
   };
 
   const handleCategoryClick = (categoryName: string) => {
-    router.push(`/category/${categoryName.toLowerCase()}`);
+    push(`/category/${categoryName.toLowerCase()}`);
     setCategoriesDropdownVisible(false);
   };
 
