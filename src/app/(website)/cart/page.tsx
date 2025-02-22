@@ -1,6 +1,4 @@
-import ShowAlert from "@/components/website/ShowAlert";
 import { cookies } from "next/headers";
-import { QuickviewOverlay } from "@/components/website/QuickviewOverlay";
 import { UpsellReviewOverlay } from "@/components/website/UpsellReviewOverlay";
 import { adminDb } from "@/lib/firebase/admin";
 import { ResetUpsellReview } from "@/components/website/ResetUpsellReview";
@@ -109,8 +107,6 @@ export default async function Cart() {
         </div>
         <Footer />
       </div>
-      <ShowAlert />
-      <QuickviewOverlay />
       <UpsellReviewOverlay cart={cart} />
       <ResetUpsellReview />
     </>
