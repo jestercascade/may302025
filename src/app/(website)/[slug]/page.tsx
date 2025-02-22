@@ -2,11 +2,9 @@ import Image from "next/image";
 import { cookies } from "next/headers";
 import styles from "./styles.module.css";
 import { formatThousands } from "@/lib/utils/common";
-import ShowAlert from "@/components/website/ShowAlert";
 import { ProductDetailsWrapper } from "@/components/website/ProductDetailsWrapper";
 import { SizeChartOverlay } from "@/components/website/ProductDetails/SizeChartOverlay";
 import clsx from "clsx";
-import { QuickviewOverlay } from "@/components/website/QuickviewOverlay";
 import { getCart } from "@/actions/get/carts";
 import { getCategories } from "@/actions/get/categories";
 import { getProducts } from "@/actions/get/products";
@@ -92,9 +90,7 @@ export default async function ProductDetails({
           }}
         />
       </ProductDetailsWrapper>
-      <QuickviewOverlay />
       <UpsellReviewOverlay cart={cart} />
-      <ShowAlert />
     </>
   );
 }

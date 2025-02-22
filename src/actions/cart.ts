@@ -26,7 +26,7 @@ export async function AddToCartAction(data: {
       secure: true,
       sameSite: "strict",
       path: "/",
-      maxAge: 30 * 24 * 60 * 60, // expires in 30 days
+      maxAge: 30 * 24 * 60 * 60,
     });
     return newDeviceIdentifier;
   };
@@ -54,7 +54,8 @@ export async function AddToCartAction(data: {
 
   const generateNewCart = async () => {
     try {
-      const newDeviceIdentifier = setNewDeviceIdentifier();
+      const newDeviceIdentifier = await setNewDeviceIdentifier();
+
       const newCartData = {
         device_identifier: newDeviceIdentifier,
         createdAt: FieldValue.serverTimestamp(),

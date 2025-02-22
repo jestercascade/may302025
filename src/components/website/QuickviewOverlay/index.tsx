@@ -9,9 +9,9 @@ import { QuickviewOptions } from "../Options/QuickviewOptions";
 import { ImageGallery } from "../ProductDetails/ImageGallery";
 import { X, ChevronRight, Check } from "lucide-react";
 import styles from "./styles.module.css";
-import { useEffect } from "react";
 import Image from "next/image";
 import clsx from "clsx";
+import { useEffect } from "react";
 
 export function QuickviewButton({
   onClick,
@@ -58,10 +58,6 @@ export function QuickviewOverlay() {
   const isVisible = useQuickviewStore((state) => state.isVisible);
   const cart = useQuickviewStore((state) => state.cart);
   const selectedProduct = useQuickviewStore((state) => state.selectedProduct);
-
-  useEffect(() => {
-    hideOverlay();
-  }, [hideOverlay]);
 
   useEffect(() => {
     document.body.style.overflow = isVisible ? "hidden" : "visible";

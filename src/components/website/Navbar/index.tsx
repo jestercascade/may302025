@@ -7,6 +7,7 @@ import { MobileNavbarButton } from "./MobileNavbarOverlay";
 import { ShoppingCart, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
+import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 
 export default function Navbar({
   itemsInCart,
@@ -15,15 +16,36 @@ export default function Navbar({
   itemsInCart: number;
   categories: CategoryType[] | undefined;
 }) {
+  // State hooks
   const [isScrollingUp, setIsScrollingUp] = useState(true);
   const [prevScrollPosition, setPrevScrollPosition] = useState(0);
   const [isCategoriesDropdownVisible, setCategoriesDropdownVisible] =
     useState(false);
-  const categoriesRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
+  // Refs
+  const categoriesRef = useRef<HTMLDivElement>(null);
+
+  // Router and store hooks
+  const router = useRouter();
+  const isQuickviewOverlayVisible = useQuickviewStore(
+    (state) => state.isVisible
+  );
+
+  // Event handler functions
+  const toggleCategoriesDropdown = () => {
+    setCategoriesDropdownVisible(!isCategoriesDropdownVisible);
+  };
+
+  const handleCategoryClick = (categoryName: string) => {
+    router.push(`/category/${categoryName.toLowerCase()}`);
+    setCategoriesDropdownVisible(false);
+  };
+
+  // Side-effects
   useEffect(() => {
     const handleScroll = () => {
+      if (isQuickviewOverlayVisible) return;
+
       const currentScrollPosition = window.scrollY;
       const scrollDifference = currentScrollPosition - prevScrollPosition;
 
@@ -53,7 +75,7 @@ export default function Navbar({
       window.removeEventListener("scroll", handleScroll);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [prevScrollPosition]);
+  }, [prevScrollPosition, isQuickviewOverlayVisible]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -79,15 +101,6 @@ export default function Navbar({
       window.removeEventListener("scroll", handleScroll, true);
     };
   }, [isCategoriesDropdownVisible]);
-
-  const toggleCategoriesDropdown = () => {
-    setCategoriesDropdownVisible(!isCategoriesDropdownVisible);
-  };
-
-  const handleCategoryClick = (categoryName: string) => {
-    router.push(`/category/${categoryName.toLowerCase()}`);
-    setCategoriesDropdownVisible(false);
-  };
 
   return (
     <nav

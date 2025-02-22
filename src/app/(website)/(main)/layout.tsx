@@ -2,7 +2,7 @@ import { Footer } from "@/components/website/Footer";
 import { MobileNavbarOverlay } from "@/components/website/Navbar/MobileNavbarOverlay";
 import { NavbarWrapper } from "@/components/website/Navbar/NavbarWrapper";
 
-export default async function WebsiteLayout({
+export default function WebsiteLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

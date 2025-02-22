@@ -2,11 +2,9 @@ import { Banner } from "@/components/website/Banner";
 import { Categories } from "@/components/website/Categories";
 import { DiscoveryProducts } from "@/components/website/DiscoveryProducts";
 import { FeaturedProducts } from "@/components/website/FeaturedProducts";
-import { QuickviewOverlay } from "@/components/website/QuickviewOverlay";
 import { UpsellReviewOverlay } from "@/components/website/UpsellReviewOverlay";
 import { getCollections } from "@/actions/get/collections";
 import { getCategories } from "@/actions/get/categories";
-import ShowAlert from "@/components/website/ShowAlert";
 import { getPageHero } from "@/actions/get/pageHero";
 import { getProducts } from "@/actions/get/products";
 import { getCart } from "@/actions/get/carts";
@@ -56,9 +54,7 @@ export default async function Home() {
           )}
         <div className="mt-8 max-w-5xl mx-auto flex flex-col gap-10">
           {combinedCollections.map((collection, index) => (
-            <div key={index}>
-              {renderCollection(collection, cart)}
-            </div>
+            <div key={index}>{renderCollection(collection, cart)}</div>
           ))}
           <div className="px-5">
             <DiscoveryProducts
@@ -69,9 +65,7 @@ export default async function Home() {
           </div>
         </div>
       </div>
-      <QuickviewOverlay />
       <UpsellReviewOverlay cart={cart} />
-      <ShowAlert />
     </>
   );
 }
@@ -115,19 +109,11 @@ function renderHero(pageHero: any) {
   );
 }
 
-function renderCollection(
-  collection: any,
-  cart: any,
-) {
+function renderCollection(collection: any, cart: any) {
   switch (collection.collectionType) {
     case "FEATURED":
       if (collection.products && collection.products.length >= 3) {
-        return (
-          <FeaturedProducts
-            collection={collection}
-            cart={cart}
-          />
-        );
+        return <FeaturedProducts collection={collection} cart={cart} />;
       }
       return null;
     case "BANNER":

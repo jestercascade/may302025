@@ -3,8 +3,6 @@ import { getCollections } from "@/actions/get/collections";
 import { CatalogEmptyState } from "@/components/website/CatalogEmptyState";
 import { Pagination } from "@/components/website/Pagination";
 import { ProductCard } from "@/components/website/ProductCard";
-import { QuickviewOverlay } from "@/components/website/QuickviewOverlay";
-import ShowAlert from "@/components/website/ShowAlert";
 import { UpsellReviewOverlay } from "@/components/website/UpsellReviewOverlay";
 import { cookies } from "next/headers";
 
@@ -69,9 +67,7 @@ export default async function Collections({
         </div>
         <Pagination currentPage={currentPage} totalPages={totalPages} />
       </div>
-      <QuickviewOverlay />
       <UpsellReviewOverlay cart={cart} />
-      <ShowAlert />
     </>
   );
 }
