@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { MobileNavbarButton } from "./MobileNavbarOverlay";
 import { ShoppingCart, ChevronDown } from "lucide-react";
 import Link from "next/link";
@@ -16,13 +16,13 @@ export default function Navbar({
   itemsInCart: number;
   categories: CategoryType[] | undefined;
 }) {
-  // State hooks
-  const [isScrollingUp, setIsScrollingUp] = useState(true);
-  const [prevScrollPosition, setPrevScrollPosition] = useState(0);
+  // State for navbar visibility and dropdown
+  const [shouldHideNavbar, setShouldHideNavbar] = useState(false);
   const [isCategoriesDropdownVisible, setCategoriesDropdownVisible] =
     useState(false);
 
-  // Refs
+  // Refs for scroll position and categories dropdown
+  const prevScrollRef = useRef(0);
   const categoriesRef = useRef<HTMLDivElement>(null);
 
   // Router and store hooks
@@ -31,31 +31,41 @@ export default function Navbar({
     (state) => state.isVisible
   );
 
-  // Event handler functions
-  const toggleCategoriesDropdown = () => {
-    setCategoriesDropdownVisible(!isCategoriesDropdownVisible);
-  };
+  // Memoized event handler functions
+  const toggleCategoriesDropdown = useCallback(() => {
+    setCategoriesDropdownVisible((prev) => !prev);
+  }, []);
 
-  const handleCategoryClick = (categoryName: string) => {
-    push(`/category/${categoryName.toLowerCase()}`);
-    setCategoriesDropdownVisible(false);
-  };
+  const handleCategoryClick = useCallback(
+    (categoryName: string) => {
+      push(`/category/${categoryName.toLowerCase()}`);
+      setCategoriesDropdownVisible(false);
+    },
+    [push]
+  );
 
-  // Side-effects
+  // Scroll and click-outside handler
   useEffect(() => {
     const handleScroll = () => {
       if (isQuickviewOverlayVisible) return;
 
       const currentScrollPosition = window.scrollY;
-      const scrollDifference = currentScrollPosition - prevScrollPosition;
+      const scrollDifference = currentScrollPosition - prevScrollRef.current;
 
+      // Update navbar visibility only when conditions change
       if (scrollDifference > 0) {
-        setIsScrollingUp(false);
+        // Scrolling down
+        if (currentScrollPosition >= 154 && !shouldHideNavbar) {
+          setShouldHideNavbar(true);
+        }
       } else if (scrollDifference < 0) {
-        setIsScrollingUp(true);
+        // Scrolling up
+        if (shouldHideNavbar) {
+          setShouldHideNavbar(false);
+        }
       }
 
-      setPrevScrollPosition(currentScrollPosition);
+      prevScrollRef.current = currentScrollPosition;
       setCategoriesDropdownVisible(false);
     };
 
@@ -75,38 +85,13 @@ export default function Navbar({
       window.removeEventListener("scroll", handleScroll);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [prevScrollPosition, isQuickviewOverlayVisible]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        categoriesRef.current &&
-        !categoriesRef.current.contains(event.target as Node)
-      ) {
-        setCategoriesDropdownVisible(false);
-      }
-    };
-
-    const handleScroll = () => {
-      if (isCategoriesDropdownVisible) {
-        setCategoriesDropdownVisible(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    window.addEventListener("scroll", handleScroll, true);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      window.removeEventListener("scroll", handleScroll, true);
-    };
-  }, [isCategoriesDropdownVisible]);
+  }, [shouldHideNavbar, isQuickviewOverlayVisible]);
 
   return (
     <nav
       className={clsx(
         "w-full z-20 fixed top-0 border-b transition duration-100 bg-white",
-        !isScrollingUp && prevScrollPosition >= 154 && "-translate-y-full"
+        shouldHideNavbar && "-translate-y-full"
       )}
     >
       <MobileNavbar itemsInCart={itemsInCart} />
@@ -122,8 +107,7 @@ export default function Navbar({
   );
 }
 
-// -- UI Components --
-
+// MobileNavbar component (unchanged)
 function MobileNavbar({ itemsInCart }: { itemsInCart: number }) {
   return (
     <div className="md:hidden flex items-center justify-between w-full max-w-[1080px] mx-auto pl-4 pr-[10px] py-2">
@@ -157,6 +141,7 @@ function MobileNavbar({ itemsInCart }: { itemsInCart: number }) {
   );
 }
 
+// DesktopNavbar component (unchanged)
 function DesktopNavbar({
   itemsInCart,
   categories,
@@ -252,8 +237,7 @@ function DesktopNavbar({
   );
 }
 
-// -- Type Definitions --
-
+// Type Definitions (unchanged)
 type CategoryType = {
   index: number;
   name: string;

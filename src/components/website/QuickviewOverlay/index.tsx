@@ -2,7 +2,7 @@
 
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 import { formatThousands } from "@/lib/utils/common";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { SizeChartOverlay } from "../ProductDetails/SizeChartOverlay";
 import { CartAndUpgradeButtons } from "../CartAndUpgradeButtons";
 import { QuickviewOptions } from "../Options/QuickviewOptions";
@@ -11,7 +11,7 @@ import { X, ChevronRight, Check } from "lucide-react";
 import styles from "./styles.module.css";
 import Image from "next/image";
 import clsx from "clsx";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback, memo } from "react";
 import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 
 export function QuickviewButton({
@@ -28,15 +28,17 @@ export function QuickviewButton({
     (state) => state.setSelectedProduct
   );
 
-  const handleClick = (event: React.MouseEvent) => {
-    if (onClick) {
-      event.stopPropagation();
-      onClick(event);
-    }
-
-    setSelectedProduct(product, cart);
-    showOverlay();
-  };
+  const handleClick = useCallback(
+    (event: React.MouseEvent) => {
+      if (onClick) {
+        event.stopPropagation();
+        onClick(event);
+      }
+      setSelectedProduct(product, cart);
+      showOverlay();
+    },
+    [onClick, product, cart, setSelectedProduct, showOverlay]
+  );
 
   return (
     <button
@@ -71,7 +73,6 @@ export function QuickviewOverlay() {
   }, [isVisible]);
 
   useEffect(() => {
-    // Close overlay on route change, skipping initial render
     if (initialRender.current) {
       initialRender.current = false;
     } else {
@@ -83,19 +84,26 @@ export function QuickviewOverlay() {
     return null;
   }
 
+  const hasColor = selectedProduct.options.colors.length > 0;
+  const hasSize = Object.keys(selectedProduct.options.sizes).length > 0;
+
   return (
     <>
       {isVisible && selectedProduct && (
         <div className="flex justify-center w-full h-dvh z-20 fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-40 backdrop-blur-sm">
-          <MobileProductDetails
+          <MemoizedMobileProductDetails
             selectedProduct={selectedProduct}
             cart={cart}
             hideOverlay={hideOverlay}
+            hasColor={hasColor}
+            hasSize={hasSize}
           />
-          <DesktopProductDetails
+          <MemoizedDesktopProductDetails
             selectedProduct={selectedProduct}
             cart={cart}
             hideOverlay={hideOverlay}
+            hasColor={hasColor}
+            hasSize={hasSize}
           />
         </div>
       )}
@@ -112,20 +120,19 @@ export function QuickviewOverlay() {
   );
 }
 
-// -- UI Components --
-
-function MobileProductDetails({
+const MemoizedMobileProductDetails = memo(function MobileProductDetails({
   selectedProduct,
   cart,
   hideOverlay,
+  hasColor,
+  hasSize,
 }: {
   selectedProduct: ProductWithUpsellType;
   cart: CartType | null;
   hideOverlay: () => void;
+  hasColor: boolean;
+  hasSize: boolean;
 }) {
-  const hasColor = selectedProduct.options.colors.length > 0;
-  const hasSize = Object.keys(selectedProduct.options.sizes).length > 0;
-
   return (
     <div className="md:hidden absolute bottom-0 left-0 right-0 top-16 bg-white rounded-t-[20px] flex flex-col">
       <div className="flex items-center justify-end px-2 py-1">
@@ -148,7 +155,7 @@ function MobileProductDetails({
                   sizes="(max-width: 486px) 244px, 288px"
                   width={288}
                   height={288}
-                  priority={true}
+                  priority={index === 0} // Only prioritize the main image
                 />
               </div>
             )
@@ -375,9 +382,9 @@ function MobileProductDetails({
             <div className="mt-14">
               <div
                 className={`
-                    [&>p>img]:max-w-[500px] [&>p>img]:rounded-xl [&>p>img]:my-7 
-                    [&>:last-child]:mb-0 [&>:first-child]:mt-0 [&>:first-child>img]:mt-0 [&>:last-child>img]:mb-0
-                  `}
+                  [&>p>img]:max-w-[500px] [&>p>img]:rounded-xl [&>p>img]:my-7 
+                  [&>:last-child]:mb-0 [&>:first-child]:mt-0 [&>:first-child>img]:mt-0 [&>:last-child>img]:mb-0
+                `}
                 dangerouslySetInnerHTML={{
                   __html: selectedProduct.description || "",
                 }}
@@ -398,20 +405,25 @@ function MobileProductDetails({
       </div>
     </div>
   );
-}
+});
 
-function DesktopProductDetails({
+const MemoizedDesktopProductDetails = memo(function DesktopProductDetails({
   selectedProduct,
   cart,
   hideOverlay,
+  hasColor,
+  hasSize,
 }: {
   selectedProduct: ProductWithUpsellType;
   cart: CartType | null;
   hideOverlay: () => void;
+  hasColor: boolean;
+  hasSize: boolean;
 }) {
   const { push } = useNavigation();
-  const hasColor = selectedProduct.options.colors.length > 0;
-  const hasSize = Object.keys(selectedProduct.options.sizes).length > 0;
+  const handleNavigation = useCallback(() => {
+    push(`/${selectedProduct.slug}-${selectedProduct.id}`);
+  }, [push, selectedProduct.slug, selectedProduct.id]);
 
   return (
     <div className="hidden md:block w-[calc(100%-40px)] max-w-max max-h-[584px] py-8 absolute top-12 bottom-12 bg-white mx-auto shadow rounded-2xl">
@@ -655,9 +667,7 @@ function DesktopProductDetails({
             <div className="mt-5">
               <button
                 className="flex items-center text-sm hover:underline"
-                onClick={() =>
-                  push(`/${selectedProduct.slug}-${selectedProduct.id}`)
-                }
+                onClick={handleNavigation}
               >
                 <span>All details</span>
                 <ChevronRight size={18} strokeWidth={2} className="-mr-[8px]" />
@@ -675,4 +685,4 @@ function DesktopProductDetails({
       </button>
     </div>
   );
-}
+});

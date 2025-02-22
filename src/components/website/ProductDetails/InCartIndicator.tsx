@@ -1,5 +1,5 @@
 import { useUpsellReviewStore } from "@/zustand/website/upsellReviewStore";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 
