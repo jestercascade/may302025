@@ -52,13 +52,14 @@ const spinnerAnimation = {
 const navigationLoadingIndicatorAnimation = {
   keyframes: {
     navigationLoadingIndicatorAnimation: {
-      "0%": { transform: "translateX(-100%)" },
-      "100%": { transform: "translateX(400%)" },
+      "0%": { transform: "translateX(-100%) scaleX(0.7)", opacity: "0.3" },
+      "50%": { transform: "translateX(0) scaleX(1)", opacity: "1" },
+      "100%": { transform: "translateX(100%) scaleX(0.7)", opacity: "0.3" },
     },
   },
   animation: {
     navigationLoadingIndicatorAnimation:
-      "navigationLoadingIndicatorAnimation 1.2s infinite ease-in-out",
+      "navigationLoadingIndicatorAnimation 1.4s infinite cubic-bezier(0.42, 0, 0.58, 1)",
   },
 };
 

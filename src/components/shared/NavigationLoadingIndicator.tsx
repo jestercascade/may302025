@@ -33,7 +33,7 @@ function LoadingOverlay({ showOverlay }: { showOverlay: boolean }) {
 
   return (
     <div
-      className={`fixed inset-0 z-[99999999999] flex items-center justify-center transition-opacity duration-200 ease-in-out ${
+      className={`fixed inset-0 z-[9999] flex items-center justify-center transition-opacity duration-200 ease-in-out ${
         showOverlay ? "opacity-100" : "opacity-0 pointer-events-none"
       }`}
       style={{
@@ -43,7 +43,15 @@ function LoadingOverlay({ showOverlay }: { showOverlay: boolean }) {
       }}
     >
       <div className="w-full h-[3px] absolute top-0 left-0 overflow-hidden">
-        <div className="h-full w-[25%] bg-amber absolute animate-navigationLoadingIndicatorAnimation"></div>
+        <div
+          className="h-full w-full bg-amber absolute animate-navigationLoadingIndicatorAnimation"
+          style={{
+            maskImage:
+              "linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 2%, rgba(0,0,0,1) 98%, rgba(0,0,0,0) 100%)",
+            WebkitMaskImage:
+              "linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 2%, rgba(0,0,0,1) 98%, rgba(0,0,0,0) 100%)",
+          }}
+        ></div>
       </div>
     </div>
   );
