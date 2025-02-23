@@ -1,18 +1,21 @@
 "use client";
 
+import {
+  SizeChartOverlay,
+  UpsellReviewOverlay,
+} from "@/components/website/DynamicOverlays";
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
-import { formatThousands } from "@/lib/utils/common";
-import { usePathname } from "next/navigation";
-import { SizeChartOverlay } from "../ProductDetails/SizeChartOverlay";
 import { CartAndUpgradeButtons } from "../CartAndUpgradeButtons";
 import { QuickviewOptions } from "../Options/QuickviewOptions";
 import { ImageGallery } from "../ProductDetails/ImageGallery";
+import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
+import { useEffect, useRef, useCallback, memo } from "react";
 import { X, ChevronRight, Check } from "lucide-react";
+import { formatThousands } from "@/lib/utils/common";
+import { usePathname } from "next/navigation";
 import styles from "./styles.module.css";
 import Image from "next/image";
 import clsx from "clsx";
-import { useEffect, useRef, useCallback, memo } from "react";
-import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 
 export function QuickviewButton({
   onClick,
@@ -107,6 +110,7 @@ export function QuickviewOverlay() {
           />
         </div>
       )}
+      <UpsellReviewOverlay cart={cart} />
       <SizeChartOverlay
         productInfo={{
           id: selectedProduct.id,
