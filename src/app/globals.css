@@ -15,7 +15,7 @@
 @layer components {
   .body-scrollbar::-webkit-scrollbar,
   .custom-scrollbar::-webkit-scrollbar {
-    @apply w-[12px] rounded-full bg-white;
+    @apply w-[12px] bg-white;
   }
 
   .body-scrollbar::-webkit-scrollbar-thumb,

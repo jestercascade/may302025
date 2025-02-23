@@ -1,6 +1,5 @@
 .customScrollbar::-webkit-scrollbar {
   width: 12px;
-  border-radius: 9999px;
   background-color: transparent;
 }
 
