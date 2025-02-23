@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { NewProductMenuButton } from "../NewProductOverlay";
 import { NewUpsellMenuButton } from "../NewUpsellOverlay";
 import { NewCollectionMenuButton } from "../Storefront/NewCollectionOverlay";
@@ -14,6 +14,7 @@ import { CreateNewsletterMenuButton } from "../Newsletters/CreateNewsletterOverl
 import { Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 
 export default function Navbar() {
   return (
@@ -30,7 +31,7 @@ function DesktopNavbar() {
 
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
-  const router = useRouter();
+  const { push } = useNavigation();
 
   const isProductListPage = pathname === "/admin/products";
   const isProductEditingPage = /^\/admin\/products\/[a-z0-9-]+-\d{5}$/.test(
@@ -93,7 +94,7 @@ function DesktopNavbar() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      router.push("/");
+      push("/");
     } catch (error) {
       console.error("Error signing out:", error);
     }
@@ -120,7 +121,7 @@ function DesktopNavbar() {
   };
 
   const handleNavigation = (path: string) => {
-    router.push(path);
+    push(path);
   };
 
   const handleDelete = async () => {
@@ -142,7 +143,7 @@ function DesktopNavbar() {
         redirectPath = "/admin/storefront";
       }
 
-      router.push(redirectPath);
+      push(redirectPath);
     } catch (error) {
       console.error("Delete failed:", error);
     } finally {

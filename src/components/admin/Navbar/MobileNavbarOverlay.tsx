@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
 import clsx from "clsx";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { DeleteProductAction } from "@/actions/products";
 import { DeleteUpsellAction } from "@/actions/upsells";
 import { DeleteCollectionAction } from "@/actions/collections";
@@ -14,6 +14,7 @@ import { NewProductMenuButton } from "../NewProductOverlay";
 import { NewUpsellMenuButton } from "../NewUpsellOverlay";
 import { clientAuth } from "@/lib/firebase/client";
 import { CreateNewsletterMenuButton } from "../Newsletters/CreateNewsletterOverlay";
+import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 
 export function MobileNavbarButton() {
   const showMobileNavbarOverlay = useMobileNavbarStore(
@@ -34,7 +35,8 @@ export function MobileNavbarButton() {
 export function MobileNavbarOverlay() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
-  const router = useRouter();
+
+  const { push } = useNavigation();
   const overlayRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
@@ -109,7 +111,7 @@ export function MobileNavbarOverlay() {
   }, [isMobileNavbarOverlayVisible, hideMobileNavbarOverlay]);
 
   const handleNavigation = (path: string) => {
-    router.push(path);
+    push(path);
     hideMobileNavbarOverlay();
   };
 
@@ -148,7 +150,7 @@ export function MobileNavbarOverlay() {
         redirectPath = "/admin/storefront";
       }
 
-      router.push(redirectPath);
+      push(redirectPath);
     } catch (error) {
       console.error("Delete failed:", error);
     } finally {
@@ -171,7 +173,7 @@ export function MobileNavbarOverlay() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      router.push("/");
+      push("/");
     } catch (error) {
       console.error("Error signing out:", error);
     }
