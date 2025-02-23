@@ -1,12 +1,12 @@
 "use client";
 
+import { ComponentPropsWithRef, useCallback, useEffect, useState } from "react";
 import { capitalizeFirstLetter } from "@/lib/utils/common";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
+import { EmblaCarouselType } from "embla-carousel";
 import Image from "next/image";
 import Link from "next/link";
-import { ComponentPropsWithRef, useCallback, useEffect, useState } from "react";
-import { EmblaCarouselType } from "embla-carousel";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export function Categories({
   categories,
