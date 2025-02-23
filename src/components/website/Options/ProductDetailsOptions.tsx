@@ -189,11 +189,9 @@ export const ProductDetailsOptions = memo(function Options({
     <div
       className={clsx(
         "dropdown-container w-max rounded-full relative",
-        {
-          "h-max flex flex-col gap-3 items-start lg:h-8 lg:flex-row lg:items-center":
-            !isStickyBarInCartIndicator,
-        },
-        { "h-8 flex gap-3 items-center": isStickyBarInCartIndicator }
+        !isStickyBarInCartIndicator &&
+          "h-max flex flex-col gap-3 items-start lg:h-8 lg:flex-row lg:items-center",
+        isStickyBarInCartIndicator && "h-8 flex gap-3 items-center"
       )}
     >
       <div className="relative">
