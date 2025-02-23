@@ -8,6 +8,7 @@ import {
   useState,
   useCallback,
   ReactNode,
+  useRef,
 } from "react";
 
 const NavigationContext = createContext<{
@@ -19,11 +20,19 @@ const NavigationContext = createContext<{
 });
 
 function LoadingOverlay({ showOverlay }: { showOverlay: boolean }) {
+  const [isVisible, setIsVisible] = useState(false);
+
   useEffect(() => {
     if (showOverlay) {
+      setIsVisible(true);
       document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "";
+      // Delay hiding the overlay to allow for fade-out animation
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+        document.body.style.overflow = "";
+      }, 200); // Match this with CSS transition duration
+      return () => clearTimeout(timer);
     }
 
     return () => {
@@ -31,10 +40,12 @@ function LoadingOverlay({ showOverlay }: { showOverlay: boolean }) {
     };
   }, [showOverlay]);
 
+  if (!isVisible) return null;
+
   return (
     <div
       className={`fixed inset-0 z-[9999] flex items-center justify-center transition-opacity duration-200 ease-in-out ${
-        showOverlay ? "opacity-100" : "opacity-0 pointer-events-none"
+        showOverlay ? "opacity-100" : "opacity-0"
       }`}
       style={{
         backdropFilter: "blur(2px)",
@@ -60,7 +71,36 @@ function LoadingOverlay({ showOverlay }: { showOverlay: boolean }) {
 export function NavigationProvider({ children }: { children: ReactNode }) {
   const [showOverlay, setShowOverlay] = useState(false);
   const pathname = usePathname();
-  const DELAY_MS = 300; // Show overlay after 300ms delay
+  const navigationStartTime = useRef<number | null>(null);
+  const DELAY_MS = 300; 
+  const MIN_LOADING_TIME = 800;
+  const FADE_DURATION = 200;
+
+  const handleNavigation = useCallback(() => {
+    if (!navigationStartTime.current) {
+      navigationStartTime.current = Date.now();
+      const timer = setTimeout(() => {
+        setShowOverlay(true);
+      }, DELAY_MS);
+      return () => clearTimeout(timer);
+    }
+  }, [DELAY_MS]);
+
+  useEffect(() => {
+    // Reset state when navigation completes
+    if (navigationStartTime.current) {
+      const navigationTime = Date.now() - navigationStartTime.current;
+      const remainingTime = Math.max(
+        MIN_LOADING_TIME - navigationTime, // Ensure minimum display time
+        FADE_DURATION // Always allow time for fade-out animation
+      );
+
+      setTimeout(() => {
+        setShowOverlay(false);
+        navigationStartTime.current = null;
+      }, remainingTime);
+    }
+  }, [pathname]);
 
   const handleLinkClick = useCallback(
     (e: MouseEvent) => {
@@ -68,28 +108,13 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
       const closestLink = target.closest("a");
       if (closestLink) {
         const href = closestLink.getAttribute("href");
-        // Check if the href starts with "/" (internal link) and doesn’t match the current pathname
         if (href?.startsWith("/") && href !== pathname) {
-          const timer = setTimeout(() => {
-            setShowOverlay(true);
-          }, DELAY_MS);
-          return () => clearTimeout(timer);
+          handleNavigation();
         }
       }
     },
-    [pathname, DELAY_MS]
+    [pathname, handleNavigation]
   );
-
-  const triggerLoading = useCallback(() => {
-    const timer = setTimeout(() => {
-      setShowOverlay(true);
-    }, DELAY_MS);
-    return () => clearTimeout(timer);
-  }, [DELAY_MS]);
-
-  useEffect(() => {
-    setShowOverlay(false);
-  }, [pathname]);
 
   useEffect(() => {
     document.addEventListener("click", handleLinkClick);
@@ -97,6 +122,10 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
       document.removeEventListener("click", handleLinkClick);
     };
   }, [handleLinkClick]);
+
+  const triggerLoading = useCallback(() => {
+    return handleNavigation();
+  }, [handleNavigation]);
 
   return (
     <NavigationContext.Provider value={{ triggerLoading, showOverlay }}>
@@ -106,7 +135,6 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Custom hook for programmatic navigation
 export function useNavigation() {
   const router = useRouter();
   const context = useContext(NavigationContext);
@@ -115,7 +143,6 @@ export function useNavigation() {
   return {
     push: useCallback(
       (url: string) => {
-        // Only show overlay if navigating to a different page
         if (url !== pathname) {
           const cleanup = context.triggerLoading();
           router.push(url);
