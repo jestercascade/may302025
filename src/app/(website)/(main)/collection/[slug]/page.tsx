@@ -13,13 +13,13 @@ export default async function Collections({
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ page?: string }>;
 }) {
-  const slug = (await params).slug;
-  const page = Number((await searchParams).page) || 1;
+  const [{ slug }, { page = "1" }] = await Promise.all([params, searchParams]);
+  const currentPage = Number(page) || 1;
+
   const cookieStore = await cookies();
   const deviceIdentifier = cookieStore.get("device_identifier")?.value || "";
-  const cart = await getCart(deviceIdentifier);
 
-  const productFields = [
+  const productFields: (keyof ProductType)[] = [
     "id",
     "name",
     "slug",
@@ -31,18 +31,22 @@ export default async function Collections({
     "highlights",
   ];
 
-  const [collection] =
-    (await getCollections({
+  const [cart, collections] = await Promise.all([
+    getCart(deviceIdentifier),
+    getCollections({
       ids: [slug.split("-").pop() as string],
       includeProducts: true,
       fields: productFields,
-    })) || [];
+    }),
+  ]);
 
+  const [collection] = collections || [];
+  const productsArray = collection?.products || [];
   const itemsPerPage = 2;
-  const totalPages = Math.ceil(collection.products.length / itemsPerPage);
-  const currentPage = Math.max(1, Math.min(page, totalPages));
-  const start = (currentPage - 1) * itemsPerPage;
-  const products = collection.products.slice(start, start + itemsPerPage);
+  const totalPages = Math.ceil(productsArray.length / itemsPerPage);
+  const currentPageAdjusted = Math.max(1, Math.min(currentPage, totalPages));
+  const startIndex = (currentPageAdjusted - 1) * itemsPerPage;
+  const products = productsArray.slice(startIndex, startIndex + itemsPerPage);
 
   if (!products.length) {
     return <CatalogEmptyState />;

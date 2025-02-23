@@ -14,12 +14,15 @@ export default async function Categories({
   params: Promise<{ name: string }>;
   searchParams: Promise<{ page?: string }>;
 }) {
-  const name = (await params).name;
-  const page = Number((await searchParams).page) || 1;
+  // Resolve params and searchParams concurrently
+  const [{ name }, { page = "1" }] = await Promise.all([params, searchParams]);
+  const currentPage = Number(page) || 1;
+
+  // Fetch cookies and get device identifier
   const cookieStore = await cookies();
   const deviceIdentifier = cookieStore.get("device_identifier")?.value || "";
-  const cart = await getCart(deviceIdentifier);
 
+  // Define the product fields to fetch
   const productFields: (keyof ProductType)[] = [
     "id",
     "name",
@@ -32,17 +35,18 @@ export default async function Categories({
     "highlights",
   ];
 
-  const allProducts =
-    ((await getProducts({
-      category: name,
-      fields: productFields,
-    })) as ProductWithUpsellType[]) || [];
+  // Fetch cart and products concurrently
+  const [cart, allProducts] = await Promise.all([
+    getCart(deviceIdentifier),
+    getProducts({ category: name, fields: productFields }),
+  ]);
 
+  const productsArray = (allProducts as ProductWithUpsellType[]) || [];
   const itemsPerPage = 2;
-  const totalPages = Math.ceil(allProducts.length / itemsPerPage);
-  const currentPage = Math.max(1, Math.min(page, totalPages));
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const products = allProducts.slice(startIndex, startIndex + itemsPerPage);
+  const totalPages = Math.ceil(productsArray.length / itemsPerPage);
+  const currentPageAdjusted = Math.max(1, Math.min(currentPage, totalPages));
+  const startIndex = (currentPageAdjusted - 1) * itemsPerPage;
+  const products = productsArray.slice(startIndex, startIndex + itemsPerPage);
 
   const displayName = getDisplayName(name);
 
@@ -57,19 +61,17 @@ export default async function Categories({
           <h2 className="md:w-[calc(100%-20px)] mx-auto mb-4 font-semibold line-clamp-3 md:text-xl">
             {displayName}
           </h2>
-          <div>
-            <div className="select-none w-full flex flex-wrap gap-2 md:gap-0">
-              {products.map((product, index) => (
-                <ProductCard
-                  key={product.id || index}
-                  product={product}
-                  cart={cart}
-                />
-              ))}
-            </div>
+          <div className="select-none w-full flex flex-wrap gap-2 md:gap-0">
+            {products.map((product, index) => (
+              <ProductCard
+                key={product.id || index}
+                product={product}
+                cart={cart}
+              />
+            ))}
           </div>
         </div>
-        <Pagination currentPage={currentPage} totalPages={totalPages} />
+        <Pagination currentPage={currentPageAdjusted} totalPages={totalPages} />
       </div>
       <UpsellReviewOverlay cart={cart} />
     </>
@@ -86,3 +88,4 @@ function getDisplayName(category: string): string {
       return `Women's ${capitalizeFirstLetter(category)}`;
   }
 }
+

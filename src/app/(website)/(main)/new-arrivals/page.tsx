@@ -11,10 +11,11 @@ export default async function NewArrivals({
 }: {
   searchParams: Promise<{ page?: string }>;
 }) {
-  const page = Number((await searchParams).page) || 1;
+  const { page = "1" } = await searchParams;
+  const currentPage = Number(page) || 1;
+
   const cookieStore = await cookies();
   const deviceIdentifier = cookieStore.get("device_identifier")?.value || "";
-  const cart = await getCart(deviceIdentifier);
 
   const productFields: (keyof ProductType)[] = [
     "id",
@@ -28,15 +29,17 @@ export default async function NewArrivals({
     "highlights",
   ];
 
-  const allProducts = (await getProducts({
-    fields: productFields,
-  })) as ProductWithUpsellType[];
+  const [cart, allProducts] = await Promise.all([
+    getCart(deviceIdentifier),
+    getProducts({ fields: productFields }),
+  ]);
 
+  const productsArray = (allProducts as ProductWithUpsellType[]) || [];
   const itemsPerPage = 2;
-  const totalPages = Math.ceil(allProducts.length / itemsPerPage);
-  const currentPage = Math.max(1, Math.min(page, totalPages));
-  const start = (currentPage - 1) * itemsPerPage;
-  const products = allProducts.slice(start, start + itemsPerPage);
+  const totalPages = Math.ceil(productsArray.length / itemsPerPage);
+  const currentPageAdjusted = Math.max(1, Math.min(currentPage, totalPages));
+  const startIndex = (currentPageAdjusted - 1) * itemsPerPage;
+  const products = productsArray.slice(startIndex, startIndex + itemsPerPage);
 
   if (!products.length) {
     return <CatalogEmptyState />;
@@ -54,7 +57,7 @@ export default async function NewArrivals({
             />
           ))}
         </div>
-        <Pagination currentPage={currentPage} totalPages={totalPages} />
+        <Pagination currentPage={currentPageAdjusted} totalPages={totalPages} />
       </div>
       <UpsellReviewOverlay cart={cart} />
     </>
