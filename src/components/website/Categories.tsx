@@ -122,7 +122,7 @@ export const PrevButton: React.FC<PropType> = (props) => {
 
   return (
     <button
-      className="embla__button embla__button--prev disabled:hidden cursor-pointer w-9 h-9 rounded-full absolute left-4 top-[44px] bg-neutral-800 bg-opacity-60 backdrop-blur-sm flex items-center justify-center transition active:bg-opacity-85 lg:hover:bg-opacity-85"
+      className="embla__button embla__button--prev disabled:hidden cursor-pointer w-10 h-10 rounded-full absolute left-4 top-[44px] bg-neutral-800 bg-opacity-60 backdrop-blur-sm flex items-center justify-center transition active:bg-opacity-85 lg:hover:bg-opacity-85"
       type="button"
       {...restProps}
     >
@@ -137,7 +137,7 @@ export const NextButton: React.FC<PropType> = (props) => {
 
   return (
     <button
-      className="embla__button embla__button--next disabled:hidden cursor-pointer w-9 h-9 rounded-full absolute right-4 top-[44px] bg-neutral-800 bg-opacity-60 backdrop-blur-sm flex items-center justify-center transition active:bg-opacity-85 lg:hover:bg-opacity-85"
+      className="embla__button embla__button--next disabled:hidden cursor-pointer w-10 h-10 rounded-full absolute right-4 top-[44px] bg-neutral-800 bg-opacity-60 backdrop-blur-sm flex items-center justify-center transition active:bg-opacity-85 lg:hover:bg-opacity-85"
       type="button"
       {...restProps}
     >

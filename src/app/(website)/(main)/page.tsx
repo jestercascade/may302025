@@ -52,10 +52,13 @@ export default async function Home() {
           categoriesData.categories.length > 0 && (
             <Categories categories={categoriesData.categories} />
           )}
-        <div className="mt-8 max-w-5xl mx-auto flex flex-col gap-10">
-          {combinedCollections.map((collection, index) => (
-            <div key={index}>{renderCollection(collection, cart)}</div>
-          ))}
+        <div className="mt-8 max-w-5xl mx-auto flex flex-col gap-8">
+          {combinedCollections
+            .map((collection) => renderCollection(collection, cart))
+            .filter(Boolean)
+            .map((content, index) => (
+              <div key={index}>{content}</div>
+            ))}
           <div className="px-5">
             <DiscoveryProducts
               page="HOME"
