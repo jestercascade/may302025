@@ -14,9 +14,9 @@ import { BackButton } from "@/components/website/BackButton";
 import { ImageGalleryWrapper } from "@/components/website/ProductDetails/ImageGalleryWrapper";
 import { ProductInfoWrapper } from "@/components/website/ProductDetails/ProductInfoWrapper";
 import { ImageGallery } from "@/components/website/ProductDetails/ImageGallery";
-import { MobileImageCarousel } from "@/components/website/ProductDetails/ImageGallery/MobileImageCarousel";
-import { Check } from "lucide-react";
 import { ProductDetailsOptions } from "@/components/website/Options/ProductDetailsOptions";
+import { Check } from "lucide-react";
+import { MobileImageCarousel } from "@/components/website/ProductDetails/MobileImageCarousel";
 
 export default async function ProductDetails({
   params,
