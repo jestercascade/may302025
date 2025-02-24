@@ -6,7 +6,6 @@ const COOKIE_NAME = "cherlygood_session";
 const ADMIN_ENTRY_KEY = process.env.ADMIN_ENTRY_KEY || "";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 
-// In your /api/auth/session endpoint:
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -25,7 +24,6 @@ export async function POST(request: NextRequest) {
 
     // INITIAL AUTHENTICATION - Only require entry point during first login
     if (isAdminEmail && isAdminEntryPoint) {
-      // Set admin claims as you're already doing
       await adminAuth.setCustomUserClaims(decodedToken.uid, {
         role: "admin",
         grantedAt: Date.now(),
@@ -44,7 +42,7 @@ export async function POST(request: NextRequest) {
         );
       }
     } else {
-      // Regular user - set customer claims as before
+      // Regular user - set customer claims
       await adminAuth.setCustomUserClaims(decodedToken.uid, {
         role: "customer",
         grantedAt: Date.now(),
