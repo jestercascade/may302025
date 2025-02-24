@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { ProductCard } from "./ProductCard";
-import { Spinner } from "@/ui/Spinners/Default";
 import { useProducts } from "@/contexts/ProductsContext";
 
 export default function ShuffledDiscoveryProducts({
@@ -21,13 +20,13 @@ export default function ShuffledDiscoveryProducts({
   const [shuffledProducts, setShuffledProducts] = useState<
     ProductWithUpsellType[]
   >([]);
-  const [isShuffling, setIsShuffling] = useState(false);
+  const [isShuffling, setIsShuffling] = useState(true); // Initialize to true
   const pathname = usePathname();
 
   useEffect(() => {
     if (!allProducts) return;
 
-    setIsShuffling(true);
+    // Shuffling logic
     const filtered = allProducts.filter((product) =>
       page === "HOME" || page === "CART"
         ? !excludeIds.includes(product.id)
@@ -42,12 +41,8 @@ export default function ShuffledDiscoveryProducts({
     }
 
     setShuffledProducts(shuffled.slice(0, 20));
-    setIsShuffling(false);
+    setIsShuffling(false); // Set to false after shuffling
   }, [allProducts, excludeIds, page, pathname]);
-
-  if (!allProducts || isShuffling) {
-    return <Spinner color="gray" />;
-  }
 
   return (
     <div>
@@ -55,9 +50,27 @@ export default function ShuffledDiscoveryProducts({
         <h2 className="font-semibold line-clamp-3 md:text-xl">{heading}</h2>
       </div>
       <div className="select-none w-full flex flex-wrap gap-2 md:gap-0">
-        {shuffledProducts.map((product) => (
-          <ProductCard key={product.id} product={product} cart={cart} />
-        ))}
+        {isShuffling
+          ? Array.from({ length: 3 }).map((_, index) => (
+              <ProductCardSkeleton key={index} />
+            ))
+          : shuffledProducts.map((product) => (
+              <ProductCard key={product.id} product={product} cart={cart} />
+            ))}
+      </div>
+    </div>
+  );
+}
+
+function ProductCardSkeleton() {
+  return (
+    <div className="flex justify-center w-full md:w-[calc(33.33%-8px)] p-[10px] rounded-2xl bg-white">
+      <div className="w-full">
+        <div className="w-full aspect-square rounded-xl overflow-hidden bg-neutral-200 animate-pulse"></div>
+        <div className="pt-2 flex flex-col gap-[6px]">
+          <div className="h-4 bg-neutral-200 animate-pulse rounded-md w-3/4"></div>
+          <div className="h-4 w-1/2 bg-neutral-200 animate-pulse rounded-md"></div>
+        </div>
       </div>
     </div>
   );
