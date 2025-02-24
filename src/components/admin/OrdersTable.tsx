@@ -137,8 +137,49 @@ export default function OrdersTable({
     <>
       {tableData.length > 0 ? (
         <div className="space-y-5">
+          {/* Mobile View */}
+          <div className="md:hidden space-y-3">
+            {tableData.map(
+              ({ id, timestamp, payer, amount, shipping, status }) => {
+                const date = formatDate(timestamp);
+                const time = formatTime(timestamp);
+
+                return (
+                  <div key={id} className="bg-white rounded-xl border">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="flex items-center space-x-3">
+                          <Link
+                            href={`/admin/orders/${id}`}
+                            className="text-blue-600 font-normal hover:underline"
+                          >
+                            {payer.name.firstName} {payer.name.lastName}
+                          </Link>
+                          <span className="text-xs text-gray-600">
+                            {shipping.address.country}
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-600 mt-2">
+                          {date} at {time}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-normal text-gray-900">
+                          ${amount.value}
+                        </div>
+                        <div className="inline-flex px-2 py-0.5 bg-green-50 text-green-700 text-xs rounded-full mt-2">
+                          {capitalizeFirstLetter(status.toLowerCase())}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+            )}
+          </div>
+
           {/* Desktop View */}
-          <div className="hidden lg:block rounded-xl bg-white border overflow-hidden">
+          <div className="hidden md:block rounded-xl bg-white border overflow-hidden">
             <div className="overflow-auto custom-x-scrollbar">
               <table className="w-full text-sm">
                 <thead>
@@ -192,7 +233,7 @@ export default function OrdersTable({
                           <td className="px-4 py-4">
                             <span
                               className={clsx(
-                                "inline-flex px-3 py-1 rounded-full text-sm font-medium",
+                                "inline-flex px-2.5 py-0.5 rounded-full text-sm font-medium",
                                 status.toUpperCase() === "COMPLETED"
                                   ? "bg-green-100 text-green-700"
                                   : "bg-gray-100"
@@ -219,6 +260,7 @@ export default function OrdersTable({
               </table>
             </div>
           </div>
+
           {orders && orders.length > rowsPerPage && (
             <div className="w-max mx-auto flex gap-1 h-9">
               <button
@@ -270,9 +312,10 @@ export default function OrdersTable({
               <Clock className="w-6 h-6 text-gray" />
             </div>
             <div>
-              <h2 className="text-xl font-medium mb-2">No newsletters yet</h2>
+              <h2 className="text-xl font-medium mb-2">No orders yet</h2>
               <p className="text-sm text-gray mb-6">
-                Click the button below to create your first one
+                Your order history will appear here when you start receiving
+                orders
               </p>
             </div>
           </div>

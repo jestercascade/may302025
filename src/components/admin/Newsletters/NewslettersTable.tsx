@@ -97,8 +97,36 @@ export default function NewslettersTable({
     <>
       {tableData.length > 0 ? (
         <div className="space-y-5">
+          {/* Mobile View */}
+          <div className="md:hidden py-2 space-y-2">
+            {tableData.map(({ id, emailSubject, lastSentAt, visibility }) => (
+              <div
+                key={id}
+                className="bg-white rounded-xl border h-[100px] relative"
+              >
+                <div className="p-4">
+                  <div className="flex items-center gap-2.5 mb-2">
+                    <h3 className="font-medium line-clamp-1">{emailSubject}</h3>
+                    {visibility === "DRAFT" && (
+                      <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray rounded-full">
+                        Draft
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {lastSentAt || "Not sent yet"}
+                  </div>
+                  <div className="flex gap-0.5 absolute bottom-2 right-2">
+                    <EditNewsletterButton id={id} />
+                    <SendNewsletterButton id={id} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
           {/* Desktop View */}
-          <div className="hidden lg:block rounded-xl bg-white border overflow-hidden">
+          <div className="hidden md:block rounded-xl bg-white border overflow-hidden">
             <div className="overflow-auto custom-x-scrollbar">
               <table className="w-full text-sm">
                 <thead>
@@ -159,6 +187,7 @@ export default function NewslettersTable({
               </table>
             </div>
           </div>
+
           {newsletters && newsletters.length > rowsPerPage && (
             <div className="w-max mx-auto flex gap-1 h-9">
               <button
