@@ -1,6 +1,6 @@
 import { Banner } from "@/components/website/Banner";
 import { Categories } from "@/components/website/Categories";
-import { DiscoveryProducts } from "@/components/website/DiscoveryProducts";
+import ShuffledDiscoveryProducts from "@/components/website/ShuffledDiscoveryProducts";
 import { FeaturedProducts } from "@/components/website/FeaturedProducts";
 import { getCollections } from "@/actions/get/collections";
 import { getCategories } from "@/actions/get/categories";
@@ -10,6 +10,8 @@ import { getCart } from "@/actions/get/carts";
 import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
+import { Spinner } from "@/ui/Spinners/Default";
 
 export default async function Home() {
   const [collections, categoriesData, pageHero] = await Promise.all([
@@ -59,11 +61,13 @@ export default async function Home() {
               <div key={index}>{content}</div>
             ))}
           <div className="px-5">
-            <DiscoveryProducts
-              page="HOME"
-              excludeIds={excludeIdsFromDiscoveryProducts}
-              cart={cart}
-            />
+            <Suspense fallback={<Spinner color="gray" />}>
+              <ShuffledDiscoveryProducts
+                page="HOME"
+                excludeIds={excludeIdsFromDiscoveryProducts}
+                cart={cart}
+              />
+            </Suspense>
           </div>
         </div>
       </div>

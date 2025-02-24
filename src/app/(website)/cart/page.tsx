@@ -3,7 +3,6 @@ import { UpsellReviewOverlay } from "@/components/website/UpsellReviewOverlay";
 import { adminDb } from "@/lib/firebase/admin";
 import { ResetUpsellReview } from "@/components/website/ResetUpsellReview";
 import { CartItemList } from "@/components/website/CartItemList";
-import { DiscoveryProducts } from "@/components/website/DiscoveryProducts";
 import { getCart } from "@/actions/get/carts";
 import { getProducts } from "@/actions/get/products";
 import Image from "next/image";
@@ -37,35 +36,35 @@ export default async function Cart() {
     (a, b) => b.index - a.index
   );
 
-  const getExcludedProductIds = (cartItems: CartItemType[]): string[] => {
-    const productIds = new Set<string>();
+  // const getExcludedProductIds = (cartItems: CartItemType[]): string[] => {
+  //   const productIds = new Set<string>();
 
-    cartItems.forEach((item: CartItemType) => {
-      if (item.type === "product") {
-        productIds.add(item.baseProductId);
-      } else if (item.type === "upsell" && item.products) {
-        item.products.forEach(
-          (product: {
-            index: number;
-            id: string;
-            slug: string;
-            name: string;
-            mainImage: string;
-            basePrice: number;
-            size: string;
-            color: string;
-          }) => {
-            productIds.add(product.id);
-          }
-        );
-      }
-    });
+  //   cartItems.forEach((item: CartItemType) => {
+  //     if (item.type === "product") {
+  //       productIds.add(item.baseProductId);
+  //     } else if (item.type === "upsell" && item.products) {
+  //       item.products.forEach(
+  //         (product: {
+  //           index: number;
+  //           id: string;
+  //           slug: string;
+  //           name: string;
+  //           mainImage: string;
+  //           basePrice: number;
+  //           size: string;
+  //           color: string;
+  //         }) => {
+  //           productIds.add(product.id);
+  //         }
+  //       );
+  //     }
+  //   });
 
-    return Array.from(productIds);
-  };
+  //   return Array.from(productIds);
+  // };
 
-  const excludeIdsFromDiscoveryProducts =
-    getExcludedProductIds(sortedCartItems);
+  // const excludeIdsFromDiscoveryProducts =
+  //   getExcludedProductIds(sortedCartItems);
 
   return (
     <>
@@ -96,14 +95,14 @@ export default async function Cart() {
               <CartItemList cartItems={sortedCartItems} />
             )}
           </div>
-          <div className="px-5">
+          {/* <div className="px-5">
             <DiscoveryProducts
               page="CART"
               heading="Add These to Your Cart"
               excludeIds={excludeIdsFromDiscoveryProducts}
               cart={cart}
             />
-          </div>
+          </div> */}
         </div>
         <Footer />
       </div>
