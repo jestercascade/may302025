@@ -32,6 +32,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             body: JSON.stringify({ idToken }),
           });
 
+          console.log("response...");
+          console.log(response);
+
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }

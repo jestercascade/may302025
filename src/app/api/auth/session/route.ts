@@ -6,6 +6,7 @@ const COOKIE_NAME = "cherlygood_session";
 const ADMIN_ENTRY_KEY = process.env.ADMIN_ENTRY_KEY || "";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 
+// In your /api/auth/session endpoint:
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -22,35 +23,35 @@ export async function POST(request: NextRequest) {
       `/auth/admin/${ADMIN_ENTRY_KEY}`
     );
 
-    // Handle scenario: admin entry point key is correct, but account is not admin email
-    if (!isAdminEmail && isAdminEntryPoint) {
-      return NextResponse.json({ result: "ACCESS_DENIED" }, { status: 403 });
-    }
-
-    // Handle admin account attempting regular sign-in
-    if (isAdminEmail && !isAdminEntryPoint) {
-      return NextResponse.json(
-        { result: "ADMIN_KEY_REQUIRED" },
-        { status: 403 }
-      );
-    }
-
-    // Handle admin authentication
+    // INITIAL AUTHENTICATION - Only require entry point during first login
     if (isAdminEmail && isAdminEntryPoint) {
+      // Set admin claims as you're already doing
       await adminAuth.setCustomUserClaims(decodedToken.uid, {
         role: "admin",
         grantedAt: Date.now(),
         grantedThrough: "admin_entry",
       });
+    } else if (isAdminEmail) {
+      // For admin email but NOT through entry point:
+      // Check if they ALREADY have admin role in their token
+      if (decodedToken.role === "admin") {
+        // They're already an admin, so continue
+      } else {
+        // They're trying to sign in as admin without using the proper entry point
+        return NextResponse.json(
+          { result: "ADMIN_KEY_REQUIRED" },
+          { status: 403 }
+        );
+      }
     } else {
-      // Set regular user claims
+      // Regular user - set customer claims as before
       await adminAuth.setCustomUserClaims(decodedToken.uid, {
         role: "customer",
         grantedAt: Date.now(),
       });
     }
 
-    // Create session only if all checks pass
+    // Create session
     const twoWeeksInMilliseconds = 60 * 60 * 24 * 14 * 1000;
     const sessionCookie = await adminAuth.createSessionCookie(body.idToken, {
       expiresIn: twoWeeksInMilliseconds,
