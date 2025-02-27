@@ -193,16 +193,14 @@ export function MobileNavbarOverlay() {
         className="absolute right-0 bottom-0 top-0 h-full w-3/4 max-w-80 px-5 pt-3 bg-white"
       >
         <div className="h-full">
-          <button
-            onClick={() => handleNavigation("/admin")}
-            className="h-12 min-w-[168px] w-[168px] ml-[2px] flex items-center justify-center"
-          >
+          <button onClick={() => handleNavigation("/admin")} className="ml-1">
             <Image
-              src="/images/logos/cherlygood-wordmark.svg"
-              alt="Cherly Good"
-              width={160}
-              height={40}
+              src="/logos/cherlygood-1.svg"
+              alt="Cherlygood"
+              width={220}
+              height={27}
               priority
+              className="mt-1"
             />
           </button>
           <div className="flex flex-col gap-4 mt-5 ml-2">

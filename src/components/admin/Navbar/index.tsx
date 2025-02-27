@@ -155,16 +155,14 @@ function DesktopNavbar() {
   return (
     <div className="hidden md:flex justify-between gap-1 flex-col md:flex-row w-full max-w-[1080px] mx-auto p-2 pl-[14px] relative">
       <div className="flex items-center gap-5">
-        <Link
-          href="/admin"
-          className="h-12 min-w-[168px] w-[168px] flex items-center justify-center"
-        >
+        <Link href="/admin">
           <Image
-            src="/images/logos/cherlygood-wordmark.svg"
-            alt="Cherly Good"
-            width={160}
-            height={40}
+            src="/logos/cherlygood-1.svg"
+            alt="Cherlygood"
+            width={232}
+            height={29}
             priority
+            className="mt-0.5"
           />
         </Link>
         <div className="flex gap-3 h-9 *:text-sm *:font-semibold *:h-full *:px-2 *:rounded-full *:flex *:items-center *:justify-center *:transition *:duration-300 *:ease-in-out">
@@ -278,16 +276,14 @@ function DesktopNavbar() {
 function MobileNavbar() {
   return (
     <div className="md:hidden flex items-center justify-between w-full max-w-[1080px] mx-auto p-2 pl-[14px]">
-      <Link
-        href="/admin"
-        className="h-12 min-w-[168px] w-[168px] flex items-center justify-center"
-      >
+      <Link href="/admin" className="ml-1">
         <Image
-          src="/images/logos/cherlygood-wordmark.svg"
-          alt="Cherly Good"
-          width={160}
-          height={40}
+          src="/logos/cherlygood-1.svg"
+          alt="Cherlygood"
+          width={220}
+          height={27}
           priority
+          className="mt-1"
         />
       </Link>
       <MobileNavbarButton />
