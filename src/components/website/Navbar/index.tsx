@@ -107,26 +107,23 @@ export default function Navbar({
   );
 }
 
-// MobileNavbar component (unchanged)
 function MobileNavbar({ itemsInCart }: { itemsInCart: number }) {
   return (
     <div className="md:hidden flex items-center justify-between w-full max-w-[1080px] mx-auto pl-4 pr-[10px] py-2">
-      <Link
-        href="/"
-        className="h-12 min-w-[168px] w-[168px] flex items-center justify-center"
-      >
+      <Link href="/" className="ml-1">
         <Image
-          src="/images/logos/cherlygood-wordmark.svg"
-          alt="Cherly Good"
-          width={160}
-          height={40}
+          src="/logos/cherlygood-1.svg"
+          alt="Cherlygood"
+          width={220}
+          height={27}
           priority
+          className="mt-1"
         />
       </Link>
       <div className="flex items-center gap-2">
         <Link
           href="/cart"
-          className="relative h-12 w-12 rounded-full flex items-center justify-center ease-in-out transition duration-300 active:bg-lightgray lg:hover:bg-lightgray"
+          className="relative h-11 w-11 rounded-full flex gap-1 items-center justify-center transition-colors active:bg-lightgray lg:hover:bg-lightgray"
         >
           <ShoppingCart size={24} strokeWidth={2.5} />
           {itemsInCart > 0 && (
@@ -141,7 +138,6 @@ function MobileNavbar({ itemsInCart }: { itemsInCart: number }) {
   );
 }
 
-// DesktopNavbar component (unchanged)
 function DesktopNavbar({
   itemsInCart,
   categories,
@@ -159,17 +155,15 @@ function DesktopNavbar({
 }) {
   return (
     <div className="hidden md:flex w-full max-w-[1080px] mx-auto px-6 py-2 flex-col md:flex-row justify-between gap-1 relative">
-      <div className="flex items-center gap-5">
-        <Link
-          href="/"
-          className="h-10 min-w-[168px] w-[168px] pl-2 flex items-center"
-        >
+      <div className="flex items-center gap-7">
+        <Link href="/">
           <Image
-            src="/images/logos/cherlygood-wordmark.svg"
-            alt="Cherly Good"
-            width={160}
-            height={40}
+            src="/logos/cherlygood-1.svg"
+            alt="Cherlygood"
+            width={232}
+            height={29}
             priority
+            className="mt-0.5"
           />
         </Link>
         <div className="flex gap-3 h-10">
@@ -237,7 +231,6 @@ function DesktopNavbar({
   );
 }
 
-// Type Definitions (unchanged)
 type CategoryType = {
   index: number;
   name: string;

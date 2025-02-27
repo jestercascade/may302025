@@ -205,8 +205,8 @@ export function StickyBar({
             </button>
           )}
           {productInfo.upsell && (
-            <div className="w-full h-11 min-[840px]:h-12 relative rounded-full flex justify-end">
-              <div className="peer w-full">
+            <div className="w-full max-w-60 h-11 min-[840px]:h-12 relative rounded-full">
+              <div className="peer">
                 <UpsellReviewButton
                   product={{
                     id: productInfo.id,

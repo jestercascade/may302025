@@ -16,7 +16,7 @@ export function MobileNavbarButton() {
   return (
     <button
       onClick={showMobileNavbarOverlay}
-      className="h-12 w-12 rounded-full flex items-center justify-center ease-in-out transition duration-300 active:bg-lightgray lg:hover:bg-lightgray"
+      className="h-11 w-11 rounded-full flex items-center justify-center ease-in-out transition duration-300 active:bg-lightgray lg:hover:bg-lightgray"
       aria-label="Menu"
     >
       <HiMiniBars3 size={26} />

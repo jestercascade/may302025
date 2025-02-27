@@ -168,7 +168,7 @@ export function Footer() {
               FAQs
             </Link>
           </div>
-          <div className="w-[270px]">
+          <div className="min-w-[270px]">
             <h4 className="block text-sm mb-3">
               Subscribe to our newsletter <br /> for exclusive deals and updates
             </h4>

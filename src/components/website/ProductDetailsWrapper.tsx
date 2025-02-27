@@ -99,17 +99,15 @@ export function ProductDetailsWrapper({
     >
       <nav className="w-full border-b bg-white">
         <div className="hidden md:flex w-full max-w-[1080px] mx-auto px-6 py-2 flex-col md:flex-row justify-between gap-1 relative">
-          <div className="flex items-center gap-5">
-            <Link
-              href="/"
-              className="h-10 min-w-[168px] w-[168px] pl-2 flex items-center"
-            >
+          <div className="flex items-center gap-7">
+            <Link href="/">
               <Image
-                src="/images/logos/cherlygood-wordmark.svg"
-                alt="Cherly Good"
-                width={160}
-                height={40}
+                src="/logos/cherlygood-1.svg"
+                alt="Cherlygood"
+                width={232}
+                height={29}
                 priority
+                className="mt-0.5"
               />
             </Link>
             <div className="flex gap-3 h-10">
@@ -160,10 +158,10 @@ export function ProductDetailsWrapper({
               </Link>
             </div>
           </div>
-          <div className="absolute right-4 top-2 md:relative md:right-auto md:top-auto min-w-[160px] w-[160px] h-10 flex items-center justify-end">
+          <div className="absolute right-4 top-2 md:relative md:right-auto md:top-auto h-10 flex items-center justify-end">
             <Link
               href="/cart"
-              className="relative h-11 w-11 rounded-full flex items-center justify-center ease-in-out transition duration-300 active:bg-lightgray lg:hover:bg-lightgray"
+              className="relative h-11 w-11 rounded-full flex gap-1 items-center justify-center transition-colors active:bg-lightgray lg:hover:bg-lightgray"
             >
               <CartIcon size={26} />
               {cart && cart.items.length > 0 && (
@@ -319,7 +317,7 @@ function Footer() {
               FAQs
             </Link>
           </div>
-          <div className="w-[270px]">
+          <div className="min-w-[270px]">
             <h4 className="block text-sm mb-3">
               Subscribe to our newsletter <br /> for exclusive deals and updates
             </h4>
