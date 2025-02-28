@@ -24,6 +24,7 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
         "highlights",
       ];
       const fetchedProducts = await getProducts({ fields: productFields });
+      console.log(1);
       setProducts(fetchedProducts as ProductWithUpsellType[]);
     }
     fetchProducts();

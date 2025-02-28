@@ -11,7 +11,7 @@ import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import { Spinner } from "@/ui/Spinners/Default";
+import { ProductsProvider } from "@/contexts/ProductsContext";
 
 export default async function Home() {
   const [collections, categoriesData, pageHero] = await Promise.all([
@@ -61,13 +61,15 @@ export default async function Home() {
               <div key={index}>{content}</div>
             ))}
           <div className="px-5">
-            <Suspense fallback={<Spinner color="gray" />}>
-              <ShuffledDiscoveryProducts
-                page="HOME"
-                excludeIds={excludeIdsFromDiscoveryProducts}
-                cart={cart}
-              />
-            </Suspense>
+            <ProductsProvider>
+              <Suspense fallback={null}>
+                <ShuffledDiscoveryProducts
+                  page="HOME"
+                  excludeIds={excludeIdsFromDiscoveryProducts}
+                  cart={cart}
+                />
+              </Suspense>
+            </ProductsProvider>
           </div>
         </div>
       </div>

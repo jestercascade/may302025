@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { ProductCard } from "./ProductCard";
 import { useProducts } from "@/contexts/ProductsContext";
@@ -20,28 +20,45 @@ export default function ShuffledDiscoveryProducts({
   const [shuffledProducts, setShuffledProducts] = useState<
     ProductWithUpsellType[]
   >([]);
-  const [isShuffling, setIsShuffling] = useState(true); // Initialize to true
+  const [isShuffling, setIsShuffling] = useState(true);
   const pathname = usePathname();
+  const initialRenderRef = useRef(true);
+  const previousPathnameRef = useRef(pathname);
 
   useEffect(() => {
     if (!allProducts) return;
 
-    // Shuffling logic
-    const filtered = allProducts.filter((product) =>
-      page === "HOME" || page === "CART"
-        ? !excludeIds.includes(product.id)
-        : true
-    );
+    // Initial render or pathname actually changed (not just during navigation events)
+    const shouldShuffle =
+      initialRenderRef.current || previousPathnameRef.current !== pathname;
 
-    // Fisher-Yates shuffle
-    const shuffled = [...filtered];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    if (shouldShuffle) {
+      setIsShuffling(true);
+
+      // Shuffling logic
+      const filtered = allProducts.filter((product) =>
+        page === "HOME" || page === "CART"
+          ? !excludeIds.includes(product.id)
+          : true
+      );
+
+      // Fisher-Yates shuffle
+      const shuffled = [...filtered];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+
+      // Slight delay to avoid double render appearance
+      setTimeout(() => {
+        setShuffledProducts(shuffled.slice(0, 20));
+        setIsShuffling(false);
+      }, 50);
+
+      // Update refs
+      initialRenderRef.current = false;
+      previousPathnameRef.current = pathname;
     }
-
-    setShuffledProducts(shuffled.slice(0, 20));
-    setIsShuffling(false); // Set to false after shuffling
   }, [allProducts, excludeIds, page, pathname]);
 
   return (

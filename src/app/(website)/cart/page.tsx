@@ -8,6 +8,9 @@ import { getProducts } from "@/actions/get/products";
 import Image from "next/image";
 import Link from "next/link";
 import clsx from "clsx";
+import { Suspense } from "react";
+import ShuffledDiscoveryProducts from "@/components/website/ShuffledDiscoveryProducts";
+import { ProductsProvider } from "@/contexts/ProductsContext";
 
 export default async function Cart() {
   const cookieStore = await cookies();
@@ -36,6 +39,36 @@ export default async function Cart() {
     (a, b) => b.index - a.index
   );
 
+  const getExcludedProductIds = (cartItems: CartItemType[]): string[] => {
+    const productIds = new Set<string>();
+
+    cartItems.forEach((item: CartItemType) => {
+      if (item.type === "product") {
+        productIds.add(item.baseProductId);
+      } else if (item.type === "upsell" && item.products) {
+        item.products.forEach(
+          (product: {
+            index: number;
+            id: string;
+            slug: string;
+            name: string;
+            mainImage: string;
+            basePrice: number;
+            size: string;
+            color: string;
+          }) => {
+            productIds.add(product.id);
+          }
+        );
+      }
+    });
+
+    return Array.from(productIds);
+  };
+
+  const excludeIdsFromDiscoveryProducts =
+    getExcludedProductIds(sortedCartItems);
+
   return (
     <>
       <div
@@ -62,6 +95,18 @@ export default async function Cart() {
             {sortedCartItems?.length > 0 && (
               <CartItemList cartItems={sortedCartItems} />
             )}
+          </div>
+          <div className="px-5">
+            <ProductsProvider>
+              <Suspense fallback={null}>
+                <ShuffledDiscoveryProducts
+                  page="CART"
+                  heading="Add These to Your Cart"
+                  excludeIds={excludeIdsFromDiscoveryProducts}
+                  cart={cart}
+                />
+              </Suspense>
+            </ProductsProvider>
           </div>
         </div>
         <Footer />
