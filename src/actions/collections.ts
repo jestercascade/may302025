@@ -4,7 +4,7 @@ import { adminDb } from "@/lib/firebase/admin";
 import { generateId } from "@/lib/utils/common";
 import { currentTimestamp } from "@/lib/utils/common";
 import { revalidatePath } from "next/cache";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export async function CreateCollectionAction(data: {
   title: string;
@@ -58,13 +58,13 @@ export async function CreateCollectionAction(data: {
     revalidatePath("/admin/storefront");
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Collection created successfully",
     };
   } catch (error) {
     console.error("Error creating collection:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to create collection",
     };
   }
@@ -88,7 +88,7 @@ export async function ChangeCollectionIndexAction(data: {
       index > existingCollections.size
     ) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: !collectionOneSnapshot.exists
           ? "Collection not found"
           : "Index is invalid or out of range",
@@ -101,7 +101,7 @@ export async function ChangeCollectionIndexAction(data: {
 
     if (!collectionTwoId) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "No collection found to swap index with",
       };
     }
@@ -128,13 +128,13 @@ export async function ChangeCollectionIndexAction(data: {
     );
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Collection index updated successfully",
     };
   } catch (error) {
     console.error("Error changing collection index:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to update collection index",
     };
   }
@@ -154,7 +154,7 @@ export async function UpdateCollectionAction(data: {
 
     if (!collectionSnapshot.exists) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Collection not found",
       };
     }
@@ -194,13 +194,13 @@ export async function UpdateCollectionAction(data: {
     revalidatePath(`/collections/${collectionData?.slug}-${data.id}`);
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Collection updated successfully",
     };
   } catch (error) {
     console.error("Error updating collection:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to update collection",
     };
   }
@@ -220,12 +220,12 @@ export async function AddProductAction(data: {
     ]);
 
     if (!productSnapshot.exists) {
-      return { type: AlertMessageType.ERROR, message: "Product not found" };
+      return { type: ShowAlertType.ERROR, message: "Product not found" };
     }
 
     if (!collectionSnapshot.exists) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Collection not found",
       };
     }
@@ -241,7 +241,7 @@ export async function AddProductAction(data: {
 
     if (productAlreadyExists) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Product already in the collection",
       };
     }
@@ -271,13 +271,13 @@ export async function AddProductAction(data: {
     paths.forEach((path) => revalidatePath(path));
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Product added to collection successfully",
     };
   } catch (error) {
     console.error("Error adding product to collection:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to add product to collection",
     };
   }
@@ -293,7 +293,7 @@ export async function RemoveProductAction(data: {
     const productSnapshot = await productRef.get();
 
     if (!productSnapshot.exists) {
-      return { type: AlertMessageType.ERROR, message: "Product not found" };
+      return { type: ShowAlertType.ERROR, message: "Product not found" };
     }
 
     const collectionRef = adminDb.collection("collections").doc(collectionId);
@@ -301,7 +301,7 @@ export async function RemoveProductAction(data: {
 
     if (!collectionSnapshot.exists) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Collection not found",
       };
     }
@@ -328,13 +328,13 @@ export async function RemoveProductAction(data: {
     revalidatePath(`/collections/${collectionData.slug}-${collectionId}`);
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Product removed from collection successfully",
     };
   } catch (error) {
     console.error("Error removing product from collection:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to remove product from collection",
     };
   }
@@ -357,12 +357,12 @@ export async function ChangeProductIndexAction(data: {
     ]);
 
     if (!productSnapshot.exists) {
-      return { type: AlertMessageType.ERROR, message: "Product not found" };
+      return { type: ShowAlertType.ERROR, message: "Product not found" };
     }
 
     if (!collectionSnapshot.exists) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Collection not found",
       };
     }
@@ -375,7 +375,7 @@ export async function ChangeProductIndexAction(data: {
       productOneChanges.index > collectionData.products.length
     ) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Index is invalid or out of range",
       };
     }
@@ -392,7 +392,7 @@ export async function ChangeProductIndexAction(data: {
 
     if (!productTwo || !productOne || productOneIndexBeforeSwap === undefined) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Products not found for index swap",
       };
     }
@@ -416,13 +416,13 @@ export async function ChangeProductIndexAction(data: {
     paths.forEach((path) => revalidatePath(path));
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Product index updated successfully",
     };
   } catch (error) {
     console.error("Error updating product index:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to update product index",
     };
   }
@@ -435,7 +435,7 @@ export async function DeleteCollectionAction(data: { id: string }) {
 
     if (!collectionSnap.exists) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Collection not found",
       };
     }
@@ -444,7 +444,7 @@ export async function DeleteCollectionAction(data: { id: string }) {
 
     const reorderResult = await ReorderCollectionIndicesAction();
 
-    if (reorderResult.type === AlertMessageType.ERROR) {
+    if (reorderResult.type === ShowAlertType.ERROR) {
       return reorderResult;
     }
 
@@ -452,13 +452,13 @@ export async function DeleteCollectionAction(data: { id: string }) {
     revalidatePath("/");
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Collection deleted successfully",
     };
   } catch (error) {
     console.error("Error deleting collection:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to delete collection",
     };
   }
@@ -494,13 +494,13 @@ async function ReorderCollectionIndicesAction() {
     revalidatePath("/");
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Collection indices reordered successfully",
     };
   } catch (error) {
     console.error("Error reordering collection indices:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to reorder collection indices",
     };
   }

@@ -1,6 +1,5 @@
 "use client";
 
-import AlertMessage from "@/components/shared/AlertMessage";
 import {
   capitalizeFirstLetter,
   formatDate,
@@ -18,7 +17,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { CreateCollectionAction } from "@/actions/collections";
 import Overlay from "@/ui/Overlay";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export function NewCollectionMenuButton({
   closeMenu,
@@ -82,11 +82,7 @@ export function NewCollectionOverlay() {
   const [isCategoryDropdownOpen, setIsCollectionTypeDropdownOpen] =
     useState(false);
   const [loading, setLoading] = useState(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
+
   const [selectedCollectionType, setSelectedCollectionType] =
     useState(FEATURED);
   const [title, setTitle] = useState<string>("");
@@ -99,7 +95,7 @@ export function NewCollectionOverlay() {
   );
 
   const collectionTypeRef = useRef(null);
-
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.storefront.name);
   const overlayName = useOverlayStore(
@@ -110,18 +106,18 @@ export function NewCollectionOverlay() {
   );
 
   useEffect(() => {
-    if (isOverlayVisible || showAlert) {
+    if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
 
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
-  }, [isOverlayVisible, showAlert]);
+  }, [isOverlayVisible]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -156,23 +152,24 @@ export function NewCollectionOverlay() {
 
   const handleSave = async () => {
     if (!title.trim()) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Enter a collection title");
-      setShowAlert(true);
-      return;
+      return showAlert({
+        message: "Enter a collection title",
+        type: ShowAlertType.ERROR,
+      });
     }
 
     if (!slug.trim()) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Enter a collection slug");
-      setShowAlert(true);
-      return;
+      return showAlert({
+        message: "Enter a collection slug",
+        type: ShowAlertType.ERROR,
+      });
     }
 
     if (!isValidDateRange) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Start date must be before end date");
-      setShowAlert(true);
+      showAlert({
+        message: "Start date must be before end date",
+        type: ShowAlertType.ERROR,
+      });
     } else {
       setLoading(true);
 
@@ -202,14 +199,16 @@ export function NewCollectionOverlay() {
           requestData as RequestDataType
         );
 
-        setAlertMessageType(result.type);
-        setAlertMessage(result.message);
-        setShowAlert(true);
+        showAlert({
+          message: result.message,
+          type: result.type,
+        });
       } catch (error) {
         console.error("Error creating collection:", error);
-        setAlertMessageType(AlertMessageType.ERROR);
-        setAlertMessage("Failed to create collection");
-        setShowAlert(true);
+        showAlert({
+          message: "Failed to create collection",
+          type: ShowAlertType.ERROR,
+        });
       } finally {
         onHideOverlay();
       }
@@ -228,12 +227,6 @@ export function NewCollectionOverlay() {
     setEndDate(
       new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000) // 7 days from today
     );
-  };
-
-  const hideAlertMessage = () => {
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
-    setShowAlert(false);
   };
 
   return (
@@ -544,13 +537,6 @@ export function NewCollectionOverlay() {
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

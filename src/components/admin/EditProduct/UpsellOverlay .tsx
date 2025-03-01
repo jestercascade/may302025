@@ -1,15 +1,15 @@
 "use client";
 
-import AlertMessage from "@/components/shared/AlertMessage";
 import { useState, useEffect } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
 import { ArrowLeft, X, Minus, Plus, Pencil } from "lucide-react";
 import clsx from "clsx";
 import Overlay from "@/ui/Overlay";
-import { AlertMessageType } from "@/lib/sharedTypes";
 import Image from "next/image";
 import { RemoveUpsellAction, SetUpsellAction } from "@/actions/products";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export function UpsellButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -32,14 +32,10 @@ export function UpsellButton({ className }: { className: string }) {
 export function UpsellOverlay({ data }: { data: DataType }) {
   const [loading, setLoading] = useState(false);
   const [upsellId, setUpsellId] = useState("");
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
 
   const { upsell, upsellDetails } = data;
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
   const overlayName = useOverlayStore(
@@ -50,24 +46,18 @@ export function UpsellOverlay({ data }: { data: DataType }) {
   );
 
   useEffect(() => {
-    if (isOverlayVisible || showAlert) {
+    if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
 
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
-  }, [isOverlayVisible, showAlert]);
-
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
-  };
+  }, [isOverlayVisible]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -84,15 +74,15 @@ export function UpsellOverlay({ data }: { data: DataType }) {
 
   const addUpsell = async () => {
     if (!upsellId.trim()) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Upsell ID cannot be empty");
-      setShowAlert(true);
-      return;
+      return showAlert({
+        message: "Upsell ID cannot be empty",
+        type: ShowAlertType.ERROR,
+      });
     } else if (!/^\d{5}$/.test(upsellId.trim())) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Upsell ID must be a 5-digit number");
-      setShowAlert(true);
-      return;
+      return showAlert({
+        message: "Upsell ID must be a 5-digit number",
+        type: ShowAlertType.ERROR,
+      });
     }
 
     setLoading(true);
@@ -102,15 +92,17 @@ export function UpsellOverlay({ data }: { data: DataType }) {
         productId: data.id,
         upsellId,
       });
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
       setUpsellId("");
     } catch (error) {
       console.error("Error setting upsell:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to set upsell");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to set upsell",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoading(false);
     }
@@ -123,14 +115,16 @@ export function UpsellOverlay({ data }: { data: DataType }) {
       const result = await RemoveUpsellAction({
         productId: data.id,
       });
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
     } catch (error) {
       console.error("Error removing upsell:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to remove upsell");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to remove upsell",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoading(false);
     }
@@ -256,13 +250,6 @@ export function UpsellOverlay({ data }: { data: DataType }) {
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

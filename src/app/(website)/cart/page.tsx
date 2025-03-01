@@ -16,7 +16,7 @@ export default async function Cart() {
   const cookieStore = await cookies();
   const deviceIdentifier = cookieStore.get("device_identifier")?.value ?? "";
   const cart = await getCart(deviceIdentifier);
-
+  
   const items = cart?.items || [];
   const productItems = items.filter(
     (item): item is CartProductItemType => item.type === "product"

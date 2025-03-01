@@ -1,9 +1,9 @@
 "use client";
 
 import { AddToCartAction } from "@/actions/cart";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { ShowAlertType } from "@/lib/sharedTypes";
 import { formatThousands } from "@/lib/utils/common";
-import { useAlertStore } from "@/zustand/website/alertStore";
+import { useAlertStore } from "@/zustand/shared/alertStore";
 import { useOptionsStore } from "@/zustand/website/optionsStore";
 import { ReactElement, useEffect, useState, useTransition } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
@@ -55,13 +55,13 @@ export function StickyBar({
     if (hasColor && !selectedColor) {
       return showAlert({
         message: "Select a color",
-        type: AlertMessageType.NEUTRAL,
+        type: ShowAlertType.NEUTRAL,
       });
     }
     if (hasSize && !selectedSize) {
       return showAlert({
         message: "Select a size",
-        type: AlertMessageType.NEUTRAL,
+        type: ShowAlertType.NEUTRAL,
       });
     }
 
@@ -76,12 +76,12 @@ export function StickyBar({
       showAlert({
         message: result.message,
         type:
-          result.type === AlertMessageType.ERROR
-            ? AlertMessageType.ERROR
-            : AlertMessageType.NEUTRAL,
+          result.type === ShowAlertType.ERROR
+            ? ShowAlertType.ERROR
+            : ShowAlertType.NEUTRAL,
       });
 
-      if (result.type === AlertMessageType.SUCCESS) {
+      if (result.type === ShowAlertType.SUCCESS) {
         setIsInCart(true);
       }
     });

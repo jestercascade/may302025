@@ -1,5 +1,5 @@
 import { NavigationProvider } from "@/components/shared/NavigationLoadingIndicator";
-import ShowAlert from "@/components/website/ShowAlert";
+import ShowAlert from "@/components/shared/ShowAlert";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Inter } from "next/font/google";
 import type { Metadata } from "next";

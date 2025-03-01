@@ -1,15 +1,15 @@
 "use client";
 
-import AlertMessage from "@/components/shared/AlertMessage";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
 import { ChangeCollectionIndexAction } from "@/actions/collections";
 import { useItemSelectorStore } from "@/zustand/admin/itemSelectorStore";
-import { AlertMessageType } from "@/lib/sharedTypes";
 import { Repeat, X, ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import Overlay from "@/ui/Overlay";
 import clsx from "clsx";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export function ChangeCollectionIndexButton({
   data,
@@ -42,12 +42,8 @@ export function ChangeCollectionIndexButton({
 
 export function ChangeCollectionIndexOverlay() {
   const [loading, setLoading] = useState<boolean>(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const selectedItem = useItemSelectorStore((state) => state.selectedItem);
   const setSelectedItem = useItemSelectorStore(
@@ -62,28 +58,22 @@ export function ChangeCollectionIndexOverlay() {
   );
 
   useEffect(() => {
-    if (isOverlayVisible || showAlert) {
+    if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
 
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
-  }, [isOverlayVisible, showAlert]);
+  }, [isOverlayVisible]);
 
   const onHideOverlay = () => {
     hideOverlay({ pageName, overlayName });
     setLoading(false);
-  };
-
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
   };
 
   const handleSave = async () => {
@@ -93,14 +83,16 @@ export function ChangeCollectionIndexOverlay() {
         id: selectedItem.id,
         index: Number(selectedItem.index),
       });
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
     } catch (error) {
       console.error("Error updating product index:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to change product index");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to change product index",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       onHideOverlay();
     }
@@ -215,13 +207,6 @@ export function ChangeCollectionIndexOverlay() {
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

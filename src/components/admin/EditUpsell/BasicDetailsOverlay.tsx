@@ -1,7 +1,6 @@
 "use client";
 
 import { UpdateUpsellAction } from "@/actions/upsells";
-import AlertMessage from "@/components/shared/AlertMessage";
 import { formatThousands, isValidRemoteImage } from "@/lib/utils/common";
 import { useState, useEffect, useCallback } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
@@ -10,9 +9,10 @@ import { ArrowLeft, X, Pencil, Minus, Plus } from "lucide-react";
 import clsx from "clsx";
 import Image from "next/image";
 import Overlay from "@/ui/Overlay";
-import { AlertMessageType } from "@/lib/sharedTypes";
 import { ReactSortable } from "react-sortablejs";
 import { getProducts } from "@/actions/get/products";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export function BasicDetailsButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -35,11 +35,6 @@ export function BasicDetailsButton({ className }: { className: string }) {
 export function BasicDetailsOverlay({ data }: { data: DataType }) {
   const [loadingProduct, setLoadingProduct] = useState(false);
   const [loadingSave, setLoadingSave] = useState(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
   const [productId, setProductId] = useState<string>("");
   const [mainImage, setMainImage] = useState(data.mainImage || "");
   const [products, setProducts] = useState<ProductType[]>(data.products || []);
@@ -53,6 +48,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
     data.pricing.discountPercentage?.toString() || ""
   );
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editUpsell.name);
   const overlayName = useOverlayStore(
@@ -63,18 +59,18 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
   );
 
   useEffect(() => {
-    if (isOverlayVisible || showAlert) {
+    if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
 
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
-  }, [isOverlayVisible, showAlert]);
+  }, [isOverlayVisible]);
 
   useEffect(() => {
     const totalBasePrice = products.reduce((total, product) => {
@@ -156,49 +152,54 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
     };
 
     if (!upsellData.mainImage) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Main image is missing");
-      setShowAlert(true);
+      showAlert({
+        message: "Main image is missing",
+        type: ShowAlertType.ERROR,
+      });
       setLoadingSave(false);
       return;
     }
 
     if (!isValidRemoteImage(upsellData.mainImage)) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage(
-        "Invalid main image URL. Try an image from Pinterest or your Firebase Storage."
-      );
-      setShowAlert(true);
+      showAlert({
+        message:
+          "Invalid main image URL. Try an image from Pinterest or your Firebase Storage.",
+        type: ShowAlertType.ERROR,
+      });
       setLoadingSave(false);
       return;
     }
 
     if (upsellData.products.length === 0) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("At least one product is required");
-      setShowAlert(true);
+      showAlert({
+        message: "At least one product is required",
+        type: ShowAlertType.ERROR,
+      });
       setLoadingSave(false);
       return;
     }
 
     if (upsellData.pricing.basePrice <= 0) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Base price must be greater than zero");
-      setShowAlert(true);
+      showAlert({
+        message: "Base price must be greater than zero",
+        type: ShowAlertType.ERROR,
+      });
       setLoadingSave(false);
       return;
     }
 
     try {
       const result = await UpdateUpsellAction(upsellData);
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
     } catch (error) {
       console.error("Error creating upsell:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to create upsell");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to create upsell",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoadingSave(false);
     }
@@ -227,21 +228,24 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
     const trimmedProductId = productId.trim();
 
     if (!trimmedProductId) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Product ID cannot be empty");
-      setShowAlert(true);
+      showAlert({
+        message: "Product ID cannot be empty",
+        type: ShowAlertType.ERROR,
+      });
       return;
     } else if (!/^\d{5}$/.test(trimmedProductId)) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Product ID must be a 5-digit number");
-      setShowAlert(true);
+      showAlert({
+        message: "Product ID must be a 5-digit number",
+        type: ShowAlertType.ERROR,
+      });
       return;
     }
 
     if (products.some((product) => product.id === trimmedProductId)) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Product already added");
-      setShowAlert(true);
+      showAlert({
+        message: "Product already added",
+        type: ShowAlertType.ERROR,
+      });
       return;
     }
 
@@ -270,15 +274,17 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
         ]);
         setProductId("");
       } else {
-        setAlertMessageType(AlertMessageType.ERROR);
-        setAlertMessage("Product not found");
-        setShowAlert(true);
+        showAlert({
+          message: "Product not found",
+          type: ShowAlertType.ERROR,
+        });
       }
     } catch (error) {
       console.error("Error fetching product:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to add product");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to add product",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoadingProduct(false);
     }
@@ -287,9 +293,10 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
   const removeProduct = (productId: string) => {
     setProducts((prevProducts) => {
       if (prevProducts.length === 1) {
-        setAlertMessageType(AlertMessageType.ERROR);
-        setAlertMessage("At least one product is required");
-        setShowAlert(true);
+        showAlert({
+          message: "At least one product is required",
+          type: ShowAlertType.ERROR,
+        });
         return prevProducts;
       }
 
@@ -322,20 +329,12 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
 
   const onHideOverlay = () => {
     hideOverlay({ pageName, overlayName });
-    setAlertMessage("");
-    setShowAlert(false);
     setProductId("");
     setMainImage(data.mainImage || "");
     setProducts(data.products || []);
     setBasePrice(data.pricing.basePrice || 0);
     setSalePrice(data.pricing.salePrice || 0);
     setDiscountPercentage(data.pricing.discountPercentage?.toString() || "");
-  };
-
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
   };
 
   return (
@@ -565,13 +564,6 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
             </button>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

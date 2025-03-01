@@ -1,6 +1,5 @@
 "use client";
 
-import AlertMessage from "@/components/shared/AlertMessage";
 import { useState, useEffect } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
@@ -26,7 +25,8 @@ import {
   ChangeProductIndexButton,
   ChangeProductIndexOverlay,
 } from "./ChangeProductIndexOverlay";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 type ProductWithIndex = ProductType & { index: number };
 
@@ -61,17 +61,13 @@ export function ProductListOverlay({
   const rowsPerPage = 2;
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
   const [productId, setProductId] = useState("");
   const [filter, setFilter] = useState<string>(ALL);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageJumpValue, setPageJumpValue] = useState("1");
   const [isPageInRange, setIsPageInRange] = useState(true);
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editCollection.name);
   const overlayName = useOverlayStore(
@@ -82,18 +78,18 @@ export function ProductListOverlay({
   );
 
   useEffect(() => {
-    if (isOverlayVisible || showAlert) {
+    if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
 
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
-  }, [isOverlayVisible, showAlert]);
+  }, [isOverlayVisible]);
 
   const onHideOverlay = () => {
     setLoading(false);
@@ -105,23 +101,17 @@ export function ProductListOverlay({
     setProductId("");
   };
 
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
-  };
-
   const addProduct = async () => {
     if (!productId.trim()) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Product ID cannot be empty");
-      setShowAlert(true);
-      return;
+      return showAlert({
+        message: "Product ID cannot be empty",
+        type: ShowAlertType.ERROR,
+      });
     } else if (!/^\d{5}$/.test(productId.trim())) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Product ID must be a 5-digit number");
-      setShowAlert(true);
-      return;
+      return showAlert({
+        message: "Product ID must be a 5-digit number",
+        type: ShowAlertType.ERROR,
+      });
     }
 
     setLoading(true);
@@ -131,15 +121,17 @@ export function ProductListOverlay({
         collectionId: data.id,
         productId,
       });
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
       setProductId("");
     } catch (error) {
       console.error("Error adding product:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to add product");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to add product",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoading(false);
       setPageJumpValue("1");
@@ -192,13 +184,12 @@ export function ProductListOverlay({
     const newFilteredProducts = getFilteredProducts(newFilter);
 
     if (newFilteredProducts.length === 0) {
-      setAlertMessageType(AlertMessageType.NEUTRAL);
-      setAlertMessage(
-        `${capitalizeFirstLetter(
+      showAlert({
+        message: `${capitalizeFirstLetter(
           newFilter.toLowerCase()
-        )} filter has no products`
-      );
-      setShowAlert(true);
+        )} filter has no products`,
+        type: ShowAlertType.NEUTRAL,
+      });
     } else {
       setFilter(newFilter);
       setPageJumpValue("1");
@@ -629,13 +620,6 @@ export function ProductListOverlay({
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
       <RemoveProductOverlay collectionId={data.id} />
       <ChangeProductIndexOverlay />

@@ -10,13 +10,13 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
-import AlertMessage from "@/components/shared/AlertMessage";
 import { Spinner } from "@/ui/Spinners/Default";
-import { AlertMessageType } from "@/lib/sharedTypes";
 import { UpdateProductAction } from "@/actions/products";
 import SizesTable from "./SizesTable";
 import Overlay from "@/ui/Overlay";
 import { clsx } from "clsx";
+import { ShowAlertType } from "@/lib/sharedTypes";
+import { useAlertStore } from "@/zustand/shared/alertStore";
 
 export function SizeChartButton() {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -38,11 +38,6 @@ export function SizeChartButton() {
 
 export function SizeChartOverlay({ data }: { data: DataType }) {
   const [loading, setLoading] = useState<boolean>(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
   const [activeTab, setActiveTab] = useState<"inches" | "centimeters">(
     "inches"
   );
@@ -217,11 +212,11 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
       }));
     } catch (error) {
       console.error("Failed to paste data:", error);
-      setAlertMessage(
-        "Failed to paste data. Make sure you have copied a valid table."
-      );
-      setAlertMessageType(AlertMessageType.ERROR);
-      setShowAlert(true);
+      showAlert({
+        message:
+          "Failed to paste data. Make sure you have copied a valid table.",
+        type: ShowAlertType.NEUTRAL,
+      });
     }
   };
 
@@ -262,6 +257,7 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
     });
   };
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
   const overlayName = useOverlayStore(
@@ -272,31 +268,25 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
   );
 
   useEffect(() => {
-    if (isOverlayVisible || showAlert) {
+    if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
 
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
   }, [isOverlayVisible, showAlert]);
 
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
-  };
-
   const handleSave = async () => {
     if (rowsCount < 1 || columnsCount < 2) {
-      setAlertMessage("Table must have at least 1 row and 2 columns.");
-      setAlertMessageType(AlertMessageType.ERROR);
-      setShowAlert(true);
-      return;
+      return showAlert({
+        message: "Table must have at least 1 row and 2 columns.",
+        type: ShowAlertType.ERROR,
+      });
     }
 
     setLoading(true);
@@ -308,14 +298,16 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
       };
 
       const result = await UpdateProductAction(updatedSizes);
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
     } catch (error) {
       console.error("Error updating product:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to update product");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to update product",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoading(false);
       hideOverlay({ pageName, overlayName });
@@ -470,13 +462,6 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { unsubscribeFromNewsletter } from "@/actions/newsletter-subscribers";
-import { useAlertStore } from "@/zustand/website/alertStore";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 import { Mail } from "lucide-react";
 import clsx from "clsx";
 import Link from "next/link";
@@ -23,8 +23,8 @@ export function NewsletterUnsubscribeButton({ email }: { email: string }) {
       showAlert({
         message: response.message,
         type: response.success
-          ? AlertMessageType.SUCCESS
-          : AlertMessageType.NEUTRAL,
+          ? ShowAlertType.SUCCESS
+          : ShowAlertType.NEUTRAL,
       });
 
       if (response.success) {
@@ -33,7 +33,7 @@ export function NewsletterUnsubscribeButton({ email }: { email: string }) {
     } catch {
       showAlert({
         message: "Something went wrong. Please try unsubscribing again later.",
-        type: AlertMessageType.NEUTRAL,
+        type: ShowAlertType.NEUTRAL,
       });
     } finally {
       setIsSubmitting(false);

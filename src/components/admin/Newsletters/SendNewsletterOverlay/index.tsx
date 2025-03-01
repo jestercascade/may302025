@@ -4,17 +4,17 @@ import { useState, useEffect } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
 import { ArrowLeft, Send, Check, X } from "lucide-react";
-import { AlertMessageType } from "@/lib/sharedTypes";
 import { useSelectedNewsletterStore } from "@/zustand/admin/selectedNewsletterStore";
 import { getNewsletters } from "@/actions/get/newsletters";
 import { getNewsletterSubscribers } from "@/actions/get/newsletter-subscribers";
 import { SendNewsletterEmailAction } from "@/actions/newsletters";
-import AlertMessage from "@/components/shared/AlertMessage";
 import { EmailLogo } from "@/components/shared/emails/EmailLogo";
 import { EmailFooter } from "@/components/shared/emails/EmailFooter";
 import styles from "./styles.module.css";
 import juice from "juice";
 import clsx from "clsx";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export function SendNewsletterButton({ id }: { id: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -44,11 +44,6 @@ export function SendNewsletterButton({ id }: { id: string }) {
 export function SendNewsletterOverlay() {
   const [loadingSave, setLoadingSave] = useState(false);
   const [loadingContent, setLoadingContent] = useState(true);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
   const [newsletter, setNewsletter] = useState<NewsletterType | null>(null);
   const [subscribers, setSubscribers] = useState<SubscriberType[] | null>(null);
   const [selectedSubscribers, setSelectedSubscribers] = useState<Set<string>>(
@@ -56,6 +51,7 @@ export function SendNewsletterOverlay() {
   );
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.newsletter.name);
   const overlayName = useOverlayStore(
@@ -123,29 +119,23 @@ export function SendNewsletterOverlay() {
   };
 
   useEffect(() => {
-    if (isOverlayVisible || showAlert) {
+    if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
 
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
-  }, [isOverlayVisible, showAlert]);
+  }, [isOverlayVisible]);
 
   const isAllSelected =
     subscribers &&
     subscribers.length > 0 &&
     selectedSubscribers.size === subscribers.length;
-
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
-  };
 
   const onHideOverlay = () => {
     setLoadingSave(false);
@@ -286,14 +276,16 @@ export function SendNewsletterOverlay() {
         );
       }
 
-      setAlertMessageType(AlertMessageType.SUCCESS);
-      setAlertMessage("Newsletter sent successfully");
-      setShowAlert(true);
+      showAlert({
+        message: "Newsletter sent successfully",
+        type: ShowAlertType.SUCCESS,
+      });
     } catch (error) {
       console.error("Error sending newsletter:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to send newsletter");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to send newsletter",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoadingSave(false);
     }
@@ -586,13 +578,6 @@ export function SendNewsletterOverlay() {
             </div>
           </div>
         </div>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

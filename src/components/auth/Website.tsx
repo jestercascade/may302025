@@ -5,8 +5,8 @@ import { clientAuth, googleProvider } from "@/lib/firebase/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useAlertStore } from "@/zustand/website/alertStore";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export const WebsiteGoogleSignInButton = () => {
   const router = useRouter();
@@ -45,7 +45,7 @@ export const WebsiteGoogleSignInButton = () => {
       if (!result?.user) {
         showAlert({
           message: "Unable to sign in at this time",
-          type: AlertMessageType.NEUTRAL,
+          type: ShowAlertType.NEUTRAL,
         });
         return;
       }
@@ -66,21 +66,21 @@ export const WebsiteGoogleSignInButton = () => {
         if (data.result === "ADMIN_KEY_REQUIRED") {
           showAlert({
             message: "Admin access requires your secure key",
-            type: AlertMessageType.NEUTRAL,
+            type: ShowAlertType.NEUTRAL,
           });
           return;
         }
         if (data.result === "MISSING_TOKEN") {
           showAlert({
             message: "Unable to complete sign-in",
-            type: AlertMessageType.NEUTRAL,
+            type: ShowAlertType.NEUTRAL,
           });
           return;
         }
         if (data.result === "AUTH_FAILED") {
           showAlert({
             message: "Sign-in failed. Please try again",
-            type: AlertMessageType.NEUTRAL,
+            type: ShowAlertType.NEUTRAL,
           });
           return;
         }
@@ -101,7 +101,7 @@ export const WebsiteGoogleSignInButton = () => {
         if (error.message.includes("auth/network-request-failed")) {
           showAlert({
             message: "Unable to connect. Please check your internet connection",
-            type: AlertMessageType.NEUTRAL,
+            type: ShowAlertType.NEUTRAL,
           });
           return;
         }
@@ -109,7 +109,7 @@ export const WebsiteGoogleSignInButton = () => {
 
       showAlert({
         message: "Sign-in failed. Please try again",
-        type: AlertMessageType.NEUTRAL,
+        type: ShowAlertType.NEUTRAL,
       });
     } finally {
       setIsSigningIn(false);

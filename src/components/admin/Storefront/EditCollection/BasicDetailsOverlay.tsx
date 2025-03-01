@@ -1,6 +1,5 @@
 "use client";
 
-import AlertMessage from "@/components/shared/AlertMessage";
 import { useState, useEffect } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
@@ -8,7 +7,8 @@ import { Pencil, ArrowLeft, X } from "lucide-react";
 import clsx from "clsx";
 import Overlay from "@/ui/Overlay";
 import { UpdateCollectionAction } from "@/actions/collections";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export function BasicDetailsButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -39,14 +39,10 @@ export function BasicDetailsOverlay({
   };
 }) {
   const [loading, setLoading] = useState<boolean>(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
   const [title, setTitle] = useState<string>(data.title);
   const [slug, setSlug] = useState<string>(data.slug);
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editCollection.name);
   const overlayName = useOverlayStore(
@@ -57,24 +53,18 @@ export function BasicDetailsOverlay({
   );
 
   useEffect(() => {
-    if (isOverlayVisible || showAlert) {
+    if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
 
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
-  }, [isOverlayVisible, showAlert]);
-
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
-  };
+  }, [isOverlayVisible]);
 
   const onHideOverlay = () => {
     setLoading(false);
@@ -91,14 +81,16 @@ export function BasicDetailsOverlay({
         title,
         slug,
       });
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
     } catch (error) {
       console.error("Error updating collection:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to update collection");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to update collection",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoading(false);
       onHideOverlay();
@@ -223,13 +215,6 @@ export function BasicDetailsOverlay({
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

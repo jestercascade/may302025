@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { CheckCircle } from "lucide-react";
-import { useAlertStore } from "@/zustand/website/alertStore";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 import { useState } from "react";
 import { subscribeToNewsletter } from "@/actions/newsletter-subscribers";
 import clsx from "clsx";
@@ -25,8 +25,8 @@ export function Footer() {
       showAlert({
         message: response.message,
         type: response.success
-          ? AlertMessageType.SUCCESS
-          : AlertMessageType.NEUTRAL,
+          ? ShowAlertType.SUCCESS
+          : ShowAlertType.NEUTRAL,
       });
 
       if (response.success) {
@@ -40,7 +40,7 @@ export function Footer() {
     } catch {
       showAlert({
         message: "Something went wrong. Please try subscribing again later.",
-        type: AlertMessageType.NEUTRAL,
+        type: ShowAlertType.NEUTRAL,
       });
     } finally {
       setIsSubmitting(false);

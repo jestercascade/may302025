@@ -3,8 +3,8 @@
 import { useTransition } from "react";
 import { Trash } from "lucide-react";
 import { RemoveFromCartAction } from "@/actions/cart";
-import { AlertMessageType } from "@/lib/sharedTypes";
-import { useAlertStore } from "@/zustand/website/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
+import { useAlertStore } from "@/zustand/shared/alertStore";
 import { DashSpinner } from "@/ui/Spinners/DashSpinner";
 import clsx from "clsx";
 
@@ -25,9 +25,9 @@ export function RemoveFromCartButton({
       showAlert({
         message: result.message,
         type:
-          result.type === AlertMessageType.ERROR
-            ? AlertMessageType.ERROR
-            : AlertMessageType.NEUTRAL,
+          result.type === ShowAlertType.ERROR
+            ? ShowAlertType.ERROR
+            : ShowAlertType.NEUTRAL,
       });
     });
   };

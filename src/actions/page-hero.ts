@@ -2,7 +2,7 @@
 
 import { adminDb } from "@/lib/firebase/admin";
 import { revalidatePath } from "next/cache";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export async function UpdatePageHeroAction(data: {
   images: {
@@ -27,13 +27,13 @@ export async function UpdatePageHeroAction(data: {
     revalidatePath("/"); // Public main page
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Page hero updated successfully",
     };
   } catch (error) {
     console.error("Error updating page hero:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to update page hero",
     };
   }

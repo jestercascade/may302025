@@ -1,6 +1,5 @@
 "use client";
 
-import AlertMessage from "@/components/shared/AlertMessage";
 import { isGifImage, isValidRemoteImage } from "@/lib/utils/common";
 import { useState, useEffect } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
@@ -8,9 +7,10 @@ import { useOverlayStore } from "@/zustand/admin/overlayStore";
 import { ArrowLeft, X, Image as ImageIcon } from "lucide-react";
 import Overlay from "@/ui/Overlay";
 import { UpdatePageHeroAction } from "@/actions/page-hero";
-import { AlertMessageType } from "@/lib/sharedTypes";
 import Image from "next/image";
 import clsx from "clsx";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export function PageHeroButton({ visibility }: { visibility: string }) {
   const HIDDEN = "HIDDEN";
@@ -66,11 +66,6 @@ export function PageHeroOverlay({
   const VISIBLE = "VISIBLE";
 
   const [loading, setLoading] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
-  const [showAlert, setShowAlert] = useState(false);
   const [title, setTitle] = useState<string>(pageHero.title || "");
   const [desktopImage, setDesktopImage] = useState<string>(
     pageHero.images?.desktop || ""
@@ -85,6 +80,7 @@ export function PageHeroOverlay({
     pageHero.destinationUrl || ""
   );
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.storefront.name);
   const overlayName = useOverlayStore(
@@ -95,18 +91,18 @@ export function PageHeroOverlay({
   );
 
   useEffect(() => {
-    if (isOverlayVisible || showAlert) {
+    if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
 
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
-  }, [isOverlayVisible, showAlert]);
+  }, [isOverlayVisible]);
 
   const handleSave = async () => {
     setLoading(true);
@@ -128,9 +124,10 @@ export function PageHeroOverlay({
           errorMessage = "Please enter a destination URL";
         }
 
-        setAlertMessageType(AlertMessageType.ERROR);
-        setAlertMessage(errorMessage);
-        setShowAlert(true);
+        showAlert({
+          message: errorMessage,
+          type: ShowAlertType.ERROR,
+        });
       } else {
         const result = await UpdatePageHeroAction({
           title,
@@ -141,15 +138,17 @@ export function PageHeroOverlay({
           destinationUrl,
           visibility: visibility as "VISIBLE" | "HIDDEN",
         });
-        setAlertMessageType(result.type);
-        setAlertMessage(result.message);
-        setShowAlert(true);
+        showAlert({
+          message: result.message,
+          type: result.type,
+        });
       }
     } catch (error) {
       console.error("Error updating page hero:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to update page hero");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to update page hero",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoading(false);
     }
@@ -162,12 +161,6 @@ export function PageHeroOverlay({
     setDestinationUrl(pageHero.destinationUrl || "");
     setDesktopImage(pageHero.images?.desktop || "");
     setMobileImage(pageHero.images?.mobile || "");
-  };
-
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
   };
 
   return (
@@ -405,13 +398,6 @@ export function PageHeroOverlay({
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

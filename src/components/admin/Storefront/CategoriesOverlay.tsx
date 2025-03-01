@@ -1,6 +1,5 @@
 "use client";
 
-import AlertMessage from "@/components/shared/AlertMessage";
 import { useState, useEffect } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
@@ -8,8 +7,9 @@ import { ArrowLeft, X } from "lucide-react";
 import clsx from "clsx";
 import Image from "next/image";
 import Overlay from "@/ui/Overlay";
-import { AlertMessageType } from "@/lib/sharedTypes";
 import { UpdateCategoriesAction } from "@/actions/categories";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 const HIDDEN = "HIDDEN";
 const VISIBLE = "VISIBLE";
@@ -60,11 +60,6 @@ export function CategoriesOverlay({
   categoriesData: StoreCategoriesType | null;
 }) {
   const [loading, setLoading] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
-  const [showAlert, setShowAlert] = useState(false);
   const [categorySectionVisibility, setCategorySectionVisibility] = useState(
     categoriesData?.showOnPublicSite
   );
@@ -72,6 +67,7 @@ export function CategoriesOverlay({
     ("VISIBLE" | "HIDDEN")[]
   >(categoriesData?.categories.map((category) => category.visibility) || []);
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.storefront.name);
   const overlayName = useOverlayStore(
@@ -82,14 +78,13 @@ export function CategoriesOverlay({
   );
 
   useEffect(() => {
-    document.body.style.overflow =
-      isOverlayVisible || showAlert ? HIDDEN : VISIBLE;
+    document.body.style.overflow = isOverlayVisible ? HIDDEN : VISIBLE;
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = VISIBLE;
       }
     };
-  }, [isOverlayVisible, showAlert]);
+  }, [isOverlayVisible]);
 
   const handleSave = async () => {
     setLoading(true);
@@ -109,11 +104,11 @@ export function CategoriesOverlay({
       );
 
       if (categorySectionVisibility && allCategoriesHidden) {
-        setAlertMessageType(AlertMessageType.ERROR);
-        setAlertMessage(
-          "Cannot display category section on storefront; all categories are hidden."
-        );
-        setShowAlert(true);
+        showAlert({
+          message:
+            "Cannot display category section on storefront; all categories are hidden.",
+          type: ShowAlertType.ERROR,
+        });
         setLoading(false);
         return;
       }
@@ -123,14 +118,16 @@ export function CategoriesOverlay({
         categories: updatedCategories || [],
       });
 
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
     } catch (error) {
       console.error("Error updating categories:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to update categories");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to update categories",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoading(false);
     }
@@ -143,12 +140,6 @@ export function CategoriesOverlay({
     setVisibilityStates(
       categoriesData?.categories.map((category) => category.visibility) || []
     );
-  };
-
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
   };
 
   const toggleVisibility = (index: number) => {
@@ -322,13 +313,6 @@ export function CategoriesOverlay({
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

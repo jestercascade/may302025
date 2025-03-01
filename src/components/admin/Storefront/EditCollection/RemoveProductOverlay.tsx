@@ -1,6 +1,5 @@
 "use client";
 
-import AlertMessage from "@/components/shared/AlertMessage";
 import { useState } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
@@ -9,7 +8,8 @@ import Overlay from "@/ui/Overlay";
 import { RemoveProductAction } from "@/actions/collections";
 import { CircleX } from "lucide-react";
 import { useItemSelectorStore } from "@/zustand/admin/itemSelectorStore";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export function RemoveProductButton({ id }: { id: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -42,12 +42,8 @@ export function RemoveProductOverlay({
   collectionId: string;
 }) {
   const [loading, setLoading] = useState<boolean>(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const selectedItem = useItemSelectorStore((state) => state.selectedItem);
   const pageName = useOverlayStore((state) => state.pages.editCollection.name);
@@ -58,12 +54,6 @@ export function RemoveProductOverlay({
     (state) => state.pages.editCollection.overlays.removeProduct.isVisible
   );
 
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
-  };
-
   const handleSave = async () => {
     setLoading(true);
 
@@ -72,14 +62,16 @@ export function RemoveProductOverlay({
         collectionId,
         productId: selectedItem.id,
       });
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
     } catch (error) {
       console.error("Error removing product from collection:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to remove product from collection");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to remove product from collection",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoading(false);
       hideOverlay({ pageName, overlayName });
@@ -127,13 +119,6 @@ export function RemoveProductOverlay({
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

@@ -1,18 +1,18 @@
 "use client";
 
 import { CreateNewsletterAction } from "@/actions/newsletters";
-import AlertMessage from "@/components/shared/AlertMessage";
 import { useState, useEffect } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
 import { useNavbarMenuStore } from "@/zustand/admin/navbarMenuStore";
 import { ArrowLeft, X } from "lucide-react";
-import { AlertMessageType } from "@/lib/sharedTypes";
 import TipTapEditor from "@/components/shared/TipTapEditor";
 import { EmailFooter } from "@/components/shared/emails/EmailFooter";
 import { EmailLogo } from "@/components/shared/emails/EmailLogo";
 import Overlay from "@/ui/Overlay";
 import clsx from "clsx";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export function CreateNewsletterMenuButton({
   closeMenu,
@@ -45,16 +45,12 @@ export function CreateNewsletterMenuButton({
 
 export function CreateNewsletterOverlay() {
   const [loading, setLoading] = useState(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
   const [newsletterData, setNewsletterData] = useState({
     emailSubject: "",
     content: "",
   });
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.newsletter.name);
   const overlayName = useOverlayStore(
@@ -65,18 +61,18 @@ export function CreateNewsletterOverlay() {
   );
 
   useEffect(() => {
-    if (isOverlayVisible || showAlert) {
+    if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
 
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
-  }, [isOverlayVisible, showAlert]);
+  }, [isOverlayVisible]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -93,12 +89,6 @@ export function CreateNewsletterOverlay() {
     }));
   };
 
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
-  };
-
   const onHideOverlay = () => {
     setLoading(false);
     hideOverlay({ pageName, overlayName });
@@ -111,10 +101,10 @@ export function CreateNewsletterOverlay() {
 
   const handleSave = async () => {
     if (!newsletterData.emailSubject.trim() || !newsletterData.content.trim()) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Subject and content are required");
-      setShowAlert(true);
-      return;
+      return showAlert({
+        message: "Subject and content are required",
+        type: ShowAlertType.ERROR,
+      });
     }
 
     setLoading(true);
@@ -122,18 +112,20 @@ export function CreateNewsletterOverlay() {
     try {
       const result = await CreateNewsletterAction(newsletterData);
 
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
 
-      if (result.type === AlertMessageType.SUCCESS) {
+      if (result.type === ShowAlertType.SUCCESS) {
         onHideOverlay();
       }
     } catch (error) {
       console.error("Error creating newsletter:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to create newsletter");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to create newsletter",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoading(false);
     }
@@ -242,13 +234,6 @@ export function CreateNewsletterOverlay() {
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

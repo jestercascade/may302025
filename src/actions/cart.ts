@@ -5,7 +5,7 @@ import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
 import { adminDb } from "@/lib/firebase/admin";
 import { generateId } from "@/lib/utils/common";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { ShowAlertType } from "@/lib/sharedTypes";
 import { FieldValue } from "firebase-admin/firestore";
 
 export async function AddToCartAction(data: {
@@ -76,13 +76,13 @@ export async function AddToCartAction(data: {
       revalidatePath("/admin");
 
       return {
-        type: AlertMessageType.SUCCESS,
+        type: ShowAlertType.SUCCESS,
         message: "Item added to cart",
       };
     } catch (error) {
       console.error("Error generating new cart:", error);
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Please reload the page and try again",
       };
     }
@@ -101,7 +101,7 @@ export async function AddToCartAction(data: {
 
       if (productExists) {
         return {
-          type: AlertMessageType.ERROR,
+          type: ShowAlertType.ERROR,
           message: "Item already in cart",
         };
       } else {
@@ -136,7 +136,7 @@ export async function AddToCartAction(data: {
 
       if (upsellExists) {
         return {
-          type: AlertMessageType.ERROR,
+          type: ShowAlertType.ERROR,
           message: "Item already in cart",
         };
       } else {
@@ -163,7 +163,7 @@ export async function AddToCartAction(data: {
     revalidatePath("/admin");
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Item added to cart",
     };
   };
@@ -188,7 +188,7 @@ export async function AddToCartAction(data: {
   } catch (error) {
     console.error("Error adding product to cart:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Please reload the page and try again",
     };
   }
@@ -204,7 +204,7 @@ export async function RemoveFromCartAction({
 
   if (!deviceIdentifier) {
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Cart not found",
     };
   }
@@ -217,7 +217,7 @@ export async function RemoveFromCartAction({
 
     if (snapshot.empty) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Cart not found",
       };
     }
@@ -246,7 +246,7 @@ export async function RemoveFromCartAction({
       revalidatePath("/admin");
 
       return {
-        type: AlertMessageType.SUCCESS,
+        type: ShowAlertType.SUCCESS,
         message: "Cart cleared",
       };
     }
@@ -274,13 +274,13 @@ export async function RemoveFromCartAction({
     revalidatePath("/admin");
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Item removed from cart",
     };
   } catch (error) {
     console.error("Error removing item from cart:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Please reload the page and try again",
     };
   }
@@ -296,7 +296,7 @@ export async function ClearPurchasedItemsAction({
 
   if (!deviceIdentifier) {
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Cart not found",
     };
   }
@@ -309,7 +309,7 @@ export async function ClearPurchasedItemsAction({
 
     if (snapshot.empty) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Cart not found",
       };
     }
@@ -349,13 +349,13 @@ export async function ClearPurchasedItemsAction({
     revalidatePath("/admin");
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Cart updated successfully",
     };
   } catch (error) {
     console.error("Error clearing purchased items from cart:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to update cart",
     };
   }

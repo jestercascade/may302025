@@ -3,7 +3,7 @@
 import { adminDb } from "@/lib/firebase/admin";
 import { generateId, currentTimestamp } from "@/lib/utils/common";
 import { revalidatePath } from "next/cache";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export async function CreateUpsellAction(
   data: Partial<Omit<UpsellType, "products">> & {
@@ -25,12 +25,12 @@ export async function CreateUpsellAction(
     revalidatePath("/admin/upsells");
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Upsell created successfully",
     };
   } catch (error) {
     console.error("Error creating upsell:", error);
-    return { type: AlertMessageType.ERROR, message: "Failed to create upsell" };
+    return { type: ShowAlertType.ERROR, message: "Failed to create upsell" };
   }
 }
 
@@ -67,12 +67,12 @@ export async function UpdateUpsellAction(
     }
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Upsell updated successfully",
     };
   } catch (error) {
     console.error("Error updating upsell:", error);
-    return { type: AlertMessageType.ERROR, message: "Failed to update upsell" };
+    return { type: ShowAlertType.ERROR, message: "Failed to update upsell" };
   }
 }
 
@@ -83,7 +83,7 @@ export async function DeleteUpsellAction(data: { id: string }) {
 
     if (!upsellSnap.exists) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Upsell not found",
       };
     }
@@ -95,13 +95,13 @@ export async function DeleteUpsellAction(data: { id: string }) {
     revalidatePath("/"); // Public main page
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Upsell deleted successfully",
     };
   } catch (error) {
     console.error("Error deleting upsell:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to delete upsell",
     };
   }

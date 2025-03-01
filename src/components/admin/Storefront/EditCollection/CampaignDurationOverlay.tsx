@@ -1,6 +1,5 @@
 "use client";
 
-import AlertMessage from "@/components/shared/AlertMessage";
 import { formatDate } from "@/lib/utils/common";
 import { useState, useEffect } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
@@ -11,7 +10,8 @@ import Overlay from "@/ui/Overlay";
 import { UpdateCollectionAction } from "@/actions/collections";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { ShowAlertType } from "@/lib/sharedTypes";
+import { useAlertStore } from "@/zustand/shared/alertStore";
 
 export function CampaignDurationButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -40,11 +40,6 @@ export function CampaignDurationOverlay({
   };
 }) {
   const [loading, setLoading] = useState<boolean>(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
   const [launchDate, setLaunchDate] = useState<Date | null>(
     new Date(data.campaignDuration.startDate)
   );
@@ -52,6 +47,7 @@ export function CampaignDurationOverlay({
     new Date(data.campaignDuration.endDate)
   );
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editCollection.name);
   const overlayName = useOverlayStore(
@@ -62,24 +58,18 @@ export function CampaignDurationOverlay({
   );
 
   useEffect(() => {
-    if (isOverlayVisible || showAlert) {
+    if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
 
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
-  }, [isOverlayVisible, showAlert]);
-
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
-  };
+  }, [isOverlayVisible]);
 
   const onHideOverlay = () => {
     setLoading(false);
@@ -94,9 +84,10 @@ export function CampaignDurationOverlay({
 
   const handleSave = async () => {
     if (!isValidDateRange) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Start date must be before end date");
-      setShowAlert(true);
+      showAlert({
+        message: "Start date must be before end date",
+        type: ShowAlertType.ERROR,
+      });
     } else {
       setLoading(true);
 
@@ -110,14 +101,16 @@ export function CampaignDurationOverlay({
           id: data.id,
           campaignDuration: campaignDuration,
         });
-        setAlertMessageType(result.type);
-        setAlertMessage(result.message);
-        setShowAlert(true);
+        showAlert({
+          message: result.message,
+          type: result.type,
+        });
       } catch (error) {
         console.error("Error updating collection:", error);
-        setAlertMessageType(AlertMessageType.ERROR);
-        setAlertMessage("Failed to update collection");
-        setShowAlert(true);
+        showAlert({
+          message: "Failed to update collection",
+          type: ShowAlertType.ERROR,
+        });
       } finally {
         onHideOverlay();
       }
@@ -233,13 +226,6 @@ export function CampaignDurationOverlay({
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

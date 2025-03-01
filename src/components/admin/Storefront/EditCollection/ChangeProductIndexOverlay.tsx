@@ -1,6 +1,5 @@
 "use client";
 
-import AlertMessage from "@/components/shared/AlertMessage";
 import { useState } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
@@ -8,8 +7,9 @@ import clsx from "clsx";
 import Overlay from "@/ui/Overlay";
 import { ChangeProductIndexAction } from "@/actions/collections";
 import { useChangeProductIndexStore } from "@/zustand/admin/collections/changeProductIndexStore";
-import { AlertMessageType } from "@/lib/sharedTypes";
 import { Repeat, X, ArrowLeft } from "lucide-react";
+import { ShowAlertType } from "@/lib/sharedTypes";
+import { useAlertStore } from "@/zustand/shared/alertStore";
 
 export function ChangeProductIndexButton({
   collectionId,
@@ -53,12 +53,8 @@ export function ChangeProductIndexButton({
 
 export function ChangeProductIndexOverlay() {
   const [loading, setLoading] = useState<boolean>(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const selectedProduct = useChangeProductIndexStore(
     (state) => state.selectedProduct
@@ -79,12 +75,6 @@ export function ChangeProductIndexOverlay() {
     setLoading(false);
   };
 
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
-  };
-
   const handleSave = async () => {
     setLoading(true);
     try {
@@ -95,14 +85,16 @@ export function ChangeProductIndexOverlay() {
           index: Number(selectedProduct.index),
         },
       });
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
     } catch (error) {
       console.error("Error updating product index:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to update product index");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to update product index",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoading(false);
       onHideOverlay();
@@ -218,13 +210,6 @@ export function ChangeProductIndexOverlay() {
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

@@ -5,8 +5,8 @@ import { clientAuth, googleProvider } from "@/lib/firebase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useAlertStore } from "@/zustand/website/alertStore";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export const AdminGoogleSignInButton = () => {
   const router = useRouter();
@@ -48,7 +48,7 @@ export const AdminGoogleSignInButton = () => {
       if (!result?.user) {
         showAlert({
           message: "Unable to sign in at this time",
-          type: AlertMessageType.NEUTRAL,
+          type: ShowAlertType.NEUTRAL,
         });
         return;
       }
@@ -69,22 +69,22 @@ export const AdminGoogleSignInButton = () => {
         if (data.result === "ACCESS_DENIED") {
           showAlert({
             message: "Not authorized. Visit the homepage to keep shopping.",
-            type: AlertMessageType.NEUTRAL,
+            type: ShowAlertType.NEUTRAL,
           });
         } else if (data.result === "ADMIN_KEY_REQUIRED") {
           showAlert({
             message: "Admin access requires your secure key",
-            type: AlertMessageType.NEUTRAL,
+            type: ShowAlertType.NEUTRAL,
           });
         } else if (data.result === "MISSING_TOKEN") {
           showAlert({
             message: "Unable to complete sign-in",
-            type: AlertMessageType.NEUTRAL,
+            type: ShowAlertType.NEUTRAL,
           });
         } else if (data.result === "AUTH_FAILED") {
           showAlert({
             message: "Sign-in failed. Please try again.",
-            type: AlertMessageType.NEUTRAL,
+            type: ShowAlertType.NEUTRAL,
           });
         } else {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -107,7 +107,7 @@ export const AdminGoogleSignInButton = () => {
         if (error.message.includes("auth/network-request-failed")) {
           showAlert({
             message: "Unable to connect. Please check your internet connection",
-            type: AlertMessageType.NEUTRAL,
+            type: ShowAlertType.NEUTRAL,
           });
           return;
         }
@@ -115,7 +115,7 @@ export const AdminGoogleSignInButton = () => {
 
       showAlert({
         message: "Sign-in failed. Please try again",
-        type: AlertMessageType.NEUTRAL,
+        type: ShowAlertType.NEUTRAL,
       });
     } finally {
       setIsSigningIn(false);

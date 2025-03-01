@@ -3,7 +3,7 @@
 import { adminDb } from "@/lib/firebase/admin";
 import { generateId, currentTimestamp } from "@/lib/utils/common";
 import { revalidatePath } from "next/cache";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 const BATCH_SIZE = 500; // Firestore batch limit
 
@@ -56,13 +56,13 @@ export async function CreateProductAction(data: CreateProductType) {
     revalidatePath("/admin/products");
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Product created successfully",
     };
   } catch (error) {
     console.error("Error creating product:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to create product",
     };
   }
@@ -166,13 +166,13 @@ export async function UpdateProductAction(
     revalidatePath("/checkout");
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Product updated successfully",
     };
   } catch (error) {
     console.error("Error updating product:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to update product",
     };
   }
@@ -190,7 +190,7 @@ export async function SetUpsellAction(data: {
 
     if (!upsellDoc.exists) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Upsell not found",
       };
     }
@@ -218,13 +218,13 @@ export async function SetUpsellAction(data: {
     revalidatePath("/checkout");
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Upsell set to product successfully",
     };
   } catch (error) {
     console.error("Error setting upsell to product:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to set upsell to product",
     };
   }
@@ -253,13 +253,13 @@ export async function RemoveUpsellAction(data: { productId: string }) {
     revalidatePath("/checkout");
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Upsell removed successfully",
     };
   } catch (error) {
     console.error("Error removing upsell from product:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to remove upsell from product",
     };
   }
@@ -272,7 +272,7 @@ export async function DeleteProductAction(data: { id: string }) {
 
     if (!productSnap.exists) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Product not found",
       };
     }
@@ -284,13 +284,13 @@ export async function DeleteProductAction(data: { id: string }) {
     paths.forEach((path) => revalidatePath(path));
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Product deleted successfully",
     };
   } catch (error) {
     console.error("Error deleting product:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to delete product",
     };
   }

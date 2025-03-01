@@ -1,4 +1,4 @@
-export enum AlertMessageType {
+export enum ShowAlertType {
   SUCCESS = "SUCCESS",
   ERROR = "ERROR",
   NEUTRAL = "NEUTRAL",

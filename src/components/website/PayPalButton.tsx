@@ -1,8 +1,8 @@
 "use client";
 
 import { ClearPurchasedItemsAction } from "@/actions/cart";
-import { AlertMessageType } from "@/lib/sharedTypes";
-import { useAlertStore } from "@/zustand/website/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
+import { useAlertStore } from "@/zustand/shared/alertStore";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
@@ -38,7 +38,7 @@ export function PayPalButton({
   ): Promise<boolean> => {
     // First attempt - no alert
     const initialResult = await ClearPurchasedItemsAction({ variantIds });
-    if (initialResult.type !== AlertMessageType.ERROR) {
+    if (initialResult.type !== ShowAlertType.ERROR) {
       return true; // Successfully cleared cart
     }
 
@@ -49,7 +49,7 @@ export function PayPalButton({
       try {
         showAlert({
           message: `Updating cart - Retry ${attempt - 1}/${MAX_RETRIES - 1}`,
-          type: AlertMessageType.NEUTRAL,
+          type: ShowAlertType.NEUTRAL,
         });
 
         // Wait before retry
@@ -57,7 +57,7 @@ export function PayPalButton({
 
         const clearResult = await ClearPurchasedItemsAction({ variantIds });
 
-        if (clearResult.type !== AlertMessageType.ERROR) {
+        if (clearResult.type !== ShowAlertType.ERROR) {
           hideAlert();
           return true;
         }
@@ -135,7 +135,7 @@ export function PayPalButton({
       showAlert({
         message:
           "Your payment couldn't be processed. Please try again or use a different payment method.",
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
       });
       console.error("Failed to capture order:", error);
       throw error;

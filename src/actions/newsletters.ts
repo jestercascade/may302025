@@ -3,7 +3,7 @@
 import { adminDb } from "@/lib/firebase/admin";
 import { generateId, currentTimestamp } from "@/lib/utils/common";
 import { revalidatePath } from "next/cache";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { ShowAlertType } from "@/lib/sharedTypes";
 import { Resend } from "resend";
 
 export async function CreateNewsletterAction(data: {
@@ -28,13 +28,13 @@ export async function CreateNewsletterAction(data: {
     revalidatePath("/admin/newsletters");
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Newsletter created successfully",
     };
   } catch (error) {
     console.error("Error creating newsletter:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to create newsletter",
     };
   }
@@ -51,7 +51,7 @@ export async function UpdateNewsletterAction(
 
     if (!newsletterSnap.exists) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Newsletter not found",
       };
     }
@@ -66,13 +66,13 @@ export async function UpdateNewsletterAction(
     revalidatePath("/admin/newsletters");
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Newsletter updated successfully",
     };
   } catch (error) {
     console.error("Error updating newsletter:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to update newsletter",
     };
   }
@@ -83,7 +83,7 @@ export async function SendNewsletterEmailAction(
   subscribers: string[],
   subject: string
 ): Promise<{
-  type: AlertMessageType;
+  type: ShowAlertType;
   message: string;
   successCount?: number;
   failedEmails?: string[];
@@ -101,7 +101,7 @@ export async function SendNewsletterEmailAction(
 
     if (error) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Failed to send email",
       };
     }
@@ -109,12 +109,12 @@ export async function SendNewsletterEmailAction(
     revalidatePath("/admin/newsletters");
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Email sent successfully",
     };
   } catch {
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to send email",
     };
   }

@@ -3,10 +3,10 @@
 import { useUpsellReviewStore } from "@/zustand/website/upsellReviewStore";
 import { useOverlayStore } from "@/zustand/website/overlayStore";
 import { ProductImagesOverlay } from "../ProductImagesOverlay";
-import { useAlertStore } from "@/zustand/website/alertStore";
+import { useAlertStore } from "@/zustand/shared/alertStore";
 import { useEffect, useState, useTransition } from "react";
 import { AddToCartAction } from "@/actions/cart";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { ShowAlertType } from "@/lib/sharedTypes";
 import { formatThousands } from "@/lib/utils/common";
 import Image from "next/image";
 import clsx from "clsx";
@@ -188,13 +188,13 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
       showAlert({
         message: result.message,
         type:
-          result.type === AlertMessageType.ERROR
-            ? AlertMessageType.ERROR
-            : AlertMessageType.NEUTRAL,
+          result.type === ShowAlertType.ERROR
+            ? ShowAlertType.ERROR
+            : ShowAlertType.NEUTRAL,
       });
 
       setIsAddingToCart(false);
-      if (result.type !== AlertMessageType.ERROR) {
+      if (result.type !== ShowAlertType.ERROR) {
         setIsInCart(true);
       }
     });

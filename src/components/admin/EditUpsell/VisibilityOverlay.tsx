@@ -1,6 +1,5 @@
 "use client";
 
-import AlertMessage from "@/components/shared/AlertMessage";
 import { useState, useEffect } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
@@ -8,7 +7,8 @@ import { ArrowLeft, Pencil } from "lucide-react";
 import clsx from "clsx";
 import Overlay from "@/ui/Overlay";
 import { UpdateUpsellAction } from "@/actions/upsells";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export function VisibilityButton() {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -37,12 +37,8 @@ export function VisibilityOverlay({ data }: { data: DataType }) {
     data.visibility.toUpperCase()
   );
   const [loading, setLoading] = useState<boolean>(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editUpsell.name);
   const overlayName = useOverlayStore(
@@ -53,24 +49,18 @@ export function VisibilityOverlay({ data }: { data: DataType }) {
   );
 
   useEffect(() => {
-    if (isOverlayVisible || showAlert) {
+    if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
 
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
-  }, [isOverlayVisible, showAlert]);
-
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
-  };
+  }, [isOverlayVisible]);
 
   const onHideOverlay = () => {
     setLoading(false);
@@ -85,14 +75,16 @@ export function VisibilityOverlay({ data }: { data: DataType }) {
         id: data.id,
         visibility: selectedVisibility as VisibilityType,
       });
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
     } catch (error) {
       console.error("Error updating upsell:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to update upsell");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to update upsell",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoading(false);
       onHideOverlay();
@@ -253,13 +245,6 @@ export function VisibilityOverlay({ data }: { data: DataType }) {
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

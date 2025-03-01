@@ -1,12 +1,10 @@
 "use client";
 
 import { UpdateNewsletterAction } from "@/actions/newsletters";
-import AlertMessage from "@/components/shared/AlertMessage";
 import { useState, useEffect } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
 import { ArrowLeft, Pencil, X } from "lucide-react";
-import { AlertMessageType } from "@/lib/sharedTypes";
 import TipTapEditor from "@/components/shared/TipTapEditor";
 import { EmailFooter } from "@/components/shared/emails/EmailFooter";
 import { EmailLogo } from "@/components/shared/emails/EmailLogo";
@@ -14,6 +12,8 @@ import Overlay from "@/ui/Overlay";
 import clsx from "clsx";
 import { useSelectedNewsletterStore } from "@/zustand/admin/selectedNewsletterStore";
 import { getNewsletters } from "@/actions/get/newsletters";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export function EditNewsletterButton({ id }: { id: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -43,16 +43,12 @@ export function EditNewsletterButton({ id }: { id: string }) {
 export function EditNewsletterOverlay() {
   const [loadingContent, setLoadingContent] = useState(true);
   const [loadingSave, setLoadingSave] = useState(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
   const [newsletterData, setNewsletterData] = useState({
     emailSubject: "",
     content: "",
   });
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.newsletter.name);
   const overlayName = useOverlayStore(
@@ -79,37 +75,39 @@ export function EditNewsletterOverlay() {
               content: newsletter.content || "",
             });
           } else {
-            setAlertMessageType(AlertMessageType.ERROR);
-            setAlertMessage("Newsletter not found");
-            setShowAlert(true);
+            showAlert({
+              message: "Newsletter not found",
+              type: ShowAlertType.ERROR,
+            });
           }
         } catch (error) {
           console.error("Error fetching newsletter:", error);
-          setAlertMessageType(AlertMessageType.ERROR);
-          setAlertMessage("Failed to load newsletter");
-          setShowAlert(true);
+          showAlert({
+            message: "Failed to load newsletter",
+            type: ShowAlertType.ERROR,
+          });
         } finally {
-          setLoadingContent(false); 
+          setLoadingContent(false);
         }
       }
     };
 
     fetchNewsletterData();
-  }, [isOverlayVisible, selectedNewsletterId]);
+  }, [isOverlayVisible, selectedNewsletterId, showAlert]);
 
   useEffect(() => {
-    if (isOverlayVisible || showAlert) {
+    if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
 
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
-  }, [isOverlayVisible, showAlert]);
+  }, [isOverlayVisible]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -126,12 +124,6 @@ export function EditNewsletterOverlay() {
     }));
   };
 
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
-  };
-
   const onHideOverlay = () => {
     setLoadingSave(false);
     hideOverlay({ pageName, overlayName });
@@ -144,9 +136,10 @@ export function EditNewsletterOverlay() {
 
   const handleSave = async () => {
     if (!newsletterData.emailSubject.trim() || !newsletterData.content.trim()) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Subject and content are required");
-      setShowAlert(true);
+      showAlert({
+        message: "Subject and content are required",
+        type: ShowAlertType.ERROR,
+      });
       return;
     }
 
@@ -158,18 +151,20 @@ export function EditNewsletterOverlay() {
         ...newsletterData,
       });
 
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
 
-      if (result.type === AlertMessageType.SUCCESS) {
+      if (result.type === ShowAlertType.SUCCESS) {
         onHideOverlay();
       }
     } catch (error) {
       console.error("Error updating newsletter:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to update newsletter");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to update newsletter",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoadingSave(false);
     }
@@ -292,13 +287,6 @@ export function EditNewsletterOverlay() {
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

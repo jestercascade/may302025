@@ -1,18 +1,18 @@
 "use client";
 
-import { useAlertStore } from "@/zustand/website/alertStore";
+import { useAlertStore } from "@/zustand/shared/alertStore";
 import { useOptionsStore } from "@/zustand/website/optionsStore";
 import { useTransition, useEffect } from "react";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { ShowAlertType } from "@/lib/sharedTypes";
 import { AddToCartAction } from "@/actions/cart";
 import { Spinner } from "@/ui/Spinners/Default";
-import clsx from "clsx";
 import { useUpsellReviewStore } from "@/zustand/website/upsellReviewStore";
 import { usePathname } from "next/navigation";
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
-import styles from "./styles.module.css";
 import { UpsellReviewButton } from "../UpsellReviewOverlay";
 import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
+import styles from "./styles.module.css";
+import clsx from "clsx";
 
 export function CartAndUpgradeButtons({
   product,
@@ -57,13 +57,13 @@ export function CartAndUpgradeButtons({
     if (hasColor && !selectedColor) {
       return showAlert({
         message: "Select a color",
-        type: AlertMessageType.NEUTRAL,
+        type: ShowAlertType.NEUTRAL,
       });
     }
     if (hasSize && !selectedSize) {
       return showAlert({
         message: "Select a size",
-        type: AlertMessageType.NEUTRAL,
+        type: ShowAlertType.NEUTRAL,
       });
     }
 
@@ -78,12 +78,12 @@ export function CartAndUpgradeButtons({
       showAlert({
         message: result.message,
         type:
-          result.type === AlertMessageType.ERROR
-            ? AlertMessageType.ERROR
-            : AlertMessageType.NEUTRAL,
+          result.type === ShowAlertType.ERROR
+            ? ShowAlertType.ERROR
+            : ShowAlertType.NEUTRAL,
       });
 
-      if (result.type === AlertMessageType.SUCCESS) {
+      if (result.type === ShowAlertType.SUCCESS) {
         setIsInCart(true);
       }
     });

@@ -3,15 +3,15 @@
 import { useState, useEffect } from "react";
 import clsx from "clsx";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
-import AlertMessage from "@/components/shared/AlertMessage";
 import Overlay from "@/ui/Overlay";
-import { AlertMessageType, EmailType } from "@/lib/sharedTypes";
+import { EmailType, ShowAlertType } from "@/lib/sharedTypes";
 import { OrderConfirmedTemplate } from "./emails/OrderConfirmedTemplate";
 import { OrderShippedTemplate } from "./emails/OrderShippedTemplate";
 import { OrderDeliveredTemplate } from "./emails/OrderDeliveredTemplate";
 import { Spinner } from "@/ui/Spinners/Default";
 import { ArrowLeft, ChevronRight, X } from "lucide-react";
 import { OrderStatusEmailAction } from "@/actions/order-status-email";
+import { useAlertStore } from "@/zustand/shared/alertStore";
 
 const overlayNameKeys: Record<EmailType, string> = {
   [EmailType.ORDER_CONFIRMED]: "orderConfirmedEmailPreview",
@@ -129,13 +129,9 @@ export function EmailPreviewOverlay({
   orderId: string;
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
 
   const overlayStore = useOverlayStore((state) => state);
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = overlayStore.hideOverlay;
   const isOverlayVisible =
     overlayStore.pages.orderDetails.overlays[overlayNameKeys[emailType]]
@@ -145,16 +141,13 @@ export function EmailPreviewOverlay({
     overlayStore.pages.orderDetails.overlays[overlayNameKeys[emailType]].name;
 
   useEffect(() => {
-    document.body.style.overflow =
-      isOverlayVisible || showAlert ? "hidden" : "visible";
+    document.body.style.overflow = isOverlayVisible ? "hidden" : "visible";
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
-  }, [isOverlayVisible, showAlert]);
-
-  const closeAlert = () => setShowAlert(false);
+  }, [isOverlayVisible]);
 
   async function handleSendEmail() {
     setIsLoading(true);
@@ -169,14 +162,16 @@ export function EmailPreviewOverlay({
         emailType
       );
 
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
     } catch (error) {
       console.error("Error creating product:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to send email");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to send email",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -290,13 +285,6 @@ export function EmailPreviewOverlay({
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={closeAlert}
-          type={alertMessageType}
-        />
       )}
     </>
   );

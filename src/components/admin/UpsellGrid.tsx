@@ -6,8 +6,8 @@ import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import AlertMessage from "../shared/AlertMessage";
 import { NewUpsellEmptyGridButton } from "./NewUpsellOverlay";
+import { useAlertStore } from "@/zustand/shared/alertStore";
 
 const PUBLISHED = "PUBLISHED";
 const DRAFT = "DRAFT";
@@ -20,17 +20,12 @@ export default function UpsellGrid({
 }: {
   upsells: UpsellType[] | null;
 }) {
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState<boolean>(false);
   const [filter, setFilter] = useState<string>(ALL);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageJumpValue, setPageJumpValue] = useState("1");
   const [isPageInRange, setIsPageInRange] = useState(true);
 
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-  };
+  const showAlert = useAlertStore((state) => state.showAlert);
 
   const getFilteredUpsells = (filter: string) => {
     if (filter === PUBLISHED) {
@@ -53,12 +48,11 @@ export default function UpsellGrid({
     const newFilteredUpsells = getFilteredUpsells(newFilter);
 
     if (newFilteredUpsells.length === 0) {
-      setAlertMessage(
-        `${capitalizeFirstLetter(
+      showAlert({
+        message: `${capitalizeFirstLetter(
           newFilter.toLowerCase()
-        )} filter has no upsells`
-      );
-      setShowAlert(true);
+        )} filter has no upsells`,
+      });
     } else {
       setFilter(newFilter);
       setPageJumpValue("1");
@@ -287,12 +281,6 @@ export default function UpsellGrid({
               </div>
             )}
           </div>
-          {showAlert && (
-            <AlertMessage
-              message={alertMessage}
-              hideAlertMessage={hideAlertMessage}
-            />
-          )}
         </>
       ) : (
         <div className="w-full flex justify-center">

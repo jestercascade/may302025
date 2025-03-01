@@ -4,7 +4,7 @@ import { OrderConfirmedTemplate } from "@/components/admin/emails/OrderConfirmed
 import { OrderShippedTemplate } from "@/components/admin/emails/OrderShippedTemplate";
 import { OrderDeliveredTemplate } from "@/components/admin/emails/OrderDeliveredTemplate";
 import { Resend } from "resend";
-import { EmailType, AlertMessageType } from "@/lib/sharedTypes";
+import { EmailType, ShowAlertType } from "@/lib/sharedTypes";
 import { adminDb } from "@/lib/firebase/admin";
 import { revalidatePath } from "next/cache";
 import { ReactElement } from "react";
@@ -31,9 +31,9 @@ export async function OrderStatusEmailAction(
 ) {
   try {
     const emailStatusResult = await updateEmailStatus(orderId, emailType);
-    if (emailStatusResult.type === AlertMessageType.ERROR) {
+    if (emailStatusResult.type === ShowAlertType.ERROR) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: emailStatusResult.message,
       };
     }
@@ -55,7 +55,7 @@ export async function OrderStatusEmailAction(
 
     if (error) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Failed to send email",
       };
     }
@@ -68,22 +68,22 @@ export async function OrderStatusEmailAction(
 
     revalidatePath("/admin/orders/[id]", "page");
 
-    if (updateResult.type === AlertMessageType.ERROR) {
+    if (updateResult.type === ShowAlertType.ERROR) {
       console.error("Failed to update email count:", updateResult.message);
       return {
-        type: AlertMessageType.SUCCESS,
+        type: ShowAlertType.SUCCESS,
         message: "Email sent successfully",
       };
     }
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Email sent and count updated successfully",
     };
   } catch (error) {
     console.error("Internal server error:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to send email",
     };
   }
@@ -98,7 +98,7 @@ async function updateEmailStatus(orderId: string, emailType: EmailType) {
 
     if (!orderSnap.exists) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Order not found",
       };
     }
@@ -108,14 +108,14 @@ async function updateEmailStatus(orderId: string, emailType: EmailType) {
 
     if (!emailKey) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Invalid email type",
       };
     }
 
     if (!orderData?.emails || !orderData.emails[emailKey]) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Email configuration not found",
       };
     }
@@ -124,7 +124,7 @@ async function updateEmailStatus(orderId: string, emailType: EmailType) {
 
     if (emailStatus.sentCount >= emailStatus.maxAllowed) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Max email send limit reached",
       };
     }
@@ -133,7 +133,7 @@ async function updateEmailStatus(orderId: string, emailType: EmailType) {
   } catch (error) {
     console.error("Error fetching email status:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to fetch email status",
     };
   }
@@ -162,13 +162,13 @@ async function incrementEmailCount(
     await orderRef.set(updatedOrderData);
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: `Email count updated for ${emailKey}`,
     };
   } catch (error) {
     console.error("Error updating email count:", error);
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to update email count",
     };
   }

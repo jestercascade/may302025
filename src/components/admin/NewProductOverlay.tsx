@@ -1,7 +1,6 @@
 "use client";
 
 import { CreateProductAction } from "@/actions/products";
-import AlertMessage from "@/components/shared/AlertMessage";
 import { capitalizeFirstLetter, isValidRemoteImage } from "@/lib/utils/common";
 import { useState, useEffect, useRef } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
@@ -11,8 +10,9 @@ import { ArrowLeft, X, ChevronDown } from "lucide-react";
 import clsx from "clsx";
 import Image from "next/image";
 import Overlay from "@/ui/Overlay";
-import { AlertMessageType } from "@/lib/sharedTypes";
 import { getCategories } from "@/actions/get/categories";
+import { ShowAlertType } from "@/lib/sharedTypes";
+import { useAlertStore } from "@/zustand/shared/alertStore";
 
 export function NewProductMenuButton({ closeMenu }: NewProductMenuButtonType) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -66,11 +66,6 @@ export function NewProductEmptyGridButton() {
 export function NewProductOverlay() {
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("Select");
   const [categories, setCategories] = useState<CategoryType[] | undefined>([]);
   const [formData, setFormData] = useState({
@@ -90,6 +85,7 @@ export function NewProductOverlay() {
     })();
   }, []);
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.products.name);
   const overlayName = useOverlayStore(
@@ -100,18 +96,18 @@ export function NewProductOverlay() {
   );
 
   useEffect(() => {
-    if (isOverlayVisible || showAlert) {
+    if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
 
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
-  }, [isOverlayVisible, showAlert]);
+  }, [isOverlayVisible]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -159,31 +155,32 @@ export function NewProductOverlay() {
 
   const handleSave = async () => {
     if (!formData.category || formData.category.toLowerCase() === "select") {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Select a category");
-      setShowAlert(true);
-      return;
+      return showAlert({
+        message: "Select a category",
+        type: ShowAlertType.ERROR,
+      });
     } else if (!isValidRemoteImage(formData.mainImage)) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage(
-        "Invalid main image URL. Try an image from Pinterest or your Firebase Storage."
-      );
-      setShowAlert(true);
-      return;
+      return showAlert({
+        message:
+          "Invalid main image URL. Try an image from Pinterest or your Firebase Storage.",
+        type: ShowAlertType.ERROR,
+      });
     }
 
     setLoading(true);
 
     try {
       const result = await CreateProductAction(formData);
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
     } catch (error) {
       console.error("Error creating product:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to create product");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to create product",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoading(false);
       onHideOverlay();
@@ -203,19 +200,13 @@ export function NewProductOverlay() {
     });
   };
 
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
-  };
-
   const handleCategoryDropdownClick = () => {
     if (categories?.length === 0) {
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage(
-        "No published categories found. Edit categories in the storefront tab."
-      );
-      setShowAlert(true);
+      showAlert({
+        message:
+          "No published categories found. Edit categories in the storefront tab.",
+        type: ShowAlertType.ERROR,
+      });
     } else {
       setIsCategoryDropdownOpen((prevState) => !prevState);
     }
@@ -422,13 +413,6 @@ export function NewProductOverlay() {
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

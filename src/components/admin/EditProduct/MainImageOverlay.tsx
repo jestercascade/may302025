@@ -1,6 +1,5 @@
 "use client";
 
-import AlertMessage from "@/components/shared/AlertMessage";
 import { isValidRemoteImage } from "@/lib/utils/common";
 import { FormEvent, useState, useEffect } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
@@ -10,7 +9,8 @@ import clsx from "clsx";
 import Image from "next/image";
 import Overlay from "@/ui/Overlay";
 import { UpdateProductAction } from "@/actions/products";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export function MainImageButton() {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -32,13 +32,9 @@ export function MainImageButton() {
 
 export function MainImageOverlay({ data }: { data: DataType }) {
   const [loading, setLoading] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
   const [mainImage, setMainImage] = useState(data.images.main);
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
   const overlayName = useOverlayStore(
@@ -49,28 +45,22 @@ export function MainImageOverlay({ data }: { data: DataType }) {
   );
 
   useEffect(() => {
-    if (isOverlayVisible || showAlert) {
+    if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
 
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
-  }, [isOverlayVisible, showAlert]);
+  }, [isOverlayVisible]);
 
   const onHideOverlay = () => {
     setLoading(false);
     hideOverlay({ pageName, overlayName });
-  };
-
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
   };
 
   const handleSave = async (event: FormEvent) => {
@@ -83,14 +73,16 @@ export function MainImageOverlay({ data }: { data: DataType }) {
         id: data.id,
         images: { main: mainImage, gallery: data.images.gallery },
       });
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
     } catch (error) {
       console.error("Error updating product:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to update product");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to update product",
+        type: ShowAlertType.NEUTRAL,
+      });
     } finally {
       setLoading(false);
       onHideOverlay();
@@ -215,13 +207,6 @@ export function MainImageOverlay({ data }: { data: DataType }) {
             </form>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );

@@ -2,13 +2,13 @@
 
 import { adminDb } from "@/lib/firebase/admin";
 import { revalidatePath } from "next/cache";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 export async function UpdateCategoriesAction(data: StoreCategoriesType) {
   try {
     if (!data.categories || !Array.isArray(data.categories)) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message: "Invalid categories data provided",
       };
     }
@@ -21,7 +21,7 @@ export async function UpdateCategoriesAction(data: StoreCategoriesType) {
         !["VISIBLE", "HIDDEN"].includes(category.visibility)
       ) {
         return {
-          type: AlertMessageType.ERROR,
+          type: ShowAlertType.ERROR,
           message: `Invalid category data for ${
             category.name || "unknown category"
           }`,
@@ -34,7 +34,7 @@ export async function UpdateCategoriesAction(data: StoreCategoriesType) {
       data.categories.every((category) => category.visibility === "HIDDEN")
     ) {
       return {
-        type: AlertMessageType.ERROR,
+        type: ShowAlertType.ERROR,
         message:
           "Cannot show categories section when all categories are hidden",
       };
@@ -57,14 +57,14 @@ export async function UpdateCategoriesAction(data: StoreCategoriesType) {
     revalidatePath("/storefront");
 
     return {
-      type: AlertMessageType.SUCCESS,
+      type: ShowAlertType.SUCCESS,
       message: "Categories updated successfully",
     };
   } catch (error) {
     console.error("Error updating categories:", error);
 
     return {
-      type: AlertMessageType.ERROR,
+      type: ShowAlertType.ERROR,
       message: "Failed to update categories",
     };
   }

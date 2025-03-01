@@ -1,6 +1,5 @@
 "use client";
 
-import AlertMessage from "@/components/shared/AlertMessage";
 import {
   FormEvent,
   useState,
@@ -14,9 +13,10 @@ import { useOverlayStore } from "@/zustand/admin/overlayStore";
 import { ArrowLeft, ChevronDown, X, Pencil } from "lucide-react";
 import Overlay from "@/ui/Overlay";
 import { UpdateProductAction } from "@/actions/products";
-import { AlertMessageType } from "@/lib/sharedTypes";
+import { ShowAlertType } from "@/lib/sharedTypes";
 import { getCategories } from "@/actions/get/categories";
 import clsx from "clsx";
+import { useAlertStore } from "@/zustand/shared/alertStore";
 
 export function BasicDetailsButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -39,14 +39,9 @@ export function BasicDetailsButton({ className }: { className: string }) {
 export function BasicDetailsOverlay({ data }: { data: DataType }) {
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMessageType, setAlertMessageType] = useState<AlertMessageType>(
-    AlertMessageType.NEUTRAL
-  );
   const [selectedCategory, setSelectedCategory] = useState(data.category);
   const [categories, setCategories] = useState<CategoryType[] | undefined>([]);
-  const [isFetchingCategories, setIsFetchingCategories] = useState(false); // New state for fetching categories
+  const [isFetchingCategories, setIsFetchingCategories] = useState(false);
   const [name, setName] = useState(data.name);
   const [slug, setSlug] = useState(data.slug);
   const [basePrice, setBasePrice] = useState(
@@ -59,6 +54,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
 
   const categoryRef = useRef<HTMLDivElement>(null);
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
   const overlayName = useOverlayStore(
@@ -71,29 +67,30 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
   useEffect(() => {
     (async () => {
       try {
-        setIsFetchingCategories(true); // Start fetching
+        setIsFetchingCategories(true);
         const categoriesData = await getCategories();
         setCategories(categoriesData?.categories);
       } catch (error) {
         console.error("Error fetching categories:", error);
-        setAlertMessageType(AlertMessageType.ERROR);
-        setAlertMessage("Couldn't get categories. Please refresh the page.");
-        setShowAlert(true);
+        showAlert({
+          message: "Couldn't get categories. Please refresh the page.",
+          type: ShowAlertType.ERROR,
+        });
       } finally {
-        setIsFetchingCategories(false); // Stop fetching
+        setIsFetchingCategories(false);
       }
     })();
-  }, []);
+  }, [showAlert]);
 
   useEffect(() => {
-    if (isOverlayVisible || showAlert) {
+    if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
     }
-
+  
     return () => {
-      if (!isOverlayVisible && !showAlert) {
+      if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
       }
     };
@@ -158,12 +155,6 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
     hideOverlay({ pageName, overlayName });
   };
 
-  const hideAlertMessage = () => {
-    setShowAlert(false);
-    setAlertMessage("");
-    setAlertMessageType(AlertMessageType.NEUTRAL);
-  };
-
   const handleSave = async (event: FormEvent) => {
     event.preventDefault();
 
@@ -183,14 +174,16 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
 
     try {
       const result = await UpdateProductAction(updatedData);
-      setAlertMessageType(result.type);
-      setAlertMessage(result.message);
-      setShowAlert(true);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
     } catch (error) {
       console.error("Error updating product:", error);
-      setAlertMessageType(AlertMessageType.ERROR);
-      setAlertMessage("Failed to update product");
-      setShowAlert(true);
+      showAlert({
+        message: "Failed to update product",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoading(false);
       onHideOverlay();
@@ -439,13 +432,6 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
             </div>
           </div>
         </Overlay>
-      )}
-      {showAlert && (
-        <AlertMessage
-          message={alertMessage}
-          hideAlertMessage={hideAlertMessage}
-          type={alertMessageType}
-        />
       )}
     </>
   );
