@@ -11,7 +11,6 @@ import {
   PageHeroButton,
   PageHeroOverlay,
 } from "@/components/admin/Storefront/PageHeroOverlay";
-import clsx from "clsx";
 
 export default async function Storefront() {
   const [categoriesData, pageHero, collections] = await Promise.all([
