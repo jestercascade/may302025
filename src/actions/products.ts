@@ -17,29 +17,16 @@ export async function CreateProductAction(data: CreateProductType) {
       slug: data.slug,
       category: data.category,
       description: "",
-      highlights: {
-        headline: "",
-        keyPoints: [],
-      },
+      highlights: { headline: "", keyPoints: [] },
       pricing: {
-        basePrice: data.basePrice,
+        basePrice: Number(data.basePrice),
         salePrice: 0,
         discountPercentage: 0,
       },
-      images: {
-        main: data.mainImage,
-        gallery: [],
-      },
-      options: {
-        colors: [],
-        sizes: {},
-      },
-      seo: {
-        metaTitle: "",
-        metaDescription: "",
-        keywords: [],
-      },
-      visibility: "DRAFT",
+      images: { main: data.mainImage, gallery: [] },
+      options: { colors: [], sizes: {} },
+      seo: { metaTitle: "", metaDescription: "", keywords: [] },
+      visibility: "DRAFT" as const,
       createdAt: currentTime,
       updatedAt: currentTime,
       sourceInfo: {
@@ -61,93 +48,41 @@ export async function CreateProductAction(data: CreateProductType) {
     };
   } catch (error) {
     console.error("Error creating product:", error);
-    return {
-      type: ShowAlertType.ERROR,
-      message: "Failed to create product",
-    };
+    return { type: ShowAlertType.ERROR, message: "Failed to create product" };
   }
 }
 
 export async function UpdateProductAction(
-  data: {
-    id: string;
-    options?: Partial<ProductType["options"]>;
-  } & Partial<Omit<ProductType, "options">>
+  data: { id: string; options?: Partial<ProductType["options"]> } & Partial<
+    Omit<ProductType, "options">
+  >
 ) {
   try {
     const productRef = adminDb.collection("products").doc(data.id);
     const productSnap = await productRef.get();
+    if (!productSnap.exists) {
+      return { type: ShowAlertType.ERROR, message: "Product not found" };
+    }
+
     const currentProduct = productSnap.data() as ProductType;
+    const isPricingChanged = hasPricingChanged(
+      data.pricing,
+      currentProduct.pricing
+    );
 
     const updatedProduct = {
       ...currentProduct,
       ...data,
-      options: {
-        ...currentProduct.options,
-        ...data.options,
-      },
+      options: { ...currentProduct.options, ...data.options },
       updatedAt: currentTimestamp(),
     };
 
     await productRef.set(updatedProduct);
 
-    // Only proceed with upsell updates if pricing changed
-    if (
-      data.pricing &&
-      (data.pricing.basePrice !== currentProduct.pricing.basePrice ||
-        data.pricing.salePrice !== currentProduct.pricing.salePrice)
-    ) {
-      // Find all upsells containing this product
-      const upsellsSnap = await adminDb.collection("upsells").get();
-
-      const upsellsToUpdate: {
-        id: string;
-        products: UpsellType["products"];
-        currentPricing: PricingType;
-      }[] = [];
-
-      upsellsSnap.forEach((doc) => {
-        const upsell = doc.data() as UpsellType;
-        if (upsell.products.some((product) => product.id === data.id)) {
-          const updatedProducts = upsell.products.map((product) =>
-            product.id === data.id
-              ? { ...product, basePrice: Number(data.pricing!.basePrice) || 0 }
-              : product
-          );
-
-          upsellsToUpdate.push({
-            id: doc.id,
-            products: updatedProducts,
-            currentPricing: upsell.pricing,
-          });
-        }
-      });
-
-      // Batch update upsells
-      if (upsellsToUpdate.length > 0) {
-        const batches = [];
-        for (let i = 0; i < upsellsToUpdate.length; i += BATCH_SIZE) {
-          batches.push(upsellsToUpdate.slice(i, i + BATCH_SIZE));
-        }
-
-        for (const batchItems of batches) {
-          const batch = adminDb.batch();
-
-          batchItems.forEach(({ id, products, currentPricing }) => {
-            const newPricing = calculateUpsellPricing(products, currentPricing);
-            batch.update(adminDb.collection("upsells").doc(id), {
-              products,
-              pricing: newPricing,
-              updatedAt: currentTimestamp(),
-            });
-          });
-
-          await batch.commit();
-        }
-      }
+    if (isPricingChanged && data.pricing?.basePrice !== undefined) {
+      await updateRelatedUpsells(data.id, Number(data.pricing.basePrice));
     }
 
-    // Revalidate paths
     revalidatePath(
       `/admin/products/${currentProduct.slug}-${currentProduct.id}`
     );
@@ -171,10 +106,7 @@ export async function UpdateProductAction(
     };
   } catch (error) {
     console.error("Error updating product:", error);
-    return {
-      type: ShowAlertType.ERROR,
-      message: "Failed to update product",
-    };
+    return { type: ShowAlertType.ERROR, message: "Failed to update product" };
   }
 }
 
@@ -189,19 +121,18 @@ export async function SetUpsellAction(data: {
     ]);
 
     if (!upsellDoc.exists) {
-      return {
-        type: ShowAlertType.ERROR,
-        message: "Upsell not found",
-      };
+      return { type: ShowAlertType.ERROR, message: "Upsell not found" };
+    }
+    if (!productDoc.exists) {
+      return { type: ShowAlertType.ERROR, message: "Product not found" };
     }
 
-    await adminDb.collection("products").doc(data.productId).update({
-      upsell: data.upsellId,
-    });
-
-    // Revalidate paths
+    await adminDb
+      .collection("products")
+      .doc(data.productId)
+      .update({ upsell: data.upsellId });
     const productData = productDoc.data() as ProductType;
-    // Revalidate paths
+
     revalidatePath(`/admin/products/${productData.slug}-${productData.id}`);
     revalidatePath("/admin/products");
     revalidatePath("/admin/upsells/[id]", "page");
@@ -234,13 +165,13 @@ export async function RemoveUpsellAction(data: { productId: string }) {
   try {
     const productRef = adminDb.collection("products").doc(data.productId);
     const productSnap = await productRef.get();
+    if (!productSnap.exists) {
+      return { type: ShowAlertType.ERROR, message: "Product not found" };
+    }
+
     const productData = productSnap.data() as ProductType;
+    await productRef.update({ upsell: "" });
 
-    await productRef.update({
-      upsell: "",
-    });
-
-    // Revalidate paths
     revalidatePath(`/admin/products/${productData.slug}-${productData.id}`);
     revalidatePath("/admin/products");
     revalidatePath("/admin/upsells/[id]", "page");
@@ -269,19 +200,27 @@ export async function DeleteProductAction(data: { id: string }) {
   try {
     const productRef = adminDb.collection("products").doc(data.id);
     const productSnap = await productRef.get();
-
     if (!productSnap.exists) {
+      return { type: ShowAlertType.ERROR, message: "Product not found" };
+    }
+
+    const productData = productSnap.data() as ProductType;
+    const upsellsSnap = await adminDb
+      .collection("upsells")
+      .where("products", "array-contains", { id: data.id })
+      .get();
+
+    if (!upsellsSnap.empty) {
       return {
         type: ShowAlertType.ERROR,
-        message: "Product not found",
+        message: "Cannot delete product used in active upsells",
       };
     }
 
     await productRef.delete();
 
-    const paths = ["/admin/products", "/"];
-
-    paths.forEach((path) => revalidatePath(path));
+    revalidatePath("/");
+    revalidatePath("/admin/products");
 
     return {
       type: ShowAlertType.SUCCESS,
@@ -289,14 +228,74 @@ export async function DeleteProductAction(data: { id: string }) {
     };
   } catch (error) {
     console.error("Error deleting product:", error);
-    return {
-      type: ShowAlertType.ERROR,
-      message: "Failed to delete product",
-    };
+    return { type: ShowAlertType.ERROR, message: "Failed to delete product" };
   }
 }
 
-// -- Logic & Utilities --
+// -- Helper Functions --
+
+function hasPricingChanged(
+  newPricing?: Partial<PricingType>,
+  currentPricing?: PricingType
+): boolean {
+  if (!newPricing || !currentPricing) return false;
+  return (
+    (newPricing.basePrice !== undefined &&
+      newPricing.basePrice !== currentPricing.basePrice) ||
+    (newPricing.salePrice !== undefined &&
+      newPricing.salePrice !== currentPricing.salePrice)
+  );
+}
+
+async function updateRelatedUpsells(
+  productId: string,
+  newBasePrice: number
+): Promise<void> {
+  const upsellsSnap = await adminDb
+    .collection("upsells")
+    .where("products", "array-contains", { id: productId })
+    .get();
+
+  const upsellsToUpdate: {
+    id: string;
+    products: UpsellType["products"];
+    currentPricing: PricingType;
+  }[] = [];
+
+  upsellsSnap.forEach((doc) => {
+    const upsell = doc.data() as UpsellType;
+    const updatedProducts = upsell.products.map((product) =>
+      product.id === productId
+        ? { ...product, basePrice: newBasePrice }
+        : product
+    );
+    upsellsToUpdate.push({
+      id: doc.id,
+      products: updatedProducts,
+      currentPricing: upsell.pricing,
+    });
+  });
+
+  if (upsellsToUpdate.length > 0) {
+    const batches = [];
+    for (let i = 0; i < upsellsToUpdate.length; i += BATCH_SIZE) {
+      batches.push(upsellsToUpdate.slice(i, i + BATCH_SIZE));
+    }
+
+    for (const batchItems of batches) {
+      const batch = adminDb.batch();
+      batchItems.forEach(({ id, products, currentPricing }) => {
+        const newPricing = calculateUpsellPricing(products, currentPricing);
+        batch.update(adminDb.collection("upsells").doc(id), {
+          products,
+          pricing: newPricing,
+          updatedAt: currentTimestamp(),
+        });
+      });
+      await batch.commit();
+    }
+  }
+}
 
 function calculateUpsellPricing(
   products: UpsellType["products"],
@@ -306,24 +305,18 @@ function calculateUpsellPricing(
     (total, product) => total + (Number(product.basePrice) || 0),
     0
   );
-
   const roundedBasePrice = Math.floor(totalBasePrice) + 0.99;
   const basePrice = Number(roundedBasePrice.toFixed(2));
-
   const discountPercentage = currentPricing.discountPercentage ?? 0;
-
   let salePrice = 0;
+
   if (discountPercentage > 0) {
     const rawSalePrice = basePrice * (1 - discountPercentage / 100);
     const roundedSalePrice = Math.floor(rawSalePrice) + 0.99;
     salePrice = Number(roundedSalePrice.toFixed(2));
   }
 
-  return {
-    basePrice,
-    salePrice,
-    discountPercentage,
-  };
+  return { basePrice, salePrice, discountPercentage };
 }
 
 // -- Type Definitions --
@@ -340,4 +333,38 @@ type PricingType = {
   basePrice: number;
   salePrice: number;
   discountPercentage: number;
+};
+
+type ProductType = {
+  id: string;
+  name: string;
+  slug: string;
+  category: string;
+  description: string;
+  highlights: { headline: string; keyPoints: string[] };
+  pricing: PricingType;
+  images: { main: string; gallery: string[] };
+  options: { colors: string[]; sizes: Record<string, number> };
+  seo: { metaTitle: string; metaDescription: string; keywords: string[] };
+  visibility: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  createdAt: string;
+  updatedAt: string;
+  sourceInfo: {
+    platform: string;
+    url: string;
+    storeId: string;
+    storeName: string;
+    storeUrl: string;
+  };
+  upsell: string;
+};
+
+type UpsellType = {
+  id: string;
+  mainImage: string;
+  visibility: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  createdAt: string;
+  updatedAt: string;
+  pricing: PricingType;
+  products: { id: string; basePrice: number }[];
 };
