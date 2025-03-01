@@ -2,6 +2,9 @@
 
 import { adminDb } from "@/lib/firebase/admin";
 import { revalidatePath } from "next/cache";
+import { FieldPath, FieldValue, Timestamp } from "firebase-admin/firestore";
+
+const BATCH_SIZE = 10; // Firestore "in" query limit is 10
 
 /**
  * Fetch all carts from the database.
@@ -19,20 +22,7 @@ export async function getCarts(): Promise<CartType[]> {
       return [];
     }
 
-    return snapshot.docs.map((cartDoc: any) => {
-      const cartData = cartDoc.data();
-      return {
-        id: cartDoc.id,
-        device_identifier: cartData.device_identifier,
-        items: cartData.items || [],
-        createdAt: (cartData.createdAt as FirebaseFirestore.Timestamp)
-          ?.toDate()
-          .toISOString(),
-        updatedAt: (cartData.updatedAt as FirebaseFirestore.Timestamp)
-          ?.toDate()
-          .toISOString(),
-      };
-    });
+    return snapshot.docs.map((cartDoc) => formatCartDocument(cartDoc));
   } catch (error) {
     console.error("Error fetching carts:", error);
     return [];
@@ -40,7 +30,7 @@ export async function getCarts(): Promise<CartType[]> {
 }
 
 /**
- * Fetch a single cart by device identifier.
+ * Fetch a single cart by device identifier with optimized item validation.
  *
  * @example Get a specific cart
  * const cart = await getCart("device-identifier");
@@ -56,9 +46,11 @@ export async function getCart(
       return null;
     }
 
+    // Fetch cart with limit for efficiency
     const snapshot = await adminDb
       .collection("carts")
       .where("device_identifier", "==", deviceIdentifier)
+      .limit(1)
       .get();
 
     if (snapshot.empty) {
@@ -67,20 +59,52 @@ export async function getCart(
 
     const cartDoc = snapshot.docs[0];
     const cartData = cartDoc.data();
+    const items = cartData.items || [];
 
-    const validatedItems = await validateCartItems(cartData.items || []);
+    // Collect IDs for batch validation
+    const productIds = new Set<string>();
+    const upsellIds = new Set<string>();
 
-    if (validatedItems.length !== cartData.items?.length) {
-      const reindexedItems = validatedItems.map((item, index) => ({
+    items.forEach((item: CartProductItemType | CartUpsellItemType) => {
+      if (item.type === "product" && item.baseProductId) {
+        productIds.add(item.baseProductId.trim());
+      } else if (item.type === "upsell" && item.baseUpsellId) {
+        upsellIds.add(item.baseUpsellId.trim());
+      }
+    });
+
+    // Batch check existence of products and upsells
+    const [validProductIds, validUpsellIds] = await Promise.all([
+      checkDocumentsExist("products", Array.from(productIds)),
+      checkDocumentsExist("upsells", Array.from(upsellIds)),
+    ]);
+
+    // Filter items based on valid IDs
+    const validatedItems = items.filter(
+      (item: CartProductItemType | CartUpsellItemType) => {
+        if (!item || !item.type) return false;
+
+        if (item.type === "product") {
+          return validProductIds.has(item.baseProductId.trim());
+        }
+
+        if (item.type === "upsell") {
+          return validUpsellIds.has(item.baseUpsellId.trim());
+        }
+
+        return false;
+      }
+    );
+
+    if (validatedItems.length !== items.length) {
+      const reindexedItems = validatedItems.map((item: any, index: any) => ({
         ...item,
         index: index + 1,
       }));
 
-      await adminDb.runTransaction(async (transaction: any) => {
-        transaction.update(cartDoc.ref, {
-          items: reindexedItems,
-          updatedAt: FirebaseFirestore.Timestamp.now(),
-        });
+      await adminDb.collection("carts").doc(cartDoc.id).update({
+        items: reindexedItems,
+        updatedAt: FieldValue.serverTimestamp(),
       });
 
       revalidatePath("/cart");
@@ -90,12 +114,8 @@ export async function getCart(
       id: cartDoc.id,
       device_identifier: cartData.device_identifier,
       items: validatedItems,
-      createdAt: (cartData.createdAt as FirebaseFirestore.Timestamp)
-        ?.toDate()
-        .toISOString(),
-      updatedAt: (cartData.updatedAt as FirebaseFirestore.Timestamp)
-        ?.toDate()
-        .toISOString(),
+      createdAt: formatTimestamp(cartData.createdAt),
+      updatedAt: formatTimestamp(cartData.updatedAt),
     };
   } catch (error) {
     console.error("Error fetching cart:", error);
@@ -103,58 +123,68 @@ export async function getCart(
   }
 }
 
-// -- Logic & Utilities --
+// --- Helper Functions ---
 
-async function validateCartItems(
-  items: (CartProductItemType | CartUpsellItemType)[]
-): Promise<(CartProductItemType | CartUpsellItemType)[]> {
-  if (!items?.length) return [];
+/**
+ * Format a Firestore document into a CartType.
+ */
+function formatCartDocument(
+  cartDoc: FirebaseFirestore.QueryDocumentSnapshot
+): CartType {
+  const cartData = cartDoc.data();
+  return {
+    id: cartDoc.id,
+    device_identifier: cartData.device_identifier,
+    items: cartData.items || [],
+    createdAt: formatTimestamp(cartData.createdAt),
+    updatedAt: formatTimestamp(cartData.updatedAt),
+  };
+}
 
-  const validatedItems = await Promise.all(
-    items.map(async (item) => {
-      try {
-        if (!item || !item.type) return null;
+/**
+ * Safely format a Firestore timestamp to ISO string.
+ */
+function formatTimestamp(timestamp: FirebaseFirestore.Timestamp): string {
+  return timestamp?.toDate().toISOString() || new Date().toISOString();
+}
 
-        if (item.type === "product") {
-          const exists = await checkDocumentExists(
-            "products",
-            item.baseProductId
-          );
-          return exists ? item : null;
-        }
+/**
+ * Check existence of multiple documents in a collection using batched "in" queries.
+ */
+async function checkDocumentsExist(
+  collectionName: "products" | "upsells",
+  ids: string[]
+): Promise<Set<string>> {
+  if (!ids.length) return new Set();
 
-        if (item.type === "upsell") {
-          const exists = await checkDocumentExists(
-            "upsells",
-            item.baseUpsellId
-          );
-          return exists ? item : null;
-        }
+  const validIds = new Set<string>();
+  const batches: string[][] = [];
 
-        return null;
-      } catch {
-        return null;
-      }
+  // Split IDs into batches of 10
+  for (let i = 0; i < ids.length; i += BATCH_SIZE) {
+    batches.push(ids.slice(i, i + BATCH_SIZE));
+  }
+
+  // Execute batch queries in parallel
+  const results = await Promise.all(
+    batches.map(async (batchIds) => {
+      const querySnapshot = await adminDb
+        .collection(collectionName)
+        .where(FieldPath.documentId(), "in", batchIds)
+        .select() // Fetch only IDs, not full documents
+        .get();
+
+      return querySnapshot.docs.map((doc) => doc.id);
     })
   );
 
-  return validatedItems.filter(
-    (item): item is CartProductItemType | CartUpsellItemType => item !== null
-  );
+  // Collect valid IDs
+  results.flat().forEach((id) => validIds.add(id));
+
+  return validIds;
 }
 
-async function checkDocumentExists(
-  collectionName: "products" | "upsells",
-  id: string
-): Promise<boolean> {
-  if (!id?.trim()) return false;
-
-  const docRef = adminDb.collection(collectionName).doc(id.trim());
-  const snapshot = await docRef.get();
-  return snapshot.exists;
-}
-
-// -- Type Definitions --
+// --- Type Definitions ---
 
 type CartProductItemType = {
   index: number;

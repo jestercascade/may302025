@@ -2,6 +2,8 @@
 
 import { adminDb } from "@/lib/firebase/admin";
 
+const BATCH_SIZE = 10;
+
 /**
  * Unified function to retrieve upsells with flexible filtering, field selection, and product inclusion.
  *
@@ -20,7 +22,7 @@ import { adminDb } from "@/lib/firebase/admin";
  *   includeProducts: true
  * });
  *
- * @example Get all upsells with specific visibility fields
+ * @example Get all upsells with specific fields
  * const upsells = await getUpsells({
  *   fields: ["mainImage", "pricing"],
  *   includeProducts: true
@@ -31,54 +33,76 @@ export async function getUpsells(
 ): Promise<UpsellType[] | null> {
   const { ids = [], fields = [], includeProducts } = options;
 
-  const upsellsRef = adminDb.collection("upsells");
-  let queryRef: FirebaseFirestore.Query<FirebaseFirestore.DocumentData> =
-    upsellsRef;
+  let upsells: UpsellType[] = [];
 
   if (ids.length > 0) {
-    queryRef = upsellsRef.where("__name__", "in", ids);
+    // Batch processing for IDs
+    const upsellBatches = [];
+    for (let i = 0; i < ids.length; i += BATCH_SIZE) {
+      upsellBatches.push(ids.slice(i, i + BATCH_SIZE));
+    }
+
+    const snapshots = await Promise.all(
+      upsellBatches.map((batch) => {
+        const docRefs = batch.map((id) =>
+          adminDb.collection("upsells").doc(id)
+        );
+        return adminDb.getAll(...docRefs);
+      })
+    );
+
+    const docs = snapshots.flat();
+    docs.forEach((doc) => {
+      if (!doc.exists) return;
+      const data = doc.data();
+      const upsell = filterUpsellFields(data, fields, includeProducts, doc.id);
+      upsells.push(upsell);
+    });
+  } else {
+    // Fetch all upsells when no IDs are provided
+    const snapshot = await adminDb.collection("upsells").get();
+    snapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      const upsell = filterUpsellFields(data, fields, includeProducts, doc.id);
+      upsells.push(upsell);
+    });
   }
 
-  const snapshot = await queryRef.get(); // Use queryRef instead of upsellsRef
+  return ids.length === 0
+    ? upsells.sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      )
+    : upsells;
+}
 
-  if (snapshot.empty) {
-    return null;
+function filterUpsellFields(
+  data: any,
+  fields: string[],
+  includeProducts: boolean | undefined,
+  id: string
+): UpsellType {
+  const upsell: Partial<UpsellType> = {
+    id,
+    updatedAt: data.updatedAt,
+  };
+
+  if (fields.length > 0) {
+    fields.forEach((field) => {
+      if (field !== "id" && field !== "updatedAt" && field in data) {
+        (upsell[field as keyof UpsellType] as any) = data[field];
+      }
+    });
+  } else {
+    Object.assign(upsell, data);
   }
 
-  const upsells = await Promise.all(
-    snapshot.docs.map(async (docSnapshot) => {
-      const data = docSnapshot.data() as Omit<UpsellType, "id">;
-      const baseUpsell: PartialUpsell = {
-        id: docSnapshot.id,
-        updatedAt: data.updatedAt,
-      };
+  if (includeProducts && data.products) {
+    const products = [...data.products].sort((a, b) => a.index - b.index);
+    upsell.products = products;
+  }
 
-      if (fields.length > 0) {
-        fields.forEach((field) => {
-          if (field !== "id" && field in data) {
-            (baseUpsell[field as keyof Omit<UpsellType, "id">] as any) =
-              data[field as keyof Omit<UpsellType, "id">];
-          }
-        });
-      } else {
-        Object.assign(baseUpsell, data);
-      }
-
-      if (includeProducts && data.products) {
-        const products = [...data.products].sort((a, b) => a.index - b.index);
-        return {
-          ...baseUpsell,
-          products,
-        } as UpsellType;
-      }
-
-      return baseUpsell as UpsellType;
-    })
-  );
-
-  return upsells.sort(
-    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-  );
+  return upsell as UpsellType;
 }
 
 // -- Type Definitions --
@@ -86,7 +110,7 @@ export async function getUpsells(
 type UpsellType = {
   id: string;
   mainImage: string;
-  visibility: VisibilityType;
+  visibility: "PUBLISHED" | "DRAFT" | "HIDDEN";
   createdAt: string;
   updatedAt: string;
   pricing: {
@@ -128,6 +152,3 @@ type GetUpsellsOptions = {
   fields?: Array<keyof UpsellType>;
   includeProducts?: boolean;
 };
-
-type PartialUpsell = Partial<Omit<UpsellType, "id" | "updatedAt">> &
-  Pick<UpsellType, "id" | "updatedAt">;
