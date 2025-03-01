@@ -31,141 +31,85 @@ export async function AddToCartAction(data: {
     return newDeviceIdentifier;
   };
 
-  const createCartItem = (index: number) => {
-    if (data.type === "product") {
-      return {
-        type: "product",
-        baseProductId: data.baseProductId,
-        size: data.size,
-        color: data.color,
-        variantId: generateId(),
-        index,
-      };
-    } else {
-      return {
-        type: "upsell",
-        baseUpsellId: data.baseUpsellId,
-        variantId: generateId(),
-        index,
-        products: data.products,
-      };
-    }
-  };
+  const createCartItem = (index: number) => ({
+    ...(data.type === "product"
+      ? {
+          type: "product",
+          baseProductId: data.baseProductId,
+          size: data.size,
+          color: data.color,
+        }
+      : {
+          type: "upsell",
+          baseUpsellId: data.baseUpsellId,
+          products: data.products,
+        }),
+    variantId: generateId(),
+    index,
+  });
 
   const generateNewCart = async () => {
     try {
       const newDeviceIdentifier = await setNewDeviceIdentifier();
+      const newCartRef = adminDb.collection("carts").doc(generateId());
 
-      const newCartData = {
+      await newCartRef.set({
         device_identifier: newDeviceIdentifier,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
         items: [createCartItem(1)],
-      };
-
-      const cartsRef = adminDb.collection("carts");
-      const newCartRef = cartsRef.doc(generateId());
-
-      await adminDb.runTransaction(async (transaction) => {
-        await transaction.set(newCartRef, newCartData);
       });
 
-      revalidatePath("/");
       revalidatePath("/cart");
-      revalidatePath("/[slug]", "page");
-      revalidatePath("/admin");
-
-      return {
-        type: ShowAlertType.SUCCESS,
-        message: "Item added to cart",
-      };
+      return { type: ShowAlertType.SUCCESS, message: "Item added to cart" };
     } catch (error) {
-      console.error("Error generating new cart:", error);
+      console.error("New cart error:", error);
       return {
         type: ShowAlertType.ERROR,
-        message: "Please reload the page and try again",
+        message: "Please reload and try again",
       };
     }
   };
 
-  const updateExistingCart = async (cartDoc: any, existingCartItems: any[]) => {
-    const nextIndex = existingCartItems.length + 1;
+  const updateExistingCart = async (
+    cartDoc: FirebaseFirestore.DocumentReference,
+    items: any[]
+  ) => {
+    const nextIndex = items.length + 1;
+    const newItem = createCartItem(nextIndex);
 
     if (data.type === "product") {
-      const productExists = existingCartItems.some(
-        (product: { baseProductId: string; size: string; color: string }) =>
-          product.baseProductId === data.baseProductId &&
-          product.size === data.size &&
-          product.color === data.color
+      const exists = items.some(
+        (item) =>
+          item.type === "product" &&
+          item.baseProductId === data.baseProductId &&
+          item.size === data.size &&
+          item.color === data.color
       );
-
-      if (productExists) {
-        return {
-          type: ShowAlertType.ERROR,
-          message: "Item already in cart",
-        };
-      } else {
-        existingCartItems.push({
-          type: data.type,
-          baseProductId: data.baseProductId,
-          size: data.size,
-          color: data.color,
-          variantId: generateId(),
-          index: nextIndex,
-        });
-      }
-    } else if (data.type === "upsell" && data.products) {
-      const upsellExists = existingCartItems.some((item) => {
-        if (item.type === "upsell" && item.baseUpsellId === data.baseUpsellId) {
-          return item.products.every(
-            (
-              existingProduct: { color: string; size: string },
-              index: number
-            ) => {
-              const newProduct = data.products?.[index];
-              if (!newProduct) return false;
-              return (
-                existingProduct.color === newProduct.color &&
-                existingProduct.size === newProduct.size
-              );
-            }
-          );
-        }
-        return false;
-      });
-
-      if (upsellExists) {
-        return {
-          type: ShowAlertType.ERROR,
-          message: "Item already in cart",
-        };
-      } else {
-        existingCartItems.push({
-          type: "upsell",
-          baseUpsellId: data.baseUpsellId,
-          variantId: generateId(),
-          index: nextIndex,
-          products: data.products,
-        });
-      }
+      if (exists)
+        return { type: ShowAlertType.ERROR, message: "Item already in cart" };
+    } else {
+      const exists = items.some(
+        (item) =>
+          item.type === "upsell" &&
+          item.baseUpsellId === data.baseUpsellId &&
+          item.products?.every(
+            (p: any, i: number) =>
+              p.color === data.products?.[i]?.color &&
+              p.size === data.products?.[i]?.size
+          )
+      );
+      if (exists)
+        return { type: ShowAlertType.ERROR, message: "Item already in cart" };
     }
 
-    await adminDb.runTransaction(async (transaction) => {
-      await transaction.update(cartDoc, {
-        items: existingCartItems,
-        updatedAt: FieldValue.serverTimestamp(),
-      });
+    await cartDoc.update({
+      items: [...items, newItem],
+      updatedAt: FieldValue.serverTimestamp(),
     });
 
-    revalidatePath("/");
     revalidatePath("/cart");
-    revalidatePath("/[slug]", "page");
-    revalidatePath("/admin");
-
-    return {
-      type: ShowAlertType.SUCCESS,
-      message: "Item added to cart",
-    };
+    return { type: ShowAlertType.SUCCESS, message: "Item added to cart" };
   };
 
   try {
@@ -173,23 +117,21 @@ export async function AddToCartAction(data: {
     const deviceIdentifier = cookieStore.get("device_identifier")?.value;
     if (!deviceIdentifier) return await generateNewCart();
 
-    const cartsRef = adminDb.collection("carts");
-    const snapshot = await cartsRef
+    const snapshot = await adminDb
+      .collection("carts")
       .where("device_identifier", "==", deviceIdentifier)
+      .limit(1)
       .get();
 
-    if (snapshot.empty) {
-      return await generateNewCart();
-    } else {
-      const cartDoc = snapshot.docs[0].ref;
-      const existingCartItems = snapshot.docs[0].data().items || [];
-      return await updateExistingCart(cartDoc, existingCartItems);
-    }
+    if (snapshot.empty) return await generateNewCart();
+
+    const cartDoc = snapshot.docs[0];
+    return await updateExistingCart(cartDoc.ref, cartDoc.data().items || []);
   } catch (error) {
-    console.error("Error adding product to cart:", error);
+    console.error("Cart error:", error);
     return {
       type: ShowAlertType.ERROR,
-      message: "Please reload the page and try again",
+      message: "Please reload and try again",
     };
   }
 }
@@ -199,89 +141,45 @@ export async function RemoveFromCartAction({
 }: {
   variantId: string;
 }) {
-  const cookieStore = await cookies();
-  const deviceIdentifier = cookieStore.get("device_identifier")?.value;
-
-  if (!deviceIdentifier) {
-    return {
-      type: ShowAlertType.ERROR,
-      message: "Cart not found",
-    };
-  }
-
   try {
-    const cartsRef = adminDb.collection("carts");
-    const snapshot = await cartsRef
+    const cookieStore = await cookies();
+    const deviceIdentifier = cookieStore.get("device_identifier")?.value;
+    if (!deviceIdentifier)
+      return { type: ShowAlertType.ERROR, message: "Cart not found" };
+
+    const snapshot = await adminDb
+      .collection("carts")
       .where("device_identifier", "==", deviceIdentifier)
+      .limit(1)
       .get();
 
-    if (snapshot.empty) {
-      return {
-        type: ShowAlertType.ERROR,
-        message: "Cart not found",
-      };
-    }
+    if (snapshot.empty)
+      return { type: ShowAlertType.ERROR, message: "Cart not found" };
 
-    const cartDoc = snapshot.docs[0].ref;
-    const existingCartItems = snapshot.docs[0].data().items;
+    const cartDoc = snapshot.docs[0];
+    const existingItems = snapshot.docs[0].data().items;
+    const filteredItems = existingItems
+      .filter((item: { variantId: string }) => item.variantId !== variantId)
+      .map((item: any, index: number) => ({ ...item, index: index + 1 }));
 
-    const filteredItems = existingCartItems.filter(
-      (item: CartProductItemType | CartUpsellItemType) =>
-        item.variantId !== variantId
-    );
-
-    // If this was the last item, delete the cart and remove the cookie
     if (filteredItems.length === 0) {
-      await adminDb.runTransaction(async (transaction) => {
-        await transaction.delete(cartDoc);
-      });
-
-      // Remove the device_identifier cookie
-      cookieStore.delete({
-        name: "device_identifier",
-        path: "/",
-      });
-
-      revalidatePath("/cart");
-      revalidatePath("/admin");
-
-      return {
-        type: ShowAlertType.SUCCESS,
-        message: "Cart cleared",
-      };
-    }
-
-    // Otherwise, update the cart as before
-    const sortedItems = filteredItems.sort(
-      (a: any, b: any) => a.index - b.index
-    );
-
-    const reindexedItems = sortedItems.map(
-      (item: CartProductItemType | CartUpsellItemType, index: number) => ({
-        ...item,
-        index: index + 1,
-      })
-    );
-
-    await adminDb.runTransaction(async (transaction) => {
-      await transaction.update(cartDoc, {
-        items: reindexedItems,
+      await cartDoc.ref.delete();
+      const cookieStore = await cookies();
+      cookieStore.delete("device_identifier");
+    } else {
+      await cartDoc.ref.update({
+        items: filteredItems,
         updatedAt: FieldValue.serverTimestamp(),
       });
-    });
+    }
 
     revalidatePath("/cart");
-    revalidatePath("/admin");
-
-    return {
-      type: ShowAlertType.SUCCESS,
-      message: "Item removed from cart",
-    };
+    return { type: ShowAlertType.SUCCESS, message: "Item removed from cart" };
   } catch (error) {
-    console.error("Error removing item from cart:", error);
+    console.error("Remove item error:", error);
     return {
       type: ShowAlertType.ERROR,
-      message: "Please reload the page and try again",
+      message: "Please reload and try again",
     };
   }
 }
@@ -291,72 +189,47 @@ export async function ClearPurchasedItemsAction({
 }: {
   variantIds: string[];
 }) {
-  const cookieStore = await cookies();
-  const deviceIdentifier = cookieStore.get("device_identifier")?.value;
-
-  if (!deviceIdentifier) {
-    return {
-      type: ShowAlertType.ERROR,
-      message: "Cart not found",
-    };
-  }
-
   try {
-    const cartsRef = adminDb.collection("carts");
-    const snapshot = await cartsRef
+    const cookieStore = await cookies();
+    const deviceIdentifier = cookieStore.get("device_identifier")?.value;
+    if (!deviceIdentifier)
+      return { type: ShowAlertType.ERROR, message: "Cart not found" };
+
+    const snapshot = await adminDb
+      .collection("carts")
       .where("device_identifier", "==", deviceIdentifier)
+      .limit(1)
       .get();
 
-    if (snapshot.empty) {
-      return {
-        type: ShowAlertType.ERROR,
-        message: "Cart not found",
-      };
-    }
+    if (snapshot.empty)
+      return { type: ShowAlertType.ERROR, message: "Cart not found" };
 
-    const cartDoc = snapshot.docs[0].ref;
-    const existingCartItems = snapshot.docs[0].data().items;
+    const cartDoc = snapshot.docs[0];
+    const existingItems = cartDoc.data().items || [];
+    const remainingItems = existingItems
+      .filter(
+        (item: { variantId: string }) => !variantIds.includes(item.variantId)
+      )
+      .map((item: any, index: number) => ({ ...item, index: index + 1 }));
 
-    // Filter out the purchased items
-    const remainingItems = existingCartItems.filter(
-      (item: { variantId: string }) => !variantIds.includes(item.variantId)
-    );
-
-    // Reindex remaining items
-    const reindexedItems = remainingItems.map((item: any, index: number) => ({
-      ...item,
-      index: index + 1,
-    }));
-
-    if (reindexedItems.length === 0) {
-      await adminDb.runTransaction(async (transaction) => {
-        await transaction.delete(cartDoc);
-      });
-
-      // Clear the device_identifier cookie since cart is gone
+    if (remainingItems.length === 0) {
+      await cartDoc.ref.delete();
       const cookieStore = await cookies();
       cookieStore.delete("device_identifier");
     } else {
-      await adminDb.runTransaction(async (transaction) => {
-        await transaction.update(cartDoc, {
-          items: reindexedItems,
-          updatedAt: FieldValue.serverTimestamp(),
-        });
+      await cartDoc.ref.update({
+        items: remainingItems,
+        updatedAt: FieldValue.serverTimestamp(),
       });
     }
 
     revalidatePath("/cart");
-    revalidatePath("/admin");
-
     return {
       type: ShowAlertType.SUCCESS,
       message: "Cart updated successfully",
     };
   } catch (error) {
-    console.error("Error clearing purchased items from cart:", error);
-    return {
-      type: ShowAlertType.ERROR,
-      message: "Failed to update cart",
-    };
+    console.error("Clear purchased error:", error);
+    return { type: ShowAlertType.ERROR, message: "Failed to update cart" };
   }
 }
