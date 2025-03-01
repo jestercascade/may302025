@@ -7,7 +7,13 @@ import { ShowAlertType } from "@/lib/sharedTypes";
 
 const BATCH_SIZE = 500; // Firestore batch limit
 
-export async function CreateProductAction(data: CreateProductType) {
+export async function CreateProductAction(data: {
+  name: string;
+  slug: string;
+  category: string;
+  basePrice: string;
+  mainImage: string;
+}) {
   try {
     const productId = generateId();
     const currentTime = currentTimestamp();
@@ -204,7 +210,6 @@ export async function DeleteProductAction(data: { id: string }) {
       return { type: ShowAlertType.ERROR, message: "Product not found" };
     }
 
-    const productData = productSnap.data() as ProductType;
     const upsellsSnap = await adminDb
       .collection("upsells")
       .where("products", "array-contains", { id: data.id })
@@ -321,50 +326,8 @@ function calculateUpsellPricing(
 
 // -- Type Definitions --
 
-type CreateProductType = {
-  name: string;
-  slug: string;
-  category: string;
-  basePrice: string;
-  mainImage: string;
-};
-
 type PricingType = {
   basePrice: number;
   salePrice: number;
   discountPercentage: number;
-};
-
-type ProductType = {
-  id: string;
-  name: string;
-  slug: string;
-  category: string;
-  description: string;
-  highlights: { headline: string; keyPoints: string[] };
-  pricing: PricingType;
-  images: { main: string; gallery: string[] };
-  options: { colors: string[]; sizes: Record<string, number> };
-  seo: { metaTitle: string; metaDescription: string; keywords: string[] };
-  visibility: "DRAFT" | "PUBLISHED" | "ARCHIVED";
-  createdAt: string;
-  updatedAt: string;
-  sourceInfo: {
-    platform: string;
-    url: string;
-    storeId: string;
-    storeName: string;
-    storeUrl: string;
-  };
-  upsell: string;
-};
-
-type UpsellType = {
-  id: string;
-  mainImage: string;
-  visibility: "DRAFT" | "PUBLISHED" | "ARCHIVED";
-  createdAt: string;
-  updatedAt: string;
-  pricing: PricingType;
-  products: { id: string; basePrice: number }[];
 };

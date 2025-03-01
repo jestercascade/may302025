@@ -78,7 +78,7 @@ export function VisibilityOverlay({
     try {
       const result = await UpdateCollectionAction({
         id: data.id,
-        visibility: selectedVisibility,
+        visibility: selectedVisibility as VisibilityType,
       });
       showAlert({
         message: result.message,

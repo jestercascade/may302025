@@ -40,18 +40,6 @@ type CollectionType = {
 };
 
 /**************************************/
-/*         Settings Types             */
-/**************************************/
-
-// Represents settings for a category section
-type SettingsType = {
-  categorySection: {
-    visibility: string;
-  };
-  [key: string]: any; // Allows for additional dynamic properties
-};
-
-/**************************************/
 /*         Upsell Types               */
 /**************************************/
 

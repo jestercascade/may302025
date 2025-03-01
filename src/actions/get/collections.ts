@@ -130,6 +130,7 @@ function filterCollectionFields(
 
   filtered.index = data.index;
   filtered.visibility = data.visibility;
+  filtered.title = data.title;
   filtered.collectionType = data.collectionType;
   filtered.updatedAt = data.updatedAt;
 
@@ -305,60 +306,9 @@ async function fetchUpsellsInBatches(
   return upsellsMap;
 }
 
-// Types
 type GetCollectionsOptionsType = {
   ids?: string[];
   fields?: string[];
   visibility?: VisibilityType;
   includeProducts?: boolean;
-};
-
-type VisibilityType = "PUBLISHED" | "DRAFT" | "HIDDEN";
-
-type CollectionType = {
-  id: string;
-  title?: string;
-  description?: string;
-  bannerImages?: string[];
-  updatedAt: string;
-  index: number;
-  visibility: VisibilityType;
-  collectionType: string;
-  products?: any[];
-};
-
-type ProductType = {
-  id: string;
-  slug?: string;
-  name?: string;
-  images?: string[];
-  pricing?: {
-    basePrice: number;
-    [key: string]: any;
-  };
-  options?: any[];
-  upsell?: string | UpsellType;
-  [key: string]: any;
-};
-
-type ProductWithUpsellType = Omit<ProductType, "upsell"> & {
-  upsell: UpsellType;
-};
-
-type UpsellType = {
-  id: string;
-  mainImage?: string;
-  visibility: VisibilityType;
-  createdAt: string;
-  updatedAt: string;
-  pricing?: any;
-  products: Array<{
-    id: string;
-    slug: string;
-    name: string;
-    images: string[];
-    basePrice: number;
-    options: any[];
-    index: number;
-  }>;
 };

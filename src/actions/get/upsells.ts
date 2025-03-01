@@ -33,7 +33,7 @@ export async function getUpsells(
 ): Promise<UpsellType[] | null> {
   const { ids = [], fields = [], includeProducts } = options;
 
-  let upsells: UpsellType[] = [];
+  const upsells: UpsellType[] = [];
 
   if (ids.length > 0) {
     // Batch processing for IDs

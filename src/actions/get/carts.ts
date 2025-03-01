@@ -2,9 +2,9 @@
 
 import { adminDb } from "@/lib/firebase/admin";
 import { revalidatePath } from "next/cache";
-import { FieldPath, FieldValue, Timestamp } from "firebase-admin/firestore";
+import { FieldPath, FieldValue } from "firebase-admin/firestore";
 
-const BATCH_SIZE = 10; // Firestore "in" query limit is 10
+const BATCH_SIZE = 10; 
 
 /**
  * Fetch all carts from the database.
@@ -46,7 +46,6 @@ export async function getCart(
       return null;
     }
 
-    // Fetch cart with limit for efficiency
     const snapshot = await adminDb
       .collection("carts")
       .where("device_identifier", "==", deviceIdentifier)
@@ -79,7 +78,6 @@ export async function getCart(
       checkDocumentsExist("upsells", Array.from(upsellIds)),
     ]);
 
-    // Filter items based on valid IDs
     const validatedItems = items.filter(
       (item: CartProductItemType | CartUpsellItemType) => {
         if (!item || !item.type) return false;
@@ -125,9 +123,6 @@ export async function getCart(
 
 // --- Helper Functions ---
 
-/**
- * Format a Firestore document into a CartType.
- */
 function formatCartDocument(
   cartDoc: FirebaseFirestore.QueryDocumentSnapshot
 ): CartType {
@@ -141,16 +136,10 @@ function formatCartDocument(
   };
 }
 
-/**
- * Safely format a Firestore timestamp to ISO string.
- */
 function formatTimestamp(timestamp: FirebaseFirestore.Timestamp): string {
   return timestamp?.toDate().toISOString() || new Date().toISOString();
 }
 
-/**
- * Check existence of multiple documents in a collection using batched "in" queries.
- */
 async function checkDocumentsExist(
   collectionName: "products" | "upsells",
   ids: string[]

@@ -123,7 +123,7 @@ export async function UpdateCollectionAction(data: {
   bannerImages?: BannerImagesType;
   title?: string;
   slug?: string;
-  visibility?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  visibility?: VisibilityType;
 }) {
   try {
     const { id, ...updates } = data;
@@ -326,7 +326,6 @@ export async function DeleteCollectionAction(data: { id: string }) {
       return { type: ShowAlertType.ERROR, message: "Collection not found" };
     }
 
-    const collectionData = collectionSnap.data() as CollectionType;
     await collectionRef.delete();
 
     // Revalidate relevant paths
@@ -347,20 +346,6 @@ export async function DeleteCollectionAction(data: { id: string }) {
 }
 
 // Type Definitions
-
-type CollectionType = {
-  id: string;
-  title: string;
-  slug: string;
-  collectionType: string;
-  campaignDuration: { startDate: string; endDate: string };
-  index: number;
-  products: { id: string; index: number }[];
-  visibility: "DRAFT" | "PUBLISHED" | "ARCHIVED";
-  updatedAt: string;
-  createdAt: string;
-  bannerImages?: BannerImagesType;
-};
 
 type BannerImagesType = {
   desktopImage: string;

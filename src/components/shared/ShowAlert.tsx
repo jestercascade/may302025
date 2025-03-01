@@ -21,10 +21,8 @@ export default function ShowAlert() {
   const typeUpper = type?.toUpperCase();
 
   useEffect(() => {
-    console.log("hello");
-
-    if (isVisible) hideAlert();
-  }, [pathname, hideAlert]); // Fixed: Removed isVisible
+    hideAlert();
+  }, [pathname, hideAlert]);
 
   useEffect(() => {
     const body = document.body;
