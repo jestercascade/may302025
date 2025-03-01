@@ -1,8 +1,7 @@
 "use server";
 
 import { adminDb } from "@/lib/firebase/admin";
-import { generateId } from "@/lib/utils/common";
-import { currentTimestamp } from "@/lib/utils/common";
+import { generateId, currentTimestamp } from "@/lib/utils/common";
 import { revalidatePath } from "next/cache";
 import { ShowAlertType } from "@/lib/sharedTypes";
 
@@ -11,49 +10,36 @@ export async function CreateCollectionAction(data: {
   slug: string;
   bannerImages?: BannerImagesType;
   collectionType: string;
-  campaignDuration: {
-    startDate: string;
-    endDate: string;
-  };
+  campaignDuration: { startDate: string; endDate: string };
 }) {
   try {
     const collectionsRef = adminDb.collection("collections");
-    const documentRef = collectionsRef.doc(generateId());
+    const collectionId = generateId();
     const currentTime = currentTimestamp();
 
+    const maxIndexSnapshot = await collectionsRef
+      .orderBy("index", "desc")
+      .limit(1)
+      .get();
+    const newIndex = maxIndexSnapshot.empty
+      ? 1
+      : maxIndexSnapshot.docs[0].data().index + 1;
+
     const newCollection = {
+      id: collectionId,
       title: data.title,
       slug: data.slug,
       collectionType: data.collectionType,
       campaignDuration: data.campaignDuration,
-      index: 1,
+      index: newIndex,
       products: [],
-      visibility: "DRAFT",
+      visibility: "DRAFT" as const,
       updatedAt: currentTime,
       createdAt: currentTime,
       ...(data.bannerImages && { bannerImages: data.bannerImages }),
     };
 
-    const existingCollections = await collectionsRef.get();
-
-    type CollectionData = {
-      id: string;
-      index: number;
-    };
-
-    const sortedCollections: CollectionData[] = existingCollections.docs
-      .map((doc) => ({ id: doc.id, ...(doc.data() as { index: number }) }))
-      .sort((a, b) => a.index - b.index);
-
-    const batch = adminDb.batch();
-    batch.set(documentRef, newCollection);
-
-    sortedCollections.forEach((collection, index) => {
-      const collectionRef = collectionsRef.doc(collection.id);
-      batch.update(collectionRef, { index: index + 2 });
-    });
-
-    await batch.commit();
+    await collectionsRef.doc(collectionId).set(newCollection);
 
     revalidatePath("/admin/storefront");
 
@@ -77,47 +63,38 @@ export async function ChangeCollectionIndexAction(data: {
   try {
     const { id, index } = data;
     const collectionsRef = adminDb.collection("collections");
-    const collectionOneRef = collectionsRef.doc(id);
-    const collectionOneSnapshot = await collectionOneRef.get();
-    const existingCollections = await collectionsRef.get();
 
-    if (
-      !collectionOneSnapshot.exists ||
-      isNaN(index) ||
-      index < 1 ||
-      index > existingCollections.size
-    ) {
-      return {
-        type: ShowAlertType.ERROR,
-        message: !collectionOneSnapshot.exists
-          ? "Collection not found"
-          : "Index is invalid or out of range",
-      };
+    const collectionRef = collectionsRef.doc(id);
+    const collectionSnap = await collectionRef.get();
+    if (!collectionSnap.exists) {
+      return { type: ShowAlertType.ERROR, message: "Collection not found" };
+    }
+    const collectionData = collectionSnap.data() as CollectionType;
+    const oldIndex = collectionData.index;
+
+    if (isNaN(index) || index < 1) {
+      return { type: ShowAlertType.ERROR, message: "Invalid index" };
     }
 
-    const collectionTwoId = existingCollections.docs.find(
-      (collection) => collection.data().index === index
-    )?.id;
-
-    if (!collectionTwoId) {
-      return {
-        type: ShowAlertType.ERROR,
-        message: "No collection found to swap index with",
-      };
+    const targetSnap = await collectionsRef
+      .where("index", "==", index)
+      .limit(1)
+      .get();
+    if (targetSnap.empty) {
+      // If no collection exists at the target index, just update the current one
+      await collectionRef.update({ index, updatedAt: currentTimestamp() });
+    } else {
+      // Swap indices using a batch
+      const targetCollectionRef = targetSnap.docs[0].ref;
+      const batch = adminDb.batch();
+      batch.update(collectionRef, { index, updatedAt: currentTimestamp() });
+      batch.update(targetCollectionRef, {
+        index: oldIndex,
+        updatedAt: currentTimestamp(),
+      });
+      await batch.commit();
     }
 
-    const collectionOneBeforeUpdate = collectionOneSnapshot.data();
-    const collectionTwoRef = collectionsRef.doc(collectionTwoId);
-
-    const batch = adminDb.batch();
-    batch.update(collectionOneRef, { index, updatedAt: currentTimestamp() });
-    batch.update(collectionTwoRef, {
-      index: collectionOneBeforeUpdate?.index,
-    });
-    await batch.commit();
-
-    // Revalidate paths to update collections data
-    const collectionData = collectionOneBeforeUpdate;
     revalidatePath("/admin/storefront");
     revalidatePath(
       `/admin/collections/${collectionData?.slug}-${collectionData?.id}`
@@ -146,48 +123,30 @@ export async function UpdateCollectionAction(data: {
   bannerImages?: BannerImagesType;
   title?: string;
   slug?: string;
-  visibility?: string;
+  visibility?: "DRAFT" | "PUBLISHED" | "ARCHIVED";
 }) {
   try {
-    const collectionRef = adminDb.collection("collections").doc(data.id);
-    const collectionSnapshot = await collectionRef.get();
-
-    if (!collectionSnapshot.exists) {
-      return {
-        type: ShowAlertType.ERROR,
-        message: "Collection not found",
-      };
+    const { id, ...updates } = data;
+    const collectionRef = adminDb.collection("collections").doc(id);
+    const collectionSnap = await collectionRef.get();
+    if (!collectionSnap.exists) {
+      return { type: ShowAlertType.ERROR, message: "Collection not found" };
     }
 
-    const updateData: Record<string, any> = {};
-
-    if (data.campaignDuration) {
-      updateData.campaignDuration = data.campaignDuration;
-    }
-
-    if (data.bannerImages) {
-      updateData.bannerImages = data.bannerImages;
-    }
-
-    if (data.title) {
-      updateData.title = data.title;
-    }
-
-    if (data.slug) {
-      updateData.slug = data.slug;
-    }
-
-    if (data.visibility) {
-      updateData.visibility = data.visibility;
-    }
-
-    await collectionRef.update({
-      ...updateData,
+    const collectionData = collectionSnap.data() as CollectionType;
+    const updateData: Partial<CollectionType> = {
+      ...(updates.campaignDuration && {
+        campaignDuration: updates.campaignDuration,
+      }),
+      ...(updates.bannerImages && { bannerImages: updates.bannerImages }),
+      ...(updates.title && { title: updates.title }),
+      ...(updates.slug && { slug: updates.slug }),
+      ...(updates.visibility && { visibility: updates.visibility }),
       updatedAt: currentTimestamp(),
-    });
+    };
 
-    // Revalidate paths to update collections data
-    const collectionData = collectionSnapshot.data();
+    await collectionRef.update(updateData);
+
     revalidatePath("/admin/storefront");
     revalidatePath(`/admin/collections/${collectionData?.slug}-${data.id}`);
     revalidatePath("/");
@@ -206,69 +165,46 @@ export async function UpdateCollectionAction(data: {
   }
 }
 
+/**
+ * Adds a product to a collection
+ */
 export async function AddProductAction(data: {
   collectionId: string;
   productId: string;
 }) {
   try {
     const { collectionId, productId } = data;
-
-    // Fetch both documents in parallel
-    const [productSnapshot, collectionSnapshot] = await Promise.all([
-      adminDb.collection("products").doc(productId).get(),
-      adminDb.collection("collections").doc(collectionId).get(),
-    ]);
-
-    if (!productSnapshot.exists) {
-      return { type: ShowAlertType.ERROR, message: "Product not found" };
+    const collectionRef = adminDb.collection("collections").doc(collectionId);
+    const collectionSnap = await collectionRef.get();
+    if (!collectionSnap.exists) {
+      return { type: ShowAlertType.ERROR, message: "Collection not found" };
     }
 
-    if (!collectionSnapshot.exists) {
+    const collectionData = collectionSnap.data() as CollectionType;
+    if (collectionData.products.some((p) => p.id === productId)) {
       return {
         type: ShowAlertType.ERROR,
-        message: "Collection not found",
+        message: "Product already in collection",
       };
     }
 
-    const collectionData = collectionSnapshot.data();
-    const collectionProducts = Array.isArray(collectionData?.products)
-      ? collectionData?.products
-      : [];
+    // Add product at index 1, shift others
+    const updatedProducts = [
+      { id: productId, index: 1 },
+      ...collectionData.products.map((p) => ({ ...p, index: p.index + 1 })),
+    ];
 
-    const productAlreadyExists = collectionProducts.some(
-      (product) => product.id === productId
-    );
-
-    if (productAlreadyExists) {
-      return {
-        type: ShowAlertType.ERROR,
-        message: "Product already in the collection",
-      };
-    }
-
-    // Sort and update indices in memory
-    collectionProducts.sort((a, b) => a.index - b.index);
-    const updatedProducts = collectionProducts.map((product, index) => ({
-      ...product,
-      index: index + 2,
-    }));
-
-    // Add new product at the beginning
-    updatedProducts.unshift({ id: productId, index: 1 });
-
-    await adminDb.collection("collections").doc(collectionId).update({
+    await collectionRef.update({
       products: updatedProducts,
       updatedAt: currentTimestamp(),
     });
 
-    // Revalidate paths
-    const paths = [
-      "/admin/storefront",
-      `/admin/collections/${collectionData?.slug}-${collectionId}`,
-      "/",
-      `/collections/${collectionData?.slug}-${collectionId}`,
-    ];
-    paths.forEach((path) => revalidatePath(path));
+    revalidatePath("/");
+    revalidatePath("/admin/storefront");
+    revalidatePath(
+      `/admin/collections/${collectionData?.slug}-${collectionId}`
+    );
+    revalidatePath(`/collections/${collectionData?.slug}-${collectionId}`);
 
     return {
       type: ShowAlertType.SUCCESS,
@@ -289,42 +225,25 @@ export async function RemoveProductAction(data: {
 }) {
   try {
     const { collectionId, productId } = data;
-    const productRef = adminDb.collection("products").doc(productId);
-    const productSnapshot = await productRef.get();
-
-    if (!productSnapshot.exists) {
-      return { type: ShowAlertType.ERROR, message: "Product not found" };
-    }
-
     const collectionRef = adminDb.collection("collections").doc(collectionId);
-    const collectionSnapshot = await collectionRef.get();
-
-    if (!collectionSnapshot.exists) {
-      return {
-        type: ShowAlertType.ERROR,
-        message: "Collection not found",
-      };
+    const collectionSnap = await collectionRef.get();
+    if (!collectionSnap.exists) {
+      return { type: ShowAlertType.ERROR, message: "Collection not found" };
     }
 
-    const collectionData = collectionSnapshot.data() as DataType;
-
-    const updatedProducts = collectionData.products.filter(
-      (product) => product.id !== productId
-    );
-
-    updatedProducts.forEach((product, index) => {
-      product.index = index + 1;
-    });
+    const collectionData = collectionSnap.data() as CollectionType;
+    const updatedProducts = collectionData.products
+      .filter((p) => p.id !== productId)
+      .map((p, idx) => ({ ...p, index: idx + 1 }));
 
     await collectionRef.update({
       products: updatedProducts,
       updatedAt: currentTimestamp(),
     });
 
-    // Revalidate paths to update collections data
+    revalidatePath("/");
     revalidatePath("/admin/storefront");
     revalidatePath(`/admin/collections/${collectionData.slug}-${collectionId}`);
-    revalidatePath("/");
     revalidatePath(`/collections/${collectionData.slug}-${collectionId}`);
 
     return {
@@ -342,78 +261,49 @@ export async function RemoveProductAction(data: {
 
 export async function ChangeProductIndexAction(data: {
   collectionId: string;
-  product: {
-    id: string;
-    index: number;
-  };
+  product: { id: string; index: number };
 }) {
   try {
-    const { collectionId, product: productOneChanges } = data;
-
-    // Fetch both documents in parallel
-    const [productSnapshot, collectionSnapshot] = await Promise.all([
-      adminDb.collection("products").doc(productOneChanges.id).get(),
-      adminDb.collection("collections").doc(collectionId).get(),
-    ]);
-
-    if (!productSnapshot.exists) {
-      return { type: ShowAlertType.ERROR, message: "Product not found" };
+    const { collectionId, product } = data;
+    const collectionRef = adminDb.collection("collections").doc(collectionId);
+    const collectionSnap = await collectionRef.get();
+    if (!collectionSnap.exists) {
+      return { type: ShowAlertType.ERROR, message: "Collection not found" };
     }
 
-    if (!collectionSnapshot.exists) {
+    const collectionData = collectionSnap.data() as CollectionType;
+    const products = collectionData.products;
+    const currentProduct = products.find((p) => p.id === product.id);
+    if (!currentProduct) {
       return {
         type: ShowAlertType.ERROR,
-        message: "Collection not found",
+        message: "Product not found in collection",
       };
     }
-
-    const collectionData = collectionSnapshot.data() as DataType;
-
-    if (
-      isNaN(productOneChanges.index) ||
-      productOneChanges.index < 1 ||
-      productOneChanges.index > collectionData.products.length
-    ) {
-      return {
-        type: ShowAlertType.ERROR,
-        message: "Index is invalid or out of range",
-      };
+    if (product.index < 1 || product.index > products.length) {
+      return { type: ShowAlertType.ERROR, message: "Index out of range" };
     }
 
-    const productOne = collectionData.products.find(
-      (item) => item.id === productOneChanges.id
-    );
+    // Remove and reinsert product at new index
+    const filteredProducts = products.filter((p) => p.id !== product.id);
+    filteredProducts.splice(product.index - 1, 0, {
+      id: product.id,
+      index: product.index,
+    });
+    const updatedProducts = filteredProducts.map((p, idx) => ({
+      ...p,
+      index: idx + 1,
+    }));
 
-    const productOneIndexBeforeSwap = productOne?.index;
-
-    const productTwo = collectionData.products.find(
-      (item) => item.index === productOneChanges.index
-    );
-
-    if (!productTwo || !productOne || productOneIndexBeforeSwap === undefined) {
-      return {
-        type: ShowAlertType.ERROR,
-        message: "Products not found for index swap",
-      };
-    }
-
-    // Perform swap in memory
-    productOne.index = productOneChanges.index;
-    productTwo.index = productOneIndexBeforeSwap;
-
-    await adminDb.collection("collections").doc(collectionId).update({
-      products: collectionData.products,
+    await collectionRef.update({
+      products: updatedProducts,
       updatedAt: currentTimestamp(),
     });
 
-    // Revalidate paths
-    const paths = [
-      "/admin/storefront",
-      `/admin/collections/${collectionData.slug}-${collectionId}`,
-      "/",
-      `/collections/${collectionData.slug}-${collectionId}`,
-    ];
-    paths.forEach((path) => revalidatePath(path));
+    revalidatePath("/");
+    revalidatePath("/admin/storefront");
+    revalidatePath(`/admin/collections/${collectionData.slug}-${collectionId}`);
+    revalidatePath(`/collections/${collectionData.slug}-${collectionId}`);
 
     return {
       type: ShowAlertType.SUCCESS,
@@ -432,22 +322,14 @@ export async function DeleteCollectionAction(data: { id: string }) {
   try {
     const collectionRef = adminDb.collection("collections").doc(data.id);
     const collectionSnap = await collectionRef.get();
-
     if (!collectionSnap.exists) {
-      return {
-        type: ShowAlertType.ERROR,
-        message: "Collection not found",
-      };
+      return { type: ShowAlertType.ERROR, message: "Collection not found" };
     }
 
+    const collectionData = collectionSnap.data() as CollectionType;
     await collectionRef.delete();
 
-    const reorderResult = await ReorderCollectionIndicesAction();
-
-    if (reorderResult.type === ShowAlertType.ERROR) {
-      return reorderResult;
-    }
-
+    // Revalidate relevant paths
     revalidatePath("/admin/storefront");
     revalidatePath("/");
 
@@ -464,64 +346,20 @@ export async function DeleteCollectionAction(data: { id: string }) {
   }
 }
 
-// -- Logic & Utilities --
+// Type Definitions
 
-async function ReorderCollectionIndicesAction() {
-  try {
-    const collectionsRef = adminDb.collection("collections");
-    const collectionsSnapshot = await collectionsRef.get();
-
-    const sortedCollections = collectionsSnapshot.docs
-      .map((doc) => ({
-        id: doc.id,
-        index: doc.data().index,
-      }))
-      .sort((a, b) => a.index - b.index);
-
-    const batch = adminDb.batch();
-
-    sortedCollections.forEach((collection, idx) => {
-      const collectionRef = collectionsRef.doc(collection.id);
-      batch.update(collectionRef, {
-        index: idx + 1,
-        updatedAt: currentTimestamp(),
-      });
-    });
-
-    await batch.commit();
-
-    revalidatePath("/admin/storefront");
-    revalidatePath("/");
-
-    return {
-      type: ShowAlertType.SUCCESS,
-      message: "Collection indices reordered successfully",
-    };
-  } catch (error) {
-    console.error("Error reordering collection indices:", error);
-    return {
-      type: ShowAlertType.ERROR,
-      message: "Failed to reorder collection indices",
-    };
-  }
-}
-
-// -- Type Definitions --
-
-type DataType = {
-  image: string;
+type CollectionType = {
+  id: string;
   title: string;
   slug: string;
-  campaignDuration: {
-    startDate: string;
-    endDate: string;
-  };
-  visibility: string;
   collectionType: string;
+  campaignDuration: { startDate: string; endDate: string };
   index: number;
+  products: { id: string; index: number }[];
+  visibility: "DRAFT" | "PUBLISHED" | "ARCHIVED";
   updatedAt: string;
   createdAt: string;
-  products: Array<{ id: string; index: number }>;
+  bannerImages?: BannerImagesType;
 };
 
 type BannerImagesType = {
