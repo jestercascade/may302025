@@ -155,7 +155,7 @@ function DesktopNavbar() {
   return (
     <div className="hidden md:flex justify-between gap-1 flex-col md:flex-row w-full max-w-[1080px] mx-auto p-2 pl-[14px] relative">
       <div className="flex items-center gap-5">
-        <Link href="/admin">
+        <Link href="/admin" className="ml-1.5 min-w-[232px]">
           <Image
             src="/logos/cherlygood-1.svg"
             alt="Cherlygood"
@@ -183,7 +183,7 @@ function DesktopNavbar() {
           </Link>
         </div>
       </div>
-      <div className="absolute right-4 top-2 md:relative md:right-auto md:top-auto min-w-[160px] w-[160px] h-12 flex items-center justify-end">
+      <div className="absolute right-4 top-2 md:relative md:right-auto md:top-auto h-12 flex items-center justify-end">
         <div className="relative" ref={menuRef}>
           <button
             onClick={toggleMenuDropdown}

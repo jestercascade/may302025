@@ -111,7 +111,7 @@ export default async function Overview() {
   ]);
 
   return (
-    <div className="max-w-[820px] flex flex-col gap-10 px-5">
+    <div className="max-w-[820px] mx-auto min-[1080px]:mx-0 flex flex-col gap-10 px-5">
       <div>
         <h2 className="font-semibold text-xl mb-6">Store Growth</h2>
         <div className="w-full p-5 relative shadow rounded-xl bg-white">
@@ -163,21 +163,21 @@ const StoreGrowth = ({ orders }: { orders: OrderType[] | null }) => {
   const metrics = storeGrowthMetrics.getMetrics();
 
   return (
-    <div className="hidden lg:block rounded-xl bg-white border overflow-hidden">
+    <div className="rounded-lg bg-white border overflow-hidden">
       <div className="overflow-auto custom-x-scrollbar">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b">
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-64">
+              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36 md:w-1/4">
                 Metric
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">
+              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36 md:w-1/4">
                 Today
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">
+              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36 md:w-1/4">
                 This Month
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">
+              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36 md:w-1/4">
                 All-Time
               </th>
             </tr>
@@ -352,15 +352,15 @@ const BestsellingProducts = ({
   }
 
   return (
-    <div className="hidden lg:block rounded-xl bg-white border overflow-hidden">
+    <div className="rounded-lg bg-white border overflow-hidden">
       <div className="overflow-auto custom-x-scrollbar">
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[738px] text-sm">
           <thead>
             <tr className="border-b">
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider">
+              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-36 md:w-1/4">
                 PRODUCT
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider w-40">
+              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-36 md:w-1/4">
                 <div className="relative">
                   <span>REVENUE</span>
                   <span className="absolute left-0 top-full font-normal bg-neutral-100">
@@ -368,7 +368,7 @@ const BestsellingProducts = ({
                   </span>
                 </div>
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider w-40">
+              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-36 md:w-1/4">
                 <div className="relative">
                   <span>REVENUE</span>
                   <span className="absolute left-0 top-full font-normal bg-neutral-100">
@@ -376,7 +376,7 @@ const BestsellingProducts = ({
                   </span>
                 </div>
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider w-40">
+              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-36 md:w-1/4">
                 <div className="relative">
                   <span>UNITS SOLD</span>
                   <span className="absolute left-0 top-full font-normal bg-neutral-100">
@@ -401,13 +401,15 @@ const BestsellingProducts = ({
                   className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors"
                 >
                   <td className="p-4">
-                    <Link
-                      href={`/admin/products/${slug}-${id}`}
-                      target="_blank"
-                      className="underline max-w-48 line-clamp-1"
-                    >
-                      {name}
-                    </Link>
+                    <div className="w-full max-w-[112px]">
+                      <Link
+                        href={`/admin/products/${slug}-${id}`}
+                        target="_blank"
+                        className="underline line-clamp-1 min-w-[152px]"
+                      >
+                        {name}
+                      </Link>
+                    </div>
                   </td>
                   <td className="p-4">
                     {todayRevenue > 0 ? formatRevenue(todayRevenue) : "—"}
@@ -563,15 +565,15 @@ const RevenueByCategory = async ({
   }
 
   return (
-    <div className="hidden lg:block rounded-xl bg-white border overflow-hidden">
+    <div className="rounded-lg bg-white border overflow-hidden">
       <div className="overflow-auto custom-x-scrollbar">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b">
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider">
+              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-36 md:w-1/4">
                 CATEGORY
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider w-44">
+              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-40 md:w-1/4">
                 <div className="relative">
                   <span>REVENUE</span>
                   <span className="absolute left-0 top-full font-normal bg-neutral-100">
@@ -579,10 +581,10 @@ const RevenueByCategory = async ({
                   </span>
                 </div>
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider w-44">
+              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-40 md:w-1/4">
                 ALL-TIME REVENUE
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider w-44">
+              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-40 md:w-1/4">
                 <div className="relative">
                   <span>CONTRIBUTION</span>
                   <span className="absolute left-0 top-full font-normal bg-neutral-100">
@@ -640,15 +642,15 @@ const ProductStatus = ({ products }: { products: ProductType[] | null }) => {
   const hiddenProducts = products.filter((p) => p.visibility !== "PUBLISHED");
 
   return (
-    <div className="hidden lg:block rounded-xl bg-white border overflow-hidden">
+    <div className="rounded-lg bg-white border overflow-hidden">
       <div className="overflow-auto custom-x-scrollbar">
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[738px] text-sm">
           <thead>
             <tr className="border-b">
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">
+              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-[100px]">
                 Status
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">
+              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-[100px]">
                 Product Count
               </th>
               <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">
@@ -759,21 +761,21 @@ const CartStatusBreakdown = ({
   );
 
   return (
-    <div className="hidden lg:block rounded-xl bg-white border overflow-hidden">
+    <div className="rounded-lg bg-white border overflow-hidden">
       <div className="overflow-auto custom-x-scrollbar">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b">
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">
+              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36">
                 Status
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">
+              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36">
                 Cart Count
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">
+              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36">
                 Total Value
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">
+              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-64">
                 Description
               </th>
             </tr>
@@ -923,9 +925,9 @@ const UpsellPerformance = ({ upsells }: { upsells: UpsellType[] | null }) => {
   const avgSavings = activeUpsells ? metrics.discountLoss / activeUpsells : 0;
 
   return (
-    <div className="hidden lg:block rounded-xl bg-white border overflow-hidden">
+    <div className="rounded-lg bg-white border overflow-hidden">
       <div className="overflow-auto custom-x-scrollbar">
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[738px] text-sm">
           <thead>
             <tr className="border-b">
               <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-36">
