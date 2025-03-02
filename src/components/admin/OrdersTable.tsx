@@ -27,7 +27,6 @@ export default function OrdersTable({
       };
     }
 
-    // Sort orders by timestamp in descending order (latest first)
     const sortedData = [...data].sort(
       (a, b) =>
         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
@@ -145,7 +144,7 @@ export default function OrdersTable({
                 const time = formatTime(timestamp);
 
                 return (
-                  <div key={id} className="bg-white rounded-xl border">
+                  <div key={id} className="bg-white rounded-xl border p-4">
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center space-x-3">
