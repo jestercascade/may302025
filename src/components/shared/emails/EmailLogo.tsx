@@ -10,17 +10,17 @@ export function EmailLogo({
   const LogoComponent = (
     <div
       style={{
-        paddingTop: "36px",
-        paddingBottom: "20px",
+        paddingTop: "40px",
+        paddingBottom: "40px",
         width: "max-content",
         margin: "0 auto",
       }}
     >
       <img
-        src="https://firebasestorage.googleapis.com/v0/b/project-2456.appspot.com/o/cherlygood-logo-silver.png?alt=media&token=b076f07b-380e-48e3-9e41-24dc3c13ba2d"
-        alt="Cherly Good"
-        width="240"
-        height="60"
+        src="https://firebasestorage.googleapis.com/v0/b/project-2456.appspot.com/o/cherlygood-1.png?alt=media&token=8828da9d-2219-4e63-9ce9-ca5e51d4f488"
+        alt="Cherlygood"
+        width="220"
+        height="28"
         style={{
           maxWidth: "100%",
           height: "auto",
