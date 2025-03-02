@@ -79,7 +79,7 @@ export function EmailFooter({
             Many thanks,
           </h2>
           <span style={{ fontSize: "14px", fontStyle: "italic" }}>
-            from <strong>Cherly Good</strong>
+            from <strong>Cherlygood</strong>
           </span>
         </div>
       </div>
@@ -138,7 +138,7 @@ export function EmailFooter({
             marginTop: "8px",
           }}
         >
-          © {CURRENT_YEAR} Cherly Good. All rights reserved.
+          © {CURRENT_YEAR} Cherlygood. All rights reserved.
         </p>
       </div>
     </div>

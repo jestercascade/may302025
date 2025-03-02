@@ -318,7 +318,7 @@ export function SendNewsletterOverlay() {
                 <div className="w-full h-full pt-2 flex flex-col items-center gap-5">
                   <div className="flex-1 w-[calc(100%-40px)] border rounded-md overflow-auto custom-scrollbar bg-neutral-50">
                     <div className="h-12 px-4 border-b flex items-center justify-center">
-                      <span className="text-gray-700 font-medium">
+                      <span className="truncate font-medium">
                         {newsletter?.emailSubject}
                       </span>
                     </div>
@@ -543,7 +543,7 @@ export function SendNewsletterOverlay() {
                       </div>
                       <div className="bg-neutral-50">
                         <div className="h-12 px-4 border-b flex items-center justify-center">
-                          <span className="text-gray-700 font-medium">
+                          <span className="truncate font-medium">
                             {newsletter?.emailSubject}
                           </span>
                         </div>

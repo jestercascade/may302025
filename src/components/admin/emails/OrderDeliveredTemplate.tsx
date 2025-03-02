@@ -32,7 +32,7 @@ export function OrderDeliveredTemplate() {
         >
           <img
             src="https://firebasestorage.googleapis.com/v0/b/project-2456.appspot.com/o/cherlygood-logo-silver.png?alt=media&token=b076f07b-380e-48e3-9e41-24dc3c13ba2d"
-            alt="Cherly Good"
+            alt="Cherlygood"
             width={240}
             height={60}
           />
@@ -160,7 +160,7 @@ export function OrderDeliveredTemplate() {
                   fontStyle: "italic",
                 }}
               >
-                from <strong>Cherly Good</strong>
+                from <strong>Cherlygood</strong>
               </span>
             </div>
           </div>
@@ -216,7 +216,7 @@ export function OrderDeliveredTemplate() {
                 marginTop: "8px",
               }}
             >
-              © {new Date().getFullYear()} Cherly Good. All rights reserved.
+              © {new Date().getFullYear()} Cherlygood. All rights reserved.
             </p>
           </div>
         </div>
