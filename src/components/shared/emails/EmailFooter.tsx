@@ -25,14 +25,14 @@ export function EmailFooter({
   };
 
   const FooterComponent = (
-    <div style={{ textAlign: "center", paddingBottom: "56px" }}>
+    <div style={{ textAlign: "center", paddingBottom: "40px" }}>
       {showFirstSeparator && (
         <div
           style={{
             width: "100%",
             height: "1px",
             background: "linear-gradient(to right, #FFFFFF, #E0E0E0, #FFFFFF)",
-            margin: "72px 0 56px 0",
+            margin: "40px 0",
           }}
         />
       )}
@@ -88,7 +88,7 @@ export function EmailFooter({
           width: "100%",
           height: "1px",
           background: "linear-gradient(to right, #FFFFFF, #E0E0E0, #FFFFFF)",
-          margin: "56px 0",
+          margin: "40px 0",
         }}
       />
       <div>

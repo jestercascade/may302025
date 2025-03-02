@@ -104,7 +104,7 @@ export function OrderConfirmedTemplate() {
               height: "1px",
               background:
                 "linear-gradient(to right, #FFFFFF, #E0E0E0, #FFFFFF)",
-              margin: "56px 0 52px 0",
+              margin: "40px 0",
             }}
           ></div>
 
@@ -172,7 +172,7 @@ export function OrderConfirmedTemplate() {
               height: "1px",
               background:
                 "linear-gradient(to right, #FFFFFF, #E0E0E0, #FFFFFF)",
-              margin: "56px 0",
+              margin: "40px 0",
             }}
           ></div>
 
