@@ -168,7 +168,7 @@ export function UpsellOverlay({ data }: { data: DataType }) {
                   </span>
                 </button>
               </div>
-              <div className="w-full h-full mt-[52px] md:mt-0 p-5 pb-28 md:pb-10 flex flex-col gap-5 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
+              <div className="w-full h-full mt-[52px] md:mt-0 p-5 flex flex-col gap-5 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
                 {upsell && upsellDetails ? (
                   <div className="mx-auto w-max max-w-full rounded-xl overflow-hidden border border-[#FFD69D] bg-[#FEF0B8]">
                     <div className="rounded-xl p-2 pb-0">
@@ -207,7 +207,7 @@ export function UpsellOverlay({ data }: { data: DataType }) {
                     </div>
                   </div>
                 ) : (
-                  <div className="w-full flex flex-col gap-4 items-center mt-[52px] md:mt-0 px-5 pt-5 pb-28 md:pb-[70px]">
+                  <div className="w-full flex flex-col gap-4 items-center mt-[52px] md:mt-0 p-5 md:pb-[70px]">
                     <div className="flex flex-col gap-2 items-center">
                       <h2 className="font-semibold text-lg">No upsell</h2>
                       <p className="text-sm text-center">

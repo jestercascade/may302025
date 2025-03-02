@@ -20,11 +20,21 @@ export function MobileNavbarButton() {
   const showMobileNavbarOverlay = useMobileNavbarStore(
     (state) => state.showMobileNavbarOverlay
   );
+  const isOverlayVisible = useMobileNavbarStore(
+    (state) => state.isMobileNavbarOverlayVisible
+  );
+
+  useEffect(() => {
+    document.body.style.overflow = isOverlayVisible ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOverlayVisible]);
 
   return (
     <button
       onClick={showMobileNavbarOverlay}
-      className="h-12 w-12 rounded-full flex items-center justify-center ease-in-out transition duration-300 active:bg-lightgray-dimmed lg:hover:bg-lightgray-dimmed"
+      className="h-12 w-12 rounded-full flex items-center justify-center transition-colors active:bg-lightgray-dimmed lg:hover:bg-lightgray-dimmed"
       aria-label="Menu"
     >
       <Menu strokeWidth={2.5} />
@@ -66,6 +76,15 @@ export function MobileNavbarOverlay() {
     isCollectionEditingPage ||
     isUpsellListPage ||
     isNewsletterListPage;
+
+  const showMenuButtons =
+    isCollectionListPage ||
+    isProductListPage ||
+    isUpsellListPage ||
+    isNewsletterListPage ||
+    isProductEditingPage ||
+    isUpsellEditingPage ||
+    isCollectionEditingPage;
 
   const productSlug = isProductEditingPage
     ? pathname.split("/").pop()
@@ -190,20 +209,10 @@ export function MobileNavbarOverlay() {
     >
       <div
         ref={menuRef}
-        className="absolute right-0 bottom-0 top-0 h-full w-3/4 max-w-80 px-5 pt-3 bg-white"
+        className="absolute right-0 bottom-0 top-0 h-full w-3/4 max-w-80 p-5 pt-10 bg-white"
       >
-        <div className="h-full">
-          <button onClick={() => handleNavigation("/admin")} className="ml-1">
-            <Image
-              src="/logos/cherlygood-1.svg"
-              alt="Cherlygood"
-              width={220}
-              height={27}
-              priority
-              className="mt-1"
-            />
-          </button>
-          <div className="flex flex-col gap-4 mt-5 ml-2">
+        <div className="h-full flex flex-col gap-4 ml-2">
+          {showMenuButtons && (
             <div className="flex flex-col gap-1">
               {isCollectionListPage && (
                 <NewCollectionMenuButton closeMenu={hideMobileNavbarOverlay} />
@@ -249,45 +258,45 @@ export function MobileNavbarOverlay() {
                 </button>
               )}
             </div>
-            {showSeparator && <hr />}
-            <div className="flex flex-col gap-1 *:h-10 *:w-max *:text-lg *:font-medium *:rounded-full *:flex *:items-center">
-              <button onClick={() => handleNavigation("/admin/storefront")}>
-                Storefront
-              </button>
-              <button onClick={() => handleNavigation("/admin/products")}>
-                Products
-              </button>
-              <button onClick={() => handleNavigation("/admin/upsells")}>
-                Upsells
-              </button>
-              <button onClick={() => handleNavigation("/admin/orders")}>
-                Orders
-              </button>
-              <button onClick={() => handleNavigation("/admin/newsletters")}>
-                Newsletters
-              </button>
-            </div>
-            <hr />
-            <div className="flex flex-col gap-1 *:h-9 *:w-max *:text-sm *:font-medium *:rounded-full *:flex *:items-center">
-              <button onClick={() => handleNavigation("/")}>
-                Public website
-              </button>
-              <button
-                onClick={() => signOut()}
-                disabled={isSigningOut}
-                className={clsx({
-                  "opacity-50 cursor-not-allowed": isSigningOut,
-                  "active:bg-lightgray lg:hover:bg-lightgray": !isSigningOut,
-                })}
-              >
-                {isSigningOut ? "Signing out..." : "Sign out"}
-              </button>
-            </div>
+          )}
+          {showSeparator && <hr />}
+          <div className="flex flex-col gap-1 *:h-10 *:w-max *:text-lg *:font-medium *:rounded-full *:flex *:items-center">
+            <button onClick={() => handleNavigation("/admin/storefront")}>
+              Storefront
+            </button>
+            <button onClick={() => handleNavigation("/admin/products")}>
+              Products
+            </button>
+            <button onClick={() => handleNavigation("/admin/upsells")}>
+              Upsells
+            </button>
+            <button onClick={() => handleNavigation("/admin/orders")}>
+              Orders
+            </button>
+            <button onClick={() => handleNavigation("/admin/newsletters")}>
+              Newsletters
+            </button>
+          </div>
+          <hr />
+          <div className="flex flex-col gap-1 *:h-9 *:w-max *:text-sm *:font-medium *:rounded-full *:flex *:items-center">
+            <button onClick={() => handleNavigation("/")}>
+              Public website
+            </button>
+            <button
+              onClick={() => signOut()}
+              disabled={isSigningOut}
+              className={clsx({
+                "opacity-50 cursor-not-allowed": isSigningOut,
+                "active:bg-lightgray lg:hover:bg-lightgray": !isSigningOut,
+              })}
+            >
+              {isSigningOut ? "Signing out..." : "Sign out"}
+            </button>
           </div>
         </div>
         <button
           onClick={hideMobileNavbarOverlay}
-          className="h-9 w-9 rounded-full absolute right-3 top-2 flex items-center justify-center transition duration-300 ease-in-out hover:bg-lightgray"
+          className="h-9 w-9 rounded-full absolute right-2 top-2 flex items-center justify-center transition duration-300 ease-in-out hover:bg-lightgray"
           type="button"
         >
           <X color="#6c6c6c" strokeWidth={1.5} />

@@ -171,7 +171,7 @@ export function CampaignDurationOverlay({
                   )}
                 </button>
               </div>
-              <div className="w-full h-full mt-[52px] md:mt-0 px-5 pt-5 pb-28 md:pb-10 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
+              <div className="w-full h-full mt-[52px] md:mt-0 p-5 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
                 <div className="w-full flex flex-col gap-5">
                   <div>
                     <h2 className="text-xs text-gray mx-auto mb-2 w-max">

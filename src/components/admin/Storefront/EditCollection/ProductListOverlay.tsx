@@ -303,7 +303,7 @@ export function ProductListOverlay({
                   </button>
                 </div>
                 {tableData.length > 0 ? (
-                  <div className="w-full h-full mt-[52px] md:mt-0 px-5 pt-5 pb-28 md:pb-8 flex flex-col gap-2 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
+                  <div className="w-full h-full mt-[52px] md:mt-0 p-5 flex flex-col gap-2 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
                     <div className="w-full flex flex-col min-[588px]:flex-row gap-2 items-center justify-between">
                       <div className="max-w-full flex flex-nowrap rounded-full bg-lightgray overflow-x-visible overflow-y-hidden invisible-scrollbar *:min-w-max *:h-9 *:rounded-full *:flex *:items-center *:justify-center *:font-semibold *:text-sm *:ease-in-out *:duration-300 *:transition">
                         <button
