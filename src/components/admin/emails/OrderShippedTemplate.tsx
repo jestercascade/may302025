@@ -149,7 +149,7 @@ export function OrderShippedTemplate() {
                 style={{
                   fontSize: "18px",
                   fontWeight: "bold",
-                  marginBottom: "12px",
+                  marginBottom: "8px",
                 }}
               >
                 Many thanks,
