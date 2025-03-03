@@ -2,7 +2,6 @@
 
 import { CloseIconThin } from "@/icons";
 import { useMobileNavbarStore } from "@/zustand/website/mobileNavbarStore";
-import Image from "next/image";
 import { HiMiniBars3 } from "react-icons/hi2";
 import { useRef, useEffect } from "react";
 import clsx from "clsx";
@@ -12,6 +11,16 @@ export function MobileNavbarButton() {
   const showMobileNavbarOverlay = useMobileNavbarStore(
     (state) => state.showMobileNavbarOverlay
   );
+  const isOverlayVisible = useMobileNavbarStore(
+    (state) => state.isMobileNavbarOverlayVisible
+  );
+
+  useEffect(() => {
+    document.body.style.overflow = isOverlayVisible ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOverlayVisible]);
 
   return (
     <button
@@ -91,52 +100,40 @@ export function MobileNavbarOverlay() {
       >
         <div
           ref={menuRef}
-          className="absolute right-0 bottom-0 top-0 h-full w-3/4 max-w-80 px-5 pt-3 bg-white"
+          className="absolute right-0 bottom-0 top-0 h-full w-3/4 max-w-80 p-5 pt-10 bg-white"
         >
-          <div className="h-full">
-            <button onClick={() => handleNavigation("/")} className="ml-1">
-              <Image
-                src="/logos/cherlygood-1.svg"
-                alt="Cherlygood"
-                width={220}
-                height={27}
-                priority
-                className="mt-1"
-              />
+          <div className="flex flex-col gap-1 *:h-10 *:ml-2 *:w-max *:text-lg *:font-medium *:rounded-full *:flex *:items-center">
+            <button onClick={() => handleNavigation("/new-arrivals")}>
+              New Arrivals
             </button>
-            <div className="mt-5 flex flex-col gap-1 *:h-10 *:ml-2 *:w-max *:text-lg *:font-medium *:rounded-full *:flex *:items-center">
-              <button onClick={() => handleNavigation("/new-arrivals")}>
-                New Arrivals
-              </button>
-              <button onClick={() => handleNavigation("/category/dresses")}>
-                Dresses
-              </button>
-              <button onClick={() => handleNavigation("/category/tops")}>
-                Tops
-              </button>
-              <button onClick={() => handleNavigation("/category/bottoms")}>
-                Bottoms
-              </button>
-              <button onClick={() => handleNavigation("/category/outerwear")}>
-                Outerwear
-              </button>
-              <button onClick={() => handleNavigation("/category/shoes")}>
-                Shoes
-              </button>
-              <button onClick={() => handleNavigation("/category/accessories")}>
-                Accessories
-              </button>
-              <button onClick={() => handleNavigation("/category/men")}>
-                Men
-              </button>
-              <button onClick={() => handleNavigation("/category/catch-all")}>
-                Catch-All
-              </button>
-            </div>
+            <button onClick={() => handleNavigation("/category/dresses")}>
+              Dresses
+            </button>
+            <button onClick={() => handleNavigation("/category/tops")}>
+              Tops
+            </button>
+            <button onClick={() => handleNavigation("/category/bottoms")}>
+              Bottoms
+            </button>
+            <button onClick={() => handleNavigation("/category/outerwear")}>
+              Outerwear
+            </button>
+            <button onClick={() => handleNavigation("/category/shoes")}>
+              Shoes
+            </button>
+            <button onClick={() => handleNavigation("/category/accessories")}>
+              Accessories
+            </button>
+            <button onClick={() => handleNavigation("/category/men")}>
+              Men
+            </button>
+            <button onClick={() => handleNavigation("/category/catch-all")}>
+              Catch-All
+            </button>
           </div>
           <button
             onClick={hideMobileNavbarOverlay}
-            className="h-9 w-9 rounded-full absolute right-3 top-2 flex items-center justify-center transition duration-300 ease-in-out hover:bg-lightgray"
+            className="h-9 w-9 rounded-full absolute right-2 top-2 flex items-center justify-center transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
             type="button"
           >
             <CloseIconThin size={24} className="stroke-gray" />

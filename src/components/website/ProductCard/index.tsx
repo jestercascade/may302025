@@ -16,7 +16,7 @@ export const ProductCard = memo(function ProductCard({
 }) {
   return (
     <div
-      className={`${styles.productCard} md:p-[10px] md:cursor-pointer md:rounded-2xl md:ease-in-out md:duration-300 md:transition md:hover:shadow-[0px_0px_4px_rgba(0,0,0,0.35)]`}
+      className={`${styles.productCard} md:p-[10px] md:rounded-2xl lg:ease-in-out lg:duration-300 lg:transition lg:hover:shadow-[0px_0px_4px_rgba(0,0,0,0.35)]`}
     >
       <Link
         href={`/${product.slug}-${product.id}`}

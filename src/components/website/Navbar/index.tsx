@@ -8,6 +8,7 @@ import Link from "next/link";
 import clsx from "clsx";
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
+import { useMobileNavbarStore } from "@/zustand/website/mobileNavbarStore";
 
 export default function Navbar({
   itemsInCart,
@@ -30,6 +31,9 @@ export default function Navbar({
   const isQuickviewOverlayVisible = useQuickviewStore(
     (state) => state.isVisible
   );
+  const isMobileNavbarVisible = useMobileNavbarStore(
+    (state) => state.isMobileNavbarOverlayVisible
+  );
 
   // Memoized event handler functions
   const toggleCategoriesDropdown = useCallback(() => {
@@ -47,7 +51,7 @@ export default function Navbar({
   // Scroll and click-outside handler
   useEffect(() => {
     const handleScroll = () => {
-      if (isQuickviewOverlayVisible) return;
+      if (isQuickviewOverlayVisible || isMobileNavbarVisible) return;
 
       const currentScrollPosition = window.scrollY;
       const scrollDifference = currentScrollPosition - prevScrollRef.current;
@@ -85,7 +89,7 @@ export default function Navbar({
       window.removeEventListener("scroll", handleScroll);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [shouldHideNavbar, isQuickviewOverlayVisible]);
+  }, [shouldHideNavbar, isQuickviewOverlayVisible, isMobileNavbarVisible]);
 
   return (
     <nav
@@ -160,16 +164,16 @@ function DesktopNavbar({
           <Image
             src="/logos/cherlygood-1.svg"
             alt="Cherlygood"
-            width={232}
-            height={29}
+            width={220}
+            height={27}
             priority
-            className="mt-0.5"
+            className="mt-1"
           />
         </Link>
         <div className="flex gap-3 h-10">
           <Link
             href="/new-arrivals"
-            className="hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out"
+            className="active:bg-lightgray lg:hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out"
           >
             New Arrivals
           </Link>
@@ -178,7 +182,7 @@ function DesktopNavbar({
               <button
                 onClick={toggleCategoriesDropdown}
                 className={clsx(
-                  "hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out",
+                  "active:bg-lightgray lg:hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out",
                   isCategoriesDropdownVisible && "bg-lightgray"
                 )}
               >
@@ -197,7 +201,7 @@ function DesktopNavbar({
                     <button
                       key={index}
                       onClick={() => handleCategoryClick(category.name)}
-                      className="block w-full text-left px-5 py-2 text-sm font-semibold transition duration-300 ease-in-out hover:bg-lightgray"
+                      className="block w-full text-left px-5 py-2 text-sm font-semibold transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                     >
                       {category.name}
                     </button>
@@ -208,13 +212,13 @@ function DesktopNavbar({
           )}
           <Link
             href="#"
-            className="hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out"
+            className="active:bg-lightgray lg:hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out"
           >
             Track Order
           </Link>
         </div>
       </div>
-      <div className="absolute right-4 top-2 md:relative md:right-auto md:top-auto min-w-[160px] w-max h-10 flex items-center justify-end">
+      <div className="absolute right-4 top-2 md:relative md:right-auto md:top-auto w-max h-10 flex items-center justify-end">
         <Link
           href="/cart"
           className="relative h-11 w-11 rounded-full flex items-center justify-center ease-in-out transition duration-300 active:bg-lightgray lg:hover:bg-lightgray"

@@ -46,7 +46,7 @@ export function QuickviewButton({
   return (
     <button
       onClick={handleClick}
-      className="outline-none border-none rounded-full w-[40px] h-[26px] flex items-center justify-center relative before:content-[''] before:absolute before:top-0 before:bottom-0 before:left-0 before:right-0 before:border before:border-black before:rounded-full before:transition before:duration-100 before:ease-in-out active:before:scale-105 md:hover:before:scale-105"
+      className="outline-none border-none rounded-full w-[40px] h-[26px] flex items-center justify-center relative before:content-[''] before:absolute before:top-0 before:bottom-0 before:left-0 before:right-0 before:border before:border-black before:rounded-full before:transition before:duration-100 before:ease-in-out active:before:scale-105 lg:hover:before:scale-105"
     >
       <Image
         src="/icons/cart-plus.svg"
