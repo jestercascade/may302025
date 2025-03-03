@@ -33,7 +33,7 @@ export function SizeChartOverlay({
                   overlayName: overlayName,
                 });
               }}
-              className="w-9 h-9 rounded-full absolute top-[6px] right-[6px] flex items-center justify-center transition duration-300 ease-in-out hover:bg-lightgray"
+              className="w-9 h-9 rounded-full absolute top-[6px] right-[6px] flex items-center justify-center transition-colors active:bg-lightgray lg:hover:bg-lightgray"
               type="button"
             >
               <X color="#6c6c6c" strokeWidth={1.5} />

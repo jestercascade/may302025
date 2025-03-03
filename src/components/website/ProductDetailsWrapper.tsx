@@ -100,20 +100,20 @@ export function ProductDetailsWrapper({
       <nav className="w-full border-b bg-white">
         <div className="hidden md:flex w-full max-w-[1080px] mx-auto px-6 py-2 flex-col md:flex-row justify-between gap-1 relative">
           <div className="flex items-center gap-7">
-            <Link href="/">
+            <Link href="/" className="ml-1">
               <Image
                 src="/logos/cherlygood-1.svg"
                 alt="Cherlygood"
-                width={232}
-                height={29}
+                width={220}
+                height={27}
                 priority
-                className="mt-0.5"
+                className="mt-1"
               />
             </Link>
             <div className="flex gap-3 h-10">
               <Link
                 href="/new-arrivals"
-                className="hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out"
+                className="active:bg-lightgray lg:hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out"
               >
                 New Arrivals
               </Link>
@@ -123,7 +123,7 @@ export function ProductDetailsWrapper({
                     <button
                       onClick={toggleCategoriesDropdown}
                       className={clsx(
-                        "hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out",
+                        "active:bg-lightgray lg:hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out",
                         isCategoriesDropdownVisible && "bg-lightgray"
                       )}
                     >
@@ -141,7 +141,7 @@ export function ProductDetailsWrapper({
                           <button
                             key={index}
                             onClick={() => handleCategoryClick(category.name)}
-                            className="block w-full text-left px-5 py-2 text-sm font-semibold transition duration-300 ease-in-out hover:bg-lightgray"
+                            className="block w-full text-left px-5 py-2 text-sm font-semibold transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                           >
                             {category.name}
                           </button>
@@ -152,7 +152,7 @@ export function ProductDetailsWrapper({
                 )}
               <Link
                 href="#"
-                className="hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out"
+                className="active:bg-lightgray lg:hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out"
               >
                 Track Order
               </Link>

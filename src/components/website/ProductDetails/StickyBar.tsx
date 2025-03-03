@@ -99,11 +99,9 @@ export function StickyBar({
   return (
     <div
       className={clsx(
-        "hidden md:block w-full py-4 px-5 fixed top-0 border-b bg-white transition-transform duration-150 ease-in-out",
-        {
-          "-translate-y-full": !shouldShowStickyBar,
-          "translate-y-0": shouldShowStickyBar,
-        }
+        "hidden md:block w-full py-4 px-5 fixed top-0 z-10 border-b bg-white transition-transform duration-150 ease-in-out",
+        !shouldShowStickyBar && "-translate-y-full",
+        shouldShowStickyBar && "translate-y-0"
       )}
     >
       <div className="w-full max-w-[1066px] h-16 mx-auto flex gap-5 items-center justify-between">

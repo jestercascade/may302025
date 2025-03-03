@@ -16,7 +16,7 @@ export default async function Cart() {
   const cookieStore = await cookies();
   const deviceIdentifier = cookieStore.get("device_identifier")?.value ?? "";
   const cart = await getCart(deviceIdentifier);
-  
+
   const items = cart?.items || [];
   const productItems = items.filter(
     (item): item is CartProductItemType => item.type === "product"
@@ -75,16 +75,16 @@ export default async function Cart() {
         id="scrollable-parent"
         className="h-screen overflow-x-hidden overflow-y-auto max-[1024px]:invisible-scrollbar lg:custom-scrollbar"
       >
-        <nav className="w-full border-b">
-          <div className="w-full max-w-[1080px] mx-auto px-6 py-2">
+        <nav className="border-b">
+          <div className="h-14 px-5 flex items-center max-w-[1080px] mx-auto">
             <Link href="/">
               <Image
                 src="/logos/cherlygood-1.svg"
                 alt="Cherlygood"
-                width={232}
-                height={29}
+                width={220}
+                height={27}
                 priority
-                className="mt-0.5"
+                className="mt-1"
               />
             </Link>
           </div>

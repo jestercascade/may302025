@@ -464,7 +464,7 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
             <button
               type="button"
               onClick={hideOverlay}
-              className="w-9 h-9 rounded-full absolute top-[6px] right-[6px] flex items-center justify-center ease-in-out transition duration-300 hover:bg-lightgray"
+              className="w-9 h-9 rounded-full absolute top-[6px] right-[6px] flex items-center justify-center ease-in-out transition duration-300 active:bg-lightgray lg:hover:bg-lightgray"
             >
               <X color="#6c6c6c" strokeWidth={1.5} />
             </button>

@@ -214,7 +214,7 @@ function NewsletterForm({
       onSubmit={onSubmit}
       className={clsx("relative h-11 w-[270px]", isSubmitting && "opacity-45")}
     >
-      <button
+      {/* <button
         type="submit"
         disabled={isSubmitting}
         className={clsx(
@@ -233,7 +233,7 @@ function NewsletterForm({
           onChange={onChange}
           required
         />
-      </div>
+      </div> */}
     </form>
   );
 }

@@ -56,7 +56,7 @@ export function ProductImagesOverlay({
         <button
           type="button"
           onClick={onClose}
-          className="w-9 h-9 rounded-full absolute top-[6px] right-[6px] flex items-center justify-center transition active:bg-lightgray min-[580px]:hover:bg-lightgray"
+          className="w-9 h-9 rounded-full absolute top-[6px] right-[6px] flex items-center justify-center transition active:bg-lightgray lg:hover:bg-lightgray"
           aria-label="Close carousel"
         >
           <CloseIconThin size={24} className="stroke-gray" />

@@ -159,7 +159,7 @@ const MemoizedMobileProductDetails = memo(function MobileProductDetails({
                   sizes="(max-width: 486px) 244px, 288px"
                   width={288}
                   height={288}
-                  priority={index === 0} // Only prioritize the main image
+                  priority={index === 0}
                 />
               </div>
             )
@@ -682,7 +682,7 @@ const MemoizedDesktopProductDetails = memo(function DesktopProductDetails({
       </div>
       <button
         onClick={hideOverlay}
-        className="h-9 w-9 rounded-full absolute top-[6px] right-[6px] flex items-center justify-center transition duration-300 ease-in-out hover:bg-lightgray"
+        className="h-9 w-9 rounded-full absolute top-[6px] right-[6px] flex items-center justify-center transition-colors active:bg-lightgray lg:hover:bg-lightgray"
         type="button"
       >
         <X color="#6c6c6c" strokeWidth={1.5} />
