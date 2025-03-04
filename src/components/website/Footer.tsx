@@ -24,9 +24,7 @@ export function Footer() {
 
       showAlert({
         message: response.message,
-        type: response.success
-          ? ShowAlertType.SUCCESS
-          : ShowAlertType.NEUTRAL,
+        type: response.success ? ShowAlertType.SUCCESS : ShowAlertType.NEUTRAL,
       });
 
       if (response.success) {
@@ -214,7 +212,7 @@ function NewsletterForm({
       onSubmit={onSubmit}
       className={clsx("relative h-11 w-[270px]", isSubmitting && "opacity-45")}
     >
-      {/* <button
+      <button
         type="submit"
         disabled={isSubmitting}
         className={clsx(
@@ -233,7 +231,7 @@ function NewsletterForm({
           onChange={onChange}
           required
         />
-      </div> */}
+      </div>
     </form>
   );
 }
