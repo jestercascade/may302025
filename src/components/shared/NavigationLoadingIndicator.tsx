@@ -1,5 +1,6 @@
 "use client";
 
+import { useNavigationLoadingIndicatorStore } from "@/zustand/shared/navigationLoadingIndicatorStore";
 import { usePathname, useRouter } from "next/navigation";
 import {
   createContext,
@@ -69,7 +70,16 @@ function LoadingOverlay({ showOverlay }: { showOverlay: boolean }) {
 }
 
 export function NavigationProvider({ children }: { children: ReactNode }) {
-  const [showOverlay, setShowOverlay] = useState(false);
+  const showOverlay = useNavigationLoadingIndicatorStore(
+    (state) => state.showOverlay
+  );
+  const hideOverlay = useNavigationLoadingIndicatorStore(
+    (state) => state.hideOverlay
+  );
+  const isOverlayVisible = useNavigationLoadingIndicatorStore(
+    (state) => state.isVisible
+  );
+
   const pathname = usePathname();
   const navigationStartTime = useRef<number | null>(null);
   const DELAY_MS = 300;
@@ -80,11 +90,11 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
     if (!navigationStartTime.current) {
       navigationStartTime.current = Date.now();
       const timer = setTimeout(() => {
-        setShowOverlay(true);
+        showOverlay();
       }, DELAY_MS);
       return () => clearTimeout(timer);
     }
-  }, [DELAY_MS]);
+  }, [DELAY_MS, showOverlay]);
 
   useEffect(() => {
     // Reset state when navigation completes
@@ -96,11 +106,11 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
       );
 
       setTimeout(() => {
-        setShowOverlay(false);
+        hideOverlay();
         navigationStartTime.current = null;
       }, remainingTime);
     }
-  }, [pathname]);
+  }, [pathname, hideOverlay]);
 
   const handleLinkClick = useCallback(
     (e: MouseEvent) => {
@@ -128,8 +138,10 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
   }, [handleNavigation]);
 
   return (
-    <NavigationContext.Provider value={{ triggerLoading, showOverlay }}>
-      <LoadingOverlay showOverlay={showOverlay} />
+    <NavigationContext.Provider
+      value={{ triggerLoading, showOverlay: isOverlayVisible }}
+    >
+      <LoadingOverlay showOverlay={isOverlayVisible} />
       {children}
     </NavigationContext.Provider>
   );

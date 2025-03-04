@@ -10,6 +10,7 @@ import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 import { useMobileNavbarStore } from "@/zustand/website/mobileNavbarStore";
 import { useAlertStore } from "@/zustand/shared/alertStore";
+import { useNavigationLoadingIndicatorStore } from "@/zustand/shared/navigationLoadingIndicatorStore";
 
 export default function Navbar({
   itemsInCart,
@@ -36,6 +37,8 @@ export default function Navbar({
     (state) => state.isMobileNavbarOverlayVisible
   );
   const isAlertOverlayVisible = useAlertStore((state) => state.isVisible);
+  const isNavigationLoadingIndicatorVisible =
+    useNavigationLoadingIndicatorStore((state) => state.isVisible);
 
   const toggleCategoriesDropdown = useCallback(() => {
     setCategoriesDropdownVisible((prev) => !prev);
@@ -54,7 +57,8 @@ export default function Navbar({
       if (
         isQuickviewOverlayVisible ||
         isMobileNavbarVisible ||
-        isAlertOverlayVisible
+        isAlertOverlayVisible ||
+        isNavigationLoadingIndicatorVisible
       ) {
         return;
       }
@@ -99,6 +103,7 @@ export default function Navbar({
     isQuickviewOverlayVisible,
     isMobileNavbarVisible,
     isAlertOverlayVisible,
+    isNavigationLoadingIndicatorVisible,
   ]);
 
   return (
