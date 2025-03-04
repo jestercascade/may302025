@@ -2,17 +2,18 @@
 
 import Link from "next/link";
 import { CheckCircle } from "lucide-react";
-import { useAlertStore } from "@/zustand/shared/alertStore";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { useState } from "react";
 import { subscribeToNewsletter } from "@/actions/newsletter-subscribers";
 import clsx from "clsx";
+import { useAlertStore } from "@/zustand/shared/alertStore";
 
 export function Footer() {
-  const { showAlert } = useAlertStore();
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  
+  const showAlert = useAlertStore((state) => state.showAlert);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

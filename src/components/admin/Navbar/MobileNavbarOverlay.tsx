@@ -1,7 +1,6 @@
 "use client";
 
 import { useMobileNavbarStore } from "@/zustand/admin/mobileNavbarStore";
-import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
 import clsx from "clsx";

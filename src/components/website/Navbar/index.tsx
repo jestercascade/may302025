@@ -9,6 +9,7 @@ import clsx from "clsx";
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 import { useMobileNavbarStore } from "@/zustand/website/mobileNavbarStore";
+import { useAlertStore } from "@/zustand/shared/alertStore";
 
 export default function Navbar({
   itemsInCart,
@@ -34,8 +35,8 @@ export default function Navbar({
   const isMobileNavbarVisible = useMobileNavbarStore(
     (state) => state.isMobileNavbarOverlayVisible
   );
+  const isAlertOverlayVisible = useAlertStore((state) => state.isVisible);
 
-  // Memoized event handler functions
   const toggleCategoriesDropdown = useCallback(() => {
     setCategoriesDropdownVisible((prev) => !prev);
   }, []);
@@ -48,15 +49,19 @@ export default function Navbar({
     [push]
   );
 
-  // Scroll and click-outside handler
   useEffect(() => {
     const handleScroll = () => {
-      if (isQuickviewOverlayVisible || isMobileNavbarVisible) return;
+      if (
+        isQuickviewOverlayVisible ||
+        isMobileNavbarVisible ||
+        isAlertOverlayVisible
+      ) {
+        return;
+      }
 
       const currentScrollPosition = window.scrollY;
       const scrollDifference = currentScrollPosition - prevScrollRef.current;
 
-      // Update navbar visibility only when conditions change
       if (scrollDifference > 0) {
         // Scrolling down
         if (currentScrollPosition >= 154 && !shouldHideNavbar) {
@@ -89,7 +94,12 @@ export default function Navbar({
       window.removeEventListener("scroll", handleScroll);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [shouldHideNavbar, isQuickviewOverlayVisible, isMobileNavbarVisible]);
+  }, [
+    shouldHideNavbar,
+    isQuickviewOverlayVisible,
+    isMobileNavbarVisible,
+    isAlertOverlayVisible,
+  ]);
 
   return (
     <nav
