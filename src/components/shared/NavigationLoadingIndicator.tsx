@@ -72,7 +72,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
   const [showOverlay, setShowOverlay] = useState(false);
   const pathname = usePathname();
   const navigationStartTime = useRef<number | null>(null);
-  const DELAY_MS = 300; 
+  const DELAY_MS = 300;
   const MIN_LOADING_TIME = 800;
   const FADE_DURATION = 200;
 
