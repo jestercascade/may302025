@@ -114,16 +114,12 @@ export function NewProductOverlay() {
       if (!categoryRef.current || !(event.target instanceof Node)) {
         return;
       }
-
       const targetNode = categoryRef.current as Node;
-
       if (!targetNode.contains(event.target)) {
         setIsCategoryDropdownOpen(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -132,7 +128,6 @@ export function NewProductOverlay() {
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
     setIsCategoryDropdownOpen(false);
-
     setFormData((prevData) => ({
       ...prevData,
       category: capitalizeFirstLetter(category),
@@ -144,7 +139,13 @@ export function NewProductOverlay() {
     let sanitizedValue = value;
 
     if (name === "slug") {
-      sanitizedValue = value.replace(/[^a-zA-Z0-9-]/g, "").toLowerCase();
+      sanitizedValue = value
+        .toLowerCase()
+        .replace(/\s+/g, "-") // Replace spaces with hyphens
+        .replace(/[^a-z0-9-]+/g, "") // Remove all except letters, numbers, hyphens
+        .replace(/--+/g, "-") // Replace multiple hyphens with one
+        .replace(/^-+/, "") // Remove leading hyphens
+        .replace(/-+$/, ""); // Remove trailing hyphens
     }
 
     setFormData((prevData) => ({
@@ -154,17 +155,42 @@ export function NewProductOverlay() {
   };
 
   const handleSave = async () => {
-    if (!formData.category || formData.category.toLowerCase() === "select") {
-      return showAlert({
-        message: "Select a category",
+    // Validation checks
+    if (!formData.category) {
+      showAlert({
+        message: "Please select a category",
         type: ShowAlertType.ERROR,
       });
-    } else if (!isValidRemoteImage(formData.mainImage)) {
-      return showAlert({
+      return;
+    }
+    if (!formData.name.trim() || formData.name.length < 3) {
+      showAlert({
+        message: "Product name must be at least 3 characters long",
+        type: ShowAlertType.ERROR,
+      });
+      return;
+    }
+    if (!formData.slug.trim() || formData.slug.length < 3) {
+      showAlert({
+        message: "Slug must be at least 3 characters long",
+        type: ShowAlertType.ERROR,
+      });
+      return;
+    }
+    if (!formData.basePrice.trim()) {
+      showAlert({
+        message: "Please enter a base price",
+        type: ShowAlertType.ERROR,
+      });
+      return;
+    }
+    if (!isValidRemoteImage(formData.mainImage)) {
+      showAlert({
         message:
           "Invalid main image URL. Try an image from Pinterest or your Firebase Storage.",
         type: ShowAlertType.ERROR,
       });
+      return;
     }
 
     setLoading(true);
@@ -175,6 +201,9 @@ export function NewProductOverlay() {
         message: result.message,
         type: result.type,
       });
+      if (result.type === ShowAlertType.SUCCESS) {
+        onHideOverlay();
+      }
     } catch (error) {
       console.error("Error creating product:", error);
       showAlert({
@@ -183,7 +212,6 @@ export function NewProductOverlay() {
       });
     } finally {
       setLoading(false);
-      onHideOverlay();
     }
   };
 

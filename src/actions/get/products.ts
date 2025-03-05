@@ -132,11 +132,23 @@ function filterProductFields(
   id: string
 ): ProductType {
   const filtered: Partial<ProductType> = { id };
-  const fieldsToInclude = fields.length > 0 ? fields : Object.keys(data);
-  fieldsToInclude.forEach((field) => {
-    if (data[field] !== undefined)
-      filtered[field as keyof ProductType] = data[field];
-  });
+  // Always include createdAt and updatedAt if they exist
+  if (data.createdAt !== undefined) filtered.createdAt = data.createdAt;
+  if (data.updatedAt !== undefined) filtered.updatedAt = data.updatedAt;
+  if (fields.length > 0) {
+    // Include specified fields
+    fields.forEach((field) => {
+      if (data[field] !== undefined)
+        filtered[field as keyof ProductType] = data[field];
+    });
+  } else {
+    // Include all fields
+    Object.keys(data).forEach((field) => {
+      if (field !== "id")
+        // id is already included
+        filtered[field as keyof ProductType] = data[field];
+    });
+  }
   return filtered as ProductType;
 }
 
