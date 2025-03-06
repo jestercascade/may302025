@@ -11,6 +11,7 @@ import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 import { useMobileNavbarStore } from "@/zustand/website/mobileNavbarStore";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { useNavigationLoadingIndicatorStore } from "@/zustand/shared/navigationLoadingIndicatorStore";
+import { usePathname } from "next/navigation";
 
 export default function Navbar({
   itemsInCart,
@@ -23,10 +24,13 @@ export default function Navbar({
   const [shouldHideNavbar, setShouldHideNavbar] = useState(false);
   const [isCategoriesDropdownVisible, setCategoriesDropdownVisible] =
     useState(false);
+  // Add a state to track if the change is from navigation or scrolling
+  const [isNavigating, setIsNavigating] = useState(false);
 
   // Refs for scroll position and categories dropdown
   const prevScrollRef = useRef(0);
   const categoriesRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
 
   // Router and store hooks
   const { push } = useNavigation();
@@ -52,8 +56,25 @@ export default function Navbar({
     [push]
   );
 
+  // Reset navbar visibility on route change
+  useEffect(() => {
+    setIsNavigating(true); // Set to true when navigating
+    setShouldHideNavbar(false);
+    prevScrollRef.current = window.scrollY;
+
+    // Reset isNavigating after a short delay to ensure the navbar is fully rendered
+    const timer = setTimeout(() => {
+      setIsNavigating(false);
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [pathname]);
+
   useEffect(() => {
     const handleScroll = () => {
+      // Skip scroll handling during navigation
+      if (isNavigating) return;
+
       if (
         isQuickviewOverlayVisible ||
         isMobileNavbarVisible ||
@@ -104,12 +125,15 @@ export default function Navbar({
     isMobileNavbarVisible,
     isAlertOverlayVisible,
     isNavigationLoadingIndicatorVisible,
+    isNavigating,
   ]);
 
   return (
     <nav
       className={clsx(
-        "w-full z-20 fixed top-0 border-b transition duration-100 bg-white",
+        "w-full z-20 fixed top-0 border-b bg-white",
+        // Apply transition only when not navigating
+        !isNavigating && "transition duration-100",
         shouldHideNavbar && "-translate-y-full"
       )}
     >
