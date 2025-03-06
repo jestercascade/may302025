@@ -3,20 +3,23 @@
 import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { ProductCard } from "./ProductCard";
-import { useProducts } from "@/contexts/ProductsContext";
+import { useProducts, useProductsState } from "@/contexts/ProductsContext";
 
 export default function ShuffledDiscoveryProducts({
   heading = "Explore Your Interests",
   page,
   excludeIds = [],
   cart,
+  itemsCount = 24,
 }: {
   heading?: string;
   page?: "HOME" | "CART";
   excludeIds?: string[];
   cart: CartType | null;
+  itemsCount?: number;
 }) {
-  const allProducts = useProducts();
+  const products = useProducts();
+  const { isLoading } = useProductsState();
   const [shuffledProducts, setShuffledProducts] = useState<
     ProductWithUpsellType[]
   >([]);
@@ -26,17 +29,18 @@ export default function ShuffledDiscoveryProducts({
   const previousPathnameRef = useRef(pathname);
 
   useEffect(() => {
-    if (!allProducts) return;
+    if (!products) return;
 
     // Initial render or pathname actually changed (not just during navigation events)
     const shouldShuffle =
       initialRenderRef.current || previousPathnameRef.current !== pathname;
 
     if (shouldShuffle) {
+      // console.log("🔀 Shuffling products for path:", pathname);
       setIsShuffling(true);
 
       // Shuffling logic
-      const filtered = allProducts.filter((product) =>
+      const filtered = products.filter((product) =>
         page === "HOME" || page === "CART"
           ? !excludeIds.includes(product.id)
           : true
@@ -51,7 +55,7 @@ export default function ShuffledDiscoveryProducts({
 
       // Slight delay to avoid double render appearance
       setTimeout(() => {
-        setShuffledProducts(shuffled.slice(0, 20));
+        setShuffledProducts(shuffled.slice(0, itemsCount));
         setIsShuffling(false);
       }, 50);
 
@@ -59,7 +63,7 @@ export default function ShuffledDiscoveryProducts({
       initialRenderRef.current = false;
       previousPathnameRef.current = pathname;
     }
-  }, [allProducts, excludeIds, page, pathname]);
+  }, [products, excludeIds, page, pathname, itemsCount]);
 
   return (
     <div>
@@ -67,8 +71,8 @@ export default function ShuffledDiscoveryProducts({
         <h2 className="font-semibold line-clamp-3 md:text-xl">{heading}</h2>
       </div>
       <div className="select-none w-full flex flex-wrap gap-2 md:gap-0">
-        {isShuffling
-          ? Array.from({ length: 3 }).map((_, index) => (
+        {isShuffling || isLoading
+          ? Array.from({ length: Math.min(itemsCount, 6) }).map((_, index) => (
               <ProductCardSkeleton key={index} />
             ))
           : shuffledProducts.map((product) => (
