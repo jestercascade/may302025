@@ -681,7 +681,7 @@ export default async function EditProduct({
                     "inline-flex px-3 py-1 rounded-full text-sm font-medium",
                     visibility.toUpperCase() === "PUBLISHED"
                       ? "bg-green-100 text-green-700"
-                      : "bg-gray-100"
+                      : "bg-gray-100 text-gray"
                   )}
                 >
                   {capitalizeFirstLetter(visibility.toLowerCase())}
