@@ -54,7 +54,7 @@ export default function CollectionTable({
     };
   };
 
-  const rowsPerPage = 16;
+  const rowsPerPage = 6;
   const { paginatedArray: tableData, totalPages } = pagination(
     collections,
     currentPage,
