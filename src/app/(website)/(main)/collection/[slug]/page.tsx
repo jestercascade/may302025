@@ -42,7 +42,7 @@ export default async function Collections({
 
   const [collection] = collections || [];
   const productsArray = collection?.products || [];
-  const itemsPerPage = 2;
+  const itemsPerPage = 60;
   const totalPages = Math.ceil(productsArray.length / itemsPerPage);
   const currentPageAdjusted = Math.max(1, Math.min(currentPage, totalPages));
   const startIndex = (currentPageAdjusted - 1) * itemsPerPage;

@@ -14,15 +14,12 @@ export default async function Categories({
   params: Promise<{ name: string }>;
   searchParams: Promise<{ page?: string }>;
 }) {
-  // Resolve params and searchParams concurrently
   const [{ name }, { page = "1" }] = await Promise.all([params, searchParams]);
   const currentPage = Number(page) || 1;
 
-  // Fetch cookies and get device identifier
   const cookieStore = await cookies();
   const deviceIdentifier = cookieStore.get("device_identifier")?.value || "";
 
-  // Define the product fields to fetch
   const productFields: (keyof ProductType)[] = [
     "id",
     "name",
@@ -35,7 +32,6 @@ export default async function Categories({
     "highlights",
   ];
 
-  // Fetch cart and products concurrently
   const [cart, allProducts] = await Promise.all([
     getCart(deviceIdentifier),
     getProducts({
@@ -46,7 +42,7 @@ export default async function Categories({
   ]);
 
   const productsArray = (allProducts as ProductWithUpsellType[]) || [];
-  const itemsPerPage = 2;
+  const itemsPerPage = 60;
   const totalPages = Math.ceil(productsArray.length / itemsPerPage);
   const currentPageAdjusted = Math.max(1, Math.min(currentPage, totalPages));
   const startIndex = (currentPageAdjusted - 1) * itemsPerPage;
