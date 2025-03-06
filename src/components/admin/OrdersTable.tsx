@@ -43,7 +43,7 @@ export default function OrdersTable({
     };
   };
 
-  const rowsPerPage = 5;
+  const rowsPerPage = 16;
   const { paginatedArray: tableData, totalPages } = pagination(
     orders || [],
     currentPage,

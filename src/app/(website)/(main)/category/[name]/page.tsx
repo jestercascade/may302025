@@ -42,7 +42,7 @@ export default async function Categories({
   ]);
 
   const productsArray = (allProducts as ProductWithUpsellType[]) || [];
-  const itemsPerPage = 60;
+  const itemsPerPage = 52;
   const totalPages = Math.ceil(productsArray.length / itemsPerPage);
   const currentPageAdjusted = Math.max(1, Math.min(currentPage, totalPages));
   const startIndex = (currentPageAdjusted - 1) * itemsPerPage;

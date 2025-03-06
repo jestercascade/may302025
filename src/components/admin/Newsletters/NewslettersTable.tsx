@@ -39,7 +39,7 @@ export default function NewslettersTable({
     };
   };
 
-  const rowsPerPage = 5;
+  const rowsPerPage = 16;
   const { paginatedArray: tableData, totalPages } = pagination(
     newsletters,
     currentPage,

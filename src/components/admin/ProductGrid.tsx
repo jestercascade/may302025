@@ -73,7 +73,7 @@ export default function ProductGrid({ products }: { products: ProductType[] }) {
     };
   };
 
-  const rowsPerPage = 4;
+  const rowsPerPage = 16;
   const { paginatedArray: gridData, totalPages } = pagination(
     filteredProducts,
     currentPage,

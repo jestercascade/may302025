@@ -77,7 +77,7 @@ export default function UpsellGrid({
     };
   };
 
-  const rowsPerPage = 4;
+  const rowsPerPage = 16;
   const { paginatedArray: gridData, totalPages } = pagination(
     filteredUpsells,
     currentPage,

@@ -35,7 +35,7 @@ export default async function NewArrivals({
   ]);
 
   const productsArray = (allProducts as ProductWithUpsellType[]) || [];
-  const itemsPerPage = 60;
+  const itemsPerPage = 52;
   const totalPages = Math.ceil(productsArray.length / itemsPerPage);
   const currentPageAdjusted = Math.max(1, Math.min(currentPage, totalPages));
   const startIndex = (currentPageAdjusted - 1) * itemsPerPage;
@@ -47,7 +47,7 @@ export default async function NewArrivals({
 
   return (
     <>
-      <div className="max-w-5xl mx-auto px-5 pt-8">
+      <div className="max-w-5xl mx-auto px-5 pt-4">
         <div className="select-none w-full flex flex-wrap gap-2 md:gap-0">
           {products.map((product, index) => (
             <ProductCard
