@@ -152,22 +152,30 @@ async function fetchProductsInBatches(
   const upsellIds = new Set<string>();
   const batches = [];
 
+  if (productIds.length === 0) {
+    return productsMap;
+  }
+
+  // Process in batches
   for (let i = 0; i < productIds.length; i += BATCH_SIZE) {
     batches.push(productIds.slice(i, i + BATCH_SIZE));
   }
 
-  const productPromises = batches.map((batchIds) => {
-    return adminDb
-      .collection("products")
-      .where("__name__", "in", batchIds)
-      .get();
-  });
+  // For each batch of IDs, use individual document references
+  for (const batch of batches) {
+    const docRefs = batch.map((id) => adminDb.collection("products").doc(id));
+    const docsSnapshot = await adminDb.getAll(...docRefs);
 
-  const snapshots = await Promise.all(productPromises);
+    docsSnapshot.forEach((doc) => {
+      if (!doc.exists) return;
 
-  snapshots.forEach((snapshot) => {
-    snapshot.docs.forEach((doc) => {
-      const data = doc.data();
+      const data = doc.data() || {};
+
+      // Skip non-published products
+      if (data.visibility !== "PUBLISHED") {
+        return;
+      }
+
       if (data.upsell && typeof data.upsell === "string") {
         upsellIds.add(data.upsell.trim());
       }
@@ -177,7 +185,7 @@ async function fetchProductsInBatches(
         ...data,
       } as ProductType);
     });
-  });
+  }
 
   // Fetch upsells if needed
   if (upsellIds.size > 0) {

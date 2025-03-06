@@ -38,7 +38,11 @@ export default async function Categories({
   // Fetch cart and products concurrently
   const [cart, allProducts] = await Promise.all([
     getCart(deviceIdentifier),
-    getProducts({ category: name, fields: productFields }),
+    getProducts({
+      category: name,
+      fields: productFields,
+      visibility: "PUBLISHED",
+    }),
   ]);
 
   const productsArray = (allProducts as ProductWithUpsellType[]) || [];
@@ -88,4 +92,3 @@ function getDisplayName(category: string): string {
       return `Women's ${capitalizeFirstLetter(category)}`;
   }
 }
-

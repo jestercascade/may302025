@@ -63,7 +63,10 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
           "highlights",
         ];
 
-        const fetchedProducts = await getProducts({ fields: productFields });
+        const fetchedProducts = await getProducts({
+          fields: productFields,
+          visibility: "PUBLISHED",
+        });
         // console.log("✅ Products fetched:", fetchedProducts?.length);
 
         // Update both global store and local state
@@ -78,7 +81,7 @@ export function ProductsProvider({ children }: { children: React.ReactNode }) {
           isLoading: false,
           lastFetched: Date.now(),
         });
-      } catch (error) {
+      } catch {
         // console.error("❌ Error fetching products:", error);
 
         // Reset loading state on error

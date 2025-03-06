@@ -43,6 +43,7 @@ export default async function ProductDetails({
         "upsell",
         "description",
       ],
+      visibility: "PUBLISHED",
     }),
   ]);
 

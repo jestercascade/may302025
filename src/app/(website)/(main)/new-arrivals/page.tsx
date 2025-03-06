@@ -31,7 +31,7 @@ export default async function NewArrivals({
 
   const [cart, allProducts] = await Promise.all([
     getCart(deviceIdentifier),
-    getProducts({ fields: productFields }),
+    getProducts({ fields: productFields, visibility: "PUBLISHED" }),
   ]);
 
   const productsArray = (allProducts as ProductWithUpsellType[]) || [];
