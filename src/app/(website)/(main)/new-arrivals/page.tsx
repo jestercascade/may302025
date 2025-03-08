@@ -35,7 +35,7 @@ export default async function NewArrivals({
   ]);
 
   const productsArray = (allProducts as ProductWithUpsellType[]) || [];
-  const itemsPerPage = 52;
+  const itemsPerPage = 3; //52
   const totalPages = Math.ceil(productsArray.length / itemsPerPage);
   const currentPageAdjusted = Math.max(1, Math.min(currentPage, totalPages));
   const startIndex = (currentPageAdjusted - 1) * itemsPerPage;
