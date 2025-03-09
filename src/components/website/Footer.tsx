@@ -12,7 +12,7 @@ export function Footer() {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  
+
   const showAlert = useAlertStore((state) => state.showAlert);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,19 +69,19 @@ export function Footer() {
             <div>
               <h3 className="font-semibold mb-4">Company</h3>
               <Link
-                href="#"
+                href="/about-us"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
                 About us
               </Link>
               <Link
-                href="#"
+                href="/privacy-policy"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
                 Privacy policy
               </Link>
               <Link
-                href="#"
+                href="/terms-of-service"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
                 Terms of service
@@ -90,28 +90,28 @@ export function Footer() {
             <div>
               <h3 className="font-semibold mb-4">Get Help</h3>
               <Link
-                href="#"
+                href="contact-us"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
                 Contact us
               </Link>
               <Link
-                href="#"
+                href="track-order"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
                 Track order
               </Link>
               <Link
-                href="#"
+                href="returns-and-refunds"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
                 Returns & refunds
               </Link>
               <Link
-                href="#"
+                href="faq"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
-                FAQs
+                FAQ
               </Link>
             </div>
           </div>
@@ -122,19 +122,19 @@ export function Footer() {
           <div className="w-full">
             <h3 className="font-semibold mb-4">Company</h3>
             <Link
-              href="#"
+              href="/about-us"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               About us
             </Link>
             <Link
-              href="#"
+              href="privacy-policy"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Privacy policy
             </Link>
             <Link
-              href="#"
+              href="terms-of-service"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Terms of service
@@ -143,28 +143,28 @@ export function Footer() {
           <div className="w-full">
             <h3 className="font-semibold mb-4">Get Help</h3>
             <Link
-              href="#"
+              href="contact-us"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Contact us
             </Link>
             <Link
-              href="#"
+              href="track-order"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Track order
             </Link>
             <Link
-              href="#"
+              href="returns-and-refunds"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Returns & refunds
             </Link>
             <Link
-              href="#"
+              href="faq"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
-              FAQs
+              FAQ
             </Link>
           </div>
           <div className="min-w-[270px]">
