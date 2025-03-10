@@ -1,9 +1,9 @@
-export default function AboutUs() {
+export default function TermsOfUse() {
   return (
     <div className={`min-h-screen relative`}>
-      <div className="max-w-[1024px] mx-auto pt-8 pb-4 px-7">
-        <div className="bg-lightgray/45 border-l-4 border-neutral-200 shadow-sm rounded-lg py-6 px-8">
-          <h1 className="font-bold text-2xl">About Us</h1>
+      <div className="max-w-[1024px] mx-auto pt-8 pb-4 px-6">
+        <div className="bg-neutral-100 rounded-lg py-6 px-8">
+          <h1 className="font-bold text-3xl text-gray-800">About Us</h1>
         </div>
       </div>
       <div className="pt-12 max-w-[1024px] px-[30px] mx-auto">
