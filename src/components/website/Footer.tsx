@@ -81,10 +81,10 @@ export function Footer() {
                 Privacy policy
               </Link>
               <Link
-                href="/terms-of-service"
+                href="/terms-of-use"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
-                Terms of service
+                Terms of use
               </Link>
             </div>
             <div>
@@ -134,10 +134,10 @@ export function Footer() {
               Privacy policy
             </Link>
             <Link
-              href="terms-of-service"
+              href="terms-of-use"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
-              Terms of service
+              Terms of use
             </Link>
           </div>
           <div className="w-full">

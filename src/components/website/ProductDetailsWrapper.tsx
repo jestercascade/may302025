@@ -234,7 +234,7 @@ function Footer() {
                 href="#"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
-                Terms of service
+                Terms of use
               </Link>
             </div>
             <div>
@@ -287,7 +287,7 @@ function Footer() {
               href="#"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
-              Terms of service
+              Terms of use
             </Link>
           </div>
           <div className="w-full">

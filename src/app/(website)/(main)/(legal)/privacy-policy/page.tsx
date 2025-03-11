@@ -1,4 +1,4 @@
-import styles from "./styles.module.css";
+import styles from "../styles.module.css";
 
 export default function PrivacyPolicy() {
   return (
@@ -151,10 +151,6 @@ export default function PrivacyPolicy() {
                 analytics tools.
               </li>
               <li>
-                <strong>Marketing Partners</strong>: To show you ads that match
-                your interests (you can opt out—see below).
-              </li>
-              <li>
                 <strong>Legal Needs</strong>: If the law requires it, like
                 responding to a court order, or to protect our business.
               </li>
@@ -193,21 +189,12 @@ export default function PrivacyPolicy() {
                 wrong.
               </li>
               <li>
-                <strong>Opt Out</strong>:
-                <ul>
-                  <li>Stop marketing emails with the “unsubscribe” link.</li>
-                  <li>
-                    Say no to sharing your info for ads with our{" "}
-                    <a href="#">
-                      “Do Not Sell or Share My Personal Information”
-                    </a>{" "}
-                    link.
-                  </li>
-                </ul>
+                <strong>Opt Out</strong>: Stop marketing emails with the
+                “unsubscribe” link in any email we send.
               </li>
             </ul>
             <p>
-              To make a request, use our <a href="#">webform</a> or email{" "}
+              To make a request, email{" "}
               <a href="mailto:privacy@cherlygood.com">privacy@cherlygood.com</a>
               . We might need to verify your identity first.
             </p>
