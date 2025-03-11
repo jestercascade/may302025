@@ -4,6 +4,33 @@
     Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.7;
 
+  strong {
+    font-weight: 600;
+  }
+
+  code {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    padding: 0 0.25rem;
+    border-radius: 0.125rem;
+    background-color: rgba(255, 99, 8, 10%);
+    color: rgb(181 70 6);
+  }
+
+  p {
+    margin-bottom: 1.25rem;
+  }
+
+  a {
+    color: #0a5ddc;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
   /* Heading styles */
   h2 {
     font-size: 1.5rem;
@@ -24,33 +51,6 @@
     font-weight: 600;
     line-height: 1.4;
     margin-bottom: 0.5rem;
-  }
-
-  /* Code styles */
-  code {
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    padding: 0 0.25rem;
-    border-radius: 0.125rem;
-    background-color: rgba(255, 99, 8, 10%);
-    color: rgb(181 70 6);
-  }
-
-  /* Paragraph styles */
-  p {
-    margin-bottom: 1.25rem;
-  }
-
-  /* Link styles */
-  a {
-    color: #4078f2;
-    text-decoration: none;
-    transition: color 0.2s ease;
-
-    &:hover {
-      color: #2359e0;
-      text-decoration: underline;
-    }
   }
 
   /* List styles */
@@ -75,6 +75,57 @@
   /* Horizontal line styles */
   hr {
     margin: 2.5rem 0 !important;
+  }
+
+  /* Table styles */
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.28);
+    font-size: 0.875rem;
+  }
+
+  th,
+  td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgb(220, 223, 228);
+  }
+
+  th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  td {
+    background-color: #ffffff;
+    transition: background-color 0.2s ease;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:hover td {
+    background-color: rgba(255, 204, 0, 0.1);
+  }
+
+  tr:first-child th:first-child {
+    border-top-left-radius: 12px;
+  }
+  tr:first-child th:last-child {
+    border-top-right-radius: 12px;
+  }
+  tr:last-child td:first-child {
+    border-bottom-left-radius: 12px;
+  }
+  tr:last-child td:last-child {
+    border-bottom-right-radius: 12px;
   }
 }
 

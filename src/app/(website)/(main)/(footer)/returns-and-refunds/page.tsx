@@ -1,5 +1,6 @@
 import Link from "next/link";
 import styles from "../styles.module.css";
+import { CircleCheck } from "lucide-react";
 
 export default function TermsOfUse() {
   return (
@@ -15,9 +16,7 @@ export default function TermsOfUse() {
       <div className="pt-12 max-w-[1024px] px-[30px] mx-auto">
         <div className="w-[736px]">
           <div className={styles.richtext}>
-            <h3>
-              <strong>Before You Start: Mandatory Requirements</strong>
-            </h3>
+            <h3>Before You Start: Mandatory Requirements</h3>
             <p>
               <strong>READ THIS FIRST</strong>:<br />
               To avoid denied returns, <strong>you MUST</strong>:
@@ -63,9 +62,7 @@ export default function TermsOfUse() {
               </strong>
             </p>
             <hr />
-            <h3>
-              <strong>Step 1: Check Eligibility & Gather Evidence</strong>
-            </h3>
+            <h3>Step 1: Check Eligibility & Gather Evidence</h3>
             <p>
               <strong>Do you qualify?</strong>
             </p>
@@ -135,41 +132,65 @@ export default function TermsOfUse() {
               photos!
             </p>
             <hr />
-            <h3>
-              <strong>Step 2: Email Support (Required)</strong>
-            </h3>
-            <p>
-              <strong>Example Email</strong>:
-            </p>
-            <p>
-              <strong>Subject</strong>: Return Request – Order #ORD-7892J –
-              Women’s Blue Jeans (Size 8)
-            </p>
-            <p>
-              <strong>Body</strong>:<br />
-              *“Hi Cherlygood Team,
-              <br />
-              I’d like to return the <strong>Women’s Blue Jeans</strong> (Order
-              #ORD-7892J) because the waistband measures 14” laid flat, not 15”
-              as advertised.
-            </p>
-            <p>Attached:</p>
-            <ol>
-              <li>Photo 1: Measuring tape across waistband.</li>
-              <li>Photo 2: Size tag (Size 8).</li>
-              <li>Photo 3: Full front/back view.</li>
-            </ol>
-            <p>
-              Please advise next steps.
-              <br />
-              Thanks,
-              <br />
-              Emily Johnson”*
-            </p>
+            <h3>Step 2: Email Support (Required)</h3>
+            <div className="w-full max-w-2xl my-6 bg-neutral-50 rounded-xl border overflow-hidden shadow-sm">
+              {/* Header */}
+              <div className="bg-neutral-200/50 px-4 py-3">
+                <div className="text-blue text-center font-semibold">
+                  Recommended Format
+                </div>
+              </div>
+
+              {/* Subject line */}
+              <div className="p-4 border-b">
+                <div className="text-sm text-gray mb-1">Subject Line:</div>
+                <strong>
+                  Return Request – Order #ORD-7892J – Women's Blue Jeans (Size
+                  8)
+                </strong>
+              </div>
+
+              {/* Email body */}
+              <div className="p-4">
+                <div className="space-y-4">
+                  <p>Hi Cherlygood Team,</p>
+
+                  <p>
+                    I'd like to return the{" "}
+                    <span className="font-semibold">Women's Blue Jeans</span>{" "}
+                    (Order <code>#ORD-7892J</code>) because the waistband
+                    measures 14" laid flat, not 15" as advertised.
+                  </p>
+
+                  <p className="font-semibold mb-2">Attached:</p>
+                  <ul className="list-decimal ml-5 !text-sm">
+                    <li>Photo 1: Measuring tape across waistband.</li>
+                    <li>Photo 2: Size tag (Size 8).</li>
+                    <li>Photo 3: Full front/back view.</li>
+                  </ul>
+
+                  <p>Please advise next steps.</p>
+
+                  <p>
+                    Thanks,
+                    <br />
+                    <strong>Emily Johnson</strong>
+                  </p>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="border-t mt-2 px-4 py-2">
+                <div className="flex items-center gap-1.5 text-sm text-gray">
+                  <CircleCheck size={18} className="text-green" />
+                  <span>
+                    This format ensures quick processing of your return request
+                  </span>
+                </div>
+              </div>
+            </div>
             <hr />
-            <h3>
-              <strong>Step 3: Start Your Return Online</strong>
-            </h3>
+            <h3>Step 3: Start Your Return Online</h3>
             <ol>
               <li>
                 <strong>Log into your account</strong> →{" "}
@@ -195,9 +216,7 @@ export default function TermsOfUse() {
               number from Step 2.
             </p>
             <hr />
-            <h3>
-              <strong>Step 4: Pack Your Item Correctly</strong>
-            </h3>
+            <h3>Step 4: Pack Your Item Correctly</h3>
             <p>
               <strong>Avoid Denials</strong>:
             </p>
@@ -223,9 +242,7 @@ export default function TermsOfUse() {
               <li>Use or damage items before documenting.</li>
             </ul>
             <hr />
-            <h3>
-              <strong>Step 5: Choose Shipping Method</strong>
-            </h3>
+            <h3>Step 5: Choose Shipping Method</h3>
             <ol>
               <li>
                 <strong>Prepaid Label</strong> ($6.95 fee deducted):
@@ -247,9 +264,7 @@ export default function TermsOfUse() {
               vacuum).
             </p>
             <hr />
-            <h3>
-              <strong>Step 6: Ship & Track Refund</strong>
-            </h3>
+            <h3>Step 6: Ship & Track Refund</h3>
             <ol>
               <li>
                 <strong>Attach Label</strong>: Secure it to the package (e.g.,
@@ -276,9 +291,7 @@ export default function TermsOfUse() {
               </li>
             </ol>
             <hr />
-            <h3>
-              <strong>FAQs & Troubleshooting</strong>
-            </h3>
+            <h3>FAQs & Troubleshooting</h3>
             <p>
               <strong>Q: Can I exchange an item?</strong>
               <br />
@@ -305,21 +318,13 @@ export default function TermsOfUse() {
               —we’ll review case-by-case (e.g., zipper fails after 20 days).
             </p>
             <hr />
-            <h3>
-              <strong>Photo Guide</strong>
-            </h3>
+            <h3>Photo Guide</h3>
             <table>
               <thead>
                 <tr>
-                  <th>
-                    <strong>Item</strong>
-                  </th>
-                  <th>
-                    <strong>Good Photo</strong>
-                  </th>
-                  <th>
-                    <strong>Bad Photo</strong>
-                  </th>
+                  <th>Item</th>
+                  <th>Good Photo</th>
+                  <th>Bad Photo</th>
                 </tr>
               </thead>
               <tbody>
@@ -347,9 +352,7 @@ export default function TermsOfUse() {
               </tbody>
             </table>
             <hr />
-            <h3>
-              <strong>Why This Works</strong>
-            </h3>
+            <h3>Why This Works</h3>
             <ul>
               <li>
                 <strong>No Guesswork</strong>: Examples (jeans, mats, vacuums)
