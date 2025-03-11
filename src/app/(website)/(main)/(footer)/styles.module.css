@@ -18,12 +18,22 @@
     line-height: 1.4;
     margin-bottom: 0.875rem;
   }
-  
+
   h4 {
     font-size: 1rem;
     font-weight: 600;
     line-height: 1.4;
     margin-bottom: 0.5rem;
+  }
+
+  /* Code styles */
+  code {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    padding: 0 0.25rem;
+    border-radius: 0.125rem;
+    background-color: rgba(255, 99, 8, 10%);
+    color: rgb(181 70 6);
   }
 
   /* Paragraph styles */

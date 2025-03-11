@@ -10,13 +10,9 @@ export default function TermsOfUse() {
           <p className="text-gray text-sm mt-1">Last Updated: March 10, 2025</p>
         </div>
       </div>
-
       <div className="pt-12 max-w-[1024px] px-[30px] mx-auto">
         <div className="w-[736px]">
           <div className={styles.richtext}>
-            <p>
-              <strong>Last Updated: March 10, 2025</strong>
-            </p>
             <p>
               Welcome to Cherlygood.com! These Terms of Use (“Terms”) govern
               your access to and use of our website, including any mobile
