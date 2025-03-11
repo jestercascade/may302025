@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "../styles.module.css";
 
 export default function TermsOfUse() {
@@ -44,58 +45,66 @@ export default function TermsOfUse() {
             <h2>Table of Contents</h2>
             <ol>
               <li>
-                <a href="#1-account-registration">Account Registration</a>
+                <Link href="#1-account-registration">Account Registration</Link>
               </li>
               <li>
-                <a href="#2-placing-an-order">Placing an Order</a>
+                <Link href="#2-placing-an-order">Placing an Order</Link>
               </li>
               <li>
-                <a href="#3-promotions">Promotions</a>
+                <Link href="#3-promotions">Promotions</Link>
               </li>
               <li>
-                <a href="#4-intellectual-property">Intellectual Property</a>
+                <Link href="#4-intellectual-property">
+                  Intellectual Property
+                </Link>
               </li>
               <li>
-                <a href="#5-user-conduct">User Conduct</a>
+                <Link href="#5-user-conduct">User Conduct</Link>
               </li>
               <li>
-                <a href="#6-user-generated-content">User-Generated Content</a>
+                <Link href="#6-user-generated-content">
+                  User-Generated Content
+                </Link>
               </li>
               <li>
-                <a href="#7-third-party-links-and-content">
+                <Link href="#7-third-party-links-and-content">
                   Third-Party Links and Content
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#8-disclaimer-of-warranties">
+                <Link href="#8-disclaimer-of-warranties">
                   Disclaimer of Warranties
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#9-limitation-of-liability">Limitation of Liability</a>
+                <Link href="#9-limitation-of-liability">
+                  Limitation of Liability
+                </Link>
               </li>
               <li>
-                <a href="#10-indemnification">Indemnification</a>
+                <Link href="#10-indemnification">Indemnification</Link>
               </li>
               <li>
-                <a href="#11-termination">Termination</a>
+                <Link href="#11-termination">Termination</Link>
               </li>
               <li>
-                <a href="#12-governing-law">Governing Law</a>
+                <Link href="#12-governing-law">Governing Law</Link>
               </li>
               <li>
-                <a href="#13-dispute-resolution-arbitration-agreement-class-action-waiver">
+                <Link href="#13-dispute-resolution-arbitration-agreement-class-action-waiver">
                   Dispute Resolution; Arbitration Agreement; Class Action Waiver
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#14-changes-to-these-terms">Changes to These Terms</a>
+                <Link href="#14-changes-to-these-terms">
+                  Changes to These Terms
+                </Link>
               </li>
               <li>
-                <a href="#15-miscellaneous">Miscellaneous</a>
+                <Link href="#15-miscellaneous">Miscellaneous</Link>
               </li>
               <li>
-                <a href="#16-contact-us">Contact Us</a>
+                <Link href="#16-contact-us">Contact Us</Link>
               </li>
             </ol>
             <hr />
@@ -115,7 +124,9 @@ export default function TermsOfUse() {
               Cherlygood.com may suspend or terminate your Account if we believe
               your information is inaccurate or if you violate these Terms.
               Notify us immediately at{" "}
-              <a href="mailto:support@cherlygood.com">support@cherlygood.com</a>{" "}
+              <Link href="mailto:support@cherlygood.com">
+                support@cherlygood.com
+              </Link>{" "}
               if you suspect unauthorized use of your Account.
             </p>
             <hr />
@@ -135,10 +146,10 @@ export default function TermsOfUse() {
             </p>
             <h4>(c) Pricing</h4>
             <p>
-              Prices are listed in USD and may change without notice. If a
-              product is listed at an incorrect price (e.g., due to a typo), we
-              may cancel the order, even if confirmed, and refund any payment
-              made.
+              Prices are listed in <strong>USD</strong> and may change without
+              notice. If a product is listed at an incorrect price (e.g., due to
+              a typo), we may cancel the order, even if confirmed, and refund
+              any payment made.
             </p>
             <h4>(d) Order Confirmation</h4>
             <p>
@@ -150,8 +161,8 @@ export default function TermsOfUse() {
             <h4>(e) Payment</h4>
             <p>
               You agree to pay the total amount, including taxes and shipping
-              fees, at checkout. We accept [Visa, Mastercard, PayPal, and other
-              methods as updated on the Sites]. If payment fails, you agree to
+              fees, at checkout. We accept Visa, Mastercard, PayPal, and other
+              methods as updated on the Sites. If payment fails, you agree to
               settle any outstanding amounts upon request.
             </p>
             <h4>(f) Taxes and Customs</h4>
@@ -163,9 +174,9 @@ export default function TermsOfUse() {
             <h4>(g) Returns and Exchanges</h4>
             <p>
               Purchases are subject to our{" "}
-              <a href="https://www.cherlygood.com/returns">Return Policy</a>.
-              Please review it before ordering, as it outlines conditions, time
-              frames, and exceptions.
+              <Link href="/returns-and-refunds">Return Policy</Link>. Please
+              review it before ordering, as it outlines conditions, time frames,
+              and exceptions.
             </p>
             <hr />
             <h3 id="3-promotions">3. Promotions</h3>
@@ -278,8 +289,10 @@ export default function TermsOfUse() {
             <h4>(a) Informal Resolution</h4>
             <p>
               Before formal action, contact us at{" "}
-              <a href="mailto:legal@cherlygood.com">legal@cherlygood.com</a> to
-              resolve disputes. If unresolved after 60 days, either party may
+              <Link href="mailto:legal@cherlygood.com">
+                legal@cherlygood.com
+              </Link>{" "}
+              to resolve disputes. If unresolved after 60 days, either party may
               proceed to arbitration.
             </p>
             <h4>(b) Arbitration</h4>
@@ -326,7 +339,10 @@ export default function TermsOfUse() {
             <h3 id="16-contact-us">16. Contact Us</h3>
             <p>
               Got questions? Email us at{" "}
-              <a href="mailto:support@cherlygood.com">support@cherlygood.com</a>
+              <Link href="mailto:support@cherlygood.com">
+                support@cherlygood.com
+              </Link>
+              .
             </p>
           </div>
         </div>

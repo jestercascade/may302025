@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "../styles.module.css";
 
 export default function PrivacyPolicy() {
@@ -32,42 +33,44 @@ export default function PrivacyPolicy() {
             <h2>Table of Contents</h2>
             <ol>
               <li>
-                <a href="#1-what-information-do-we-collect">
+                <Link href="#1-what-information-do-we-collect">
                   What Information Do We Collect?
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#2-how-do-we-use-your-information">
+                <Link href="#2-how-do-we-use-your-information">
                   How Do We Use Your Information?
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#3-who-do-we-share-your-information-with">
+                <Link href="#3-who-do-we-share-your-information-with">
                   Who Do We Share Your Information With?
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#4-cookies-and-tracking">Cookies and Tracking</a>
+                <Link href="#4-cookies-and-tracking">Cookies and Tracking</Link>
               </li>
               <li>
-                <a href="#5-your-rights">Your Rights</a>
+                <Link href="#5-your-rights">Your Rights</Link>
               </li>
               <li>
-                <a href="#6-data-security-and-retention">
+                <Link href="#6-data-security-and-retention">
                   Data Security and Retention
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#7-childrens-privacy">Children’s Privacy</a>
+                <Link href="#7-childrens-privacy">Children’s Privacy</Link>
               </li>
               <li>
-                <a href="#8-international-users">International Users</a>
+                <Link href="#8-international-users">International Users</Link>
               </li>
               <li>
-                <a href="#9-updates-to-this-policy">Updates to This Policy</a>
+                <Link href="#9-updates-to-this-policy">
+                  Updates to This Policy
+                </Link>
               </li>
               <li>
-                <a href="#10-contact-us">Contact Us</a>
+                <Link href="#10-contact-us">Contact Us</Link>
               </li>
             </ol>
             <hr />
@@ -171,7 +174,10 @@ export default function PrivacyPolicy() {
               You can control cookies through your browser settings. We also
               respect Global Privacy Control (GPC) signals to opt you out of
               certain tracking. Want to learn more? Check out{" "}
-              <a href="https://allaboutcookies.org/">AllAboutCookies.org</a>.
+              <Link href="https://allaboutcookies.org/">
+                AllAboutCookies.org
+              </Link>
+              .
             </p>
             <hr />
             <h3 id="5-your-rights">5. Your Rights</h3>
@@ -195,7 +201,9 @@ export default function PrivacyPolicy() {
             </ul>
             <p>
               To make a request, email{" "}
-              <a href="mailto:privacy@cherlygood.com">privacy@cherlygood.com</a>
+              <Link href="mailto:privacy@cherlygood.com">
+                privacy@cherlygood.com
+              </Link>
               . We might need to verify your identity first.
             </p>
             <p>
@@ -237,7 +245,10 @@ export default function PrivacyPolicy() {
             <h3 id="10-contact-us">10. Contact Us</h3>
             <p>
               Got questions? Email us at{" "}
-              <a href="mailto:privacy@cherlygood.com">privacy@cherlygood.com</a>
+              <Link href="mailto:privacy@cherlygood.com">
+                privacy@cherlygood.com
+              </Link>
+              .
             </p>
           </div>
         </div>
