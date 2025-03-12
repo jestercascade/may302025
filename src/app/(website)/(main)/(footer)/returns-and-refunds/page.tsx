@@ -220,7 +220,7 @@ export default function TermsOfUse() {
                 <div className="w-full max-w-2xl bg-neutral-50 rounded-xl border overflow-hidden shadow-sm">
                   {/* Header */}
                   <div className="bg-neutral-200/50 px-4 py-3">
-                    <div className="text-blue text-center font-semibold">
+                    <div className="text-green text-center font-semibold">
                       Approved Email
                     </div>
                   </div>
@@ -295,7 +295,7 @@ export default function TermsOfUse() {
                 <div className="w-full max-w-2xl bg-neutral-50 rounded-xl border overflow-hidden shadow-sm">
                   {/* Header */}
                   <div className="bg-neutral-200/50 px-4 py-3">
-                    <div className="text-blue text-center font-semibold">
+                    <div className="text-red text-center font-semibold">
                       Denied Email
                     </div>
                   </div>
