@@ -44,6 +44,7 @@
     font-weight: 600;
     line-height: 1.4;
     margin-bottom: 0.875rem;
+    margin-top: 1.5rem;
   }
 
   h4 {
@@ -74,7 +75,7 @@
 
   /* Horizontal line styles */
   hr {
-    margin: 2.5rem 0 !important;
+    margin: 2.5rem 0;
   }
 
   /* Table styles */
@@ -88,9 +89,14 @@
     font-size: 0.875rem;
   }
 
-  th,
-  td {
+  th {
     padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgb(220, 223, 228);
+  }
+
+  td {
+    padding: 0 1rem;
     text-align: left;
     border-bottom: 1px solid rgb(220, 223, 228);
   }
@@ -102,9 +108,17 @@
     letter-spacing: 0.5px;
   }
 
+  th:first-child {
+    min-width: 128px;
+  }
+
   td {
     background-color: #ffffff;
     transition: background-color 0.2s ease;
+  }
+
+  tbody tr {
+    height: 64px;
   }
 
   tr:last-child td {
