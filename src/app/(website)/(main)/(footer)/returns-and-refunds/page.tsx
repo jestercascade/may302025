@@ -26,7 +26,7 @@ export default function TermsOfUse() {
                 <li>
                   <strong>
                     Email{" "}
-                    <Link href="mailto:support@cherlygood.com">
+                    <Link href="mailto:support@cherlygood.com" target="_blank">
                       support@cherlygood.com
                     </Link>{" "}
                     BEFORE starting a return
@@ -487,7 +487,7 @@ export default function TermsOfUse() {
                 <strong>Q: Late-discovered defect?</strong>
                 <br />
                 A: Email{" "}
-                <Link href="mailto:support@cherlygood.com">
+                <Link href="mailto:support@cherlygood.com" target="_blank">
                   support@cherlygood.com
                 </Link>
                 —we’ll review case-by-case (e.g., zipper fails after 20 days).
@@ -543,7 +543,7 @@ export default function TermsOfUse() {
             <div>
               <p>
                 <strong>Questions?</strong> Email us at{" "}
-                <Link href="mailto:support@cherlygood.com">
+                <Link href="mailto:support@cherlygood.com" target="_blank">
                   support@cherlygood.com
                 </Link>
               </p>

@@ -118,6 +118,13 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
       const closestLink = target.closest("a");
       if (closestLink) {
         const href = closestLink.getAttribute("href");
+        const linkTarget = closestLink.getAttribute("target");
+
+        // Skip if the link opens in a new tab
+        if (linkTarget === "_blank") {
+          return;
+        }
+
         if (href?.startsWith("/") && href !== pathname) {
           handleNavigation();
         }

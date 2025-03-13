@@ -128,7 +128,7 @@ export default function TermsOfUse() {
                 Cherlygood.com may suspend or terminate your Account if we
                 believe your information is inaccurate or if you violate these
                 Terms. Notify us immediately at{" "}
-                <Link href="mailto:support@cherlygood.com">
+                <Link href="mailto:support@cherlygood.com" target="_blank">
                   support@cherlygood.com
                 </Link>{" "}
                 if you suspect unauthorized use of your Account.
@@ -180,9 +180,11 @@ export default function TermsOfUse() {
               <h4>(g) Returns and Exchanges</h4>
               <p>
                 Purchases are subject to our{" "}
-                <Link href="/returns-and-refunds">Return Policy</Link>. Please
-                review it before ordering, as it outlines conditions, time
-                frames, and exceptions.
+                <Link href="/returns-and-refunds" target="_blank">
+                  Return Policy
+                </Link>
+                . Please review it before ordering, as it outlines conditions,
+                time frames, and exceptions.
               </p>
             </div>
             <hr className="!mb-8" />
@@ -322,7 +324,7 @@ export default function TermsOfUse() {
               <h4>(a) Informal Resolution</h4>
               <p>
                 Before formal action, contact us at{" "}
-                <Link href="mailto:legal@cherlygood.com">
+                <Link href="mailto:legal@cherlygood.com" target="_blank">
                   legal@cherlygood.com
                 </Link>{" "}
                 to resolve disputes. If unresolved after 60 days, either party
@@ -378,7 +380,7 @@ export default function TermsOfUse() {
               <h3 id="16-contact-us">16. Contact Us</h3>
               <p>
                 Got questions? Email us at{" "}
-                <Link href="mailto:support@cherlygood.com">
+                <Link href="mailto:support@cherlygood.com" target="_blank">
                   support@cherlygood.com
                 </Link>
                 .

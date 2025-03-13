@@ -186,7 +186,7 @@ export default function PrivacyPolicy() {
                 You can control cookies through your browser settings. We also
                 respect Global Privacy Control (GPC) signals to opt you out of
                 certain tracking. Want to learn more? Check out{" "}
-                <Link href="https://allaboutcookies.org/">
+                <Link href="https://allaboutcookies.org/" target="_blank">
                   AllAboutCookies.org
                 </Link>
                 .
@@ -216,7 +216,7 @@ export default function PrivacyPolicy() {
               </ul>
               <p>
                 To make a request, email{" "}
-                <Link href="mailto:privacy@cherlygood.com">
+                <Link href="mailto:privacy@cherlygood.com" target="_blank">
                   privacy@cherlygood.com
                 </Link>
                 . We might need to verify your identity first.
@@ -271,7 +271,7 @@ export default function PrivacyPolicy() {
               <h3 id="10-contact-us">10. Contact Us</h3>
               <p>
                 Got questions? Email us at{" "}
-                <Link href="mailto:privacy@cherlygood.com">
+                <Link href="mailto:privacy@cherlygood.com" target="_blank">
                   privacy@cherlygood.com
                 </Link>
                 .
