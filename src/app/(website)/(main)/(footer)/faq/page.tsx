@@ -1,6 +1,5 @@
 import Link from "next/link";
 import styles from "../styles.module.css";
-import { CircleCheck } from "lucide-react";
 
 export default function TermsOfUse() {
   return (
@@ -9,8 +8,7 @@ export default function TermsOfUse() {
         <div className="bg-lightgray/45 border-l-4 border-neutral-200 shadow-sm rounded-lg py-6 px-8">
           <h1 className="font-bold text-2xl">Frequently Asked Questions</h1>
           <p className="text-gray text-sm mt-1 italic">
-            Got questions? We’ve got answers—quick, honest, and easy to
-            understand.
+            Got questions? We’ve got answers—quick and easy to understand.
           </p>
         </div>
       </div>
