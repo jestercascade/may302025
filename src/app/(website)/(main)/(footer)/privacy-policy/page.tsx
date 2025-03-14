@@ -1,5 +1,10 @@
 import Link from "next/link";
 import styles from "../styles.module.css";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+};
 
 export default function PrivacyPolicy() {
   return (
