@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { cache } from "react";
 import Image from "next/image";
 import { Check } from "lucide-react";
 import { cookies } from "next/headers";
@@ -20,6 +21,45 @@ import {
   UpsellReviewOverlay,
 } from "@/components/website/DynamicOverlays";
 
+const cachedGetCart = cache(getCart);
+const cachedGetCategories = cache(getCategories);
+const cachedGetProducts = cache(getProducts);
+
+const getProductIdFromSlug = (slug: string): string => {
+  return slug.split("-").pop() as string;
+};
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const slug = (await params).slug;
+  const productId = getProductIdFromSlug(slug);
+
+  const [fetchedProducts] = await Promise.all([
+    cachedGetProducts({
+      ids: [productId],
+      fields: ["seo"],
+      visibility: "PUBLISHED",
+    }),
+  ]);
+
+  const product = fetchedProducts?.[0];
+
+  if (!product) {
+    return {
+      title: "Product Not Found",
+      description: "The product could not be found.",
+    };
+  }
+
+  return {
+    title: product.seo.metaTitle,
+    description: product.seo.metaDescription,
+  };
+}
+
 export default async function ProductDetails({
   params,
 }: {
@@ -29,11 +69,13 @@ export default async function ProductDetails({
   const cookieStore = await cookies();
   const deviceIdentifier = cookieStore.get("device_identifier")?.value ?? "";
 
+  const productId = getProductIdFromSlug(slug);
+
   const [cart, categoriesData, fetchedProducts] = await Promise.all([
-    getCart(deviceIdentifier),
-    getCategories({ visibility: "VISIBLE" }),
-    getProducts({
-      ids: [slug.split("-").pop() as string],
+    cachedGetCart(deviceIdentifier),
+    cachedGetCategories({ visibility: "VISIBLE" }),
+    cachedGetProducts({
+      ids: [productId],
       fields: [
         "name",
         "pricing",
