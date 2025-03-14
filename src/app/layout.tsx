@@ -9,11 +9,11 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "Cherlygood",
+    default: "Cherlygood – Literally Stop, Stare, Then Buy It.",
     template: "%s - Cherlygood",
   },
   description:
-    "Make your style the one everyone’s screenshotting—clothes, home goods, and zero regrets. Shop now!",
+    "Make your style the one everyone's screenshotting—clothes, aesthetic finds, and zero regrets. Shop now!",
 };
 
 export default function RootLayout({
