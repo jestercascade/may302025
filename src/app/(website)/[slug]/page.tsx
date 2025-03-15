@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import { cache } from "react";
 import Image from "next/image";
 import { Check } from "lucide-react";
 import { cookies } from "next/headers";
@@ -21,13 +20,26 @@ import {
   UpsellReviewOverlay,
 } from "@/components/website/DynamicOverlays";
 
-const cachedGetCart = cache(getCart);
-const cachedGetCategories = cache(getCategories);
-const cachedGetProducts = cache(getProducts);
-
 const getProductIdFromSlug = (slug: string): string => {
   return slug.split("-").pop() as string;
 };
+
+export async function generateStaticParams() {
+  try {
+    const products = await getProducts({
+      fields: ["slug"],
+      visibility: "PUBLISHED",
+    });
+    if (!products || products.length === 0) {
+      console.warn("No published products found for static generation.");
+      return [];
+    }
+    return products.map((product) => ({ slug: product.slug }));
+  } catch (error) {
+    console.error("Error fetching products for static params:", error);
+    return [];
+  }
+}
 
 export async function generateMetadata({
   params,
@@ -38,7 +50,7 @@ export async function generateMetadata({
   const productId = getProductIdFromSlug(slug);
 
   const [fetchedProducts] = await Promise.all([
-    cachedGetProducts({
+    getProducts({
       ids: [productId],
       fields: ["seo"],
       visibility: "PUBLISHED",
@@ -72,9 +84,9 @@ export default async function ProductDetails({
   const productId = getProductIdFromSlug(slug);
 
   const [cart, categoriesData, fetchedProducts] = await Promise.all([
-    cachedGetCart(deviceIdentifier),
-    cachedGetCategories({ visibility: "VISIBLE" }),
-    cachedGetProducts({
+    getCart(deviceIdentifier),
+    getCategories({ visibility: "VISIBLE" }),
+    getProducts({
       ids: [productId],
       fields: [
         "name",

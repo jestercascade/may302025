@@ -54,7 +54,7 @@ function LoadingOverlay({ showOverlay }: { showOverlay: boolean }) {
         backgroundColor: "rgba(244, 244, 244, 0.45)",
       }}
     >
-      <div className="w-full h-[3px] absolute top-0 left-0 overflow-hidden">
+      <div className="w-full h-1 absolute top-0 left-0 overflow-hidden">
         <div
           className="h-full w-full bg-amber absolute animate-navigationLoadingIndicatorAnimation"
           style={{
