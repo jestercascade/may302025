@@ -64,9 +64,16 @@ export async function getCategories(
 async function createDefaultCategories(
   categoriesRef: FirebaseFirestore.DocumentReference
 ): Promise<StoreCategoriesType> {
+  const currentTimestamp = new Date().toISOString();
   const newCategoriesDoc: StoreCategoriesType = {
     showOnPublicSite: false,
-    categories: defaultCategories,
+    categories: defaultCategories.map(
+      (category): CategoryType => ({
+        ...category,
+        createdAt: currentTimestamp,
+        updatedAt: currentTimestamp,
+      })
+    ),
   };
   await categoriesRef.set(newCategoriesDoc);
   return newCategoriesDoc;
@@ -75,34 +82,53 @@ async function createDefaultCategories(
 function addMissingDefaultCategories(
   existingCategories: CategoryType[]
 ): CategoryType[] {
+  const currentTimestamp = new Date().toISOString();
   const existingNames = new Set(
     existingCategories.map((category) => category.name)
   );
-  const categoriesToAdd = defaultCategories.filter(
-    (category) => !existingNames.has(category.name)
-  );
+  const categoriesToAdd = defaultCategories
+    .filter((category) => !existingNames.has(category.name))
+    .map(
+      (category): CategoryType => ({
+        ...category,
+        createdAt: currentTimestamp,
+        updatedAt: currentTimestamp,
+      })
+    );
   return [...existingCategories, ...categoriesToAdd];
 }
 
 function getCategoriesToUpdate(
   existingCategories: CategoryType[]
 ): CategoryType[] {
-  return defaultCategories.filter((defaultCategory) => {
-    const existingCategory = existingCategories.find(
-      (cat) => cat.name === defaultCategory.name
-    );
-    return (
-      existingCategory &&
-      (existingCategory.index !== defaultCategory.index ||
-        existingCategory.image !== defaultCategory.image)
-    );
-  });
+  return defaultCategories
+    .filter((defaultCategory) => {
+      const existingCategory = existingCategories.find(
+        (cat) => cat.name === defaultCategory.name
+      );
+      return (
+        existingCategory &&
+        (existingCategory.index !== defaultCategory.index ||
+          existingCategory.image !== defaultCategory.image)
+      );
+    })
+    .map((defaultCategory): CategoryType => {
+      const existingCategory = existingCategories.find(
+        (cat) => cat.name === defaultCategory.name
+      )!;
+      return {
+        ...defaultCategory,
+        createdAt: existingCategory.createdAt,
+        updatedAt: existingCategory.updatedAt,
+      };
+    });
 }
 
 function updateCategories(
   existingCategories: CategoryType[],
   categoriesToUpdate: CategoryType[]
 ): CategoryType[] {
+  const currentTimestamp = new Date().toISOString();
   const updatedCategories = existingCategories.filter(
     (category) =>
       !categoriesToUpdate.some(
@@ -112,27 +138,20 @@ function updateCategories(
 
   const mergedCategories = [
     ...updatedCategories,
-    ...defaultCategories.filter((cat) =>
-      categoriesToUpdate.some((update) => update.name === cat.name)
-    ),
+    ...categoriesToUpdate.map((cat) => ({
+      ...cat,
+      createdAt:
+        existingCategories.find((c) => c.name === cat.name)?.createdAt ||
+        cat.createdAt,
+      updatedAt: currentTimestamp,
+    })),
   ];
   return mergedCategories.sort((a, b) => a.index - b.index);
 }
 
-// -- Type Definitions --
-
-type VisibilityFilterType = {
-  visibility?: "VISIBLE" | "HIDDEN";
-};
-
-type StoreCategoriesType = {
-  showOnPublicSite: boolean;
-  categories: CategoryType[];
-};
-
 // -- Default Categories --
 
-const defaultCategories: CategoryType[] = [
+const defaultCategories: DefaultCategory[] = [
   { index: 0, name: "Dresses", image: "dresses.png", visibility: "HIDDEN" },
   { index: 1, name: "Tops", image: "tops.png", visibility: "HIDDEN" },
   { index: 2, name: "Bottoms", image: "bottoms.png", visibility: "HIDDEN" },
@@ -147,3 +166,16 @@ const defaultCategories: CategoryType[] = [
   { index: 6, name: "Men", image: "men.png", visibility: "HIDDEN" },
   { index: 7, name: "Catch-All", image: "catch-all.png", visibility: "HIDDEN" },
 ];
+
+// -- Type Definitions --
+
+type VisibilityFilterType = {
+  visibility?: "VISIBLE" | "HIDDEN";
+};
+
+type StoreCategoriesType = {
+  showOnPublicSite: boolean;
+  categories: CategoryType[];
+};
+
+type DefaultCategory = Omit<CategoryType, "createdAt" | "updatedAt">;

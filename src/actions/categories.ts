@@ -18,7 +18,9 @@ export async function UpdateCategoriesAction(data: StoreCategoriesType) {
         typeof category.index !== "number" ||
         typeof category.name !== "string" ||
         typeof category.image !== "string" ||
-        !["VISIBLE", "HIDDEN"].includes(category.visibility)
+        !["VISIBLE", "HIDDEN"].includes(category.visibility) ||
+        typeof category.createdAt !== "string" ||
+        typeof category.updatedAt !== "string"
       ) {
         return {
           type: ShowAlertType.ERROR,
@@ -44,9 +46,14 @@ export async function UpdateCategoriesAction(data: StoreCategoriesType) {
       (a, b) => a.index - b.index
     );
 
+    const currentTimestamp = new Date().toISOString();
     const updateData: StoreCategoriesType = {
       showOnPublicSite: data.showOnPublicSite,
-      categories: sortedCategories,
+      categories: sortedCategories.map((category) => ({
+        ...category,
+        createdAt: category.createdAt,
+        updatedAt: currentTimestamp,
+      })),
     };
 
     const categoriesRef = adminDb
@@ -71,13 +78,6 @@ export async function UpdateCategoriesAction(data: StoreCategoriesType) {
 }
 
 // Type Definitions
-
-type CategoryType = {
-  index: number;
-  name: string;
-  image: string;
-  visibility: "VISIBLE" | "HIDDEN";
-};
 
 type StoreCategoriesType = {
   showOnPublicSite: boolean;

@@ -5,6 +5,8 @@ type CategoryType = {
   name: string;
   image: string;
   visibility: "VISIBLE" | "HIDDEN";
+  createdAt: string;
+  updatedAt: string;
 };
 
 type CollectionProductType = {
