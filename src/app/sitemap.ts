@@ -71,12 +71,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Category pages (e.g., /category/dresses)
   const categoryPages: MetadataRoute.Sitemap = categories?.categories
-    ? categories.categories.map((category: CategoryType) => ({
-        url: `${BASE_URL}/category/${category.name.toLowerCase()}`,
-        lastModified: new Date(category.updatedAt).toISOString(), // Use required updatedAt
-        changeFrequency: "weekly",
-        priority: 0.7,
-      }))
+    ? categories.categories.map((category: CategoryType) => {
+        const lastModifiedDate = new Date(category.updatedAt);
+        if (isNaN(lastModifiedDate.getTime())) {
+          console.warn(
+            `Invalid updatedAt value for category ${category.name}: ${category.updatedAt}. Using current date as fallback.`
+          );
+          return {
+            url: `${BASE_URL}/category/${category.name.toLowerCase()}`,
+            lastModified: new Date().toISOString(),
+            changeFrequency: "weekly",
+            priority: 0.7,
+          };
+        }
+        return {
+          url: `${BASE_URL}/category/${category.name.toLowerCase()}`,
+          lastModified: lastModifiedDate.toISOString(),
+          changeFrequency: "weekly",
+          priority: 0.7,
+        };
+      })
     : [];
 
   // Collection pages (e.g., /collections/black-friday-sale-52029)

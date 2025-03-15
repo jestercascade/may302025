@@ -90,12 +90,15 @@ export function CategoriesOverlay({
     setLoading(true);
 
     try {
+      const currentTimestamp = new Date().toISOString();
       const updatedCategories = categoriesData?.categories.map(
         (category, index) => ({
           index: category.index,
           name: category.name,
           image: category.image,
           visibility: visibilityStates[index],
+          createdAt: category.createdAt, // Preserve original createdAt
+          updatedAt: currentTimestamp, // Update updatedAt to current timestamp
         })
       );
 
@@ -319,13 +322,6 @@ export function CategoriesOverlay({
 }
 
 // -- Type Definitions --
-
-type CategoryType = {
-  index: number;
-  name: string;
-  image: string;
-  visibility: "VISIBLE" | "HIDDEN";
-};
 
 type StoreCategoriesType = {
   showOnPublicSite: boolean;
