@@ -125,13 +125,6 @@ type VisibilityFilterType = {
   visibility?: "VISIBLE" | "HIDDEN";
 };
 
-type CategoryType = {
-  index: number;
-  name: string;
-  image: string;
-  visibility: "VISIBLE" | "HIDDEN";
-};
-
 type StoreCategoriesType = {
   showOnPublicSite: boolean;
   categories: CategoryType[];

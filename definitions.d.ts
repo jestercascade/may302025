@@ -1,21 +1,17 @@
-/**************************************/
-/*           Basic Types              */
-/**************************************/
-
-// Visibility states for various entities
 type VisibilityType = "DRAFT" | "PUBLISHED" | "HIDDEN";
 
-/**************************************/
-/*         Collection Types           */
-/**************************************/
+type CategoryType = {
+  index: number;
+  name: string;
+  image: string;
+  visibility: "VISIBLE" | "HIDDEN";
+};
 
-// Represents a product within a collection
 type CollectionProductType = {
   index: number;
   id: string;
 };
 
-// Represents a collection with products, banner images, and visibility
 type CollectionType = {
   id: string;
   index: number;
@@ -39,11 +35,6 @@ type CollectionType = {
   updatedAt: string;
 };
 
-/**************************************/
-/*         Upsell Types               */
-/**************************************/
-
-// Represents an upsell with products, pricing, and visibility
 type UpsellType = {
   id: string;
   mainImage: string;
@@ -84,7 +75,6 @@ type UpsellType = {
   }>;
 };
 
-// Represents a product with an upsell, omitting the original upsell property
 type ProductWithUpsellType = {
   id: string;
   name: string;
@@ -194,7 +184,6 @@ type ProductWithUpsellType = {
   }>;
 };
 
-// Represents a product review with upsell information
 type UpsellReviewProductType = {
   id: string;
   upsell: {
@@ -237,11 +226,6 @@ type UpsellReviewProductType = {
   };
 };
 
-/**************************************/
-/*         Product Types              */
-/**************************************/
-
-// Represents a product with details like pricing, images, and options
 type ProductType = {
   id: string;
   name: string;
@@ -314,11 +298,6 @@ type ProductType = {
   }>;
 };
 
-/**************************************/
-/*         Newsletter Types           */
-/**************************************/
-
-// Represents a newsletter with content and visibility
 type NewsletterType = {
   id: string;
   emailSubject: string;
@@ -329,7 +308,6 @@ type NewsletterType = {
   lastSentAt: string;
 };
 
-// Represents a subscriber with email and status
 type SubscriberType = {
   email: string;
   status: string;
@@ -337,11 +315,6 @@ type SubscriberType = {
   updatedAt: FirebaseFirestore.Timestamp;
 };
 
-/**************************************/
-/*           Cart Types               */
-/**************************************/
-
-// Represents a product item in the cart
 type CartProductItemType = {
   index: number;
   baseProductId: string;
@@ -351,7 +324,6 @@ type CartProductItemType = {
   type: "product";
 };
 
-// Represents an upsell item in the cart
 type CartUpsellItemType = {
   index: number;
   baseUpsellId: string;
@@ -364,7 +336,6 @@ type CartUpsellItemType = {
   }>;
 };
 
-// Represents a cart with items and metadata
 type CartType = {
   id: string;
   device_identifier: string;
@@ -373,11 +344,6 @@ type CartType = {
   updatedAt: string;
 };
 
-/**************************************/
-/*           Order Types              */
-/**************************************/
-
-// Represents an order with payer, amount, and shipping details
 type OrderType = {
   id: string;
   status: string;

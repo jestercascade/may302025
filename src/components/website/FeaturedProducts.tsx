@@ -28,7 +28,7 @@ export function FeaturedProducts({
       <div className="pl-5 min-[480px]:pl-0 mb-4 flex items-center gap-4 h-8 md:w-[calc(100%-20px)] md:mx-auto">
         <h2 className="font-semibold line-clamp-3 md:text-xl">{title}</h2>
         <Link
-          href={`/collection/${slug}-${id}`}
+          href={`/collections/${slug}-${id}`}
           className="text-sm rounded-full px-3 h-full text-nowrap flex items-center justify-center transition duration-300 ease-in-out bg-lightgray active:bg-lightgray-dimmed lg:hover:bg-lightgray-dimmed"
         >
           See more
