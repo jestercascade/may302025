@@ -4,6 +4,8 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
+  description:
+    "Your data’s safe with us—guarded like a VIP secret. Shop knowing your info stays private, polished, and never shared.",
 };
 
 export default function PrivacyPolicy() {

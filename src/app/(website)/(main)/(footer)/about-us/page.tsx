@@ -2,6 +2,8 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About Us",
+  description:
+    "How it started, what we’re about, and why your closet (and vibe) just got an upgrade.",
 };
 
 export default function AboutUs() {

@@ -1,8 +1,15 @@
 import Link from "next/link";
 import styles from "../styles.module.css";
 import { CircleCheck } from "lucide-react";
+import { Metadata } from "next";
 
-export default function TermsOfUse() {
+export const metadata: Metadata = {
+  title: "Returns & Refunds",
+  description:
+    "Changed your mind? No stress—send it back faster than you can screenshot a cart. Easy refunds, zero guilt trips.",
+};
+
+export default function ReturnsAndRefunds() {
   return (
     <div className={`min-h-screen relative`}>
       <div className="max-w-[1024px] mx-auto pt-8 pb-4 px-7">

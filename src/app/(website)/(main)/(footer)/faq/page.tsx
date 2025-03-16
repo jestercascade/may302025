@@ -1,7 +1,14 @@
 import Link from "next/link";
 import styles from "../styles.module.css";
+import { Metadata } from "next";
 
-export default function TermsOfUse() {
+export const metadata: Metadata = {
+  title: "FAQs",
+  description:
+    "Shortcuts to clarity: instant answers on orders, shipping, and returns—so you can shop smarter, not harder.",
+};
+
+export default function FrequentlyAskedQuestions() {
   return (
     <div className={`min-h-screen relative`}>
       <div className="max-w-[1024px] mx-auto pt-8 pb-4 px-7">

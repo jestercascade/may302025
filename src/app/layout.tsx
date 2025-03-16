@@ -42,7 +42,7 @@ export default function RootLayout({
     sameAs: [
       "https://www.facebook.com/cherlygood",
       "https://www.instagram.com/cherlygood",
-      "https://www.twitter.com/cherlygood",
+      "https://x.com/cherlygood",
     ],
   };
 
@@ -50,7 +50,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta name="theme-color" content="#ffffff" />
-        <link rel="canonical" href="https://cherlygood.com" />
+        <link rel="canonical" href="https://cherlygood.com/" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

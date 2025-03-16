@@ -1,5 +1,12 @@
 import Link from "next/link";
 import styles from "../styles.module.css";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Use",
+  description:
+    "Your rights, our promises—written in plain English, not lawyer-speak. Shop knowing we’ve got your back, always.",
+};
 
 export default function TermsOfUse() {
   return (

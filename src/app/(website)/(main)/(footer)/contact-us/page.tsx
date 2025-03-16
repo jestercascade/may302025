@@ -1,4 +1,11 @@
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Contact Us",
+  description:
+    "Got an issue? Spill the tea and we'll fix it fast—no bots, just real talk with friendly support.",
+};
 
 export default function ContactUs() {
   return (
