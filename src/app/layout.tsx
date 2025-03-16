@@ -14,18 +14,48 @@ export const metadata: Metadata = {
   },
   description:
     "Make your style the one everyone's screenshotting—clothes, aesthetic finds, and zero regrets. Shop now!",
-  twitter: {
-    card: "summary_large_image",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
+  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Cherlygood",
+    url: "https://cherlygood.com",
+    logo: "https://cherlygood.com/logo.png",
+    sameAs: [
+      "https://www.facebook.com/cherlygood",
+      "https://www.instagram.com/cherlygood",
+      "https://www.twitter.com/cherlygood",
+    ],
+  };
+
   return (
     <html lang="en">
+      <head>
+        <meta name="theme-color" content="#ffffff" />
+        <link rel="canonical" href="https://cherlygood.com" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      </head>
       <body className={`${inter.className} body-scrollbar`}>
         <NavigationProvider>
           <AuthProvider>
