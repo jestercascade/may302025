@@ -155,7 +155,7 @@ function MobileNavbar({ itemsInCart }: { itemsInCart: number }) {
     <div className="md:hidden flex items-center justify-between w-full max-w-[1080px] mx-auto pl-4 pr-[10px] py-2">
       <Link href="/" className="ml-1">
         <Image
-          src="/logos/cherlygood-1.svg"
+          src="/cherlygood/logo.svg"
           alt="Cherlygood"
           width={220}
           height={27}
@@ -201,7 +201,7 @@ function DesktopNavbar({
       <div className="flex items-center gap-7">
         <Link href="/">
           <Image
-            src="/logos/cherlygood-1.svg"
+            src="/cherlygood/logo.svg"
             alt="Cherlygood"
             width={220}
             height={27}

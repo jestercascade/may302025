@@ -157,7 +157,7 @@ function DesktopNavbar() {
       <div className="flex items-center gap-5">
         <Link href="/admin" className="ml-1.5 min-w-[232px]">
           <Image
-            src="/logos/cherlygood-1.svg"
+            src="/cherlygood/logo.svg"
             alt="Cherlygood"
             width={232}
             height={29}
@@ -278,7 +278,7 @@ function MobileNavbar() {
     <div className="md:hidden flex items-center justify-between w-full max-w-[1080px] mx-auto p-2 pl-[14px]">
       <Link href="/admin" className="ml-1">
         <Image
-          src="/logos/cherlygood-1.svg"
+          src="/cherlygood/logo.svg"
           alt="Cherlygood"
           width={220}
           height={27}
