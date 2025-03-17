@@ -101,17 +101,17 @@ const categoryMetadata = {
   dresses: {
     title: "Dresses That Make Leggings Jealous",
     description:
-      "Slip-ons, smocked midis, ruched fits—leggings can’t compete with this much comfort *or* drama. Bonus: no waistband marks.",
+      "Slip-ons, smocked midis, ruched fits—leggings can’t compete with this much comfort or drama. Bonus: no waistband marks.",
   },
   tops: {
     title: "Tops That’ll Trend By Tomorrow",
     description:
-      "Balletcore knits, cold-shoulder tees, and tops designed to turn heads (no algorithm required).",
+      "Balletcore knits, cold-shoulder tees, tops designed to turn heads—no algorithm (or mirror) required.",
   },
   bottoms: {
     title: "Bottoms That Squeeze Right (No Drama)",
     description:
-      "High-waisted denim, slouchy cargos, pleated trousers—for days when you want to eat *and* look expensive.",
+      "High-waisted denim, slouchy cargos, pleated trousers—for days when you want to eat and look expensive.",
   },
   outerwear: {
     title: "Coats That Look Hot When It's Not",
@@ -119,24 +119,24 @@ const categoryMetadata = {
       "Puffer jackets, leather moto coats, teddy bear layers—stay warm without sacrificing your vibe. Winter who?",
   },
   shoes: {
-    title: "Walk the Hype in Trendy Kicks",
+    title: "Walk the Hype in Fresh Kicks",
     description:
-      "Platform boots, strappy sandals, dad sneakers so fresh, your steps sound expensive. Walk the walk, then screenshot the scuffs.",
+      "Platform boots, strappy sandals, dad sneakers so crisp—your steps sound expensive. Walk the walk, then screenshot the scuffs.",
   },
   accessories: {
     title: "Trendy Accessories for Your IRL Glow-Up",
     description:
-      "Chunky hoops, mini bags, and hair clips so cute, even your messy bun becomes a vibe.",
+      "Chunky hoops, mini bags, hair clips so cute—even your messy bun becomes a main character.",
   },
   men: {
     title: "Men’s Drip That Holds Weight",
     description:
-      "Sneakers that pop, multi-tools that fix anything. Your boys’ll hype it, straight up.",
+      "Sneakers that pop, multi-tools that fix anything. Your boys’ll hype it, no cap.",
   },
   "catch-all": {
     title: "The Stuff Your Feed’s Obsessed With",
     description:
-      "Viral tumblers, sunset lamps, and retro phone charms—this is where your screenshots come to life. Add to cart, already.",
+      "Viral tumblers, sunset lamps, retro phone charms—this is where your screenshots come to life. Add to cart, already.",
   },
 };
 
