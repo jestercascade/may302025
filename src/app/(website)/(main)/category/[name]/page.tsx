@@ -5,7 +5,26 @@ import { Pagination } from "@/components/website/Pagination";
 import { ProductCard } from "@/components/website/ProductCard";
 import { UpsellReviewOverlay } from "@/components/website/UpsellReviewOverlay";
 import { capitalizeFirstLetter } from "@/lib/utils/common";
+import { Metadata } from "next";
 import { cookies } from "next/headers";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ name: string }>;
+}): Promise<Metadata> {
+  const category = (await params).name.toLowerCase();
+  const meta = categoryMetadata[category as keyof typeof categoryMetadata] || {
+    title: "Cherlygood - Literally Stop, Stare, Then Buy It.",
+    description:
+      "Make your style the one everyone's screenshotting—clothes, aesthetic finds, and zero regrets. Shop now!",
+  };
+
+  return {
+    title: meta.title,
+    description: meta.description,
+  };
+}
 
 export default async function Categories({
   params,
@@ -77,6 +96,49 @@ export default async function Categories({
     </>
   );
 }
+
+const categoryMetadata = {
+  dresses: {
+    title: "Dresses That Make Leggings Jealous",
+    description:
+      "Slip-ons, smocked midis, ruched fits—leggings can’t compete with this much comfort *or* drama. Bonus: no waistband marks.",
+  },
+  tops: {
+    title: "Tops That’ll Trend By Tomorrow",
+    description:
+      "Balletcore knits, cold-shoulder tees, and tops designed to turn heads (no algorithm required).",
+  },
+  bottoms: {
+    title: "Bottoms That Squeeze Right (No Drama)",
+    description:
+      "High-waisted denim, slouchy cargos, pleated trousers—for days when you want to eat *and* look expensive.",
+  },
+  outerwear: {
+    title: "Coats That Look Hot When It's Not",
+    description:
+      "Puffer jackets, leather moto coats, teddy bear layers—stay warm without sacrificing your vibe. Winter who?",
+  },
+  shoes: {
+    title: "Walk the Hype in Trendy Kicks",
+    description:
+      "Platform boots, strappy sandals, dad sneakers so fresh, your steps sound expensive. Walk the walk, then screenshot the scuffs.",
+  },
+  accessories: {
+    title: "Trendy Accessories for Your IRL Glow-Up",
+    description:
+      "Chunky hoops, mini bags, and hair clips so cute, even your messy bun becomes a vibe.",
+  },
+  men: {
+    title: "Men’s Drip That Holds Weight",
+    description:
+      "Sneakers that pop, multi-tools that fix anything. Your boys’ll hype it, straight up.",
+  },
+  "catch-all": {
+    title: "The Stuff Your Feed’s Obsessed With",
+    description:
+      "Viral tumblers, sunset lamps, and retro phone charms—this is where your screenshots come to life. Add to cart, already.",
+  },
+};
 
 function getDisplayName(category: string): string {
   switch (category.toLowerCase()) {
