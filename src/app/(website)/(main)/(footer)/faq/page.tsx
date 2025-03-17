@@ -3,7 +3,7 @@ import styles from "../styles.module.css";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Instant Answers, Smarter Shopping",
+  title: "Instant Answers, Zero Hassle",
   description:
     "Your top questions, answered in seconds—no digging, no DMs, just clarity right when you need it.",
 };
