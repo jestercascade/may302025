@@ -3,7 +3,7 @@ import styles from "../styles.module.css";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Clear Rules, Stress-Free Shopping",
+  title: "Transparent Rules, Shop Confidently",
   description:
     "Written for humans, not lawyers. Shop knowing we’ve got your back, always.",
 };
