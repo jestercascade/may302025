@@ -4,9 +4,9 @@ import { CircleCheck } from "lucide-react";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Returns & Refunds",
+  title: "Easy Returns, Happy Shoppers",
   description:
-    "Changed your mind? No stress—send it back faster than you can screenshot a cart. Easy refunds, zero guilt trips.",
+    "Ordered a medium, got a tent? Send it back with a few clicks—refunds so fast, your wallet won't even notice.",
 };
 
 export default function ReturnsAndRefunds() {

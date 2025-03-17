@@ -3,9 +3,9 @@ import styles from "../styles.module.css";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Use",
+  title: "Clear Rules, Stress-Free Shopping",
   description:
-    "Your rights, our promises—written in plain English, not lawyer-speak. Shop knowing we’ve got your back, always.",
+    "Written for humans, not lawyers. Shop knowing we’ve got your back, always.",
 };
 
 export default function TermsOfUse() {

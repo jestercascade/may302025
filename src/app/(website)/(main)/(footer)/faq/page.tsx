@@ -3,9 +3,9 @@ import styles from "../styles.module.css";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "FAQs",
+  title: "Instant Answers, Smarter Shopping",
   description:
-    "Shortcuts to clarity: instant answers on orders, shipping, and returns—so you can shop smarter, not harder.",
+    "Your top questions, answered in seconds—no digging, no DMs, just clarity right when you need it.",
 };
 
 export default function FrequentlyAskedQuestions() {

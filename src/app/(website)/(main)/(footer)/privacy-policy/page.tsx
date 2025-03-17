@@ -3,9 +3,9 @@ import styles from "../styles.module.css";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy",
+  title: "Privacy You Can Trust",
   description:
-    "Your data’s safe with us—guarded like a VIP secret. Shop knowing your info stays private, polished, and never shared.",
+    "Your secrets are safe with us—locked down, never spilled, and always respected. Pinky swear.",
 };
 
 export default function PrivacyPolicy() {

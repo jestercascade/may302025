@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About Us",
+  title: "More Than a Brand: Our Story",
   description:
     "How it started, what we’re about, and why your closet (and vibe) just got an upgrade.",
 };
