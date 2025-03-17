@@ -9,8 +9,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "Cherlygood – Literally Stop, Stare, Then Buy It.",
-    template: "%s – Cherlygood",
+    default: "Cherlygood - Literally Stop, Stare, Then Buy It.",
+    template: "%s - Cherlygood",
   },
   description:
     "Make your style the one everyone's screenshotting—clothes, aesthetic finds, and zero regrets. Shop now!",

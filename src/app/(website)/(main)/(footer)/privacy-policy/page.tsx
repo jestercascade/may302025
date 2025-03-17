@@ -3,7 +3,7 @@ import styles from "../styles.module.css";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy You Can Trust",
+  title: "Your Privacy, Always Protected",
   description:
     "Your secrets are safe with us—locked down, never spilled, and always respected. Pinky swear.",
 };
