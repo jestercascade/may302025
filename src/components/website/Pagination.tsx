@@ -24,9 +24,7 @@ export function Pagination({
   const [inputError, setInputError] = useState(false);
   const lastPageRequested = useRef<number | null>(null);
 
-  // Reset navigation state when the component mounts (after page transition)
   useEffect(() => {
-    // Check if we've arrived at the requested page
     if (
       lastPageRequested.current === currentPage ||
       lastPageRequested.current === null
@@ -53,20 +51,16 @@ export function Pagination({
     } else if (direction === "last") {
       targetPage = totalPages;
     } else {
-      // Input navigation
       targetPage = page || parseInt(inputValue);
 
-      // Validate page number
       if (isNaN(targetPage) || targetPage < 1 || targetPage > totalPages) {
         setInputError(true);
         return;
       }
     }
 
-    // Store the requested page to compare after navigation
     lastPageRequested.current = targetPage;
 
-    // Don't navigate if already on the target page
     if (targetPage === currentPage) {
       return;
     }
@@ -78,7 +72,6 @@ export function Pagination({
     params.set("page", targetPage.toString());
     router.push(`${pathname}?${params.toString()}`);
 
-    // Safety timeout to reset spinner if navigation takes too long
     setTimeout(() => {
       setIsNavigating(false);
       setNavigatingDirection(null);
@@ -109,11 +102,12 @@ export function Pagination({
             <button
               onClick={() => handleNavigation("prev")}
               disabled={currentPage === 1 || isNavigating}
+              title="Previous page"
+              aria-label="Go to previous page"
               className={clsx(
                 "w-9 h-9 flex items-center justify-center rounded-full ease-in-out duration-300 transition",
                 {
-                  "pointer-events-none":
-                    currentPage === 1 || isNavigating,
+                  "pointer-events-none": currentPage === 1 || isNavigating,
                   "active:bg-lightgray-dimmed lg:hover:bg-lightgray-dimmed":
                     currentPage !== 1 && !isNavigating,
                 }
@@ -143,7 +137,8 @@ export function Pagination({
                   onBlur={() => setInputError(false)}
                   className="w-full h-full text-center bg-transparent focus:outline-none"
                   disabled={isNavigating}
-                  aria-label="Go to page"
+                  title="Page number"
+                  aria-label="Enter page number"
                 />
               )}
             </div>
@@ -153,10 +148,13 @@ export function Pagination({
             <button
               onClick={() => handleNavigation("last")}
               disabled={currentPage === totalPages || isNavigating}
+              title="Last page"
+              aria-label={`Go to last page, ${totalPages}`}
               className={clsx(
                 "min-w-[36px] max-w-[36px] h-9 px-1 flex items-center justify-center border rounded-full bg-white",
                 {
-                  "cursor-context-menu": currentPage === totalPages || isNavigating,
+                  "cursor-context-menu":
+                    currentPage === totalPages || isNavigating,
                   "hover:bg-lightgray cursor-pointer":
                     currentPage !== totalPages && !isNavigating,
                 }
@@ -172,6 +170,8 @@ export function Pagination({
             <button
               onClick={() => handleNavigation("next")}
               disabled={currentPage === totalPages || isNavigating}
+              title="Next page"
+              aria-label="Go to next page"
               className={clsx(
                 "w-9 h-9 flex items-center justify-center rounded-full ease-in-out duration-300 transition",
                 {
