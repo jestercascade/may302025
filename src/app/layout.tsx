@@ -70,7 +70,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta name="theme-color" content="#ffffff" />
         <link rel="canonical" href="https://cherlygood.com/" />
         <script
           type="application/ld+json"
