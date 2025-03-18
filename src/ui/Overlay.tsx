@@ -11,4 +11,6 @@ const Overlay = forwardRef<HTMLDivElement, { children: React.ReactNode }>(
   )
 );
 
+Overlay.displayName = "Overlay";
+
 export default Overlay;
