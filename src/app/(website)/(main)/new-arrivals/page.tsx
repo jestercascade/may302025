@@ -5,6 +5,13 @@ import { Pagination } from "@/components/website/Pagination";
 import { ProductCard } from "@/components/website/ProductCard";
 import { UpsellReviewOverlay } from "@/components/website/UpsellReviewOverlay";
 import { cookies } from "next/headers";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "New Drops That Break the Algorithm (Not Your Bank)",
+  description:
+    "Slip-ons, mini bags, sunset lamps—drops for that instant screenshot status (btw, no filter needed for your glow-up).",
+};
 
 export default async function NewArrivals({
   searchParams,

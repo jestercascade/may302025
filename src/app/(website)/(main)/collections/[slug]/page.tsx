@@ -5,6 +5,40 @@ import { Pagination } from "@/components/website/Pagination";
 import { ProductCard } from "@/components/website/ProductCard";
 import { UpsellReviewOverlay } from "@/components/website/UpsellReviewOverlay";
 import { cookies } from "next/headers";
+import { Metadata } from "next";
+import { cache } from "react";
+
+const cachedGetCollections = cache(getCollections);
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const collectionId = slug.split("-").pop();
+
+  const collections = await cachedGetCollections({
+    ids: [collectionId as string],
+    includeProducts: false,
+    fields: ["title"],
+  });
+  const [collection] = collections || [];
+
+  if (!collection) {
+    return {
+      title: "Cherlygood - Literally Stop, Stare, Then Buy It.",
+      description:
+        "Make your style the one everyone's screenshotting—clothes, aesthetic finds, and zero regrets. Shop now!",
+    };
+  }
+
+  return {
+    title: collection.title,
+    description:
+      "Make your style the one everyone's screenshotting—clothes, aesthetic finds, and zero regrets. Shop now!",
+  };
+}
 
 export default async function Collections({
   params,
@@ -31,26 +65,29 @@ export default async function Collections({
     "highlights",
   ];
 
+  const collectionId = slug.split("-").pop() as string;
+
   const [cart, collections] = await Promise.all([
     getCart(deviceIdentifier),
-    getCollections({
-      ids: [slug.split("-").pop() as string],
+    cachedGetCollections({
+      ids: [collectionId],
       includeProducts: true,
       fields: productFields,
     }),
   ]);
 
   const [collection] = collections || [];
-  const productsArray = collection?.products || [];
+
+  if (!collection || !collection.products || collection.products.length === 0) {
+    return <CatalogEmptyState />;
+  }
+
+  const productsArray = collection.products;
   const itemsPerPage = 52;
   const totalPages = Math.ceil(productsArray.length / itemsPerPage);
   const currentPageAdjusted = Math.max(1, Math.min(currentPage, totalPages));
   const startIndex = (currentPageAdjusted - 1) * itemsPerPage;
   const products = productsArray.slice(startIndex, startIndex + itemsPerPage);
-
-  if (!products.length) {
-    return <CatalogEmptyState />;
-  }
 
   return (
     <>
@@ -60,16 +97,16 @@ export default async function Collections({
             {collection.title}
           </h2>
           <div className="select-none w-full flex flex-wrap gap-2 md:gap-0">
-            {products.filter(Boolean).map((product, index) => (
+            {products.map((product, index) => (
               <ProductCard
-                key={index}
+                key={product.id || index}
                 product={product as ProductWithUpsellType & { index: number }}
                 cart={cart}
               />
             ))}
           </div>
         </div>
-        <Pagination currentPage={currentPage} totalPages={totalPages} />
+        <Pagination currentPage={currentPageAdjusted} totalPages={totalPages} />
       </div>
       <UpsellReviewOverlay cart={cart} />
     </>
