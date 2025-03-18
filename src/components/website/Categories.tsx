@@ -124,6 +124,8 @@ export const PrevButton: React.FC<PropType> = (props) => {
     <button
       className="embla__button embla__button--prev disabled:hidden cursor-pointer w-10 h-10 rounded-full absolute left-4 top-[44px] bg-neutral-800 bg-opacity-60 backdrop-blur-sm flex items-center justify-center transition active:bg-opacity-85 lg:hover:bg-opacity-85"
       type="button"
+      title="Previous slide"
+      aria-label="Previous slide"
       {...restProps}
     >
       <ChevronLeft color="#ffffff" strokeWidth={1.5} className="mr-[2px]" />
@@ -139,6 +141,8 @@ export const NextButton: React.FC<PropType> = (props) => {
     <button
       className="embla__button embla__button--next disabled:hidden cursor-pointer w-10 h-10 rounded-full absolute right-4 top-[44px] bg-neutral-800 bg-opacity-60 backdrop-blur-sm flex items-center justify-center transition active:bg-opacity-85 lg:hover:bg-opacity-85"
       type="button"
+      title="Next slide"
+      aria-label="Next slide"
       {...restProps}
     >
       <ChevronRight color="#ffffff" strokeWidth={1.5} className="ml-[2px]" />

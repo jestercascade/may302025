@@ -167,6 +167,8 @@ function MobileNavbar({ itemsInCart }: { itemsInCart: number }) {
         <Link
           href="/cart"
           className="relative h-11 w-11 rounded-full flex gap-1 items-center justify-center transition-colors active:bg-lightgray lg:hover:bg-lightgray"
+          aria-label="View cart"
+          title="View cart"
         >
           <ShoppingCart size={24} strokeWidth={2.5} />
           {itemsInCart > 0 && (
@@ -261,6 +263,8 @@ function DesktopNavbar({
         <Link
           href="/cart"
           className="relative h-11 w-11 rounded-full flex items-center justify-center ease-in-out transition duration-300 active:bg-lightgray lg:hover:bg-lightgray"
+          aria-label="View cart"
+          title="View cart"
         >
           <ShoppingCart strokeWidth={2.5} />
           {itemsInCart > 0 && (
