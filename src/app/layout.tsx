@@ -8,6 +8,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://cherlygood.com"),
   title: {
     default: "Cherlygood - Literally Stop, Stare, Then Buy It.",
     template: "%s - Cherlygood",
@@ -24,6 +25,27 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
+  },
+  openGraph: {
+    title: "Cherlygood - Literally Stop, Stare, Then Buy It.",
+    description:
+      "Make your style the one everyone's screenshotting—clothes, aesthetic finds, and zero regrets. Shop now!",
+    images: [
+      {
+        url: "/opengraph-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Cherlygood Open Graph Image",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@cherlygood",
+    title: "Cherlygood - Literally Stop, Stare, Then Buy It.",
+    description:
+      "Make your style the one everyone's screenshotting—clothes, aesthetic finds, and zero regrets. Shop now!",
+    images: ["/opengraph-image.jpg"],
   },
 };
 
