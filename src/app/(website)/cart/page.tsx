@@ -79,7 +79,7 @@ export default async function Cart() {
           <div className="h-14 px-5 flex items-center max-w-[1080px] mx-auto">
             <Link href="/">
               <Image
-                src="/logos/cherlygood-1.svg"
+                src="/cherlygood/logo.svg"
                 alt="Cherlygood"
                 width={220}
                 height={27}

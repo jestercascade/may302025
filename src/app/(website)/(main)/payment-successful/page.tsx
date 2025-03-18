@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Payment Successful, Thanks So Much!",
+};
 
 const INVALID_PARAMS_REDIRECT_PATH = "/";
 const PAYMENT_SUCCESS_COOKIE_NAME = "payment_success";

@@ -102,7 +102,7 @@ export function ProductDetailsWrapper({
           <div className="flex items-center gap-7">
             <Link href="/" className="ml-1">
               <Image
-                src="/logos/cherlygood-1.svg"
+                src="/cherlygood/logo.svg"
                 alt="Cherlygood"
                 width={220}
                 height={27}

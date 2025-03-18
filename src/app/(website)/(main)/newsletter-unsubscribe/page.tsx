@@ -1,5 +1,10 @@
 import { NewsletterUnsubscribeButton } from "@/components/website/NewsletterUnsubscribeButton";
+import { Metadata } from "next";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Unsubscribe from Our Newsletter",
+};
 
 const INVALID_EMAIL_REDIRECT_PATH = "/";
 
