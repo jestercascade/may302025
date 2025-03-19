@@ -7,7 +7,7 @@ const config = {
       "Make your style the one everyone's screenshotting—clothes, aesthetic finds, and zero regrets. Shop now!",
     IMAGE: "/opengraph-image.jpg",
     SITE_NAME: "Cherlygood",
-    URL: "https://cherlygood.com",
+    URL: "https://cherlygood.com/",
     TWITTER_HANDLE: "@cherlygood",
     CANONICAL: "https://cherlygood.com/",
     ROBOTS_PROTECTED: "noindex,nofollow",
