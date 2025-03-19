@@ -3,49 +3,47 @@ import ShowAlert from "@/components/shared/ShowAlert";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { Inter } from "next/font/google";
 import type { Metadata } from "next";
+import { appConfig } from "@/config";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://cherlygood.com"),
+  metadataBase: new URL(appConfig.BASE_URL),
   title: {
-    default: "Cherlygood - Literally Stop, Stare, Then Buy It.",
-    template: "%s - Cherlygood",
+    default: appConfig.SEO.TITLE,
+    template: `%s - ${appConfig.APP_NAME}`,
   },
-  description:
-    "Make your style the one everyone's screenshotting—clothes, aesthetic finds, and zero regrets. Shop now!",
+  description: appConfig.SEO.DESCRIPTION,
   robots: {
-    index: true,
-    follow: true,
+    index: appConfig.SEO.ROBOTS_PUBLIC.includes("index"),
+    follow: appConfig.SEO.ROBOTS_PUBLIC.includes("follow"),
     googleBot: {
-      index: true,
-      follow: true,
+      index: appConfig.SEO.ROBOTS_PUBLIC.includes("index"),
+      follow: appConfig.SEO.ROBOTS_PUBLIC.includes("follow"),
       "max-video-preview": -1,
       "max-image-preview": "large",
       "max-snippet": -1,
     },
   },
   openGraph: {
-    title: "Cherlygood - Literally Stop, Stare, Then Buy It.",
-    description:
-      "Make your style the one everyone's screenshotting—clothes, aesthetic finds, and zero regrets. Shop now!",
+    title: appConfig.SEO.TITLE,
+    description: appConfig.SEO.DESCRIPTION,
     images: [
       {
-        url: "/opengraph-image.jpg",
+        url: appConfig.SEO.IMAGE,
         width: 1200,
         height: 630,
-        alt: "Cherlygood Open Graph Image",
+        alt: `${appConfig.APP_NAME} Open Graph Image`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@cherlygood",
-    title: "Cherlygood - Literally Stop, Stare, Then Buy It.",
-    description:
-      "Make your style the one everyone's screenshotting—clothes, aesthetic finds, and zero regrets. Shop now!",
-    images: ["/opengraph-image.jpg"],
+    site: appConfig.SEO.TWITTER_HANDLE,
+    title: appConfig.SEO.TITLE,
+    description: appConfig.SEO.DESCRIPTION,
+    images: [appConfig.SEO.IMAGE],
   },
 };
 
@@ -57,20 +55,16 @@ export default function RootLayout({
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "Cherlygood",
-    url: "https://cherlygood.com",
-    logo: "https://cherlygood.com/logo.png",
-    sameAs: [
-      "https://www.facebook.com/cherlygood",
-      "https://www.instagram.com/cherlygood",
-      "https://x.com/cherlygood",
-    ],
+    name: appConfig.STRUCTURED_DATA.name,
+    url: appConfig.BASE_URL,
+    logo: appConfig.STRUCTURED_DATA.logo,
+    sameAs: appConfig.STRUCTURED_DATA.socialLinks,
   };
 
   return (
     <html lang="en">
       <head>
-        <link rel="canonical" href="https://cherlygood.com/" />
+        <link rel="canonical" href={appConfig.SEO.CANONICAL} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}

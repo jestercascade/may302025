@@ -5,6 +5,7 @@ import { generateId, currentTimestamp } from "@/lib/utils/common";
 import { revalidatePath } from "next/cache";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { Resend } from "resend";
+import { appConfig } from "@/config";
 
 export async function CreateNewsletterAction(data: {
   emailSubject: string;
@@ -88,7 +89,7 @@ export async function SendNewsletterEmailAction(
   successCount?: number;
   failedEmails?: string[];
 }> {
-  const resend = new Resend(process.env.RESEND_API_KEY);
+  const resend = new Resend(appConfig.RESEND.API_KEY);
 
   try {
     const { error } = await resend.emails.send({

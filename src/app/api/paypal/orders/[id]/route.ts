@@ -1,3 +1,4 @@
+import { appConfig } from "@/config";
 import { generateAccessToken } from "@/lib/utils/orders";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
@@ -17,7 +18,7 @@ export async function GET(
       );
     }
 
-    const url = `${process.env.PAYPAL_API_BASE}/v2/checkout/orders/${orderId}`;
+    const url = `${appConfig.PAYPAL.API_BASE}/v2/checkout/orders/${orderId}`;
 
     const response = await fetch(url, {
       method: "GET",

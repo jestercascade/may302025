@@ -1,16 +1,16 @@
 import { DecodedIdToken } from "firebase-admin/auth";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import appConfig from "@/lib/config";
+import { appConfig } from "./config";
 
 // Constants
 const COOKIE_NAME = "cherlygood_session";
-const ADMIN_ENTRY_KEY = process.env.ADMIN_ENTRY_KEY || "";
+const ADMIN_ENTRY_KEY = appConfig.ADMIN.ENTRY_KEY || "";
 if (!ADMIN_ENTRY_KEY) {
   throw new Error("ADMIN_ENTRY_KEY environment variable is required");
 }
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "";
+const ADMIN_EMAIL = appConfig.ADMIN.EMAIL || "";
 if (!ADMIN_EMAIL) {
   throw new Error("ADMIN_EMAIL environment variable is required");
 }

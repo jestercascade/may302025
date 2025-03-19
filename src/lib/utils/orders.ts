@@ -1,5 +1,7 @@
-const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
+import { appConfig } from "@/config";
+
+const PAYPAL_CLIENT_ID = appConfig.PAYPAL.CLIENT_ID;
+const PAYPAL_CLIENT_SECRET = appConfig.PAYPAL.CLIENT_SECRET;
 
 export async function generateAccessToken() {
   if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
@@ -11,7 +13,7 @@ export async function generateAccessToken() {
   ).toString("base64");
 
   const response = await fetch(
-    `${process.env.PAYPAL_API_BASE}/v1/oauth2/token`,
+    `${appConfig.PAYPAL.API_BASE}/v1/oauth2/token`,
     {
       method: "POST",
       headers: {

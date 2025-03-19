@@ -1,4 +1,3 @@
-import config from "@/lib/config";
 import { adminDb } from "@/lib/firebase/admin";
 import { capitalizeFirstLetter, formatThousands } from "@/lib/utils/common";
 import Image from "next/image";
@@ -10,6 +9,7 @@ import {
 import { EmailType } from "@/lib/sharedTypes";
 import { getProducts } from "@/actions/get/products";
 import clsx from "clsx";
+import { appConfig } from "@/config";
 
 const PAYPAL_BASE_URL =
   "https://www.sandbox.paypal.com/unifiedtransactions/details/payment/";
@@ -21,7 +21,7 @@ export default async function OrderDetails({
 }) {
   const { id } = await params;
   const response = await fetch(
-    `${config.BASE_URL}/api/paypal/orders/${id}`,
+    `${appConfig.BASE_URL}/api/paypal/orders/${id}`,
     {
       cache: "no-store",
     }

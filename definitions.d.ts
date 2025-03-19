@@ -374,3 +374,53 @@ type OrderType = {
   transactionId: string;
   timestamp: string;
 };
+
+type ConfigType = {
+  APP_NAME: string;
+  BASE_URL: string;
+  SEO: {
+    TITLE: string;
+    DESCRIPTION: string;
+    IMAGE: string;
+    SITE_NAME: string;
+    URL: string;
+    TWITTER_HANDLE: string;
+    CANONICAL: string;
+    ROBOTS_PROTECTED: string;
+    ROBOTS_PUBLIC: string;
+  };
+  STRUCTURED_DATA: {
+    name: string;
+    logo: string;
+    socialLinks: string[];
+  };
+  REMOTE_PATTERNS: Array<{ protocol: string; hostname: string }>;
+  FIREBASE: {
+    CLIENT: {
+      API_KEY: string | undefined;
+      AUTH_DOMAIN: string | undefined;
+      PROJECT_ID: string | undefined;
+      STORAGE_BUCKET: string | undefined;
+      MESSAGING_SENDER_ID: string | undefined;
+      APP_ID: string | undefined;
+      MEASUREMENT_ID: string | undefined;
+    };
+    ADMIN: {
+      PRIVATE_KEY: string | undefined;
+      CLIENT_EMAIL: string | undefined;
+      PROJECT_ID: string | undefined;
+    };
+  };
+  PAYPAL: {
+    CLIENT_ID: string | undefined;
+    CLIENT_SECRET: string | undefined;
+    API_BASE: string;
+  };
+  RESEND: {
+    API_KEY: string | undefined;
+  };
+  ADMIN: {
+    EMAIL: string | undefined;
+    ENTRY_KEY: string | undefined;
+  };
+};

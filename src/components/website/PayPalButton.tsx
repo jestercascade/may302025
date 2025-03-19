@@ -1,6 +1,7 @@
 "use client";
 
 import { ClearPurchasedItemsAction } from "@/actions/cart";
+import { appConfig } from "@/config";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
@@ -11,7 +12,7 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second between retries
 
 const initialOptions = {
-  clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "",
+  clientId: appConfig.PAYPAL.CLIENT_ID || "",
   currency: "USD",
   intent: "capture",
 };

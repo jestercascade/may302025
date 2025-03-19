@@ -1,10 +1,11 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { adminAuth } from "@/lib/firebase/admin";
+import { appConfig } from "@/config";
 
 const COOKIE_NAME = "cherlygood_session";
-const ADMIN_ENTRY_KEY = process.env.ADMIN_ENTRY_KEY || "";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_ENTRY_KEY = appConfig.ADMIN.ENTRY_KEY || "";
+const ADMIN_EMAIL = appConfig.ADMIN.EMAIL;
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
     cookieStore.set(COOKIE_NAME, sessionCookie, {
       maxAge: twoWeeksInMilliseconds,
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.APP_ENV === "production",
       sameSite: "lax",
       path: "/",
     });

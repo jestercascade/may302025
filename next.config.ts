@@ -1,9 +1,9 @@
+import { appConfig } from "@/config";
 import type { NextConfig } from "next";
-import config from "./src/lib/config.js";
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: config.REMOTE_PATTERNS.map((pattern) => ({
+    remotePatterns: appConfig.REMOTE_PATTERNS.map((pattern) => ({
       protocol: "https",
       hostname: pattern.hostname,
     })),

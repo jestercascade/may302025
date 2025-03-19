@@ -6,6 +6,7 @@ import { generateAccessToken } from "@/lib/utils/orders";
 import { getCart } from "@/actions/get/carts";
 import { getProducts } from "@/actions/get/products";
 import { revalidatePath } from "next/cache";
+import { appConfig } from "@/config";
 
 export async function POST(
   _request: NextRequest,
@@ -22,7 +23,7 @@ export async function POST(
 
   try {
     const accessToken = await generateAccessToken();
-    const url = `${process.env.PAYPAL_API_BASE}/v2/checkout/orders/${orderId}/capture`;
+    const url = `${appConfig.PAYPAL.API_BASE}/v2/checkout/orders/${orderId}/capture`;
 
     const response = await fetch(url, {
       method: "POST",

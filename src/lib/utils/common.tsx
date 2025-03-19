@@ -1,5 +1,5 @@
+import { appConfig } from "@/config";
 import { customAlphabet } from "nanoid";
-import { REMOTE_PATTERNS } from "../config";
 
 export function createNonLinkableEmail(email: string): React.ReactNode {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -143,7 +143,7 @@ export function isValidRemoteImage(url: string) {
       return false;
     }
 
-    const isRemote = REMOTE_PATTERNS.some((pattern) => {
+    const isRemote = appConfig.REMOTE_PATTERNS.some((pattern) => {
       const patternProtocol = pattern.protocol.replace(":", "");
       const parsedProtocol = parsedUrl.protocol.replace(":", "");
       return (

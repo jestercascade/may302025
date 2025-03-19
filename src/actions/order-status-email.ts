@@ -8,8 +8,9 @@ import { EmailType, ShowAlertType } from "@/lib/sharedTypes";
 import { adminDb } from "@/lib/firebase/admin";
 import { revalidatePath } from "next/cache";
 import { ReactElement } from "react";
+import { appConfig } from "@/config";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(appConfig.RESEND.API_KEY);
 
 const EMAIL_TEMPLATES: Record<EmailType, EmailTemplateType> = {
   [EmailType.ORDER_CONFIRMED]: OrderConfirmedTemplate,

@@ -1,3 +1,4 @@
+import { appConfig } from "@/config";
 import { generateAccessToken } from "@/lib/utils/orders";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
@@ -12,7 +13,7 @@ export async function POST(request: NextRequest) {
 
     const totalAmount = calculateTotalAmount(cart);
     const accessToken = await generateAccessToken();
-    const url = `${process.env.PAYPAL_API_BASE}/v2/checkout/orders`;
+    const url = `${appConfig.PAYPAL.API_BASE}/v2/checkout/orders`;
 
     const payload = {
       intent: "CAPTURE",
