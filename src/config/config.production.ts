@@ -6,7 +6,6 @@ const productionConfig = {
   // BASE_URL: "https://cherlygood.com/",
   SEO: {
     ...baseConfig.SEO,
-    ROBOTS_PROTECTED: "noindex,nofollow",
     CANONICAL: "https://cherlygood.vercel.app/",
     // CANONICAL: "https://cherlygood.com/",
   },
