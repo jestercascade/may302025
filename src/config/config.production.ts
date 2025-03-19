@@ -6,8 +6,6 @@ const productionConfig = {
   // BASE_URL: "https://cherlygood.com/",
   SEO: {
     ...baseConfig.SEO,
-    CANONICAL: "https://cherlygood.vercel.app/",
-    // CANONICAL: "https://cherlygood.com/",
   },
   PAYPAL: {
     ...baseConfig.PAYPAL,

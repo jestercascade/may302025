@@ -107,7 +107,6 @@ export function Pagination({
               className={clsx(
                 "w-9 h-9 flex items-center justify-center rounded-full ease-in-out duration-300 transition",
                 {
-                  "pointer-events-none": currentPage === 1 || isNavigating,
                   "active:bg-lightgray-dimmed lg:hover:bg-lightgray-dimmed":
                     currentPage !== 1 && !isNavigating,
                 }
@@ -175,8 +174,6 @@ export function Pagination({
               className={clsx(
                 "w-9 h-9 flex items-center justify-center rounded-full ease-in-out duration-300 transition",
                 {
-                  "pointer-events-none opacity-50":
-                    currentPage === totalPages || isNavigating,
                   "active:bg-lightgray-dimmed lg:hover:bg-lightgray-dimmed":
                     currentPage !== totalPages && !isNavigating,
                 }

@@ -9,9 +9,6 @@ const config = {
     SITE_NAME: "Cherlygood",
     URL: "https://cherlygood.com/",
     TWITTER_HANDLE: "@cherlygood",
-    CANONICAL: "https://cherlygood.com/",
-    ROBOTS_PROTECTED: "noindex,nofollow",
-    ROBOTS_PUBLIC: "index,follow",
   },
 
   STRUCTURED_DATA: {

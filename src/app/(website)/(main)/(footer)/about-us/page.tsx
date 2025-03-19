@@ -4,6 +4,9 @@ export const metadata: Metadata = {
   title: "More Than a Brand, Our Story",
   description:
     "How it started, what we’re about, and why your closet (and vibe) just got an upgrade.",
+  alternates: {
+    canonical: "/about-us",
+  },
 };
 
 export default function AboutUs() {

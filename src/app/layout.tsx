@@ -12,22 +12,21 @@ export const metadata: Metadata = {
   metadataBase: new URL(appConfig.BASE_URL),
   title: {
     default: appConfig.SEO.TITLE,
-    template: `%s - ${appConfig.APP_NAME}`,
+    template: `%s | ${appConfig.APP_NAME}`,
   },
   description: appConfig.SEO.DESCRIPTION,
-  robots: {
-    index: appConfig.SEO.ROBOTS_PUBLIC.includes("index"),
-    follow: appConfig.SEO.ROBOTS_PUBLIC.includes("follow"),
-    googleBot: {
-      index: appConfig.SEO.ROBOTS_PUBLIC.includes("index"),
-      follow: appConfig.SEO.ROBOTS_PUBLIC.includes("follow"),
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+  ...(process.env.APP_ENV !== "production" && {
+    robots: {
+      index: false,
+      follow: false,
+      googleBot: { index: false, follow: false },
     },
-  },
+  }),
   openGraph: {
-    title: appConfig.SEO.TITLE,
+    title: {
+      default: appConfig.SEO.TITLE,
+      template: `%s | ${appConfig.APP_NAME}`,
+    },
     description: appConfig.SEO.DESCRIPTION,
     images: [
       {
@@ -37,13 +36,12 @@ export const metadata: Metadata = {
         alt: `${appConfig.APP_NAME} Open Graph Image`,
       },
     ],
+    siteName: appConfig.APP_NAME,
   },
   twitter: {
     card: "summary_large_image",
-    site: appConfig.SEO.TWITTER_HANDLE,
-    title: appConfig.SEO.TITLE,
-    description: appConfig.SEO.DESCRIPTION,
-    images: [appConfig.SEO.IMAGE],
+    creator: appConfig.SEO.TWITTER_HANDLE,
+    images: appConfig.SEO.IMAGE,
   },
 };
 
@@ -64,7 +62,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="canonical" href={appConfig.SEO.CANONICAL} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
