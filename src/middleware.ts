@@ -21,20 +21,10 @@ const PROTECTED_ROUTES = [
   "/demo", // Example of another protected route
 ] as const;
 
-// Custom error classes
-class SessionVerificationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "SessionVerificationError";
-  }
-}
-
-class NetworkError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "NetworkError";
-  }
-}
+// Result type for session verification (replacing custom error classes)
+type VerifySessionResult =
+  | { success: true; decodedClaims: DecodedIdToken }
+  | { success: false; error: string };
 
 // Helper functions
 const isAdmin = (decodedClaims: DecodedIdToken): boolean => {
@@ -91,7 +81,7 @@ const signOutAndRedirect = async (
 
 const verifySessionWithAPI = async (
   sessionCookie: string
-): Promise<DecodedIdToken> => {
+): Promise<VerifySessionResult> => {
   try {
     const response = await fetch(`${appConfig.BASE_URL}/api/auth/verify`, {
       method: "POST",
@@ -103,20 +93,44 @@ const verifySessionWithAPI = async (
     });
 
     if (!response.ok) {
-      throw new SessionVerificationError(
-        `Invalid session: ${response.status} ${response.statusText}`
-      );
+      return {
+        success: false,
+        error: `Invalid session: ${response.status} ${response.statusText}`,
+      };
     }
 
-    return response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch {
+      return {
+        success: false,
+        error: "Invalid session: invalid JSON response",
+      };
+    }
+
+    if (!data) {
+      return {
+        success: false,
+        error: "Session verification returned null payload",
+      };
+    }
+
+    return { success: true, decodedClaims: data as DecodedIdToken };
   } catch (error: unknown) {
     if (
       error instanceof TypeError ||
       (error instanceof Error && error.name === "AbortError")
     ) {
-      throw new NetworkError("Failed to verify session: Network error");
+      return {
+        success: false,
+        error: "Failed to verify session: Network error",
+      };
     }
-    throw error;
+    return {
+      success: false,
+      error: "An unexpected error occurred during session verification",
+    };
   }
 };
 
@@ -127,6 +141,7 @@ export async function middleware(request: NextRequest) {
   // Check for admin entry key route
   if (pathname.startsWith("/auth/admin/")) {
     if (!isValidAdminEntryKey(pathname)) {
+      console.log("Invalid admin entry key provided");
       return signOutAndRedirect(request);
     }
     return NextResponse.next();
@@ -142,27 +157,26 @@ export async function middleware(request: NextRequest) {
 
   // If no session cookie exists, sign out and redirect
   if (!session) {
+    console.log("No session cookie found");
     return signOutAndRedirect(request);
   }
 
-  try {
-    const decodedClaims = await verifySessionWithAPI(session.value);
+  const result = await verifySessionWithAPI(session.value);
+  if (result.success) {
+    const decodedClaims = result.decodedClaims;
 
     // For admin routes, verify admin privileges
     if (pathname.startsWith("/admin")) {
       if (!isAdmin(decodedClaims)) {
-        // Redirect unauthorized admin attempts after signing out
+        console.log("Unauthorized admin access attempt");
         return signOutAndRedirect(request);
       }
     }
 
     // Session is valid, allow request to proceed
     return NextResponse.next();
-  } catch (error) {
-    // For all error cases, sign out and redirect appropriately
-    if (error instanceof NetworkError) {
-      return NextResponse.redirect(new URL("/error", request.url));
-    }
+  } else {
+    console.log("Session verification failed:", result.error);
     return signOutAndRedirect(request);
   }
 }

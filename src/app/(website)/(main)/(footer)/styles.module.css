@@ -109,7 +109,7 @@
 }
 
 .richtext tr:hover td {
-  background-color: rgba(255, 204, 0, 0.1);
+  background-color: #ffcc001a;
 }
 
 .richtext tr:first-child th:first-child {

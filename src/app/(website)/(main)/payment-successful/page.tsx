@@ -3,9 +3,20 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Payment Successful, Thanks So Much!",
-};
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ email: string }>;
+}): Promise<Metadata> {
+  const { email } = await searchParams;
+
+  return {
+    title: "Payment Successful, Thanks So Much!",
+    alternates: {
+      canonical: `/payment-successful?email=${email}`,
+    },
+  };
+}
 
 const INVALID_PARAMS_REDIRECT_PATH = "/";
 const PAYMENT_SUCCESS_COOKIE_NAME = "payment_success";

@@ -289,7 +289,7 @@ export default function CollectionTable({
                       return (
                         <tr
                           key={index}
-                          className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors"
+                          className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors"
                         >
                           <td className="px-4 py-4 font-medium">{index}</td>
                           <td className="px-4 py-4 w-64">
@@ -337,7 +337,7 @@ export default function CollectionTable({
                             <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                               <Link
                                 href={`/admin/collections/${slug}-${id}`}
-                                className="h-9 w-9 rounded-full flex items-center justify-center ease-in-out duration-300 transition active:bg-lightgray lg:hover:bg-lightgray"
+                                className="h-9 w-9 rounded-full flex items-center justify-center"
                               >
                                 <Pencil size={18} strokeWidth={1.75} />
                               </Link>

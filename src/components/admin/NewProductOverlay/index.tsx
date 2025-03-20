@@ -13,6 +13,7 @@ import Overlay from "@/ui/Overlay";
 import { getCategories } from "@/actions/get/categories";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { useAlertStore } from "@/zustand/shared/alertStore";
+import styles from "./styles.module.css";
 
 export function NewProductMenuButton({ closeMenu }: NewProductMenuButtonType) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -277,10 +278,10 @@ export function NewProductOverlay() {
                   onClick={handleSave}
                   disabled={loading}
                   className={clsx(
-                    "relative h-9 w-max px-4 rounded-full overflow-hidden transition duration-300 ease-in-out text-white bg-neutral-700",
+                    "relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
                     {
                       "bg-opacity-50": loading,
-                      "active:bg-neutral-700/85": !loading,
+                      "hover:bg-neutral-600 active:bg-neutral-800": !loading,
                     }
                   )}
                 >
@@ -322,7 +323,9 @@ export function NewProductOverlay() {
                         block: isCategoryDropdownOpen,
                       })}
                     >
-                      <div className="overflow-hidden h-full max-h-[228px] overflow-x-hidden overflow-y-visible custom-scrollbar w-full py-[6px] flex flex-col gap-0 rounded-md shadow-dropdown bg-white">
+                      <div
+                        className={`overflow-hidden h-full max-h-[228px] overflow-x-hidden overflow-y-visible w-full py-[6px] rounded-md shadow-dropdown bg-white ${styles.customScrollbar}`}
+                      >
                         {categories?.map((category, index) => (
                           <div
                             key={index}
@@ -422,10 +425,10 @@ export function NewProductOverlay() {
                 onClick={handleSave}
                 disabled={loading}
                 className={clsx(
-                  "relative h-12 w-full rounded-full overflow-hidden transition duration-300 ease-in-out text-white bg-neutral-700",
+                  "relative h-12 w-full rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
                   {
                     "bg-opacity-50": loading,
-                    "active:bg-neutral-700/85": !loading,
+                    "hover:bg-neutral-600 active:bg-neutral-800": !loading,
                   }
                 )}
               >

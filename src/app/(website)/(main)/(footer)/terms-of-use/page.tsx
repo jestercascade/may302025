@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Transparent Rules, Shop Confidently",
   description:
     "Written for humans, not lawyers. Shop knowing we’ve got your back, always.",
+  alternates: {
+    canonical: "/terms-of-use",
+  },
 };
 
 export default function TermsOfUse() {

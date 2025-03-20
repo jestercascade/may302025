@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Your Privacy, Always Protected",
   description:
     "Your secrets are safe with us—locked down, never spilled, and always respected. Pinky swear.",
+  alternates: {
+    canonical: "/privacy-policy",
+  },
 };
 
 export default function PrivacyPolicy() {

@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+
 export default async function TrackOrder() {
-  return <div>Track Order</div>;
+  redirect("/");
 }

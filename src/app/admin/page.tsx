@@ -183,7 +183,7 @@ const StoreGrowth = ({ orders }: { orders: OrderType[] | null }) => {
             </tr>
           </thead>
           <tbody>
-            <tr className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors">
+            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4 font-semibold">Revenue</td>
               <td
                 className={clsx(
@@ -209,13 +209,13 @@ const StoreGrowth = ({ orders }: { orders: OrderType[] | null }) => {
                 {storeGrowthMetrics.formatRevenue(metrics.revenue.allTime)}
               </td>
             </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors">
+            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4 font-semibold">Orders</td>
               <td className="p-4">{metrics.orders.today || "—"}</td>
               <td className="p-4">{metrics.orders.thisMonth || "—"}</td>
               <td className="p-4">{metrics.orders.allTime || "—"}</td>
             </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors">
+            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4 font-semibold">AOV</td>
               <td className="p-4">
                 {metrics.aov.today
@@ -398,7 +398,7 @@ const BestsellingProducts = ({
               }) => (
                 <tr
                   key={id}
-                  className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors"
+                  className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors"
                 >
                   <td className="p-4">
                     <div className="w-full max-w-[112px]">
@@ -599,7 +599,7 @@ const RevenueByCategory = async ({
               ({ name, category, monthRevenue, allTimeRevenue }) => (
                 <tr
                   key={name}
-                  className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors"
+                  className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors"
                 >
                   <td className="p-4 font-semibold">{category}</td>
                   <td
@@ -659,7 +659,7 @@ const ProductStatus = ({ products }: { products: ProductType[] | null }) => {
             </tr>
           </thead>
           <tbody>
-            <tr className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors">
+            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4">
                 <span className="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">
                   Active
@@ -668,7 +668,7 @@ const ProductStatus = ({ products }: { products: ProductType[] | null }) => {
               <td className="p-4 font-semibold">{activeProducts.length}</td>
               <td className="p-4">Currently available for sale.</td>
             </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors">
+            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4">
                 <span className="inline-block bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs">
                   Hidden
@@ -781,7 +781,7 @@ const CartStatusBreakdown = ({
             </tr>
           </thead>
           <tbody>
-            <tr className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors">
+            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4">
                 <span className="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">
                   Active
@@ -808,7 +808,7 @@ const CartStatusBreakdown = ({
               </td>
               <td className="p-4">Carts within &lt; 24 hours.</td>
             </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors">
+            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4">
                 <span className="inline-block bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs">
                   Idle
@@ -835,7 +835,7 @@ const CartStatusBreakdown = ({
               </td>
               <td className="p-4">Carts inactive for 1-7 days.</td>
             </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors">
+            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4">
                 <span className="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
                   Abandoned
@@ -865,7 +865,7 @@ const CartStatusBreakdown = ({
               </td>
               <td className="p-4">Carts abandoned for 7-30 days.</td>
             </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors">
+            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4">
                 <span className="inline-block bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs">
                   Dead
@@ -942,7 +942,7 @@ const UpsellPerformance = ({ upsells }: { upsells: UpsellType[] | null }) => {
             </tr>
           </thead>
           <tbody>
-            <tr className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors">
+            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4 font-semibold">Active Upsells</td>
               <td className="p-4 font-semibold">{activeUpsells}</td>
               <td className="p-4">
@@ -950,7 +950,7 @@ const UpsellPerformance = ({ upsells }: { upsells: UpsellType[] | null }) => {
                 least discount impact.
               </td>
             </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors">
+            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4 font-semibold">Revenue from Upsells</td>
               <td className="p-4 font-semibold">
                 {metrics.totalRevenue !== 0
@@ -962,7 +962,7 @@ const UpsellPerformance = ({ upsells }: { upsells: UpsellType[] | null }) => {
                 value of upsells.
               </td>
             </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors">
+            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4 font-semibold">Revenue Lost via Discounts</td>
               <td className="p-4 font-semibold">
                 {metrics.discountLoss !== 0
@@ -974,7 +974,7 @@ const UpsellPerformance = ({ upsells }: { upsells: UpsellType[] | null }) => {
                 maintaining customer value.
               </td>
             </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors">
+            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4 font-semibold">Avg. Customer Savings</td>
               <td className="p-4 font-semibold">
                 {avgSavings !== 0

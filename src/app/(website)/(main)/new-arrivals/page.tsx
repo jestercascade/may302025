@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   title: "New Drops That Break the Algorithm (Not Your Bank)",
   description:
     "Slip-ons, mini bags, sunset lamps—drops for that instant screenshot status (btw, no filter needed for your glow-up).",
+  alternates: {
+    canonical: "/new-arrivals",
+  },
 };
 
 export default async function NewArrivals({

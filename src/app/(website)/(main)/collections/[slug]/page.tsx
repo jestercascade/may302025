@@ -37,6 +37,9 @@ export async function generateMetadata({
     title: collection.title,
     description:
       "Make your style the one everyone's screenshotting—clothes, aesthetic finds, and zero regrets. Shop now!",
+    alternates: {
+      canonical: `/collections/${slug}-${collectionId}`,
+    },
   };
 }
 

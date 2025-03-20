@@ -363,7 +363,7 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
                       "px-6 py-2 font-semibold text-sm text-white bg-neutral-700 rounded-full",
                       {
                         "opacity-50": loading,
-                        "hover:bg-neutral-800": !loading,
+                        "hover:bg-neutral-600 active:bg-neutral-800": !loading,
                       }
                     )}
                   >
@@ -453,7 +453,7 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
                   </p>
                   <button
                     onClick={addRow}
-                    className="px-4 py-2 text-sm font-medium text-white bg-neutral-700 rounded-full hover:bg-neutral-800"
+                    className="px-4 py-2 text-sm font-medium text-white bg-neutral-700 rounded-full hover:bg-neutral-600 active:bg-neutral-800"
                   >
                     Add Row
                   </button>

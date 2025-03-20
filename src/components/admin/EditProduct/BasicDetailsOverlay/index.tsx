@@ -15,8 +15,9 @@ import Overlay from "@/ui/Overlay";
 import { UpdateProductAction } from "@/actions/products";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { getCategories } from "@/actions/get/categories";
-import clsx from "clsx";
 import { useAlertStore } from "@/zustand/shared/alertStore";
+import clsx from "clsx";
+import styles from "./styles.module.css";
 
 export function BasicDetailsButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -88,7 +89,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
     } else {
       document.body.style.overflow = "visible";
     }
-  
+
     return () => {
       if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
@@ -254,10 +255,10 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                   onClick={handleSave}
                   disabled={loading}
                   className={clsx(
-                    "relative h-9 w-max px-4 rounded-full overflow-hidden transition text-white bg-neutral-700",
+                    "relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
                     {
                       "bg-opacity-50": loading,
-                      "active:bg-neutral-700/85": !loading,
+                      "hover:bg-neutral-600 active:bg-neutral-800": !loading,
                     }
                   )}
                 >
@@ -299,7 +300,9 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                         block: isCategoryDropdownOpen,
                       })}
                     >
-                      <div className="overflow-hidden h-full max-h-[228px] overflow-x-hidden overflow-y-visible custom-scrollbar w-full py-[6px] flex flex-col gap-0 rounded-md shadow-dropdown bg-white">
+                      <div
+                        className={`overflow-hidden h-full max-h-[228px] overflow-x-hidden overflow-y-visible w-full py-[6px] flex flex-col gap-0 rounded-md shadow-dropdown bg-white ${styles.customScrollbar}`}
+                      >
                         {isFetchingCategories ? (
                           <div className="w-full h-12 flex items-center justify-center">
                             <Spinner color="gray" />
@@ -413,10 +416,10 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                 onClick={handleSave}
                 disabled={loading}
                 className={clsx(
-                  "relative h-12 w-full rounded-full overflow-hidden transition duration-300 ease-in-out text-white bg-neutral-700",
+                  "relative h-12 w-full rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
                   {
                     "bg-opacity-50": loading,
-                    "active:bg-neutral-700/85": !loading,
+                    "hover:bg-neutral-600 active:bg-neutral-800": !loading,
                   }
                 )}
               >

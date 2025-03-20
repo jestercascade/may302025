@@ -219,19 +219,19 @@ function Footer() {
             <div>
               <h3 className="font-semibold mb-4">Company</h3>
               <Link
-                href="#"
+                href="/about-us"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
                 About us
               </Link>
               <Link
-                href="#"
+                href="/privacy-policy"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
                 Privacy policy
               </Link>
               <Link
-                href="#"
+                href="/terms-of-use"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
                 Terms of use
@@ -240,7 +240,7 @@ function Footer() {
             <div>
               <h3 className="font-semibold mb-4">Get Help</h3>
               <Link
-                href="#"
+                href="/contact-us"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
                 Contact us
@@ -252,13 +252,13 @@ function Footer() {
                 Track order
               </Link>
               <Link
-                href="#"
+                href="/returns-and-refunds"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
                 Returns & refunds
               </Link>
               <Link
-                href="#"
+                href="/faq"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
                 FAQs
@@ -272,19 +272,19 @@ function Footer() {
           <div className="w-full">
             <h3 className="font-semibold mb-4">Company</h3>
             <Link
-              href="#"
+              href="/about-us"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               About us
             </Link>
             <Link
-              href="#"
+              href="/privacy-policy"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Privacy policy
             </Link>
             <Link
-              href="#"
+              href="/terms-of-use"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Terms of use
@@ -293,7 +293,7 @@ function Footer() {
           <div className="w-full">
             <h3 className="font-semibold mb-4">Get Help</h3>
             <Link
-              href="#"
+              href="/contact-us"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Contact us
@@ -305,13 +305,13 @@ function Footer() {
               Track order
             </Link>
             <Link
-              href="#"
+              href="/returns-and-refunds"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Returns & refunds
             </Link>
             <Link
-              href="#"
+              href="/faq"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               FAQs

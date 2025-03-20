@@ -209,7 +209,7 @@ export default function OrdersTable({
                       return (
                         <tr
                           key={id}
-                          className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors"
+                          className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors"
                         >
                           <td className="px-4 py-4">
                             <Link

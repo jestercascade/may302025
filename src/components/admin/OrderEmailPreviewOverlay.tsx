@@ -208,12 +208,12 @@ export function EmailPreviewOverlay({
           onClick={handleSendEmail}
           disabled={isLoading}
           className={clsx(
-            "relative w-max px-4 text-white bg-neutral-700 transition ease-in-out",
+            "relative w-max px-4 text-white bg-neutral-700 transition-colors",
             {
               "h-9 rounded-full": !isMobile,
               "h-12 w-full rounded-full": isMobile,
               "bg-opacity-50": isLoading,
-              "hover:bg-neutral-700/85 active:bg-neutral-700/85": !isLoading,
+              "hover:bg-neutral-600 active:bg-neutral-800": !isLoading,
             }
           )}
         >

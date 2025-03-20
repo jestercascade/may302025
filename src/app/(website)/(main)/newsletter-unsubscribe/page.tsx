@@ -2,9 +2,22 @@ import { NewsletterUnsubscribeButton } from "@/components/website/NewsletterUnsu
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Unsubscribe from Our Newsletter",
-};
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ email?: string | string[] }>;
+}): Promise<Metadata> {
+  const { email } = await searchParams;
+  const emailValue = Array.isArray(email) ? email[0] : email;
+  const encodedEmail = encodeURIComponent(emailValue ?? "");
+
+  return {
+    title: "Unsubscribe from Our Newsletter",
+    alternates: {
+      canonical: `/newsletter-unsubscribe?email=${encodedEmail}`,
+    },
+  };
+}
 
 const INVALID_EMAIL_REDIRECT_PATH = "/";
 

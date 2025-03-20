@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   title: "Easy Returns, Happy Shoppers",
   description:
     "Ordered a medium, got a tent? Send it back with a few clicks—refunds so fast, your wallet won't even notice.",
+  alternates: {
+    canonical: "/returns-and-refunds",
+  },
 };
 
 export default function ReturnsAndRefunds() {

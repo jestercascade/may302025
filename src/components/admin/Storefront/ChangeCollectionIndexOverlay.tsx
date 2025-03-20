@@ -33,7 +33,7 @@ export function ChangeCollectionIndexButton({
   return (
     <button
       onClick={handleClick}
-      className="h-9 w-9 rounded-full flex items-center justify-center ease-in-out duration-300 transition active:bg-lightgray lg:hover:bg-lightgray"
+      className="h-9 w-9 rounded-full flex items-center justify-center"
     >
       <Repeat size={18} strokeWidth={1.75} />
     </button>
@@ -142,10 +142,10 @@ export function ChangeCollectionIndexOverlay() {
                   onClick={handleSave}
                   disabled={loading}
                   className={clsx(
-                    "relative h-9 w-max px-4 rounded-full overflow-hidden transition duration-300 ease-in-out text-white bg-neutral-700",
+                    "relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
                     {
                       "bg-opacity-50": loading,
-                      "active:bg-neutral-700/85": !loading,
+                      "hover:bg-neutral-600 active:bg-neutral-800": !loading,
                     }
                   )}
                 >
@@ -188,10 +188,10 @@ export function ChangeCollectionIndexOverlay() {
                 onClick={handleSave}
                 disabled={loading}
                 className={clsx(
-                  "relative h-12 w-full rounded-full overflow-hidden transition duration-300 ease-in-out text-white bg-neutral-700",
+                  "relative h-12 w-full rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
                   {
                     "bg-opacity-50": loading,
-                    "active:bg-neutral-700/85": !loading,
+                    "hover:bg-neutral-600 active:bg-neutral-800": !loading,
                   }
                 )}
               >

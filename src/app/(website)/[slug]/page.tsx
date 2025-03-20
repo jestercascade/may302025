@@ -19,6 +19,7 @@ import {
   SizeChartOverlay,
   UpsellReviewOverlay,
 } from "@/components/website/DynamicOverlays";
+import { redirect } from "next/navigation";
 
 const getProductIdFromSlug = (slug: string): string => {
   return slug.split("-").pop() as string;
@@ -59,16 +60,12 @@ export async function generateMetadata({
 
   const product = fetchedProducts?.[0];
 
-  if (!product) {
-    return {
-      title: "Product Not Found",
-      description: "The product could not be found.",
-    };
-  }
-
   return {
-    title: product.seo.metaTitle,
-    description: product.seo.metaDescription,
+    title: product?.seo.metaTitle,
+    description: product?.seo.metaDescription,
+    alternates: {
+      canonical: `/${slug}-${productId}`,
+    },
   };
 }
 
@@ -104,7 +101,7 @@ export default async function ProductDetails({
   const product = fetchedProducts?.[0] as ProductWithUpsellType;
 
   if (!product) {
-    return null;
+    redirect("/");
   }
 
   const hasColor = product.options.colors.length > 0;

@@ -5,8 +5,8 @@ import { CheckCircle } from "lucide-react";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { useState } from "react";
 import { subscribeToNewsletter } from "@/actions/newsletter-subscribers";
-import clsx from "clsx";
 import { useAlertStore } from "@/zustand/shared/alertStore";
+import clsx from "clsx";
 
 export function Footer() {
   const [email, setEmail] = useState("");
@@ -90,25 +90,25 @@ export function Footer() {
             <div>
               <h3 className="font-semibold mb-4">Get Help</h3>
               <Link
-                href="contact-us"
+                href="/contact-us"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
                 Contact us
               </Link>
               <Link
-                href="track-order"
+                href="#"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
                 Track order
               </Link>
               <Link
-                href="returns-and-refunds"
+                href="/returns-and-refunds"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
                 Returns & refunds
               </Link>
               <Link
-                href="faq"
+                href="/faq"
                 className="block w-max text-sm text-gray mb-2 hover:underline"
               >
                 FAQ
@@ -128,13 +128,13 @@ export function Footer() {
               About us
             </Link>
             <Link
-              href="privacy-policy"
+              href="/privacy-policy"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Privacy policy
             </Link>
             <Link
-              href="terms-of-use"
+              href="/terms-of-use"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Terms of use
@@ -143,25 +143,25 @@ export function Footer() {
           <div className="w-full">
             <h3 className="font-semibold mb-4">Get Help</h3>
             <Link
-              href="contact-us"
+              href="/contact-us"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Contact us
             </Link>
             <Link
-              href="track-order"
+              href="#"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Track order
             </Link>
             <Link
-              href="returns-and-refunds"
+              href="/returns-and-refunds"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Returns & refunds
             </Link>
             <Link
-              href="faq"
+              href="/faq"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               FAQ

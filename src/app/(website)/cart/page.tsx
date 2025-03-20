@@ -1,16 +1,23 @@
-import { cookies } from "next/headers";
+import ShuffledDiscoveryProducts from "@/components/website/ShuffledDiscoveryProducts";
 import { UpsellReviewOverlay } from "@/components/website/UpsellReviewOverlay";
-import { adminDb } from "@/lib/firebase/admin";
 import { ResetUpsellReview } from "@/components/website/ResetUpsellReview";
 import { CartItemList } from "@/components/website/CartItemList";
-import { getCart } from "@/actions/get/carts";
+import { ProductsProvider } from "@/contexts/ProductsContext";
 import { getProducts } from "@/actions/get/products";
+import { adminDb } from "@/lib/firebase/admin";
+import { getCart } from "@/actions/get/carts";
+import { cookies } from "next/headers";
+import { Suspense } from "react";
+import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import clsx from "clsx";
-import { Suspense } from "react";
-import ShuffledDiscoveryProducts from "@/components/website/ShuffledDiscoveryProducts";
-import { ProductsProvider } from "@/contexts/ProductsContext";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/cart",
+  },
+};
 
 export default async function Cart() {
   const cookieStore = await cookies();
@@ -337,19 +344,19 @@ function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Company</h3>
             <Link
-              href="#"
+              href="/about-us"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               About us
             </Link>
             <Link
-              href="#"
+              href="/privacy-policy"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Privacy policy
             </Link>
             <Link
-              href="#"
+              href="/terms-of-use"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Terms of use
@@ -358,7 +365,7 @@ function Footer() {
           <div>
             <h3 className="font-semibold mb-4">Get Help</h3>
             <Link
-              href="#"
+              href="/contact-us"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Contact us
@@ -370,13 +377,13 @@ function Footer() {
               Track order
             </Link>
             <Link
-              href="#"
+              href="/returns-and-refunds"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Returns & refunds
             </Link>
             <Link
-              href="#"
+              href="/faq"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               FAQs
@@ -389,19 +396,19 @@ function Footer() {
           <div className="w-full">
             <h3 className="font-semibold mb-4">Company</h3>
             <Link
-              href="#"
+              href="/about-us"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               About us
             </Link>
             <Link
-              href="#"
+              href="/privacy-policy"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Privacy policy
             </Link>
             <Link
-              href="#"
+              href="/terms-of-use"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Terms of use
@@ -410,7 +417,7 @@ function Footer() {
           <div className="w-full">
             <h3 className="font-semibold mb-4">Get Help</h3>
             <Link
-              href="#"
+              href="/contact-us"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Contact us
@@ -422,13 +429,13 @@ function Footer() {
               Track order
             </Link>
             <Link
-              href="#"
+              href="/returns-and-refunds"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               Returns & refunds
             </Link>
             <Link
-              href="#"
+              href="/faq"
               className="block w-max text-sm text-gray mb-2 hover:underline"
             >
               FAQs

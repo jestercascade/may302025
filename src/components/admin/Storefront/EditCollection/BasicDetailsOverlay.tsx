@@ -134,10 +134,10 @@ export function BasicDetailsOverlay({
                   onClick={handleSave}
                   disabled={loading}
                   className={clsx(
-                    "relative h-9 w-max px-4 rounded-full overflow-hidden transition duration-300 ease-in-out text-white bg-neutral-700",
+                    "relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
                     {
                       "bg-opacity-50": loading,
-                      "active:bg-neutral-700/85": !loading,
+                      "hover:bg-neutral-600 active:bg-neutral-800": !loading,
                     }
                   )}
                 >
@@ -184,7 +184,7 @@ export function BasicDetailsOverlay({
                           .toLowerCase();
                         setSlug(sanitizedValue);
                       }}
-                      className="w-full h-9 px-3 rounded-md transition duration-300 ease-in-out border focus:border-neutral-400"
+                      className="w-full h-9 px-3 rounded-md transition-colors border focus:border-neutral-400"
                       required
                     />
                   </div>
@@ -196,10 +196,10 @@ export function BasicDetailsOverlay({
                 onClick={handleSave}
                 disabled={loading}
                 className={clsx(
-                  "relative h-12 w-full rounded-full overflow-hidden transition duration-300 ease-in-out text-white bg-neutral-700",
+                  "relative h-12 w-full rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
                   {
                     "bg-opacity-50": loading,
-                    "active:bg-neutral-700/85": !loading,
+                    "hover:bg-neutral-600 active:bg-neutral-800": !loading,
                   }
                 )}
               >

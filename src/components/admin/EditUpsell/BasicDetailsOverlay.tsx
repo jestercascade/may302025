@@ -374,10 +374,11 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                   onClick={handleSave}
                   disabled={loadingSave}
                   className={clsx(
-                    "relative h-9 w-max px-4 rounded-full overflow-hidden transition duration-300 ease-in-out text-white bg-neutral-700",
+                    "relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
                     {
                       "bg-opacity-50": loadingSave,
-                      "active:bg-neutral-700/85": !loadingSave,
+                      "hover:bg-neutral-600 active:bg-neutral-800":
+                        !loadingSave,
                     }
                   )}
                 >
@@ -546,10 +547,10 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
               onClick={handleSave}
               disabled={loadingSave}
               className={clsx(
-                "relative h-12 w-full rounded-full overflow-hidden transition duration-300 ease-in-out text-white bg-neutral-700",
+                "relative h-12 w-full rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
                 {
                   "bg-opacity-50": loadingSave,
-                  "active:bg-neutral-700/85": !loadingSave,
+                  "hover:bg-neutral-600 active:bg-neutral-800": !loadingSave,
                 }
               )}
             >

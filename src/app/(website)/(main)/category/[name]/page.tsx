@@ -7,6 +7,7 @@ import { UpsellReviewOverlay } from "@/components/website/UpsellReviewOverlay";
 import { capitalizeFirstLetter } from "@/lib/utils/common";
 import { Metadata } from "next";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata({
   params,
@@ -23,6 +24,9 @@ export async function generateMetadata({
   return {
     title: meta.title,
     description: meta.description,
+    alternates: {
+      canonical: `/category/${category}`,
+    },
   };
 }
 
@@ -35,6 +39,21 @@ export default async function Categories({
 }) {
   const [{ name }, { page = "1" }] = await Promise.all([params, searchParams]);
   const currentPage = Number(page) || 1;
+
+  const validCategoryNames = [
+    "dresses",
+    "tops",
+    "bottoms",
+    "outerwear",
+    "shoes",
+    "accessories",
+    "men",
+    "catch-all",
+  ];
+
+  if (!validCategoryNames.includes(name.toLowerCase())) {
+    redirect("/");
+  }
 
   const cookieStore = await cookies();
   const deviceIdentifier = cookieStore.get("device_identifier")?.value || "";

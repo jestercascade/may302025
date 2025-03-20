@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: "Human Support, Instant Fixes",
   description:
     "Got a problem? Our squad’s on it—no scripts, no bots, just friendly help that actually works.",
+  alternates: {
+    canonical: "/contact-us",
+  },
 };
 
 export default function ContactUs() {

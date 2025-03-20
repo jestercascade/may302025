@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Instant Answers, Zero Hassle",
   description:
     "Your top questions, answered in seconds—no digging, no DMs, just clarity right when you need it.",
+  alternates: {
+    canonical: "/faq",
+  },
 };
 
 export default function FrequentlyAskedQuestions() {
