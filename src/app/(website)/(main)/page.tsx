@@ -12,6 +12,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { ProductsProvider } from "@/contexts/ProductsContext";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+  },
+};
 
 export default async function Home() {
   const [collections, categoriesData, pageHero] = await Promise.all([
