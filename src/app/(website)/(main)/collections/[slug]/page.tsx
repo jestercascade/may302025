@@ -7,6 +7,7 @@ import { UpsellReviewOverlay } from "@/components/website/UpsellReviewOverlay";
 import { cookies } from "next/headers";
 import { Metadata } from "next";
 import { cache } from "react";
+import { redirect } from "next/navigation";
 
 const cachedGetCollections = cache(getCollections);
 
@@ -24,14 +25,6 @@ export async function generateMetadata({
     fields: ["title"],
   });
   const [collection] = collections || [];
-
-  if (!collection) {
-    return {
-      title: "Cherlygood - Literally Stop, Stare, Then Buy It.",
-      description:
-        "Make your style the one everyone's screenshotting—clothes, aesthetic finds, and zero regrets. Shop now!",
-    };
-  }
 
   return {
     title: collection.title,
@@ -82,7 +75,7 @@ export default async function Collections({
   const [collection] = collections || [];
 
   if (!collection || !collection.products || collection.products.length === 0) {
-    return <CatalogEmptyState />;
+    redirect("/");
   }
 
   const productsArray = collection.products;
