@@ -385,9 +385,6 @@ type ConfigType = {
     SITE_NAME: string;
     URL: string;
     TWITTER_HANDLE: string;
-    CANONICAL: string;
-    ROBOTS_PROTECTED: string;
-    ROBOTS_PUBLIC: string;
   };
   STRUCTURED_DATA: {
     name: string;

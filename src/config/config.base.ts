@@ -7,13 +7,13 @@ const config = {
       "Make your style the one everyone's screenshotting—clothes, aesthetic finds, and zero regrets. Shop now!",
     IMAGE: "/opengraph-image.jpg",
     SITE_NAME: "Cherlygood",
-    URL: "https://cherlygood.com/",
+    URL: "https://cherlygood.vercel.app/",
     TWITTER_HANDLE: "@cherlygood",
   },
 
   STRUCTURED_DATA: {
     name: "Cherlygood",
-    logo: "https://cherlygood.com/logo.png",
+    logo: "https://cherlygood.vercel.app/logo.png",
     socialLinks: [
       "https://www.facebook.com/cherlygood",
       "https://www.instagram.com/cherlygood",

@@ -3,7 +3,6 @@ import baseConfig from "./config.base";
 const productionConfig = {
   ...baseConfig,
   BASE_URL: "https://cherlygood.vercel.app/",
-  // BASE_URL: "https://cherlygood.com/",
   SEO: {
     ...baseConfig.SEO,
   },
