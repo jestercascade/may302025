@@ -1,7 +1,7 @@
 "use client";
 
 import { memo, useEffect, useState, useMemo } from "react";
-import { useProductColorImageStore } from "@/zustand/website/ProductColorImageStore";
+import { useProductColorImageStore } from "@/zustand/website/productColorImageStore";
 import styles from "./styles.module.css";
 import Image from "next/image";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useProductColorImageStore } from "@/zustand/website/ProductColorImageStore";
+import { useProductColorImageStore } from "@/zustand/website/productColorImageStore";
 import { useOptionsStore } from "@/zustand/website/optionsStore";
 import { memo, useCallback, useMemo } from "react";
 import { ChevronRight } from "lucide-react";
