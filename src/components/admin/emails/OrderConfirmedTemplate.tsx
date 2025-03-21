@@ -25,7 +25,7 @@ export function OrderConfirmedTemplate() {
         <div
           style={{
             paddingTop: "0px",
-            paddingBottom: "32px",
+            paddingBottom: "20px",
             width: "max-content",
             margin: "0 auto",
           }}
