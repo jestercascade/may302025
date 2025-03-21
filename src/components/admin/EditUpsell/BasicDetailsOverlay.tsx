@@ -13,6 +13,7 @@ import { ReactSortable } from "react-sortablejs";
 import { getProducts } from "@/actions/get/products";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { ShowAlertType } from "@/lib/sharedTypes";
+import { useBodyOverflowStore } from "@/zustand/shared/bodyOverflowStore";
 
 export function BasicDetailsButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -57,17 +58,22 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
   const isOverlayVisible = useOverlayStore(
     (state) => state.pages.editUpsell.overlays.basicDetails.isVisible
   );
+  const setPreventBodyOverflowChange = useBodyOverflowStore(
+    (state) => state.setPreventBodyOverflowChange
+  );
 
   useEffect(() => {
     if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
+      setPreventBodyOverflowChange(false);
     }
 
     return () => {
       if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
+        setPreventBodyOverflowChange(false);
       }
     };
   }, [isOverlayVisible]);
@@ -157,6 +163,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
         type: ShowAlertType.ERROR,
       });
       setLoadingSave(false);
+      setPreventBodyOverflowChange(true);
       return;
     }
 
@@ -167,6 +174,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
         type: ShowAlertType.ERROR,
       });
       setLoadingSave(false);
+      setPreventBodyOverflowChange(true);
       return;
     }
 
@@ -176,6 +184,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
         type: ShowAlertType.ERROR,
       });
       setLoadingSave(false);
+      setPreventBodyOverflowChange(true);
       return;
     }
 
@@ -185,6 +194,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
         type: ShowAlertType.ERROR,
       });
       setLoadingSave(false);
+      setPreventBodyOverflowChange(true);
       return;
     }
 
@@ -194,14 +204,14 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
         message: result.message,
         type: result.type,
       });
-    } catch (error) {
-      console.error("Error creating upsell:", error);
+    } catch {
       showAlert({
         message: "Failed to create upsell",
         type: ShowAlertType.ERROR,
       });
     } finally {
       setLoadingSave(false);
+      setPreventBodyOverflowChange(true);
     }
   };
 
@@ -232,12 +242,14 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
         message: "Product ID cannot be empty",
         type: ShowAlertType.ERROR,
       });
+      setPreventBodyOverflowChange(true);
       return;
     } else if (!/^\d{5}$/.test(trimmedProductId)) {
       showAlert({
         message: "Product ID must be a 5-digit number",
         type: ShowAlertType.ERROR,
       });
+      setPreventBodyOverflowChange(true);
       return;
     }
 
@@ -246,6 +258,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
         message: "Product already added",
         type: ShowAlertType.ERROR,
       });
+      setPreventBodyOverflowChange(true);
       return;
     }
 
@@ -278,15 +291,16 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
           message: "Product not found",
           type: ShowAlertType.ERROR,
         });
+        setPreventBodyOverflowChange(true);
       }
-    } catch (error) {
-      console.error("Error fetching product:", error);
+    } catch {
       showAlert({
         message: "Failed to add product",
         type: ShowAlertType.ERROR,
       });
     } finally {
       setLoadingProduct(false);
+      setPreventBodyOverflowChange(true);
     }
   };
 
@@ -297,6 +311,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
           message: "At least one product is required",
           type: ShowAlertType.ERROR,
         });
+        setPreventBodyOverflowChange(true);
         return prevProducts;
       }
 
@@ -335,6 +350,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
     setBasePrice(data.pricing.basePrice || 0);
     setSalePrice(data.pricing.salePrice || 0);
     setDiscountPercentage(data.pricing.discountPercentage?.toString() || "");
+    setPreventBodyOverflowChange(true);
   };
 
   return (
