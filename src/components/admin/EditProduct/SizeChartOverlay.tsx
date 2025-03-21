@@ -336,9 +336,7 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
               </div>
               <div className="hidden md:flex md:items-center md:justify-between py-2 pr-4 pl-2">
                 <button
-                  onClick={() => {
-                    hideOverlay({ pageName, overlayName });
-                  }}
+                  onClick={() => hideOverlay({ pageName, overlayName })}
                   type="button"
                   className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                 >
@@ -352,7 +350,7 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
                 <div className="flex gap-2">
                   <button
                     onClick={handlePasteData}
-                    className="px-4 py-2 font-semibold text-sm bg-lightgray rounded-full hover:bg-lightgray-dimmed"
+                    className="relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors bg-lightgray hover:bg-lightgray-dimmed"
                   >
                     Paste from Clipboard
                   </button>
@@ -360,9 +358,9 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
                     onClick={handleSave}
                     disabled={loading}
                     className={clsx(
-                      "px-6 py-2 font-semibold text-sm text-white bg-neutral-700 rounded-full",
+                      "relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
                       {
-                        "opacity-50": loading,
+                        "bg-opacity-50": loading,
                         "hover:bg-neutral-600 active:bg-neutral-800": !loading,
                       }
                     )}

@@ -14,6 +14,7 @@ import { getCategories } from "@/actions/get/categories";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import styles from "./styles.module.css";
+import { useBodyOverflowStore } from "@/zustand/shared/bodyOverflowStore";
 
 export function NewProductMenuButton({ closeMenu }: NewProductMenuButtonType) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -95,17 +96,22 @@ export function NewProductOverlay() {
   const isOverlayVisible = useOverlayStore(
     (state) => state.pages.products.overlays.newProduct.isVisible
   );
+  const setPreventBodyOverflowChange = useBodyOverflowStore(
+    (state) => state.setPreventBodyOverflowChange
+  );
 
   useEffect(() => {
     if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
+      setPreventBodyOverflowChange(false);
     }
 
     return () => {
       if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
+        setPreventBodyOverflowChange(false);
       }
     };
   }, [isOverlayVisible]);
@@ -156,12 +162,12 @@ export function NewProductOverlay() {
   };
 
   const handleSave = async () => {
-    // Validation checks
     if (!formData.category) {
       showAlert({
         message: "Please select a category",
         type: ShowAlertType.ERROR,
       });
+      setPreventBodyOverflowChange(true);
       return;
     }
     if (!formData.name.trim() || formData.name.length < 3) {
@@ -169,6 +175,7 @@ export function NewProductOverlay() {
         message: "Product name must be at least 3 characters long",
         type: ShowAlertType.ERROR,
       });
+      setPreventBodyOverflowChange(true);
       return;
     }
     if (!formData.slug.trim() || formData.slug.length < 3) {
@@ -176,6 +183,7 @@ export function NewProductOverlay() {
         message: "Slug must be at least 3 characters long",
         type: ShowAlertType.ERROR,
       });
+      setPreventBodyOverflowChange(true);
       return;
     }
     if (!formData.basePrice.trim()) {
@@ -183,6 +191,7 @@ export function NewProductOverlay() {
         message: "Please enter a base price",
         type: ShowAlertType.ERROR,
       });
+      setPreventBodyOverflowChange(true);
       return;
     }
     if (!isValidRemoteImage(formData.mainImage)) {
@@ -191,6 +200,7 @@ export function NewProductOverlay() {
           "Invalid main image URL. Try an image from Pinterest or your Firebase Storage.",
         type: ShowAlertType.ERROR,
       });
+      setPreventBodyOverflowChange(true);
       return;
     }
 
@@ -205,14 +215,14 @@ export function NewProductOverlay() {
       if (result.type === ShowAlertType.SUCCESS) {
         onHideOverlay();
       }
-    } catch (error) {
-      console.error("Error creating product:", error);
+    } catch {
       showAlert({
         message: "Failed to create product",
         type: ShowAlertType.ERROR,
       });
     } finally {
       setLoading(false);
+      setPreventBodyOverflowChange(true);
     }
   };
 
