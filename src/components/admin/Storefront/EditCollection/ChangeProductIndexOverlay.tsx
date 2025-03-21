@@ -44,7 +44,7 @@ export function ChangeProductIndexButton({
   return (
     <button
       onClick={handleClick}
-      className="h-9 w-9 rounded-full flex items-center justify-center ease-in-out duration-300 transition active:bg-lightgray lg:hover:bg-lightgray"
+      className="h-9 w-9 rounded-full flex items-center justify-center"
     >
       <Repeat size={18} strokeWidth={1.75} />
     </button>

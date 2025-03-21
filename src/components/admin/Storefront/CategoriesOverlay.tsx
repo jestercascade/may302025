@@ -10,6 +10,7 @@ import Overlay from "@/ui/Overlay";
 import { UpdateCategoriesAction } from "@/actions/categories";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { ShowAlertType } from "@/lib/sharedTypes";
+import { useBodyOverflowStore } from "@/zustand/shared/bodyOverflowStore";
 
 const HIDDEN = "HIDDEN";
 const VISIBLE = "VISIBLE";
@@ -76,12 +77,20 @@ export function CategoriesOverlay({
   const isOverlayVisible = useOverlayStore(
     (state) => state.pages.storefront.overlays.categories.isVisible
   );
+  const { setPreventBodyOverflowChange } = useBodyOverflowStore();
 
   useEffect(() => {
-    document.body.style.overflow = isOverlayVisible ? HIDDEN : VISIBLE;
+    if (isOverlayVisible) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "visible";
+      setPreventBodyOverflowChange(false);
+    }
+
     return () => {
       if (!isOverlayVisible) {
-        document.body.style.overflow = VISIBLE;
+        document.body.style.overflow = "visible";
+        setPreventBodyOverflowChange(false);
       }
     };
   }, [isOverlayVisible]);
@@ -97,8 +106,8 @@ export function CategoriesOverlay({
           name: category.name,
           image: category.image,
           visibility: visibilityStates[index],
-          createdAt: category.createdAt, // Preserve original createdAt
-          updatedAt: currentTimestamp, // Update updatedAt to current timestamp
+          createdAt: category.createdAt,
+          updatedAt: currentTimestamp,
         })
       );
 
@@ -125,14 +134,14 @@ export function CategoriesOverlay({
         message: result.message,
         type: result.type,
       });
-    } catch (error) {
-      console.error("Error updating categories:", error);
+    } catch {
       showAlert({
         message: "Failed to update categories",
         type: ShowAlertType.ERROR,
       });
     } finally {
       setLoading(false);
+      setPreventBodyOverflowChange(true);
     }
   };
 

@@ -11,6 +11,7 @@ import Image from "next/image";
 import clsx from "clsx";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { ShowAlertType } from "@/lib/sharedTypes";
+import { useBodyOverflowStore } from "@/zustand/shared/bodyOverflowStore";
 
 export function PageHeroButton({ visibility }: { visibility: string }) {
   const HIDDEN = "HIDDEN";
@@ -89,17 +90,22 @@ export function PageHeroOverlay({
   const isOverlayVisible = useOverlayStore(
     (state) => state.pages.storefront.overlays.editPageHero.isVisible
   );
+  const setPreventBodyOverflowChange = useBodyOverflowStore(
+    (state) => state.setPreventBodyOverflowChange
+  );
 
   useEffect(() => {
     if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
+      setPreventBodyOverflowChange(false);
     }
 
     return () => {
       if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
+        setPreventBodyOverflowChange(false);
       }
     };
   }, [isOverlayVisible]);
@@ -143,14 +149,14 @@ export function PageHeroOverlay({
           type: result.type,
         });
       }
-    } catch (error) {
-      console.error("Error updating page hero:", error);
+    } catch {
       showAlert({
         message: "Failed to update page hero",
         type: ShowAlertType.ERROR,
       });
     } finally {
       setLoading(false);
+      setPreventBodyOverflowChange(true);
     }
   };
 

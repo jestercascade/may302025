@@ -60,7 +60,7 @@ export default async function EditCollection({
     collectionProducts =
       (await getProducts({
         ids: Array.from(productIndexes.keys()),
-        fields: ["id", "slug", "images", "name", "pricing"],
+        fields: ["id", "slug", "images", "name", "pricing", "visibility"],
       })) || [];
   }
 

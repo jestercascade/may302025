@@ -12,6 +12,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { useAlertStore } from "@/zustand/shared/alertStore";
+import { useBodyOverflowStore } from "@/zustand/shared/bodyOverflowStore";
 
 export function CampaignDurationButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -56,17 +57,22 @@ export function CampaignDurationOverlay({
   const isOverlayVisible = useOverlayStore(
     (state) => state.pages.editCollection.overlays.campaignDuration.isVisible
   );
+  const setPreventBodyOverflowChange = useBodyOverflowStore(
+    (state) => state.setPreventBodyOverflowChange
+  );
 
   useEffect(() => {
     if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
+      setPreventBodyOverflowChange(false);
     }
 
     return () => {
       if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
+        setPreventBodyOverflowChange(false);
       }
     };
   }, [isOverlayVisible]);
@@ -74,6 +80,7 @@ export function CampaignDurationOverlay({
   const onHideOverlay = () => {
     setLoading(false);
     hideOverlay({ pageName, overlayName });
+    setPreventBodyOverflowChange(true);
   };
 
   const isValidDateRange =
@@ -88,6 +95,7 @@ export function CampaignDurationOverlay({
         message: "Start date must be before end date",
         type: ShowAlertType.ERROR,
       });
+      setPreventBodyOverflowChange(true);
     } else {
       setLoading(true);
 

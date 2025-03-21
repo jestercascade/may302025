@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { useRef, useEffect } from "react";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { usePathname } from "next/navigation";
+import { useBodyOverflowStore } from "@/zustand/shared/bodyOverflowStore";
 
 const SUCCESS = "SUCCESS";
 const ERROR = "ERROR";
@@ -14,6 +15,9 @@ export default function ShowAlert() {
   const type = useAlertStore((state) => state.type);
   const isVisible = useAlertStore((state) => state.isVisible);
   const hideAlert = useAlertStore((state) => state.hideAlert);
+  const preventBodyOverflowChange = useBodyOverflowStore(
+    (state) => state.preventBodyOverflowChange
+  );
 
   const overlayRef = useRef(null);
   const pathname = usePathname();
@@ -35,15 +39,19 @@ export default function ShowAlert() {
       if (productDetailsWrapper)
         productDetailsWrapper.style.overflow = "hidden";
     } else {
-      body.style.overflow = "";
-      if (productDetailsWrapper) productDetailsWrapper.style.overflow = "";
+      if (!preventBodyOverflowChange) {
+        body.style.overflow = "";
+        if (productDetailsWrapper) productDetailsWrapper.style.overflow = "";
+      }
     }
 
     return () => {
-      body.style.overflow = "";
-      if (productDetailsWrapper) productDetailsWrapper.style.overflow = "";
+      if (!preventBodyOverflowChange) {
+        body.style.overflow = "";
+        if (productDetailsWrapper) productDetailsWrapper.style.overflow = "";
+      }
     };
-  }, [isVisible]);
+  }, [isVisible, preventBodyOverflowChange]);
 
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {

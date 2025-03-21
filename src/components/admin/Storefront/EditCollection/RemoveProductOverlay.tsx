@@ -10,6 +10,7 @@ import { CircleX } from "lucide-react";
 import { useItemSelectorStore } from "@/zustand/admin/itemSelectorStore";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { ShowAlertType } from "@/lib/sharedTypes";
+import { useBodyOverflowStore } from "@/zustand/shared/bodyOverflowStore";
 
 export function RemoveProductButton({ id }: { id: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -29,7 +30,7 @@ export function RemoveProductButton({ id }: { id: string }) {
   return (
     <button
       onClick={handleClick}
-      className="h-9 w-9 rounded-full flex items-center justify-center ease-in-out duration-300 transition active:bg-lightgray lg:hover:bg-lightgray"
+      className="h-9 w-9 rounded-full flex items-center justify-center"
     >
       <CircleX size={20} strokeWidth={1.75} />
     </button>
@@ -53,6 +54,9 @@ export function RemoveProductOverlay({
   const isOverlayVisible = useOverlayStore(
     (state) => state.pages.editCollection.overlays.removeProduct.isVisible
   );
+  const setPreventBodyOverflowChange = useBodyOverflowStore(
+    (state) => state.setPreventBodyOverflowChange
+  );
 
   const handleSave = async () => {
     setLoading(true);
@@ -75,6 +79,7 @@ export function RemoveProductOverlay({
     } finally {
       setLoading(false);
       hideOverlay({ pageName, overlayName });
+      setPreventBodyOverflowChange(true);
     }
   };
 

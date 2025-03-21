@@ -27,6 +27,7 @@ import {
 } from "./ChangeProductIndexOverlay";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { ShowAlertType } from "@/lib/sharedTypes";
+import { useBodyOverflowStore } from "@/zustand/shared/bodyOverflowStore";
 
 type ProductWithIndex = ProductType & { index: number };
 
@@ -58,7 +59,7 @@ export function ProductListOverlay({
   const HIDDEN = "HIDDEN";
   const INACTIVE = "INACTIVE";
   const ALL = "ALL";
-  const rowsPerPage = 2;
+  const rowsPerPage = 12;
 
   const [loading, setLoading] = useState<boolean>(false);
   const [productId, setProductId] = useState("");
@@ -76,17 +77,22 @@ export function ProductListOverlay({
   const isOverlayVisible = useOverlayStore(
     (state) => state.pages.editCollection.overlays.productList.isVisible
   );
+  const setPreventBodyOverflowChange = useBodyOverflowStore(
+    (state) => state.setPreventBodyOverflowChange
+  );
 
   useEffect(() => {
     if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
+      setPreventBodyOverflowChange(false);
     }
 
     return () => {
       if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
+        setPreventBodyOverflowChange(false);
       }
     };
   }, [isOverlayVisible]);
@@ -137,6 +143,7 @@ export function ProductListOverlay({
       setPageJumpValue("1");
       setCurrentPage(1);
       setIsPageInRange(true);
+      setPreventBodyOverflowChange(true);
     }
   };
 
@@ -171,9 +178,7 @@ export function ProductListOverlay({
   const filteredProducts = getFilteredProducts(filter);
   const totalPages = Math.ceil(filteredProducts.length / rowsPerPage);
 
-  // New useEffect to handle page navigation after product removal
   useEffect(() => {
-    // If current page is greater than total pages, go to last available page
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(totalPages);
       setPageJumpValue(totalPages.toString());
@@ -419,7 +424,7 @@ export function ProductListOverlay({
                                 }) => (
                                   <tr
                                     key={id}
-                                    className="group border-b last:border-b-0 hover:bg-gray-50/80 transition-colors"
+                                    className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors"
                                   >
                                     <td className="p-4 pr-0 font-medium">
                                       {index}
@@ -503,7 +508,7 @@ export function ProductListOverlay({
                                       <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <Link
                                           href={`/admin/products/${slug}-${id}`}
-                                          className="h-9 w-9 rounded-full flex items-center justify-center ease-in-out duration-300 transition active:bg-lightgray lg:hover:bg-lightgray"
+                                          className="h-9 w-9 rounded-full flex items-center justify-center"
                                         >
                                           <Pencil
                                             size={18}
