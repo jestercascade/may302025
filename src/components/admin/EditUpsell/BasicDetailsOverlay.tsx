@@ -300,7 +300,6 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
       });
     } finally {
       setLoadingProduct(false);
-      setPreventBodyOverflowChange(true);
     }
   };
 
