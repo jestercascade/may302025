@@ -109,15 +109,19 @@ export function ProductListOverlay({
 
   const addProduct = async () => {
     if (!productId.trim()) {
-      return showAlert({
+      showAlert({
         message: "Product ID cannot be empty",
         type: ShowAlertType.ERROR,
       });
+      setPreventBodyOverflowChange(true);
+      return;
     } else if (!/^\d{5}$/.test(productId.trim())) {
-      return showAlert({
+      showAlert({
         message: "Product ID must be a 5-digit number",
         type: ShowAlertType.ERROR,
       });
+      setPreventBodyOverflowChange(true);
+      return;
     }
 
     setLoading(true);
@@ -195,6 +199,7 @@ export function ProductListOverlay({
         )} filter has no products`,
         type: ShowAlertType.NEUTRAL,
       });
+      setPreventBodyOverflowChange(true);
     } else {
       setFilter(newFilter);
       setPageJumpValue("1");
