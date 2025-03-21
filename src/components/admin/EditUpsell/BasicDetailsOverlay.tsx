@@ -304,16 +304,16 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
   };
 
   const removeProduct = (productId: string) => {
-    setProducts((prevProducts) => {
-      if (prevProducts.length === 1) {
-        showAlert({
-          message: "At least one product is required",
-          type: ShowAlertType.ERROR,
-        });
-        setPreventBodyOverflowChange(true);
-        return prevProducts;
-      }
+    if (products.length === 1) {
+      showAlert({
+        message: "At least one product is required",
+        type: ShowAlertType.ERROR,
+      });
+      setPreventBodyOverflowChange(true);
+      return;
+    }
 
+    setProducts((prevProducts) => {
       const updatedProducts = prevProducts
         .filter((product) => product.id !== productId)
         .map((product, newIndex) => ({

@@ -1,5 +1,6 @@
 import { appConfig } from "@/config";
 import { customAlphabet } from "nanoid";
+import React from "react";
 
 export function createNonLinkableEmail(email: string): React.ReactNode {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -43,10 +44,10 @@ export function createNonLinkableEmail(email: string): React.ReactNode {
       ))}
       <span>@</span>
       {domainParts.map((part, index) => (
-        <>
-          <span key={`domain-${index}`}>{part}</span>
+        <React.Fragment key={`domain-${index}`}>
+          <span>{part}</span>
           {index < domainParts.length - 1 && <span>.</span>}
-        </>
+        </React.Fragment>
       ))}
     </>
   );

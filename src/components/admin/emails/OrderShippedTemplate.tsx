@@ -31,10 +31,14 @@ export function OrderShippedTemplate() {
           }}
         >
           <img
-            src="https://firebasestorage.googleapis.com/v0/b/project-2456.appspot.com/o/cherlygood-logo-silver.png?alt=media&token=b076f07b-380e-48e3-9e41-24dc3c13ba2d"
+            src="https://firebasestorage.googleapis.com/v0/b/project-2456.appspot.com/o/logo-gray.svg?alt=media&token=a68f634c-d468-4181-b7df-a68c3f7ea0b4"
             alt="Cherlygood"
-            width={240}
-            height={60}
+            width="220"
+            height="28"
+            style={{
+              maxWidth: "100%",
+              height: "auto",
+            }}
           />
         </div>
 
