@@ -31,7 +31,7 @@ export function OrderShippedTemplate() {
           }}
         >
           <img
-            src="https://firebasestorage.googleapis.com/v0/b/project-2456.appspot.com/o/logo-gray.svg?alt=media&token=a68f634c-d468-4181-b7df-a68c3f7ea0b4"
+            src="https://firebasestorage.googleapis.com/v0/b/project-2456.appspot.com/o/logo-gray.png?alt=media&token=dcae0a43-b21b-4040-b7a6-810b8a456bc8"
             alt="Cherlygood"
             width="220"
             height="28"
