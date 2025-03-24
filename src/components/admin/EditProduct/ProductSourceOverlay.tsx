@@ -202,7 +202,6 @@ export function ProductSourceOverlay({ data }: { data: DataType }) {
                         onChange={handleInputChange}
                         placeholder="AliExpress"
                         className="w-full h-9 px-3 rounded-md transition duration-300 ease-in-out border focus:border-neutral-400"
-                        required
                       />
                     </div>
                   </div>
@@ -218,7 +217,6 @@ export function ProductSourceOverlay({ data }: { data: DataType }) {
                         onChange={handleInputChange}
                         placeholder="https://www.aliexpress.com/"
                         className="w-full h-9 px-3 rounded-md transition duration-300 ease-in-out border focus:border-neutral-400"
-                        required
                       />
                     </div>
                   </div>
@@ -234,7 +232,6 @@ export function ProductSourceOverlay({ data }: { data: DataType }) {
                         onChange={handleInputChange}
                         placeholder="Women's Sleepwear Store"
                         className="w-full h-9 px-3 rounded-md transition duration-300 ease-in-out border focus:border-neutral-400"
-                        required
                       />
                     </div>
                   </div>
@@ -250,7 +247,6 @@ export function ProductSourceOverlay({ data }: { data: DataType }) {
                         onChange={handleInputChange}
                         placeholder="3286105"
                         className="w-full h-9 px-3 rounded-md transition duration-300 ease-in-out border focus:border-neutral-400"
-                        required
                       />
                     </div>
                   </div>
@@ -266,7 +262,6 @@ export function ProductSourceOverlay({ data }: { data: DataType }) {
                         onChange={handleInputChange}
                         placeholder="https://www.aliexpress.com/store/4839201765"
                         className="w-full h-9 px-3 rounded-md transition duration-300 ease-in-out border focus:border-neutral-400"
-                        required
                       />
                     </div>
                   </div>
@@ -282,7 +277,6 @@ export function ProductSourceOverlay({ data }: { data: DataType }) {
                         onChange={handleInputChange}
                         placeholder="https://www.aliexpress.com/item/7584936210472938.html"
                         className="w-full h-9 px-3 rounded-md transition-colors border focus:border-neutral-400"
-                        required
                       />
                     </div>
                   </div>
