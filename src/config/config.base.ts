@@ -22,10 +22,11 @@ const config = {
   },
 
   REMOTE_PATTERNS: [
+    { protocol: "https", hostname: "res.cloudinary.com" }, // Cloudinary
     { protocol: "https", hostname: "i.pinimg.com" }, // Pinterest
     { protocol: "https", hostname: "img.kwcdn.com" }, // Temu
     { protocol: "https", hostname: "firebasestorage.googleapis.com" }, // Firebase
-    { protocol: "https", hostname: "res.cloudinary.com" }, // Cloudinary
+    { protocol: "https", hostname: "ae01.alicdn.com" }, // AliExpress
   ],
 
   FIREBASE: {
