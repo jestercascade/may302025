@@ -27,6 +27,8 @@ const config = {
     { protocol: "https", hostname: "img.kwcdn.com" }, // Temu
     { protocol: "https", hostname: "firebasestorage.googleapis.com" }, // Firebase
     { protocol: "https", hostname: "ae01.alicdn.com" }, // AliExpress
+    { protocol: "https", hostname: "ae02.alicdn.com" }, // AliExpress
+    { protocol: "https", hostname: "ae03.alicdn.com" }, // AliExpress
   ],
 
   FIREBASE: {
