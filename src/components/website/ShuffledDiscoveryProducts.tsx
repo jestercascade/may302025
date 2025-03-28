@@ -67,18 +67,29 @@ export default function ShuffledDiscoveryProducts({
 
   return (
     <div>
-      <div className="mb-4 flex items-center gap-4 h-8 md:w-[calc(100%-20px)] md:mx-auto">
-        <h2 className="font-semibold line-clamp-3 md:text-xl">{heading}</h2>
-      </div>
-      <div className="select-none w-full flex flex-wrap gap-2 md:gap-0">
-        {isShuffling || isLoading
-          ? Array.from({ length: Math.min(itemsCount, 6) }).map((_, index) => (
+      {isShuffling || isLoading ? (
+        <>
+          <div className="mb-4 flex items-center gap-4 h-8 md:w-[calc(100%-20px)] md:mx-auto">
+            <h2 className="font-semibold line-clamp-3 md:text-xl">{heading}</h2>
+          </div>
+          <div className="select-none w-full flex flex-wrap gap-2 md:gap-0">
+            {Array.from({ length: Math.min(itemsCount, 6) }).map((_, index) => (
               <ProductCardSkeleton key={index} />
-            ))
-          : shuffledProducts.map((product) => (
+            ))}
+          </div>
+        </>
+      ) : shuffledProducts.length >= 3 ? (
+        <>
+          <div className="mb-4 flex items-center gap-4 h-8 md:w-[calc(100%-20px)] md:mx-auto">
+            <h2 className="font-semibold line-clamp-3 md:text-xl">{heading}</h2>
+          </div>
+          <div className="select-none w-full flex flex-wrap gap-2 md:gap-0">
+            {shuffledProducts.map((product) => (
               <ProductCard key={product.id} product={product} cart={cart} />
             ))}
-      </div>
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }
