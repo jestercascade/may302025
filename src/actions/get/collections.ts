@@ -108,7 +108,9 @@ export async function getCollections(
     });
   }
 
-  return collections.sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+  return collections.sort(
+    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+  );
 }
 
 function filterCollectionFields(

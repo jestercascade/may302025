@@ -1,7 +1,7 @@
 "use client";
 
 import { NewProductEmptyGridButton } from "@/components/admin/NewProductOverlay";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Copy, Check } from "lucide-react";
 import { capitalizeFirstLetter, formatThousands } from "@/lib/utils/common";
 import clsx from "clsx";
 import Image from "next/image";
@@ -20,8 +20,20 @@ export default function ProductGrid({ products }: { products: ProductType[] }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageJumpValue, setPageJumpValue] = useState("1");
   const [isPageInRange, setIsPageInRange] = useState(true);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const showAlert = useAlertStore((state) => state.showAlert);
+
+  const copyProductId = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    id: string
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigator.clipboard.writeText(id);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const getFilteredProducts = (filter: string) => {
     if (filter === PUBLISHED) {
@@ -184,60 +196,75 @@ export default function ProductGrid({ products }: { products: ProductType[] }) {
             </div>
             <div className="w-full flex flex-wrap gap-5 justify-start">
               {gridData.map(({ id, name, pricing, images, slug }, index) => (
-                <Link
+                <div
                   key={index}
-                  href={`/admin/products/${slug}-${id}`}
                   className="group aspect-square w-[calc(50%-10px)] min-[560px]:w-[calc(33.33%-14px)] lg:w-[calc(25%-15px)] select-none"
                 >
-                  <div className="relative">
-                    <div className="w-full aspect-square overflow-hidden flex items-center justify-center shadow-[2px_2px_4px_#9E9E9E] bg-white">
-                      <Image
-                        src={images.main}
-                        alt={name}
-                        width={250}
-                        height={250}
-                        priority
-                      />
+                  <Link href={`/admin/products/${slug}-${id}`}>
+                    <div className="relative">
+                      <div className="w-full aspect-square overflow-hidden flex items-center justify-center shadow-[2px_2px_4px_#9E9E9E] bg-white">
+                        <Image
+                          src={images.main}
+                          alt={name}
+                          width={250}
+                          height={250}
+                          priority
+                        />
+                      </div>
+                      <div className="w-full h-full absolute top-0 bottom-0 left-0 right-0 ease-in-out duration-300 transition group-hover:bg-black/20"></div>
                     </div>
-                    <div className="w-full h-full absolute top-0 bottom-0 left-0 right-0 ease-in-out duration-300 transition group-hover:bg-black/20"></div>
-                  </div>
-                  <div className="mt-2 w-max mx-auto flex items-center justify-center">
-                    {Number(pricing.salePrice) ? (
-                      <div className="flex items-center gap-[6px]">
+                  </Link>
+                  <div className="mt-2 w-full flex items-center justify-between px-1">
+                    <div>
+                      {Number(pricing.salePrice) ? (
+                        <div className="flex items-center gap-[6px]">
+                          <div className="flex items-baseline">
+                            <span className="text-[0.813rem] leading-3 font-semibold">
+                              $
+                            </span>
+                            <span className="text-lg font-bold">
+                              {Math.floor(Number(pricing.salePrice))}
+                            </span>
+                            <span className="text-[0.813rem] leading-3 font-semibold">
+                              {(Number(pricing.salePrice) % 1)
+                                .toFixed(2)
+                                .substring(1)}
+                            </span>
+                          </div>
+                          <span className="text-[0.813rem] leading-3 text-gray line-through">
+                            ${formatThousands(Number(pricing.basePrice))}
+                          </span>
+                        </div>
+                      ) : (
                         <div className="flex items-baseline">
                           <span className="text-[0.813rem] leading-3 font-semibold">
                             $
                           </span>
                           <span className="text-lg font-bold">
-                            {Math.floor(Number(pricing.salePrice))}
+                            {Math.floor(Number(pricing.basePrice))}
                           </span>
                           <span className="text-[0.813rem] leading-3 font-semibold">
-                            {(Number(pricing.salePrice) % 1)
+                            {(Number(pricing.basePrice) % 1)
                               .toFixed(2)
                               .substring(1)}
                           </span>
                         </div>
-                        <span className="text-[0.813rem] leading-3 text-gray line-through">
-                          ${formatThousands(Number(pricing.basePrice))}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="flex items-baseline">
-                        <span className="text-[0.813rem] leading-3 font-semibold">
-                          $
-                        </span>
-                        <span className="text-lg font-bold">
-                          {Math.floor(Number(pricing.basePrice))}
-                        </span>
-                        <span className="text-[0.813rem] leading-3 font-semibold">
-                          {(Number(pricing.basePrice) % 1)
-                            .toFixed(2)
-                            .substring(1)}
-                        </span>
-                      </div>
-                    )}
+                      )}
+                    </div>
+                    <button
+                      onClick={(e) => copyProductId(e, id)}
+                      className="p-1.5 rounded-md hover:bg-[#efefef] transition-colors"
+                      title={`Copy Product ID: ${id}`}
+                      aria-label="Copy product ID"
+                    >
+                      {copiedId === id ? (
+                        <Check size={16} className="text-green-500" />
+                      ) : (
+                        <Copy size={16} className="text-gray-600" />
+                      )}
+                    </button>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
             {filteredProducts.length > rowsPerPage && (

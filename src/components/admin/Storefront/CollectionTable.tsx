@@ -400,7 +400,7 @@ export default function CollectionTable({
           )}
         </div>
       ) : (
-        <div className="rounded-xl bg-white shadow-sm border/50 p-12 text-center">
+        <div className="rounded-xl bg-white border p-12 text-center">
           <div className="max-w-sm mx-auto space-y-4">
             <div className="p-4 rounded-full bg-gray-100 w-max mx-auto">
               <Clock className="w-6 h-6 text-gray" />
@@ -408,7 +408,7 @@ export default function CollectionTable({
             <div>
               <h2 className="text-xl font-medium mb-2">No collections yet</h2>
               <p className="text-sm text-gray mb-6">
-                Create your first collection to start organizing your products
+                Click the button below to create your first collection
               </p>
               <NewCollectionEmptyTableButton />
             </div>
