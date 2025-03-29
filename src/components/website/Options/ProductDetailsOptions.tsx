@@ -57,6 +57,8 @@ export const ProductDetailsOptions = memo(function Options({
   );
 
   // Initialize all store hooks
+  const resetOptions = useOptionsStore((state) => state.resetOptions);
+  const setProductId = useOptionsStore((state) => state.setProductId);
   const selectedColor = useOptionsStore((state) => state.selectedColor);
   const selectedSize = useOptionsStore((state) => state.selectedSize);
   const isInCart = useOptionsStore((state) => state.isInCart);
@@ -68,6 +70,16 @@ export const ProductDetailsOptions = memo(function Options({
   const shouldShowStickyBar = useScrollStore(
     (state) => state.shouldShowStickyBar
   );
+
+  useEffect(() => {
+    setProductId(productInfo.id);
+    return () => {
+      resetOptions();
+      setIsInCart(false);
+      setLocalSelections([]);
+      setDropdownVisible(false);
+    };
+  }, [productInfo.id, resetOptions, setIsInCart, setProductId]);
 
   // Handle sticky bar visibility
   useEffect(() => {
