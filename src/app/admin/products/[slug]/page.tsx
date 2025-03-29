@@ -169,61 +169,80 @@ export default async function EditProduct({
             )}
           >
             {hasBasicDetails ? (
-              <div className="w-[calc(100%-60px)]">
-                <div className="p-5">
-                  <h3 className="text-xs text-gray mb-2">Category</h3>
-                  <p className="font-medium">{category}</p>
-                </div>
-                <div className="p-5">
-                  <h3 className="text-xs text-gray mb-2">Name</h3>
-                  <p className="font-medium max-w-[540px]">{name}</p>
-                </div>
-                <div className="p-5">
-                  <h3 className="text-xs text-gray mb-2">Price</h3>
-                  <div className="w-max flex items-center justify-center">
-                    {Number(pricing.salePrice) ? (
-                      <div className="flex items-center gap-[6px]">
+              <>
+                <div className="w-[calc(100%-60px)]">
+                  <div className="p-5">
+                    <h3 className="text-xs text-gray mb-4">Main</h3>
+                    <div className="flex items-center flex-col gap-[6px] w-max">
+                      <div className="w-full max-w-[280px] rounded-xl aspect-square flex items-center justify-center overflow-hidden bg-lightgray">
+                        {images.main && isValidRemoteImage(images.main) && (
+                          <Image
+                            src={images.main}
+                            alt={name}
+                            width={280}
+                            height={280}
+                            priority
+                          />
+                        )}
+                      </div>
+                      <MainImageButton />
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-xs text-gray mb-2">Category</h3>
+                    <p className="font-medium">{category}</p>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-xs text-gray mb-2">Name</h3>
+                    <p className="font-medium max-w-[540px]">{name}</p>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-xs text-gray mb-2">Price</h3>
+                    <div className="w-max flex items-center justify-center">
+                      {Number(pricing.salePrice) ? (
+                        <div className="flex items-center gap-[6px]">
+                          <div className="flex items-baseline">
+                            <span className="text-[0.813rem] leading-3 font-semibold">
+                              $
+                            </span>
+                            <span className="text-lg font-bold">
+                              {Math.floor(Number(pricing.salePrice))}
+                            </span>
+                            <span className="text-[0.813rem] leading-3 font-semibold">
+                              {(Number(pricing.salePrice) % 1)
+                                .toFixed(2)
+                                .substring(1)}
+                            </span>
+                          </div>
+                          <span className="text-[0.813rem] leading-3 text-gray line-through">
+                            ${formatThousands(Number(pricing.basePrice))}
+                          </span>
+                        </div>
+                      ) : (
                         <div className="flex items-baseline">
                           <span className="text-[0.813rem] leading-3 font-semibold">
                             $
                           </span>
                           <span className="text-lg font-bold">
-                            {Math.floor(Number(pricing.salePrice))}
+                            {Math.floor(Number(pricing.basePrice))}
                           </span>
                           <span className="text-[0.813rem] leading-3 font-semibold">
-                            {(Number(pricing.salePrice) % 1)
+                            {(Number(pricing.basePrice) % 1)
                               .toFixed(2)
                               .substring(1)}
                           </span>
                         </div>
-                        <span className="text-[0.813rem] leading-3 text-gray line-through">
-                          ${formatThousands(Number(pricing.basePrice))}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="flex items-baseline">
-                        <span className="text-[0.813rem] leading-3 font-semibold">
-                          $
-                        </span>
-                        <span className="text-lg font-bold">
-                          {Math.floor(Number(pricing.basePrice))}
-                        </span>
-                        <span className="text-[0.813rem] leading-3 font-semibold">
-                          {(Number(pricing.basePrice) % 1)
-                            .toFixed(2)
-                            .substring(1)}
-                        </span>
-                      </div>
-                    )}
+                      )}
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <h3 className="text-xs text-gray mb-2">Slug</h3>
+                    <p className="font-medium">
+                      {slug}-{id}
+                    </p>
                   </div>
                 </div>
-                <div className="p-5">
-                  <h3 className="text-xs text-gray mb-2">Slug</h3>
-                  <p className="font-medium">
-                    {slug}-{id}
-                  </p>
-                </div>
-              </div>
+              </>
             ) : (
               <span className="text-xs text-gray">Nothing here</span>
             )}
@@ -244,81 +263,43 @@ export default async function EditProduct({
             </p>
           </div>
           <div className="w-full relative shadow rounded-xl bg-white">
-            <div className="p-5 flex flex-col gap-5">
-              <div className="relative border rounded-xl">
-                <div>
-                  {!images.main || !isValidRemoteImage(images.main) ? (
-                    <div className="w-full flex items-center justify-between p-5 pr-2">
-                      <span className="text-xs text-gray">No main image</span>
-                      <MainImageButton />
-                    </div>
-                  ) : (
-                    <div className="w-full flex items-center justify-between pl-5 pr-2 py-2">
-                      <span className="text-xs text-gray">Main</span>
-                      <MainImageButton />
-                    </div>
-                  )}
+            <div>
+              {images.gallery.length === 0 ||
+              images.gallery.every((image) => !isValidRemoteImage(image)) ? (
+                <div className="w-full flex items-center justify-between p-5 pr-2">
+                  <span className="text-xs text-gray">No gallery</span>
+                  <ImageGalleryButton />
                 </div>
-                <div>
-                  {images.main && isValidRemoteImage(images.main) && (
-                    <div className="p-5 pt-0">
-                      <div className="w-full max-w-[280px] rounded-xl aspect-square flex items-center justify-center overflow-hidden">
-                        <Image
-                          src={images.main}
-                          alt={name}
-                          width={280}
-                          height={280}
-                          priority
-                        />
-                      </div>
-                    </div>
-                  )}
+              ) : (
+                <div className="w-full flex items-center justify-between pl-5 pr-2 py-2">
+                  <span className="text-xs text-gray">Gallery</span>
+                  <ImageGalleryButton />
                 </div>
-              </div>
-              <div className="relative border rounded-xl">
-                <div>
-                  {images.gallery.length === 0 ||
-                  images.gallery.every(
-                    (image) => !isValidRemoteImage(image)
-                  ) ? (
-                    <div className="w-full flex items-center justify-between p-5 pr-2">
-                      <span className="text-xs text-gray">No gallery</span>
-                      <ImageGalleryButton />
-                    </div>
-                  ) : (
-                    <div className="w-full flex items-center justify-between pl-5 pr-2 py-2">
-                      <span className="text-xs text-gray">Gallery</span>
-                      <ImageGalleryButton />
-                    </div>
-                  )}
-                </div>
-                <div>
-                  {images.gallery.length > 0 &&
-                    images.gallery.every((image) =>
-                      isValidRemoteImage(image)
-                    ) && (
-                      <div className="flex flex-wrap gap-2 p-5 pt-0">
-                        {images.gallery.map(
-                          (image, index) =>
-                            isValidRemoteImage(image) && (
-                              <div
-                                key={index}
-                                className="max-w-[148px] lg:max-w-[210px] w-[calc(50%-4px)] border rounded-xl aspect-square flex items-center justify-center overflow-hidden"
-                              >
-                                <Image
-                                  src={image}
-                                  alt={name}
-                                  width={210}
-                                  height={210}
-                                  priority
-                                />
-                              </div>
-                            )
-                        )}
-                      </div>
+              )}
+            </div>
+            <div>
+              {images.gallery.length > 0 &&
+                images.gallery.every((image) => isValidRemoteImage(image)) && (
+                  <div className="flex flex-wrap gap-2 p-5 pt-0">
+                    {images.gallery.map(
+                      (image, index) =>
+                        isValidRemoteImage(image) && (
+                          <div
+                            key={index}
+                            className="max-w-[148px] lg:max-w-[210px] w-[calc(50%-4px)] border rounded-xl aspect-square flex items-center justify-center overflow-hidden"
+                          >
+                            <Image
+                              src={image}
+                              alt={name}
+                              width={210}
+                              height={210}
+                              priority
+                            />
+                          </div>
+                        )
                     )}
-                </div>
-              </div>
+                  </div>
+                )}
             </div>
           </div>
         </div>

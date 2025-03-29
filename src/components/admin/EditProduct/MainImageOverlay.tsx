@@ -4,7 +4,7 @@ import { isValidRemoteImage } from "@/lib/utils/common";
 import { FormEvent, useState, useEffect } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
-import { ArrowLeft, X, Pencil } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
 import clsx from "clsx";
 import Image from "next/image";
 import Overlay from "@/ui/Overlay";
@@ -23,9 +23,9 @@ export function MainImageButton() {
     <button
       onClick={() => showOverlay({ pageName, overlayName })}
       type="button"
-      className="w-9 h-9 rounded-full flex items-center justify-center transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
+      className="w-max py-1.5 px-3 text-sm rounded-full transition-colors bg-lightgray hover:bg-lightgray-dimmed"
     >
-      <Pencil size={18} strokeWidth={1.75} />
+      Change
     </button>
   );
 }
