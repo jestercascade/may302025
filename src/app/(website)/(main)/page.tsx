@@ -13,6 +13,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { ProductsProvider } from "@/contexts/ProductsContext";
 import { Metadata } from "next";
+import { CatalogEmptyState } from "@/components/website/CatalogEmptyState";
 
 export const metadata: Metadata = {
   alternates: {
@@ -31,13 +32,34 @@ export default async function Home() {
   ]);
 
   const featuredCollections = await enrichFeaturedCollections(collections);
-
   const combinedCollections = [
     ...featuredCollections,
-    ...(collections?.filter(
-      (collection) => collection.collectionType !== "FEATURED"
-    ) || []),
+    ...(collections?.filter((c) => c.collectionType !== "FEATURED") || []),
   ].sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+
+  // Check visibility of main sections
+  const heroContent = renderHero(pageHero);
+  const isHeroRendered = heroContent !== null;
+  const isCategoriesRendered =
+    categoriesData?.showOnPublicSite && categoriesData.categories?.length > 0;
+  const hasCollectionContent = combinedCollections.some((c) => {
+    if (c.collectionType === "FEATURED") return c.products.length >= 3;
+    if (c.collectionType === "BANNER") return c.products.length > 0;
+    return false;
+  });
+
+  // Early exit for empty state checks
+  if (!isHeroRendered && !isCategoriesRendered && !hasCollectionContent) {
+    const discoveryProductsCheck =
+      (await getProducts({
+        fields: ["id"],
+        visibility: "PUBLISHED",
+      })) ?? [];
+
+    if (discoveryProductsCheck.length < 3) {
+      return <CatalogEmptyState />;
+    }
+  }
 
   const cookieStore = await cookies();
   const deviceIdentifier = cookieStore.get("device_identifier")?.value ?? "";
@@ -54,7 +76,7 @@ export default async function Home() {
 
   return (
     <>
-      {renderHero(pageHero)}
+      {heroContent}
       <div>
         {categoriesData?.showOnPublicSite &&
           categoriesData.categories.length > 0 && (
