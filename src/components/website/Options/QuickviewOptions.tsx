@@ -51,73 +51,26 @@ export const QuickviewOptions = memo(function Options({
 
   // Initialize all state hooks
   const [isDropdownVisible, setDropdownVisible] = useState(false);
-  const [localSelections, setLocalSelections] = useState<string[]>([]);
-  const [currentSelectionKey, setCurrentSelectionKey] = useState<string | null>(
-    null
-  );
 
   // Initialize all store hooks
+  const resetOptions = useOptionsStore((state) => state.resetOptions);
   const selectedColor = useOptionsStore((state) => state.selectedColor);
   const selectedSize = useOptionsStore((state) => state.selectedSize);
-  const isInCart = useOptionsStore((state) => state.isInCart);
-  const setIsInCart = useOptionsStore((state) => state.setIsInCart);
-  const setProductId = useOptionsStore((state) => state.setProductId);
-  const resetOptions = useOptionsStore((state) => state.resetOptions);
   const showOverlay = useOverlayStore((state) => state.showOverlay);
-  const productDetailsPage = useOverlayStore(
-    (state) => state.pages.productDetails
-  );
-  const shouldShowStickyBar = useScrollStore(
-    (state) => state.shouldShowStickyBar
-  );
+  const productDetailsPage = useOverlayStore((state) => state.pages.productDetails);
+  const shouldShowStickyBar = useScrollStore((state) => state.shouldShowStickyBar);
+  const isInCart = useOptionsStore((state) => state.isInCart);
 
-  // Handle sticky bar visibility
+  useEffect(() => {
+    resetOptions();
+  }, [productInfo.id, resetOptions]);
+
   useEffect(() => {
     if (!shouldShowStickyBar) {
       setDropdownVisible(false);
     }
   }, [shouldShowStickyBar]);
 
-  // Handle selection key updates
-  useEffect(() => {
-    const selectionKeyParts = [
-      productInfo.id.toLowerCase(),
-      selectedColor?.toLowerCase(),
-      selectedSize?.toLowerCase(),
-    ];
-
-    const selectionKey = selectionKeyParts.filter(Boolean).join("-");
-    setCurrentSelectionKey(selectionKey);
-  }, [selectedColor, selectedSize, productInfo.id]);
-
-  // Handle cart status updates
-  useEffect(() => {
-    const isInLocalCart = currentSelectionKey
-      ? localSelections.includes(currentSelectionKey)
-      : false;
-    setIsInCart(isInLocalCart);
-
-    if (
-      isInCart &&
-      currentSelectionKey &&
-      !localSelections.includes(currentSelectionKey)
-    ) {
-      setLocalSelections((prev) => [...prev, currentSelectionKey]);
-    }
-  }, [isInCart, currentSelectionKey, localSelections, productInfo.id, setIsInCart]);
-
-  // Reset when switching products.
-  useEffect(() => {
-    setProductId(productInfo.id);
-    return () => {
-      resetOptions();
-      setIsInCart(false);
-      setLocalSelections([]);
-      setDropdownVisible(false);
-    };
-  }, [productInfo.id, resetOptions, setIsInCart, setProductId]);
-
-  // Handle click outside dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
@@ -134,7 +87,6 @@ export const QuickviewOptions = memo(function Options({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isDropdownVisible]);
 
-  // If no options are available, return null
   if (!hasColor && !hasSize) {
     return null;
   }
@@ -213,12 +165,7 @@ export const QuickviewOptions = memo(function Options({
           className="h-8 w-max px-4 rounded-full flex items-center justify-center gap-[2px] ease-in-out duration-300 transition bg-lightgray active:bg-lightgray-dimmed lg:hover:bg-lightgray-dimmed"
         >
           <div className="text-sm font-medium">{getButtonText()}</div>
-          <ChevronRight
-            color="#828282"
-            size={18}
-            strokeWidth={2}
-            className="-mr-[8px]"
-          />
+          <ChevronRight color="#828282" size={18} strokeWidth={2} className="-mr-[8px]" />
         </button>
         {isDropdownVisible && (
           <div className="absolute top-[42px] left-0 z-20 pb-2">
@@ -232,9 +179,7 @@ export const QuickviewOptions = memo(function Options({
                   />
                 </div>
               )}
-              {hasColor && !hasSize && (
-                <ProductColors colors={productInfo.options.colors} />
-              )}
+              {hasColor && !hasSize && <ProductColors colors={productInfo.options.colors} />}
               {!hasColor && hasSize && (
                 <ProductSizes
                   sizeChart={productInfo.options.sizes}
@@ -247,11 +192,7 @@ export const QuickviewOptions = memo(function Options({
       </div>
       {isInCart &&
         !isDropdownVisible &&
-        (isStickyBarInCartIndicator ? (
-          <StickyBarInCartIndicator />
-        ) : (
-          <InCartIndicator />
-        ))}
+        (isStickyBarInCartIndicator ? <StickyBarInCartIndicator /> : <InCartIndicator />)}
     </div>
   );
 });

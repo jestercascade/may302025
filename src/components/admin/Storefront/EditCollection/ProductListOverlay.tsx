@@ -7,24 +7,11 @@ import clsx from "clsx";
 import Overlay from "@/ui/Overlay";
 import { AddProductAction } from "@/actions/collections";
 import Image from "next/image";
-import {
-  Pencil,
-  ArrowLeft,
-  X,
-  ChevronLeft,
-  ChevronRight,
-  Plus,
-} from "lucide-react";
+import { Pencil, ArrowLeft, X, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { capitalizeFirstLetter, formatThousands } from "@/lib/utils/common";
 import Link from "next/link";
-import {
-  RemoveProductButton,
-  RemoveProductOverlay,
-} from "./RemoveProductOverlay";
-import {
-  ChangeProductIndexButton,
-  ChangeProductIndexOverlay,
-} from "./ChangeProductIndexOverlay";
+import { RemoveProductButton, RemoveProductOverlay } from "./RemoveProductOverlay";
+import { ChangeProductIndexButton, ChangeProductIndexOverlay } from "./ChangeProductIndexOverlay";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { useBodyOverflowStore } from "@/zustand/shared/bodyOverflowStore";
@@ -95,7 +82,7 @@ export function ProductListOverlay({
         setPreventBodyOverflowChange(false);
       }
     };
-  }, [isOverlayVisible]);
+  }, [isOverlayVisible, setPreventBodyOverflowChange]);
 
   const onHideOverlay = () => {
     setLoading(false);
@@ -166,14 +153,11 @@ export function ProductListOverlay({
 
   const getFilteredProducts = (filter: string) => {
     if (filter === PUBLISHED) {
-      return data.products.filter(
-        (product) => product.visibility.toUpperCase() === PUBLISHED
-      );
+      return data.products.filter((product) => product.visibility.toUpperCase() === PUBLISHED);
     } else if (filter === INACTIVE) {
       return data.products.filter(
         (product) =>
-          product.visibility.toUpperCase() === HIDDEN ||
-          product.visibility.toUpperCase() === DRAFT
+          product.visibility.toUpperCase() === HIDDEN || product.visibility.toUpperCase() === DRAFT
       );
     }
     return data.products;
@@ -194,9 +178,7 @@ export function ProductListOverlay({
 
     if (newFilteredProducts.length === 0) {
       showAlert({
-        message: `${capitalizeFirstLetter(
-          newFilter.toLowerCase()
-        )} filter has no products`,
+        message: `${capitalizeFirstLetter(newFilter.toLowerCase())} filter has no products`,
         type: ShowAlertType.NEUTRAL,
       });
       setPreventBodyOverflowChange(true);
@@ -208,11 +190,7 @@ export function ProductListOverlay({
     }
   };
 
-  const pagination = (
-    data: ProductWithIndex[],
-    currentPage: number,
-    rowsPerPage: number
-  ) => {
+  const pagination = (data: ProductWithIndex[], currentPage: number, rowsPerPage: number) => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     const paginatedArray = data.slice(startIndex, endIndex);
@@ -223,11 +201,7 @@ export function ProductListOverlay({
     };
   };
 
-  const { paginatedArray: tableData } = pagination(
-    filteredProducts,
-    currentPage,
-    rowsPerPage
-  );
+  const { paginatedArray: tableData } = pagination(filteredProducts, currentPage, rowsPerPage);
 
   const handlePrevious = () => {
     setCurrentPage((prevPage) => {
@@ -302,14 +276,8 @@ export function ProductListOverlay({
                     type="button"
                     className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                   >
-                    <ArrowLeft
-                      size={20}
-                      strokeWidth={2}
-                      className="-ml-1 stroke-blue"
-                    />
-                    <span className="font-semibold text-sm text-blue">
-                      Products
-                    </span>
+                    <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
+                    <span className="font-semibold text-sm text-blue">Products</span>
                   </button>
                 </div>
                 {tableData.length > 0 ? (
@@ -319,9 +287,7 @@ export function ProductListOverlay({
                         <button
                           onClick={() => handleFilterChange(ALL)}
                           className={`px-3 pl-[14px] h-9 hover:bg-lightgray-dimmed rounded-full ${
-                            filter === ALL
-                              ? "text-blue"
-                              : "text-gray hover:text-black"
+                            filter === ALL ? "text-blue" : "text-gray hover:text-black"
                           }`}
                         >
                           View all ({data.products.length})
@@ -329,16 +295,13 @@ export function ProductListOverlay({
                         <button
                           onClick={() => handleFilterChange(PUBLISHED)}
                           className={`px-3 h-9 hover:bg-lightgray-dimmed rounded-full ${
-                            filter === PUBLISHED
-                              ? "text-blue"
-                              : "text-gray hover:text-black"
+                            filter === PUBLISHED ? "text-blue" : "text-gray hover:text-black"
                           }`}
                         >
                           Published (
                           {
                             data.products.filter(
-                              (product) =>
-                                product.visibility.toUpperCase() === PUBLISHED
+                              (product) => product.visibility.toUpperCase() === PUBLISHED
                             ).length
                           }
                           )
@@ -346,9 +309,7 @@ export function ProductListOverlay({
                         <button
                           onClick={() => handleFilterChange(INACTIVE)}
                           className={`px-3 pr-[14px] h-9 hover:bg-lightgray-dimmed rounded-full ${
-                            filter === INACTIVE
-                              ? "text-blue"
-                              : "text-gray hover:text-black"
+                            filter === INACTIVE ? "text-blue" : "text-gray hover:text-black"
                           }`}
                         >
                           Inactive (
@@ -378,16 +339,11 @@ export function ProductListOverlay({
                             className={clsx(
                               "w-11 h-9 rounded-full flex items-center justify-center transition duration-300 ease-in-out",
                               {
-                                "active:bg-lightgray lg:hover:bg-lightgray":
-                                  !loading,
+                                "active:bg-lightgray lg:hover:bg-lightgray": !loading,
                               }
                             )}
                           >
-                            {loading ? (
-                              <Spinner color="gray" />
-                            ) : (
-                              <Plus strokeWidth={1.75} />
-                            )}
+                            {loading ? <Spinner color="gray" /> : <Plus strokeWidth={1.75} />}
                           </button>
                         </div>
                       </div>
@@ -418,22 +374,12 @@ export function ProductListOverlay({
                             </thead>
                             <tbody>
                               {tableData.map(
-                                ({
-                                  id,
-                                  index,
-                                  slug,
-                                  images,
-                                  name,
-                                  pricing,
-                                  visibility,
-                                }) => (
+                                ({ id, index, slug, images, name, pricing, visibility }) => (
                                   <tr
                                     key={id}
                                     className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors"
                                   >
-                                    <td className="p-4 pr-0 font-medium">
-                                      {index}
-                                    </td>
+                                    <td className="p-4 pr-0 font-medium">{index}</td>
                                     <td className="p-2">
                                       <div className="h-[120px] w-[120px] overflow-hidden flex items-center justify-center">
                                         <Image
@@ -446,9 +392,7 @@ export function ProductListOverlay({
                                       </div>
                                     </td>
                                     <td className="p-4">
-                                      <p className="font-medium line-clamp-2">
-                                        {name}
-                                      </p>
+                                      <p className="font-medium line-clamp-2">{name}</p>
                                     </td>
                                     <td className="p-4">
                                       <div className="w-max flex items-center justify-center">
@@ -459,9 +403,7 @@ export function ProductListOverlay({
                                                 $
                                               </span>
                                               <span className="text-lg font-bold">
-                                                {Math.floor(
-                                                  Number(pricing.salePrice)
-                                                )}
+                                                {Math.floor(Number(pricing.salePrice))}
                                               </span>
                                               <span className="text-[0.813rem] leading-3 font-semibold">
                                                 {(Number(pricing.salePrice) % 1)
@@ -470,10 +412,7 @@ export function ProductListOverlay({
                                               </span>
                                             </div>
                                             <span className="text-[0.813rem] leading-3 text-gray line-through">
-                                              $
-                                              {formatThousands(
-                                                Number(pricing.basePrice)
-                                              )}
+                                              ${formatThousands(Number(pricing.basePrice))}
                                             </span>
                                           </div>
                                         ) : (
@@ -482,9 +421,7 @@ export function ProductListOverlay({
                                               $
                                             </span>
                                             <span className="text-lg font-bold">
-                                              {Math.floor(
-                                                Number(pricing.basePrice)
-                                              )}
+                                              {Math.floor(Number(pricing.basePrice))}
                                             </span>
                                             <span className="text-[0.813rem] leading-3 font-semibold">
                                               {(Number(pricing.basePrice) % 1)
@@ -504,9 +441,7 @@ export function ProductListOverlay({
                                             : "bg-gray-100"
                                         )}
                                       >
-                                        {capitalizeFirstLetter(
-                                          visibility.toLowerCase()
-                                        )}
+                                        {capitalizeFirstLetter(visibility.toLowerCase())}
                                       </span>
                                     </td>
                                     <td className="p-4">
@@ -515,10 +450,7 @@ export function ProductListOverlay({
                                           href={`/admin/products/${slug}-${id}`}
                                           className="h-9 w-9 rounded-full flex items-center justify-center"
                                         >
-                                          <Pencil
-                                            size={18}
-                                            strokeWidth={1.75}
-                                          />
+                                          <Pencil size={18} strokeWidth={1.75} />
                                         </Link>
                                         <ChangeProductIndexButton
                                           collectionId={data.id}
@@ -546,10 +478,7 @@ export function ProductListOverlay({
                             onClick={handlePrevious}
                             className="w-9 h-9 flex items-center justify-center rounded-full ease-in-out duration-300 transition active:bg-lightgray lg:hover:bg-lightgray"
                           >
-                            <ChevronLeft
-                              strokeWidth={1.5}
-                              className="mr-[2px]"
-                            />
+                            <ChevronLeft strokeWidth={1.5} className="mr-[2px]" />
                           </button>
                           <input
                             value={pageJumpValue}
@@ -576,10 +505,7 @@ export function ProductListOverlay({
                             onClick={handleNext}
                             className="w-9 h-9 flex items-center justify-center rounded-full ease-in-out duration-300 transition bg-white active:bg-lightgray lg:hover:bg-lightgray "
                           >
-                            <ChevronRight
-                              strokeWidth={1.5}
-                              className="ml-[2px]"
-                            />
+                            <ChevronRight strokeWidth={1.5} className="ml-[2px]" />
                           </button>
                         </div>
                       </div>
@@ -588,12 +514,8 @@ export function ProductListOverlay({
                 ) : (
                   <div className="w-full flex flex-col gap-4 items-center mt-[52px] md:mt-0 px-5 pt-5 pb-28 md:pb-[90px]">
                     <div className="flex flex-col gap-2 items-center">
-                      <h2 className="font-semibold text-lg">
-                        Collection is empty
-                      </h2>
-                      <p className="text-sm text-center">
-                        Enter ID below for your first product
-                      </p>
+                      <h2 className="font-semibold text-lg">Collection is empty</h2>
+                      <p className="text-sm text-center">Enter ID below for your first product</p>
                     </div>
                     <div className="w-full min-[588px]:w-56 h-9 rounded-full overflow-hidden flex items-center border shadow-sm">
                       <input
@@ -611,16 +533,11 @@ export function ProductListOverlay({
                           className={clsx(
                             "w-11 h-9 rounded-full flex items-center justify-center transition duration-300 ease-in-out",
                             {
-                              "active:bg-lightgray lg:hover:bg-lightgray":
-                                !loading,
+                              "active:bg-lightgray lg:hover:bg-lightgray": !loading,
                             }
                           )}
                         >
-                          {loading ? (
-                            <Spinner color="gray" />
-                          ) : (
-                            <Plus strokeWidth={1.75} />
-                          )}
+                          {loading ? <Spinner color="gray" /> : <Plus strokeWidth={1.75} />}
                         </button>
                       </div>
                     </div>

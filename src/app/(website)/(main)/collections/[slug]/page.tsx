@@ -1,13 +1,12 @@
 import { getCart } from "@/actions/get/carts";
 import { getCollections } from "@/actions/get/collections";
-import { CatalogEmptyState } from "@/components/website/CatalogEmptyState";
 import { Pagination } from "@/components/website/Pagination";
 import { ProductCard } from "@/components/website/ProductCard";
 import { UpsellReviewOverlay } from "@/components/website/UpsellReviewOverlay";
+import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { Metadata } from "next";
 import { cache } from "react";
-import { redirect } from "next/navigation";
 
 const cachedGetCollections = cache(getCollections);
 

@@ -18,9 +18,7 @@ import { useBodyOverflowStore } from "@/zustand/shared/bodyOverflowStore";
 export function BasicDetailsButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const pageName = useOverlayStore((state) => state.pages.editUpsell.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.editUpsell.overlays.basicDetails.name
-  );
+  const overlayName = useOverlayStore((state) => state.pages.editUpsell.overlays.basicDetails.name);
 
   return (
     <button
@@ -39,12 +37,8 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
   const [productId, setProductId] = useState<string>("");
   const [mainImage, setMainImage] = useState(data.mainImage || "");
   const [products, setProducts] = useState<ProductType[]>(data.products || []);
-  const [basePrice, setBasePrice] = useState<number>(
-    data.pricing.basePrice || 0
-  );
-  const [salePrice, setSalePrice] = useState<number>(
-    data.pricing.salePrice || 0
-  );
+  const [basePrice, setBasePrice] = useState<number>(data.pricing.basePrice || 0);
+  const [salePrice, setSalePrice] = useState<number>(data.pricing.salePrice || 0);
   const [discountPercentage, setDiscountPercentage] = useState<string>(
     data.pricing.discountPercentage?.toString() || ""
   );
@@ -52,9 +46,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editUpsell.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.editUpsell.overlays.basicDetails.name
-  );
+  const overlayName = useOverlayStore((state) => state.pages.editUpsell.overlays.basicDetails.name);
   const isOverlayVisible = useOverlayStore(
     (state) => state.pages.editUpsell.overlays.basicDetails.isVisible
   );
@@ -76,20 +68,17 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
         setPreventBodyOverflowChange(false);
       }
     };
-  }, [isOverlayVisible]);
+  }, [isOverlayVisible, setPreventBodyOverflowChange]);
 
   useEffect(() => {
     const totalBasePrice = products.reduce((total, product) => {
       const price =
-        typeof product.basePrice === "number"
-          ? product.basePrice
-          : parseFloat(product.basePrice);
+        typeof product.basePrice === "number" ? product.basePrice : parseFloat(product.basePrice);
       return isNaN(price) ? total : total + price;
     }, 0);
 
     // Round down to the nearest .99
-    const roundedTotal =
-      totalBasePrice === 0 ? 0 : Math.floor(totalBasePrice) + 0.99;
+    const roundedTotal = totalBasePrice === 0 ? 0 : Math.floor(totalBasePrice) + 0.99;
 
     // Format to two decimal places
     const formattedTotal = Number(roundedTotal.toFixed(2));
@@ -107,8 +96,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
         const rawSalePrice = basePrice * (1 - discountValue / 100);
 
         // Round down to the nearest .99
-        const roundedSalePrice =
-          rawSalePrice === 0 ? 0 : Math.floor(rawSalePrice) + 0.99;
+        const roundedSalePrice = rawSalePrice === 0 ? 0 : Math.floor(rawSalePrice) + 0.99;
 
         // Format to two decimal places
         const formattedSalePrice = Number(roundedSalePrice.toFixed(2));
@@ -123,9 +111,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
     calculateSalePrice(discountPercentage);
   }, [basePrice, discountPercentage, calculateSalePrice]);
 
-  const handleDiscountPercentageChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleDiscountPercentageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     if (value === "" || /^[0-9]+$/.test(value)) {
       setDiscountPercentage(value);
@@ -142,19 +128,16 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
       pricing: {
         basePrice: basePrice,
         salePrice: salePrice > 0 ? salePrice : 0,
-        discountPercentage:
-          discountPercentage !== "" ? parseInt(discountPercentage, 10) : 0,
+        discountPercentage: discountPercentage !== "" ? parseInt(discountPercentage, 10) : 0,
       },
-      products: products.map(
-        ({ id, slug, name, images, basePrice }, index) => ({
-          index: index + 1,
-          id,
-          slug,
-          name,
-          images,
-          basePrice,
-        })
-      ),
+      products: products.map(({ id, slug, name, images, basePrice }, index) => ({
+        index: index + 1,
+        id,
+        slug,
+        name,
+        images,
+        basePrice,
+      })),
     };
 
     if (!upsellData.mainImage) {
@@ -169,8 +152,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
 
     if (!isValidRemoteImage(upsellData.mainImage)) {
       showAlert({
-        message:
-          "Invalid main image URL. Try an image from Pinterest or your Firebase Storage.",
+        message: "Invalid main image URL. Try an image from Pinterest or your Firebase Storage.",
         type: ShowAlertType.ERROR,
       });
       setLoadingSave(false);
@@ -215,9 +197,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
     }
   };
 
-  const handleProductIdInputChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleProductIdInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     if (/^\d*$/.test(value)) {
       setProductId(value);
@@ -281,10 +261,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
           basePrice: pricing?.basePrice ?? 0,
         };
 
-        setProducts((prevProducts) => [
-          ...prevProducts,
-          newProduct as ProductType,
-        ]);
+        setProducts((prevProducts) => [...prevProducts, newProduct as ProductType]);
         setProductId("");
       } else {
         showAlert({
@@ -376,14 +353,8 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                   type="button"
                   className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                 >
-                  <ArrowLeft
-                    size={20}
-                    strokeWidth={2}
-                    className="-ml-1 stroke-blue"
-                  />
-                  <span className="font-semibold text-sm text-blue">
-                    Edit upsell
-                  </span>
+                  <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
+                  <span className="font-semibold text-sm text-blue">Edit upsell</span>
                 </button>
                 <button
                   onClick={handleSave}
@@ -392,8 +363,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                     "relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
                     {
                       "bg-opacity-50": loadingSave,
-                      "hover:bg-neutral-600 active:bg-neutral-800":
-                        !loadingSave,
+                      "hover:bg-neutral-600 active:bg-neutral-800": !loadingSave,
                     }
                   )}
                 >
@@ -426,16 +396,11 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                         className={clsx(
                           "w-11 h-9 rounded-full flex items-center justify-center transition duration-300 ease-in-out",
                           {
-                            "active:bg-lightgray lg:hover:bg-lightgray":
-                              !loadingProduct,
+                            "active:bg-lightgray lg:hover:bg-lightgray": !loadingProduct,
                           }
                         )}
                       >
-                        {loadingProduct ? (
-                          <Spinner color="gray" />
-                        ) : (
-                          <Plus strokeWidth={1.75} />
-                        )}
+                        {loadingProduct ? <Spinner color="gray" /> : <Plus strokeWidth={1.75} />}
                       </button>
                     </div>
                   </div>
@@ -449,23 +414,19 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                         ghostClass="opacity-50"
                       >
                         {products.map(({ id, images, name, basePrice }) => (
-                          <div
-                            key={id}
-                            className="w-[calc(50%-10px)] cursor-move"
-                          >
+                          <div key={id} className="w-[calc(50%-10px)] cursor-move">
                             <div className="w-full border rounded-md overflow-hidden">
                               <div className="w-full aspect-square relative">
                                 <div className="w-full h-full flex items-center justify-center overflow-hidden">
-                                  {images &&
-                                    isValidRemoteImage(images.main) && (
-                                      <Image
-                                        src={images.main}
-                                        alt="Upsell"
-                                        width={200}
-                                        height={200}
-                                        priority
-                                      />
-                                    )}
+                                  {images && isValidRemoteImage(images.main) && (
+                                    <Image
+                                      src={images.main}
+                                      alt="Upsell"
+                                      width={200}
+                                      height={200}
+                                      priority
+                                    />
+                                  )}
                                 </div>
                                 <button
                                   onClick={() => removeProduct(id)}
@@ -479,9 +440,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                                   type="text"
                                   placeholder="Custom name"
                                   value={name}
-                                  onChange={(event) =>
-                                    handleProductNameChange(event, id)
-                                  }
+                                  onChange={(event) => handleProductNameChange(event, id)}
                                   className="h-full w-full px-3 text-sm text-gray"
                                 />
                               </div>
@@ -501,9 +460,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                   <div className="flex gap-5">
                     <div>
                       <h2 className="mb-2 text-xs text-gray">Base price</h2>
-                      <div className="font-medium">
-                        {basePrice > 0 ? `$${basePrice}` : "--"}
-                      </div>
+                      <div className="font-medium">{basePrice > 0 ? `$${basePrice}` : "--"}</div>
                     </div>
                     <div>
                       <h2 className="mb-2 text-xs text-gray">Sale price</h2>
@@ -532,13 +489,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                     <div className="w-full max-w-[383px] border rounded-md overflow-hidden">
                       <div className="w-full aspect-square flex items-center justify-center overflow-hidden">
                         {mainImage && isValidRemoteImage(mainImage) && (
-                          <Image
-                            src={mainImage}
-                            alt="Upsell"
-                            width={383}
-                            height={383}
-                            priority
-                          />
+                          <Image src={mainImage} alt="Upsell" width={383} height={383} priority />
                         )}
                       </div>
                       <div className="w-full h-9 border-t overflow-hidden">

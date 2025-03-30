@@ -11,13 +11,12 @@ import Overlay from "@/ui/Overlay";
 import { UpdateProductAction } from "@/actions/products";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { ShowAlertType } from "@/lib/sharedTypes";
+import { useBodyOverflowStore } from "@/zustand/shared/bodyOverflowStore";
 
 export function ColorsButton() {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.editProduct.overlays.colors.name
-  );
+  const overlayName = useOverlayStore((state) => state.pages.editProduct.overlays.colors.name);
 
   return (
     <button
@@ -38,11 +37,12 @@ export function ColorsOverlay({ data }: { data: DataType }) {
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.editProduct.overlays.colors.name
-  );
+  const overlayName = useOverlayStore((state) => state.pages.editProduct.overlays.colors.name);
   const isOverlayVisible = useOverlayStore(
     (state) => state.pages.editProduct.overlays.colors.isVisible
+  );
+  const setPreventBodyOverflowChange = useBodyOverflowStore(
+    (state) => state.setPreventBodyOverflowChange
   );
 
   useEffect(() => {
@@ -50,19 +50,16 @@ export function ColorsOverlay({ data }: { data: DataType }) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "visible";
+      setPreventBodyOverflowChange(false);
     }
 
     return () => {
       if (!isOverlayVisible) {
         document.body.style.overflow = "visible";
+        setPreventBodyOverflowChange(false);
       }
     };
-  }, [isOverlayVisible]);
-
-  const onHideOverlay = () => {
-    setLoading(false);
-    hideOverlay({ pageName, overlayName });
-  };
+  }, [isOverlayVisible, setPreventBodyOverflowChange]);
 
   const handleSave = async () => {
     setLoading(true);
@@ -77,13 +74,14 @@ export function ColorsOverlay({ data }: { data: DataType }) {
           type: ShowAlertType.ERROR,
         });
         hasMissingInfo = true;
+        setPreventBodyOverflowChange(true);
       } else if (!isValidRemoteImage(image)) {
         showAlert({
-          message:
-            "Invalid image URL found. Try an image from Pinterest or your Firebase Storage.",
+          message: "Invalid image URL found. Try an image from Pinterest or your Firebase Storage.",
           type: ShowAlertType.ERROR,
         });
         hasInvalidImage = true;
+        setPreventBodyOverflowChange(true);
       }
     });
 
@@ -109,7 +107,8 @@ export function ColorsOverlay({ data }: { data: DataType }) {
       });
     } finally {
       setLoading(false);
-      onHideOverlay();
+      hideOverlay({ pageName, overlayName });
+      setPreventBodyOverflowChange(true);
     }
   };
 
@@ -119,16 +118,16 @@ export function ColorsOverlay({ data }: { data: DataType }) {
     );
 
     if (hasInvalidExistingColor) {
-      const message = colors.some(
-        ({ name, image }) => name === "" || image === ""
-      )
+      const message = colors.some(({ name, image }) => name === "" || image === "")
         ? "Make sure existing colors are provided names & image URLs"
         : "Invalid image URL found. Try an image from Pinterest or your Firebase Storage.";
 
-      return showAlert({
+      showAlert({
         message: message,
         type: ShowAlertType.ERROR,
       });
+      setPreventBodyOverflowChange(true);
+      return;
     }
 
     setColors((prevColors) => [...prevColors, { ...newColor }]);
@@ -141,9 +140,7 @@ export function ColorsOverlay({ data }: { data: DataType }) {
 
   const handleColorChange = (index: number, field: string, value: string) => {
     setColors((prevColors) =>
-      prevColors.map((color, i) =>
-        i === index ? { ...color, [field]: value } : color
-      )
+      prevColors.map((color, i) => (i === index ? { ...color, [field]: value } : color))
     );
   };
 
@@ -177,14 +174,8 @@ export function ColorsOverlay({ data }: { data: DataType }) {
                   type="button"
                   className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                 >
-                  <ArrowLeft
-                    size={20}
-                    strokeWidth={2}
-                    className="-ml-1 stroke-blue"
-                  />
-                  <span className="font-semibold text-sm text-blue">
-                    Colors
-                  </span>
+                  <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
+                  <span className="font-semibold text-sm text-blue">Colors</span>
                 </button>
                 <button
                   onClick={handleSave}
@@ -227,13 +218,7 @@ export function ColorsOverlay({ data }: { data: DataType }) {
                     <div className="w-full aspect-square relative overflow-hidden">
                       <div className="w-full h-full flex items-center justify-center">
                         {image && isValidRemoteImage(image) && (
-                          <Image
-                            src={image}
-                            alt=""
-                            width={400}
-                            height={400}
-                            priority
-                          />
+                          <Image src={image} alt="" width={400} height={400} priority />
                         )}
                       </div>
                       <button
@@ -249,9 +234,7 @@ export function ColorsOverlay({ data }: { data: DataType }) {
                         className="w-full h-full px-3 text-sm font-medium"
                         placeholder="Color name"
                         value={name}
-                        onChange={(e) =>
-                          handleColorChange(index, "name", e.target.value)
-                        }
+                        onChange={(e) => handleColorChange(index, "name", e.target.value)}
                       />
                     </div>
                     <div className="w-full h-9 border-t">
@@ -260,9 +243,7 @@ export function ColorsOverlay({ data }: { data: DataType }) {
                         className="w-full h-full px-3 text-sm text-gray"
                         placeholder="Image URL"
                         value={image}
-                        onChange={(e) =>
-                          handleColorChange(index, "image", e.target.value)
-                        }
+                        onChange={(e) => handleColorChange(index, "image", e.target.value)}
                       />
                     </div>
                   </div>

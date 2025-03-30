@@ -19,9 +19,7 @@ export function PageHeroButton({ visibility }: { visibility: string }) {
 
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const pageName = useOverlayStore((state) => state.pages.storefront.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.storefront.overlays.editPageHero.name
-  );
+  const overlayName = useOverlayStore((state) => state.pages.storefront.overlays.editPageHero.name);
 
   return (
     <button
@@ -51,42 +49,29 @@ export function PageHeroButton({ visibility }: { visibility: string }) {
         </div>
       </div>
       <p className="w-52 text-left text-gray text-xs leading-[18px]">
-        The first thing visitors notice. Use visuals that make a strong first
-        impression.
+        The first thing visitors notice. Use visuals that make a strong first impression.
       </p>
     </button>
   );
 }
 
-export function PageHeroOverlay({
-  pageHero,
-}: {
-  pageHero: Partial<PageHeroType>;
-}) {
+export function PageHeroOverlay({ pageHero }: { pageHero: Partial<PageHeroType> }) {
   const HIDDEN = "HIDDEN";
   const VISIBLE = "VISIBLE";
 
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState<string>(pageHero.title || "");
-  const [desktopImage, setDesktopImage] = useState<string>(
-    pageHero.images?.desktop || ""
-  );
-  const [mobileImage, setMobileImage] = useState<string>(
-    pageHero.images?.mobile || ""
-  );
+  const [desktopImage, setDesktopImage] = useState<string>(pageHero.images?.desktop || "");
+  const [mobileImage, setMobileImage] = useState<string>(pageHero.images?.mobile || "");
   const [visibility, setVisibility] = useState<string>(
     pageHero.visibility?.toUpperCase() || HIDDEN
   );
-  const [destinationUrl, setDestinationUrl] = useState<string>(
-    pageHero.destinationUrl || ""
-  );
+  const [destinationUrl, setDestinationUrl] = useState<string>(pageHero.destinationUrl || "");
 
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.storefront.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.storefront.overlays.editPageHero.name
-  );
+  const overlayName = useOverlayStore((state) => state.pages.storefront.overlays.editPageHero.name);
   const isOverlayVisible = useOverlayStore(
     (state) => state.pages.storefront.overlays.editPageHero.isVisible
   );
@@ -108,16 +93,13 @@ export function PageHeroOverlay({
         setPreventBodyOverflowChange(false);
       }
     };
-  }, [isOverlayVisible]);
+  }, [isOverlayVisible, setPreventBodyOverflowChange]);
 
   const handleSave = async () => {
     setLoading(true);
 
     try {
-      if (
-        visibility === VISIBLE &&
-        (!title || !desktopImage || !mobileImage || !destinationUrl)
-      ) {
+      if (visibility === VISIBLE && (!title || !desktopImage || !mobileImage || !destinationUrl)) {
         let errorMessage = "";
 
         if (!title) {
@@ -193,14 +175,8 @@ export function PageHeroOverlay({
                   type="button"
                   className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                 >
-                  <ArrowLeft
-                    size={20}
-                    strokeWidth={2}
-                    className="-ml-1 stroke-blue"
-                  />
-                  <span className="font-semibold text-sm text-blue">
-                    Edit page hero
-                  </span>
+                  <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
+                  <span className="font-semibold text-sm text-blue">Edit page hero</span>
                 </button>
                 <button
                   onClick={handleSave}
@@ -288,9 +264,7 @@ export function PageHeroOverlay({
                   <h2 className="text-xs text-gray">Images</h2>
                   <div className="p-5 rounded-md border flex flex-col gap-5">
                     <div className="flex flex-col gap-2">
-                      <h2 className="text-xs text-gray">
-                        Desktop (1440x360 px)
-                      </h2>
+                      <h2 className="text-xs text-gray">Desktop (1440x360 px)</h2>
                       <div className="w-full border rounded-md overflow-hidden">
                         <div className="w-full min-h-[59px] flex items-center justify-center overflow-hidden">
                           {desktopImage && isValidRemoteImage(desktopImage) ? (
@@ -313,11 +287,7 @@ export function PageHeroOverlay({
                               />
                             )
                           ) : (
-                            <ImageIcon
-                              color="#e5e5e5"
-                              size={52}
-                              strokeWidth={0.75}
-                            />
+                            <ImageIcon color="#e5e5e5" size={52} strokeWidth={0.75} />
                           )}
                         </div>
                         <div className="w-full h-9 border-t overflow-hidden">
@@ -333,9 +303,7 @@ export function PageHeroOverlay({
                       </div>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <h2 className="text-xs text-gray">
-                        Mobile (960x1280 px)
-                      </h2>
+                      <h2 className="text-xs text-gray">Mobile (960x1280 px)</h2>
                       <div className="w-full max-w-[416px] border rounded-md overflow-hidden">
                         <div className="w-full min-h-[314px] flex items-center justify-center overflow-hidden">
                           {mobileImage && isValidRemoteImage(mobileImage) ? (
@@ -358,11 +326,7 @@ export function PageHeroOverlay({
                               />
                             )
                           ) : (
-                            <ImageIcon
-                              color="#e5e5e5"
-                              size={52}
-                              strokeWidth={0.75}
-                            />
+                            <ImageIcon color="#e5e5e5" size={52} strokeWidth={0.75} />
                           )}
                         </div>
                         <div className="w-full h-9 border-t overflow-hidden">

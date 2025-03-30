@@ -1,14 +1,7 @@
 "use client";
 
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
-import {
-  Pencil,
-  ArrowLeft,
-  X,
-  ArrowUp,
-  ArrowDown,
-  ArrowRight,
-} from "lucide-react";
+import { Pencil, ArrowLeft, X, ArrowUp, ArrowDown, ArrowRight } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { UpdateProductAction } from "@/actions/products";
@@ -17,13 +10,12 @@ import Overlay from "@/ui/Overlay";
 import { clsx } from "clsx";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { useAlertStore } from "@/zustand/shared/alertStore";
+import { useBodyOverflowStore } from "@/zustand/shared/bodyOverflowStore";
 
 export function SizeChartButton() {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.editProduct.overlays.sizes.name
-  );
+  const overlayName = useOverlayStore((state) => state.pages.editProduct.overlays.sizes.name);
 
   return (
     <button
@@ -38,11 +30,35 @@ export function SizeChartButton() {
 
 export function SizeChartOverlay({ data }: { data: DataType }) {
   const [loading, setLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<"inches" | "centimeters">(
-    "inches"
-  );
+  const [activeTab, setActiveTab] = useState<"inches" | "centimeters">("inches");
   const [rowsCount, setRowsCount] = useState<number>(0);
   const [columnsCount, setColumnsCount] = useState<number>(0);
+  const showAlert = useAlertStore((state) => state.showAlert);
+  const hideOverlay = useOverlayStore((state) => state.hideOverlay);
+  const pageName = useOverlayStore((state) => state.pages.editProduct.name);
+  const overlayName = useOverlayStore((state) => state.pages.editProduct.overlays.sizes.name);
+  const isOverlayVisible = useOverlayStore(
+    (state) => state.pages.editProduct.overlays.sizes.isVisible
+  );
+  const setPreventBodyOverflowChange = useBodyOverflowStore(
+    (state) => state.setPreventBodyOverflowChange
+  );
+
+  useEffect(() => {
+    if (isOverlayVisible) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "visible";
+      setPreventBodyOverflowChange(false);
+    }
+
+    return () => {
+      if (!isOverlayVisible) {
+        document.body.style.overflow = "visible";
+        setPreventBodyOverflowChange(false);
+      }
+    };
+  }, [isOverlayVisible, setPreventBodyOverflowChange]);
 
   const [tableData, setTableData] = useState<SizeChartType>({
     inches: { columns: [], rows: [] },
@@ -113,8 +129,7 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
       // Normal column addition
       const newColumnName = `Column${columns.length + 1}`;
       const newColumnOrder =
-        Math.max(...tableData[activeTab].columns.map((col) => col.order), 0) +
-        1;
+        Math.max(...tableData[activeTab].columns.map((col) => col.order), 0) + 1;
       setTableData((prevData) => ({
         ...prevData,
         [activeTab]: {
@@ -213,10 +228,10 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
     } catch (error) {
       console.error("Failed to paste data:", error);
       showAlert({
-        message:
-          "Failed to paste data. Make sure you have copied a valid table.",
+        message: "Failed to paste data. Make sure you have copied a valid table.",
         type: ShowAlertType.NEUTRAL,
       });
+      setPreventBodyOverflowChange(true);
     }
   };
 
@@ -234,9 +249,7 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
     }));
   };
 
-  const updateColumns = (
-    updatedColumns: { label: string; order: number }[]
-  ) => {
+  const updateColumns = (updatedColumns: { label: string; order: number }[]) => {
     setTableData((prevData) => {
       const updateRows = (rows: TableRowType[]) =>
         rows.map((row) => {
@@ -257,36 +270,14 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
     });
   };
 
-  const showAlert = useAlertStore((state) => state.showAlert);
-  const hideOverlay = useOverlayStore((state) => state.hideOverlay);
-  const pageName = useOverlayStore((state) => state.pages.editProduct.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.editProduct.overlays.sizes.name
-  );
-  const isOverlayVisible = useOverlayStore(
-    (state) => state.pages.editProduct.overlays.sizes.isVisible
-  );
-
-  useEffect(() => {
-    if (isOverlayVisible) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "visible";
-    }
-
-    return () => {
-      if (!isOverlayVisible) {
-        document.body.style.overflow = "visible";
-      }
-    };
-  }, [isOverlayVisible, showAlert]);
-
   const handleSave = async () => {
     if (rowsCount < 1 || columnsCount < 2) {
-      return showAlert({
+      showAlert({
         message: "Table must have at least 1 row and 2 columns.",
         type: ShowAlertType.ERROR,
       });
+      setPreventBodyOverflowChange(true);
+      return;
     }
 
     setLoading(true);
@@ -308,9 +299,11 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
         message: "Failed to update product",
         type: ShowAlertType.ERROR,
       });
+      setPreventBodyOverflowChange(true);
     } finally {
       setLoading(false);
       hideOverlay({ pageName, overlayName });
+      setPreventBodyOverflowChange(true);
     }
   };
 
@@ -340,11 +333,7 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
                   type="button"
                   className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                 >
-                  <ArrowLeft
-                    size={20}
-                    strokeWidth={2}
-                    className="-ml-1 stroke-blue"
-                  />
+                  <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
                   <span className="font-semibold text-sm text-blue">Sizes</span>
                 </button>
                 <div className="flex gap-2">
@@ -384,9 +373,7 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
                   <button
                     onClick={() => setActiveTab("inches")}
                     className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
-                      activeTab === "inches"
-                        ? "bg-white shadow-sm"
-                        : "text-gray hover:text-black"
+                      activeTab === "inches" ? "bg-white shadow-sm" : "text-gray hover:text-black"
                     }`}
                   >
                     Inches
@@ -446,9 +433,7 @@ export function SizeChartOverlay({ data }: { data: DataType }) {
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg">
-                  <p className="text-gray-500 mb-4">
-                    No data available. Add a row to start.
-                  </p>
+                  <p className="text-gray-500 mb-4">No data available. Add a row to start.</p>
                   <button
                     onClick={addRow}
                     className="px-4 py-2 text-sm font-medium text-white bg-neutral-700 rounded-full hover:bg-neutral-600 active:bg-neutral-800"
