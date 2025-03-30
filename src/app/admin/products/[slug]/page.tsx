@@ -387,7 +387,7 @@ export default async function EditProduct({
                                 key={index}
                                 className="max-w-[148px] lg:max-w-[210px] w-[calc(50%-4px)] rounded-xl border flex flex-col items-center justify-center overflow-hidden"
                               >
-                                <div className="w-full aspect-square overflow-hidden">
+                                <div className="w-full aspect-square overflow-hidden flex items-center justify-center">
                                   <Image
                                     src={color.image}
                                     alt={color.name}
