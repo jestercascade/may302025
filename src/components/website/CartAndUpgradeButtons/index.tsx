@@ -34,9 +34,7 @@ export function CartAndUpgradeButtons({
   const isSimpleProductInCart =
     !hasColor &&
     !hasSize &&
-    cart?.items.some(
-      (item) => item.type === "product" && item.baseProductId === product.id
-    );
+    cart?.items.some((item) => item.type === "product" && item.baseProductId === product.id);
 
   useEffect(() => {
     setIsInCart(
@@ -77,10 +75,7 @@ export function CartAndUpgradeButtons({
 
       showAlert({
         message: result.message,
-        type:
-          result.type === ShowAlertType.ERROR
-            ? ShowAlertType.ERROR
-            : ShowAlertType.NEUTRAL,
+        type: result.type === ShowAlertType.ERROR ? ShowAlertType.ERROR : ShowAlertType.NEUTRAL,
       });
 
       if (result.type === ShowAlertType.SUCCESS) {
