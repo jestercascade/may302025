@@ -29,6 +29,9 @@ const config = {
     { protocol: "https", hostname: "ae01.alicdn.com" }, // AliExpress
     { protocol: "https", hostname: "ae02.alicdn.com" }, // AliExpress
     { protocol: "https", hostname: "ae03.alicdn.com" }, // AliExpress
+    { protocol: "https", hostname: "ae-pic-a1.aliexpress-media.com" }, // AliExpress
+    { protocol: "https", hostname: "ae-pic-a2.aliexpress-media.com" }, // AliExpress
+    { protocol: "https", hostname: "ae-pic-a3.aliexpress-media.com" }, // AliExpress
   ],
 
   FIREBASE: {
