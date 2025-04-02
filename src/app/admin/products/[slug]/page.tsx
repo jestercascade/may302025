@@ -109,13 +109,14 @@ export default async function EditProduct({ params }: { params: Promise<{ slug: 
 
   const hasBasicDetails = category && name && pricing.basePrice && slug && id;
   const hasOnPageSeo = seo.metaTitle && seo.metaDescription && seo.keywords.length;
-  const hasSourceInfo =
-    sourceInfo.platform &&
-    sourceInfo.platformUrl &&
-    sourceInfo.store &&
-    sourceInfo.storeId &&
-    sourceInfo.storeUrl &&
-    sourceInfo.productUrl;
+  const hasSourceInfo = [
+    sourceInfo.platform,
+    sourceInfo.platformUrl,
+    sourceInfo.store,
+    sourceInfo.storeId,
+    sourceInfo.storeUrl,
+    sourceInfo.productUrl,
+  ].some((value) => value && value.trim() !== "");
 
   return (
     <>
@@ -489,36 +490,42 @@ export default async function EditProduct({ params }: { params: Promise<{ slug: 
           >
             {hasSourceInfo ? (
               <div className="w-[calc(100%-60px)]">
-                <div className="p-5">
-                  <h3 className="text-xs text-gray mb-2">Platform</h3>
-                  <Link
-                    href={sourceInfo.platformUrl}
-                    target="_blank"
-                    className="font-medium text-blue active:underline hover:underline"
-                  >
-                    {sourceInfo.platform}
-                  </Link>
-                </div>
-                <div className="p-5">
-                  <h3 className="text-xs text-gray mb-2">Store</h3>
-                  <Link
-                    href={sourceInfo.storeUrl}
-                    target="_blank"
-                    className="font-medium text-blue active:underline hover:underline"
-                  >
-                    {sourceInfo.store} ({sourceInfo.storeId})
-                  </Link>
-                </div>
-                <div className="p-5">
-                  <h3 className="text-xs text-gray mb-2">Product</h3>
-                  <Link
-                    href={sourceInfo.productUrl}
-                    target="_blank"
-                    className="font-medium text-blue active:underline hover:underline"
-                  >
-                    View on {sourceInfo.platform}
-                  </Link>
-                </div>
+                {sourceInfo.platform && sourceInfo.platformUrl && (
+                  <div className="p-5">
+                    <h3 className="text-xs text-gray mb-2">Platform</h3>
+                    <Link
+                      href={sourceInfo.platformUrl}
+                      target="_blank"
+                      className="font-medium text-blue active:underline hover:underline"
+                    >
+                      {sourceInfo.platform}
+                    </Link>
+                  </div>
+                )}
+                {sourceInfo.store && (sourceInfo.storeUrl || sourceInfo.storeId) && (
+                  <div className="p-5">
+                    <h3 className="text-xs text-gray mb-2">Store</h3>
+                    <Link
+                      href={sourceInfo.storeUrl || "#"}
+                      target="_blank"
+                      className="font-medium text-blue active:underline hover:underline"
+                    >
+                      {sourceInfo.store} {sourceInfo.storeId && `(${sourceInfo.storeId})`}
+                    </Link>
+                  </div>
+                )}
+                {sourceInfo.productUrl && (
+                  <div className="p-5">
+                    <h3 className="text-xs text-gray mb-2">Product</h3>
+                    <Link
+                      href={sourceInfo.productUrl}
+                      target="_blank"
+                      className="font-medium text-blue active:underline hover:underline"
+                    >
+                      View on {sourceInfo.platform || "Source"}
+                    </Link>
+                  </div>
+                )}
               </div>
             ) : (
               <span className="text-xs text-gray">Nothing here</span>

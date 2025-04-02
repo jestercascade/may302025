@@ -32,12 +32,12 @@ export function ProductSourceOverlay({ data }: { data: DataType }) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormDataType>({
     id: data.id,
-    platform: data.sourceInfo.platform,
-    platformUrl: data.sourceInfo.platformUrl,
-    store: data.sourceInfo.store,
-    storeId: data.sourceInfo.storeId,
-    storeUrl: data.sourceInfo.storeUrl,
-    productUrl: data.sourceInfo.productUrl,
+    platform: data.sourceInfo.platform || "",
+    platformUrl: data.sourceInfo.platformUrl || "",
+    store: data.sourceInfo.store || "",
+    storeId: data.sourceInfo.storeId || "",
+    storeUrl: data.sourceInfo.storeUrl || "",
+    productUrl: data.sourceInfo.productUrl || "",
   });
 
   const showAlert = useAlertStore((state) => state.showAlert);
@@ -127,12 +127,12 @@ export function ProductSourceOverlay({ data }: { data: DataType }) {
                         hideOverlay({ pageName, overlayName });
                         setFormData({
                           id: data.id,
-                          platform: data.sourceInfo.platform,
-                          platformUrl: data.sourceInfo.platformUrl,
-                          store: data.sourceInfo.store,
-                          storeId: data.sourceInfo.storeId,
-                          storeUrl: data.sourceInfo.storeUrl,
-                          productUrl: data.sourceInfo.productUrl,
+                          platform: data.sourceInfo.platform || "",
+                          platformUrl: data.sourceInfo.platformUrl || "",
+                          store: data.sourceInfo.store || "",
+                          storeId: data.sourceInfo.storeId || "",
+                          storeUrl: data.sourceInfo.storeUrl || "",
+                          productUrl: data.sourceInfo.productUrl || "",
                         });
                       }}
                       type="button"
@@ -148,25 +148,19 @@ export function ProductSourceOverlay({ data }: { data: DataType }) {
                       hideOverlay({ pageName, overlayName });
                       setFormData({
                         id: data.id,
-                        platform: data.sourceInfo.platform,
-                        platformUrl: data.sourceInfo.platformUrl,
-                        store: data.sourceInfo.store,
-                        storeId: data.sourceInfo.storeId,
-                        storeUrl: data.sourceInfo.storeUrl,
-                        productUrl: data.sourceInfo.productUrl,
+                        platform: data.sourceInfo.platform || "",
+                        platformUrl: data.sourceInfo.platformUrl || "",
+                        store: data.sourceInfo.store || "",
+                        storeId: data.sourceInfo.storeId || "",
+                        storeUrl: data.sourceInfo.storeUrl || "",
+                        productUrl: data.sourceInfo.productUrl || "",
                       });
                     }}
                     type="button"
                     className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                   >
-                    <ArrowLeft
-                      size={20}
-                      strokeWidth={2}
-                      className="-ml-1 stroke-blue"
-                    />
-                    <span className="font-semibold text-sm text-blue">
-                      Product source
-                    </span>
+                    <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
+                    <span className="font-semibold text-sm text-blue">Product source</span>
                   </button>
                   <button
                     type="submit"
