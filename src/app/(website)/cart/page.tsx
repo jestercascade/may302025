@@ -12,6 +12,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import clsx from "clsx";
+import { getDiscoveryProductsSettings } from "@/actions/get/discoveryProducts";
 
 export const metadata: Metadata = {
   alternates: {
@@ -25,26 +26,18 @@ export default async function Cart() {
   const cart = await getCart(deviceIdentifier);
 
   const items = cart?.items || [];
-  const productItems = items.filter(
-    (item): item is CartProductItemType => item.type === "product"
-  );
-  const upsellItems = items.filter(
-    (item): item is CartUpsellItemType => item.type === "upsell"
-  );
+  const productItems = items.filter((item): item is CartProductItemType => item.type === "product");
+  const upsellItems = items.filter((item): item is CartUpsellItemType => item.type === "upsell");
 
-  const [baseProducts, cartUpsells] = await Promise.all([
+  const [baseProducts, cartUpsells, discoveryProductsSettings] = await Promise.all([
     getBaseProducts(productItems.map((p) => p.baseProductId).filter(Boolean)),
     getCartUpsells(upsellItems),
+    getDiscoveryProductsSettings(),
   ]);
 
-  const cartProducts = mapCartProductsToBaseProducts(
-    productItems,
-    baseProducts
-  );
+  const cartProducts = mapCartProductsToBaseProducts(productItems, baseProducts);
 
-  const sortedCartItems = [...cartProducts, ...cartUpsells].sort(
-    (a, b) => b.index - a.index
-  );
+  const sortedCartItems = [...cartProducts, ...cartUpsells].sort((a, b) => b.index - a.index);
 
   const getExcludedProductIds = (cartItems: CartItemType[]): string[] => {
     const productIds = new Set<string>();
@@ -73,8 +66,9 @@ export default async function Cart() {
     return Array.from(productIds);
   };
 
-  const excludeIdsFromDiscoveryProducts =
-    getExcludedProductIds(sortedCartItems);
+  const excludeIdsFromDiscoveryProducts = getExcludedProductIds(sortedCartItems);
+
+  const showDiscoveryProducts = discoveryProductsSettings?.visibleOnPages?.home === true;
 
   return (
     <>
@@ -99,22 +93,22 @@ export default async function Cart() {
         <div className="w-full max-w-[580px] md:max-w-5xl mx-auto flex flex-col gap-10">
           <div className="w-full px-5 mx-auto">
             <EmptyCartState sortedCartItems={sortedCartItems} />
-            {sortedCartItems?.length > 0 && (
-              <CartItemList cartItems={sortedCartItems} />
-            )}
+            {sortedCartItems?.length > 0 && <CartItemList cartItems={sortedCartItems} />}
           </div>
-          <div className="px-5">
-            <ProductsProvider>
-              <Suspense fallback={null}>
-                <ShuffledDiscoveryProducts
-                  page="CART"
-                  heading="Add These to Your Cart"
-                  excludeIds={excludeIdsFromDiscoveryProducts}
-                  cart={cart}
-                />
-              </Suspense>
-            </ProductsProvider>
-          </div>
+          {showDiscoveryProducts && (
+            <div className="px-5">
+              <ProductsProvider>
+                <Suspense fallback={null}>
+                  <ShuffledDiscoveryProducts
+                    page="CART"
+                    heading="Add These to Your Cart"
+                    excludeIds={excludeIdsFromDiscoveryProducts}
+                    cart={cart}
+                  />
+                </Suspense>
+              </ProductsProvider>
+            </div>
+          )}
         </div>
         <Footer />
       </div>
@@ -146,9 +140,7 @@ const mapCartProductsToBaseProducts = (
 ) =>
   cartProducts
     .map((cartProduct) => {
-      const baseProduct = baseProducts.find(
-        (product) => product.id === cartProduct.baseProductId
-      );
+      const baseProduct = baseProducts.find((product) => product.id === cartProduct.baseProductId);
 
       if (!baseProduct) return null;
 
@@ -169,9 +161,7 @@ const mapCartProductsToBaseProducts = (
         type: cartProduct.type,
       };
     })
-    .filter(
-      (product): product is NonNullable<typeof product> => product !== null
-    );
+    .filter((product): product is NonNullable<typeof product> => product !== null);
 
 const getCartUpsells = async (
   upsellItems: Array<{
@@ -218,9 +208,7 @@ const getCartUpsells = async (
           color: selectedProduct.color,
         };
       })
-      .filter(
-        (product): product is NonNullable<typeof product> => product !== null
-      );
+      .filter((product): product is NonNullable<typeof product> => product !== null);
 
     if (detailedProducts.length === 0) {
       return null;
@@ -238,16 +226,10 @@ const getCartUpsells = async (
   });
 
   const results = await Promise.all(upsellPromises);
-  return results.filter(
-    (result): result is NonNullable<typeof result> => result !== null
-  );
+  return results.filter((result): result is NonNullable<typeof result> => result !== null);
 };
 
-const getUpsell = async ({
-  id,
-}: {
-  id: string;
-}): Promise<Partial<UpsellType> | null> => {
+const getUpsell = async ({ id }: { id: string }): Promise<Partial<UpsellType> | null> => {
   const documentRef = adminDb.collection("upsells").doc(id);
   const snapshot = await documentRef.get();
 
@@ -260,9 +242,7 @@ const getUpsell = async ({
     return null;
   }
 
-  const productIds = data.products
-    ? data.products.map((p: { id: string }) => p.id)
-    : [];
+  const productIds = data.products ? data.products.map((p: { id: string }) => p.id) : [];
 
   const products =
     productIds.length > 0
@@ -295,13 +275,9 @@ const getUpsell = async ({
           }
         : null;
     })
-    .filter(
-      (product: any): product is NonNullable<typeof product> => product !== null
-    );
+    .filter((product: any): product is NonNullable<typeof product> => product !== null);
 
-  const sortedProducts = updatedProducts.sort(
-    (a: any, b: any) => a.index - b.index
-  );
+  const sortedProducts = updatedProducts.sort((a: any, b: any) => a.index - b.index);
 
   const upsell: Partial<UpsellType> = {
     id: snapshot.id,
@@ -314,24 +290,10 @@ const getUpsell = async ({
 
 // -- UI Components --
 
-function EmptyCartState({
-  sortedCartItems,
-}: {
-  sortedCartItems: Array<CartItemType>;
-}) {
+function EmptyCartState({ sortedCartItems }: { sortedCartItems: Array<CartItemType> }) {
   return (
-    <div
-      className={clsx(
-        sortedCartItems?.length === 0 ? "flex justify-center py-16" : "hidden"
-      )}
-    >
-      <Image
-        src="/icons/cart-thin.svg"
-        alt="Cart"
-        width={80}
-        height={80}
-        priority={true}
-      />
+    <div className={clsx(sortedCartItems?.length === 0 ? "flex justify-center py-16" : "hidden")}>
+      <Image src="/icons/cart-thin.svg" alt="Cart" width={80} height={80} priority={true} />
     </div>
   );
 }
@@ -343,10 +305,7 @@ function Footer() {
         <div className="grid grid-cols-2">
           <div>
             <h3 className="font-semibold mb-4">Company</h3>
-            <Link
-              href="/about-us"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/about-us" className="block w-max text-sm text-gray mb-2 hover:underline">
               About us
             </Link>
             <Link
@@ -364,16 +323,10 @@ function Footer() {
           </div>
           <div>
             <h3 className="font-semibold mb-4">Get Help</h3>
-            <Link
-              href="/contact-us"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/contact-us" className="block w-max text-sm text-gray mb-2 hover:underline">
               Contact us
             </Link>
-            <Link
-              href="#"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="#" className="block w-max text-sm text-gray mb-2 hover:underline">
               Track order
             </Link>
             <Link
@@ -382,10 +335,7 @@ function Footer() {
             >
               Returns & refunds
             </Link>
-            <Link
-              href="/faq"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/faq" className="block w-max text-sm text-gray mb-2 hover:underline">
               FAQs
             </Link>
           </div>
@@ -395,10 +345,7 @@ function Footer() {
         <div className="flex gap-10">
           <div className="w-full">
             <h3 className="font-semibold mb-4">Company</h3>
-            <Link
-              href="/about-us"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/about-us" className="block w-max text-sm text-gray mb-2 hover:underline">
               About us
             </Link>
             <Link
@@ -416,16 +363,10 @@ function Footer() {
           </div>
           <div className="w-full">
             <h3 className="font-semibold mb-4">Get Help</h3>
-            <Link
-              href="/contact-us"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/contact-us" className="block w-max text-sm text-gray mb-2 hover:underline">
               Contact us
             </Link>
-            <Link
-              href="#"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="#" className="block w-max text-sm text-gray mb-2 hover:underline">
               Track order
             </Link>
             <Link
@@ -434,10 +375,7 @@ function Footer() {
             >
               Returns & refunds
             </Link>
-            <Link
-              href="/faq"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/faq" className="block w-max text-sm text-gray mb-2 hover:underline">
               FAQs
             </Link>
           </div>

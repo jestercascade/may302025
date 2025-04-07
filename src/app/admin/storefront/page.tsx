@@ -1,21 +1,24 @@
 import { getCategories } from "@/actions/get/categories";
 import { getCollections } from "@/actions/get/collections";
+import { getDiscoveryProductsSettings } from "@/actions/get/discoveryProducts";
 import { getPageHero } from "@/actions/get/pageHero";
 import {
   CategoriesButton,
   CategoriesOverlay,
 } from "@/components/admin/Storefront/CategoriesOverlay";
 import CollectionTable from "@/components/admin/Storefront/CollectionTable";
-import { NewCollectionOverlay } from "@/components/admin/Storefront/NewCollectionOverlay";
 import {
-  PageHeroButton,
-  PageHeroOverlay,
-} from "@/components/admin/Storefront/PageHeroOverlay";
+  DiscoveryProductsButton,
+  DiscoveryProductsOverlay,
+} from "@/components/admin/Storefront/DiscoveryProductsOverlay";
+import { NewCollectionOverlay } from "@/components/admin/Storefront/NewCollectionOverlay";
+import { PageHeroButton, PageHeroOverlay } from "@/components/admin/Storefront/PageHeroOverlay";
 
 export default async function Storefront() {
-  const [categoriesData, pageHero, collections] = await Promise.all([
+  const [categoriesData, pageHero, discoveryProductsSettings, collections] = await Promise.all([
     getCategories(),
     getPageHero(),
+    getDiscoveryProductsSettings(),
     getCollections({
       fields: ["title", "slug", "products", "campaignDuration"],
     }) as Promise<CollectionType[]>,
@@ -28,9 +31,8 @@ export default async function Storefront() {
           <h2 className="font-semibold text-lg mb-5">Elements</h2>
           <div className="w-full flex flex-wrap gap-2">
             <PageHeroButton visibility={pageHero.visibility} />
-            <CategoriesButton
-              showOnPublicSite={categoriesData?.showOnPublicSite}
-            />
+            <CategoriesButton showOnPublicSite={categoriesData?.showOnPublicSite} />
+            <DiscoveryProductsButton />
           </div>
         </div>
         <CollectionTable collections={collections} />
@@ -38,6 +40,7 @@ export default async function Storefront() {
       <NewCollectionOverlay />
       <PageHeroOverlay pageHero={pageHero} />
       <CategoriesOverlay categoriesData={categoriesData} />
+      <DiscoveryProductsOverlay discoveryProductsSettings={discoveryProductsSettings} />
     </>
   );
 }

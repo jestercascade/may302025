@@ -83,6 +83,7 @@ const OVERLAY_CONFIG = {
     overlays: createOverlays([
       "newCollection",
       "categories",
+      "discoveryProducts",
       "editPageHero",
       "removeProduct",
       "changeProductIndex",

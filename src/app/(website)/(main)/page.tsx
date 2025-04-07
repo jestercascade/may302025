@@ -7,6 +7,7 @@ import { getCategories } from "@/actions/get/categories";
 import { getPageHero } from "@/actions/get/pageHero";
 import { getProducts } from "@/actions/get/products";
 import { getCart } from "@/actions/get/carts";
+import { getDiscoveryProductsSettings } from "@/actions/get/discoveryProducts";
 import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,13 +23,14 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const [collections, categoriesData, pageHero] = await Promise.all([
+  const [collections, categoriesData, pageHero, discoveryProductsSettings] = await Promise.all([
     getCollections({
       fields: ["title", "slug", "products"],
       visibility: "PUBLISHED",
     }),
     getCategories({ visibility: "VISIBLE" }),
     getPageHero(),
+    getDiscoveryProductsSettings(),
   ]);
 
   const featuredCollections = await enrichFeaturedCollections(collections);
@@ -74,14 +76,15 @@ export default async function Home() {
         .map((product) => product.id)
     );
 
+  const showDiscoveryProducts = discoveryProductsSettings?.visibleOnPages?.home === true;
+
   return (
     <>
       {heroContent}
       <div>
-        {categoriesData?.showOnPublicSite &&
-          categoriesData.categories.length > 0 && (
-            <Categories categories={categoriesData.categories} />
-          )}
+        {categoriesData?.showOnPublicSite && categoriesData.categories.length > 0 && (
+          <Categories categories={categoriesData.categories} />
+        )}
         <div className="mt-8 max-w-5xl mx-auto flex flex-col gap-8">
           {combinedCollections
             .map((collection) => renderCollection(collection, cart))
@@ -89,17 +92,19 @@ export default async function Home() {
             .map((content, index) => (
               <div key={index}>{content}</div>
             ))}
-          <div className="px-5">
-            <ProductsProvider>
-              <Suspense fallback={null}>
-                <ShuffledDiscoveryProducts
-                  page="HOME"
-                  excludeIds={excludeIdsFromDiscoveryProducts}
-                  cart={cart}
-                />
-              </Suspense>
-            </ProductsProvider>
-          </div>
+          {showDiscoveryProducts && (
+            <div className="px-5">
+              <ProductsProvider>
+                <Suspense fallback={null}>
+                  <ShuffledDiscoveryProducts
+                    page="HOME"
+                    excludeIds={excludeIdsFromDiscoveryProducts}
+                    cart={cart}
+                  />
+                </Suspense>
+              </ProductsProvider>
+            </div>
+          )}
         </div>
       </div>
     </>
@@ -109,11 +114,7 @@ export default async function Home() {
 // -- UI Components --
 
 function renderHero(pageHero: any) {
-  if (
-    pageHero?.visibility !== "VISIBLE" ||
-    !pageHero.images?.desktop ||
-    !pageHero.images?.mobile
-  ) {
+  if (pageHero?.visibility !== "VISIBLE" || !pageHero.images?.desktop || !pageHero.images?.mobile) {
     return null;
   }
 
@@ -169,8 +170,7 @@ async function enrichFeaturedCollections(
 ): Promise<EnrichedCollectionType[]> {
   const featuredCollections = (collections || []).filter(
     (collection) =>
-      collection.collectionType === "FEATURED" &&
-      collection.visibility === "PUBLISHED"
+      collection.collectionType === "FEATURED" && collection.visibility === "PUBLISHED"
   );
 
   // Create a map of product IDs and their indexes
@@ -187,40 +187,23 @@ async function enrichFeaturedCollections(
   // Fetch and enrich products
   const productsFromDb = await getProducts({
     ids: productIds,
-    fields: [
-      "name",
-      "slug",
-      "description",
-      "highlights",
-      "pricing",
-      "images",
-      "options",
-      "upsell",
-    ],
+    fields: ["name", "slug", "description", "highlights", "pricing", "images", "options", "upsell"],
     visibility: "PUBLISHED",
   });
 
   const productsWithIndexes = (productsFromDb || []).map((product) => ({
     ...product,
-    index:
-      productIdToIndexMap.find((item) => item.id === product.id)?.index ?? 0,
+    index: productIdToIndexMap.find((item) => item.id === product.id)?.index ?? 0,
   }));
 
   // Enrich collections with product details
   return featuredCollections.map((collection) => {
     const enrichedProducts = (collection.products || [])
       .map((product: any) => {
-        const productDetails = productsWithIndexes.find(
-          (p) => p.id === product.id
-        );
-        return productDetails
-          ? { ...productDetails, index: product.index }
-          : undefined;
+        const productDetails = productsWithIndexes.find((p) => p.id === product.id);
+        return productDetails ? { ...productDetails, index: product.index } : undefined;
       })
-      .filter(
-        (product: any): product is NonNullable<typeof product> =>
-          product !== undefined
-      )
+      .filter((product: any): product is NonNullable<typeof product> => product !== undefined)
       .sort((a: any, b: any) => (a.index ?? 0) - (b.index ?? 0));
 
     return {
