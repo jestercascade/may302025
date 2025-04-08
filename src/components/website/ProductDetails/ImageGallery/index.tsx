@@ -43,13 +43,13 @@ export function ImageGallery({ images, productName }: ProductImagesType) {
           />
         ))}
       </div>
-      <div className="w-full relative rounded-3xl overflow-hidden bg-neutral-100 [box-shadow:0px_1.6px_3.6px_rgb(0,_0,_0,_0.4),_0px_0px_2.9px_rgb(0,_0,_0,_0.1)]">
+      <div className="w-full relative rounded-[20px] overflow-hidden bg-neutral-100 [box-shadow:0px_1.6px_3.6px_rgb(0,_0,_0,_0.4),_0px_0px_2.9px_rgb(0,_0,_0,_0.1)]">
         <Image
           src={displayedImage}
           alt={productName}
-          width={500}
-          height={0}
-          sizes="(max-width: 500px) 100vw, 500px"
+          width={506}
+          height={675}
+          sizes="(max-width: 506px) 100vw, 506px"
           priority
           style={{ width: "100%", height: "auto" }}
           className="block transition-opacity duration-200"

@@ -7,7 +7,8 @@ import {
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 import { CartAndUpgradeButtons } from "../CartAndUpgradeButtons";
 import { QuickviewOptions } from "../Options/QuickviewOptions";
-import { ImageGallery } from "../ProductDetails/ImageGallery";
+import { useProductColorImageStore } from "@/zustand/website/productColorImageStore";
+import { useState, useMemo } from "react";
 import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 import { useEffect, useRef, useCallback, memo } from "react";
 import { X, ChevronRight, Check } from "lucide-react";
@@ -430,9 +431,9 @@ const MemoizedDesktopProductDetails = memo(function DesktopProductDetails({
   }, [push, selectedProduct.slug, selectedProduct.id]);
 
   return (
-    <div className="hidden md:block w-[calc(100%-40px)] max-w-max max-h-[584px] py-8 absolute top-12 bottom-12 bg-white mx-auto shadow rounded-2xl">
+    <div className="hidden md:block w-[calc(100%-40px)] max-w-max max-h-[584px] pb-8 pt-[1.875rem] absolute top-12 bottom-12 bg-white mx-auto shadow rounded-2xl">
       <div className="relative pl-8 pr-7 flex flex-row gap-5 custom-scrollbar max-h-[584px] h-full overflow-x-hidden overflow-y-visible">
-        <div className="sticky top-0 w-[584px] flex flex-col gap-16">
+        <div className="w-[584px] pt-[2px]">
           <ImageGallery
             images={selectedProduct.images}
             productName={selectedProduct.name}
@@ -688,5 +689,98 @@ const MemoizedDesktopProductDetails = memo(function DesktopProductDetails({
         <X color="#6c6c6c" strokeWidth={1.5} />
       </button>
     </div>
+  );
+});
+
+const ImageGallery = memo(function ({
+  images,
+  productName,
+}: {
+  images: {
+    main: string;
+    gallery: string[];
+  };
+  productName: string;
+}) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { selectedColorImage, resetSelectedColorImage } =
+    useProductColorImageStore();
+
+  const productImages = useMemo(
+    () => [images.main, ...(images.gallery ?? [])],
+    [images.main, images.gallery]
+  );
+
+  useEffect(() => {
+    resetSelectedColorImage();
+  }, [resetSelectedColorImage]);
+
+  const handleImageSelect = (index: number) => {
+    if (index === currentImageIndex) return;
+    setCurrentImageIndex(index);
+    if (selectedColorImage) {
+      resetSelectedColorImage();
+    }
+  };
+
+  const displayedImage = selectedColorImage || productImages[currentImageIndex];
+
+  return (
+    <div className="select-none flex w-full">
+      <div
+        className={`${styles.customScrollbar} apply-scrollbar min-w-[62px] max-w-[62px] max-h-[380px] overflow-x-hidden overflow-y-visible flex flex-col gap-2 mr-2`}
+      >
+        {productImages.map((image, index) => (
+          <ThumbnailImage
+            key={image}
+            image={image}
+            productName={productName}
+            onSelect={() => handleImageSelect(index)}
+          />
+        ))}
+      </div>
+      <div className="w-full relative rounded-[20px] overflow-hidden bg-neutral-100 [box-shadow:0px_1.6px_3.6px_rgb(0,_0,_0,_0.4),_0px_0px_2.9px_rgb(0,_0,_0,_0.1)]">
+        <Image
+          src={displayedImage}
+          alt={productName}
+          width={506}
+          height={675}
+          sizes="(max-width: 506px) 100vw, 506px"
+          priority
+          style={{ width: "100%", height: "auto" }}
+          className="block transition-opacity duration-200"
+        />
+      </div>
+    </div>
+  );
+});
+
+const ThumbnailImage = memo(function ThumbnailImage({
+  image,
+  productName,
+  onSelect,
+}: {
+  image: string;
+  productName: string;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      onClick={onSelect}
+      onMouseEnter={onSelect}
+      className="w-[56px] h-[56px] relative min-h-[56px] min-w-[56px] rounded-md flex items-center justify-center overflow-hidden"
+    >
+      <div className="relative w-full h-full">
+        <Image
+          src={image}
+          alt={productName}
+          fill
+          sizes="56px"
+          className="object-cover"
+          priority={false}
+        />
+      </div>
+      <div className="w-full h-full rounded-md absolute top-0 bottom-0 left-0 right-0 ease-in-out duration-200 transition hover:bg-amber/30" />
+    </button>
   );
 });
