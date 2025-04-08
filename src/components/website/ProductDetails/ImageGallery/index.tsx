@@ -29,7 +29,7 @@ export function ImageGallery({ images, productName }: ProductImagesType) {
   const displayedImage = selectedColorImage || productImages[currentImageIndex];
 
   return (
-    <div className="flex w-full select-none">
+    <div className="select-none flex w-full">
       <div
         className={`${styles.customScrollbar} apply-scrollbar min-w-[62px] max-w-[62px] max-h-[380px] overflow-x-hidden overflow-y-visible flex flex-col gap-2 mr-2`}
       >
@@ -42,21 +42,17 @@ export function ImageGallery({ images, productName }: ProductImagesType) {
           />
         ))}
       </div>
-      <div className="w-full max-w-[580px] h-full flex flex-col gap-5">
-        <div className="w-full relative rounded-3xl overflow-hidden [box-shadow:0px_1.6px_3.6px_rgb(0,_0,_0,_0.4),_0px_0px_2.9px_rgb(0,_0,_0,_0.1)]">
-          <div className="relative w-full bg-lightgray">
-            <Image
-              src={displayedImage}
-              alt={productName}
-              width={580}
-              height={0}
-              sizes="(max-width: 580px) 100vw, 580px"
-              priority
-              style={{ width: "100%", height: "auto" }}
-              className="block transition-opacity duration-200"
-            />
-          </div>
-        </div>
+      <div className="w-full relative rounded-3xl overflow-hidden bg-neutral-100 [box-shadow:0px_1.6px_3.6px_rgb(0,_0,_0,_0.4),_0px_0px_2.9px_rgb(0,_0,_0,_0.1)]">
+        <Image
+          src={displayedImage}
+          alt={productName}
+          width={550}
+          height={0}
+          sizes="(max-width: 550px) 100vw, 550px"
+          priority
+          style={{ width: "100%", height: "auto" }}
+          className="block transition-opacity duration-200"
+        />
       </div>
     </div>
   );
