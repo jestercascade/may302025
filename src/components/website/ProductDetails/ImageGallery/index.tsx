@@ -7,8 +7,7 @@ import Image from "next/image";
 
 export function ImageGallery({ images, productName }: ProductImagesType) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const { selectedColorImage, resetSelectedColorImage } =
-    useProductColorImageStore();
+  const { selectedColorImage, resetSelectedColorImage } = useProductColorImageStore();
 
   const productImages = useMemo(
     () => [images.main, ...(images.gallery ?? [])],
@@ -44,16 +43,19 @@ export function ImageGallery({ images, productName }: ProductImagesType) {
         ))}
       </div>
       <div className="w-full max-w-[580px] h-full flex flex-col gap-5">
-        <div className="w-full aspect-square relative flex items-center justify-center bg-lightgray overflow-hidden rounded-3xl [box-shadow:0px_1.6px_3.6px_rgb(0,_0,_0,_0.4),_0px_0px_2.9px_rgb(0,_0,_0,_0.1)]">
-          <Image
-            src={displayedImage}
-            alt={productName}
-            width={580}
-            height={580}
-            priority
-            className="object-cover transition-opacity duration-200"
-            sizes="(max-width: 580px) 100vw, 580px"
-          />
+        <div className="w-full relative rounded-3xl overflow-hidden [box-shadow:0px_1.6px_3.6px_rgb(0,_0,_0,_0.4),_0px_0px_2.9px_rgb(0,_0,_0,_0.1)]">
+          <div className="relative w-full bg-lightgray">
+            <Image
+              src={displayedImage}
+              alt={productName}
+              width={580}
+              height={0}
+              sizes="(max-width: 580px) 100vw, 580px"
+              priority
+              style={{ width: "100%", height: "auto" }}
+              className="block transition-opacity duration-200"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -75,13 +77,16 @@ const ThumbnailImage = memo(function ThumbnailImage({
       onMouseEnter={onSelect}
       className="w-[56px] h-[56px] relative min-h-[56px] min-w-[56px] rounded-md flex items-center justify-center overflow-hidden"
     >
-      <Image
-        src={image}
-        alt={productName}
-        width={56}
-        height={68}
-        priority={false}
-      />
+      <div className="relative w-full h-full">
+        <Image
+          src={image}
+          alt={productName}
+          fill
+          sizes="56px"
+          className="object-cover"
+          priority={false}
+        />
+      </div>
       <div className="w-full h-full rounded-md absolute top-0 bottom-0 left-0 right-0 ease-in-out duration-200 transition hover:bg-amber/30" />
     </button>
   );
