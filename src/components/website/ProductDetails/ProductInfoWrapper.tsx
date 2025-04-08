@@ -37,10 +37,7 @@ export function ProductInfoWrapper({
   }, [updateHeight]);
 
   return (
-    <div
-      ref={wrapperRef}
-      className="sticky top-5 pt-5 w-[328px] min-w-[328px] min-[896px]:w-[420px]"
-    >
+    <div ref={wrapperRef} className="sticky top-5 pt-5 min-w-[372px]">
       {children}
     </div>
   );

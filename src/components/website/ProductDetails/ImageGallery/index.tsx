@@ -47,9 +47,9 @@ export function ImageGallery({ images, productName }: ProductImagesType) {
         <Image
           src={displayedImage}
           alt={productName}
-          width={550}
-          height={733}
-          sizes="(max-width: 550px) 100vw, 550px"
+          width={500}
+          height={0}
+          sizes="(max-width: 500px) 100vw, 500px"
           priority
           style={{ width: "100%", height: "auto" }}
           className="block transition-opacity duration-200"
