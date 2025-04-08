@@ -3,11 +3,19 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useScrollStore } from "@/zustand/website/scrollStore";
 
-export function ImageGalleryWrapper({ children }: { children: React.ReactNode }) {
+export function ImageGalleryWrapper({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const setShouldShowStickyBar = useScrollStore((state) => state.setShouldShowStickyBar);
+  const setShouldShowStickyBar = useScrollStore(
+    (state) => state.setShouldShowStickyBar
+  );
   const scrollPosition = useScrollStore((state) => state.scrollPosition);
-  const productInfoWrapperHeight = useScrollStore((state) => state.productInfoWrapperHeight);
+  const productInfoWrapperHeight = useScrollStore(
+    (state) => state.productInfoWrapperHeight
+  );
   const [wrapperHeight, setWrapperHeight] = useState(0);
 
   useEffect(() => {
@@ -43,10 +51,15 @@ export function ImageGalleryWrapper({ children }: { children: React.ReactNode })
 
     const threshold = calculateThreshold();
     setShouldShowStickyBar(scrollPosition >= threshold);
-  }, [scrollPosition, wrapperHeight, productInfoWrapperHeight, setShouldShowStickyBar]);
+  }, [
+    scrollPosition,
+    wrapperHeight,
+    productInfoWrapperHeight,
+    setShouldShowStickyBar,
+  ]);
 
   return (
-    <div ref={wrapperRef} className="w-full">
+    <div ref={wrapperRef} className="w-full sticky top-5">
       {children}
     </div>
   );

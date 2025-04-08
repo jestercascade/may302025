@@ -7,7 +7,8 @@ import Image from "next/image";
 
 export function ImageGallery({ images, productName }: ProductImagesType) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const { selectedColorImage, resetSelectedColorImage } = useProductColorImageStore();
+  const { selectedColorImage, resetSelectedColorImage } =
+    useProductColorImageStore();
 
   const productImages = useMemo(
     () => [images.main, ...(images.gallery ?? [])],
@@ -47,7 +48,7 @@ export function ImageGallery({ images, productName }: ProductImagesType) {
           src={displayedImage}
           alt={productName}
           width={550}
-          height={0}
+          height={733}
           sizes="(max-width: 550px) 100vw, 550px"
           priority
           style={{ width: "100%", height: "auto" }}
