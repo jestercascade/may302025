@@ -56,8 +56,12 @@ export const ProductDetailsOptions = memo(function Options({
   const selectedColor = useOptionsStore((state) => state.selectedColor);
   const selectedSize = useOptionsStore((state) => state.selectedSize);
   const showOverlay = useOverlayStore((state) => state.showOverlay);
-  const productDetailsPage = useOverlayStore((state) => state.pages.productDetails);
-  const shouldShowStickyBar = useScrollStore((state) => state.shouldShowStickyBar);
+  const productDetailsPage = useOverlayStore(
+    (state) => state.pages.productDetails
+  );
+  const shouldShowStickyBar = useScrollStore(
+    (state) => state.shouldShowStickyBar
+  );
   const isInCart = useOptionsStore((state) => state.isInCart);
 
   useEffect(() => {
@@ -160,11 +164,16 @@ export const ProductDetailsOptions = memo(function Options({
           className="h-8 w-max px-4 rounded-full flex items-center justify-center gap-[2px] ease-in-out duration-300 transition bg-lightgray active:bg-lightgray-dimmed lg:hover:bg-lightgray-dimmed"
         >
           <div className="text-sm font-medium">{getButtonText()}</div>
-          <ChevronRight color="#828282" size={18} strokeWidth={2} className="-mr-[8px]" />
+          <ChevronRight
+            color="#828282"
+            size={18}
+            strokeWidth={2}
+            className="-mr-[8px]"
+          />
         </button>
         {isDropdownVisible && (
           <div className="absolute top-[42px] left-0 z-20 pb-2">
-            <div className="space-y-4 w-max min-w-[238px] max-w-[288px] p-5 rounded-xl shadow-dropdown bg-white before:content-[''] before:w-[14px] before:h-[14px] before:bg-white before:rounded-tl-[2px] before:rotate-45 before:origin-top-left before:absolute before:-top-[10px] before:border-l before:border-t before:border-[#d9d9d9] before:left-16 min-[840px]:before:right-24">
+            <div className="space-y-4 w-max min-w-[238px] max-w-[288px] p-5 rounded-xl shadow-dropdown bg-white before:content-[''] before:w-[14px] before:h-[14px] before:bg-white before:rounded-tl-[2px] before:rotate-45 before:origin-top-left before:absolute before:-top-[10px] before:border-l before:border-t before:border-[#d9d9d9] before:left-14 min-[840px]:before:right-24">
               {hasColor && hasSize && (
                 <div className="flex flex-col gap-4 select-none">
                   <ProductColors colors={productInfo.options.colors} />
@@ -174,7 +183,9 @@ export const ProductDetailsOptions = memo(function Options({
                   />
                 </div>
               )}
-              {hasColor && !hasSize && <ProductColors colors={productInfo.options.colors} />}
+              {hasColor && !hasSize && (
+                <ProductColors colors={productInfo.options.colors} />
+              )}
               {!hasColor && hasSize && (
                 <ProductSizes
                   sizeChart={productInfo.options.sizes}
@@ -187,7 +198,11 @@ export const ProductDetailsOptions = memo(function Options({
       </div>
       {isInCart &&
         !isDropdownVisible &&
-        (isStickyBarInCartIndicator ? <StickyBarInCartIndicator /> : <InCartIndicator />)}
+        (isStickyBarInCartIndicator ? (
+          <StickyBarInCartIndicator />
+        ) : (
+          <InCartIndicator />
+        ))}
     </div>
   );
 });
