@@ -23,42 +23,60 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const [collections, categoriesData, pageHero, discoveryProductsSettings] = await Promise.all([
-    getCollections({
-      fields: ["title", "slug", "products"],
-      visibility: "PUBLISHED",
-    }),
-    getCategories({ visibility: "VISIBLE" }),
-    getPageHero(),
-    getDiscoveryProductsSettings(),
-  ]);
+  const [collections, categoriesData, pageHero, discoveryProductsSettings] =
+    await Promise.all([
+      getCollections({
+        fields: ["title", "slug", "products"],
+        visibility: "PUBLISHED",
+        publishedProductsOnly: true,
+      }),
+      getCategories({ visibility: "VISIBLE" }),
+      getPageHero(),
+      getDiscoveryProductsSettings(),
+    ]);
 
-  const featuredCollections = await enrichFeaturedCollections(collections);
+  const featured = await enrichFeaturedCollections(collections || []);
   const combinedCollections = [
-    ...featuredCollections,
+    ...featured,
     ...(collections?.filter((c) => c.collectionType !== "FEATURED") || []),
   ].sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
 
-  // Check visibility of main sections
+  const excludedIds = new Set(
+    combinedCollections
+      .filter((c) => c.collectionType === "FEATURED")
+      .flatMap((c) =>
+        (c.products || [])
+          .sort((a, b) => (a.index ?? 0) - (b.index ?? 0))
+          .slice(0, 3)
+          .map((p) => p.id)
+      )
+  );
+
   const heroContent = renderHero(pageHero);
   const isHeroRendered = heroContent !== null;
   const isCategoriesRendered =
-    categoriesData?.showOnPublicSite && categoriesData.categories?.length > 0;
+    !!categoriesData?.showOnPublicSite && categoriesData.categories?.length > 0;
   const hasCollectionContent = combinedCollections.some((c) => {
     if (c.collectionType === "FEATURED") return c.products.length >= 3;
     if (c.collectionType === "BANNER") return c.products.length > 0;
     return false;
   });
 
-  // Early exit for empty state checks
   if (!isHeroRendered && !isCategoriesRendered && !hasCollectionContent) {
-    const discoveryProductsCheck =
-      (await getProducts({
-        fields: ["id"],
-        visibility: "PUBLISHED",
-      })) ?? [];
+    if (discoveryProductsSettings?.visibleOnPages?.home !== true) {
+      return <CatalogEmptyState />;
+    }
 
-    if (discoveryProductsCheck.length < 3) {
+    const publishedProducts = await getProducts({
+      fields: ["id"],
+      visibility: "PUBLISHED",
+    });
+
+    const availableProducts = (publishedProducts ?? []).filter(
+      (p) => !excludedIds.has(p.id)
+    ).length;
+
+    if (availableProducts < 3) {
       return <CatalogEmptyState />;
     }
   }
@@ -67,22 +85,11 @@ export default async function Home() {
   const deviceIdentifier = cookieStore.get("device_identifier")?.value ?? "";
   const cart = await getCart(deviceIdentifier);
 
-  const excludeIdsFromDiscoveryProducts = combinedCollections
-    .filter((collection) => collection.collectionType === "FEATURED")
-    .flatMap((collection) =>
-      (collection.products || [])
-        .sort((a, b) => (a.index ?? 0) - (b.index ?? 0))
-        .slice(0, 3)
-        .map((product) => product.id)
-    );
-
-  const showDiscoveryProducts = discoveryProductsSettings?.visibleOnPages?.home === true;
-
   return (
     <>
       {heroContent}
       <div>
-        {categoriesData?.showOnPublicSite && categoriesData.categories.length > 0 && (
+        {isCategoriesRendered && (
           <Categories categories={categoriesData.categories} />
         )}
         <div className="mt-8 max-w-5xl mx-auto flex flex-col gap-8">
@@ -92,13 +99,13 @@ export default async function Home() {
             .map((content, index) => (
               <div key={index}>{content}</div>
             ))}
-          {showDiscoveryProducts && (
+          {discoveryProductsSettings?.visibleOnPages?.home === true && (
             <div className="px-5">
               <ProductsProvider>
                 <Suspense fallback={null}>
                   <ShuffledDiscoveryProducts
                     page="HOME"
-                    excludeIds={excludeIdsFromDiscoveryProducts}
+                    excludeIds={Array.from(excludedIds)}
                     cart={cart}
                   />
                 </Suspense>
@@ -114,7 +121,11 @@ export default async function Home() {
 // -- UI Components --
 
 function renderHero(pageHero: any) {
-  if (pageHero?.visibility !== "VISIBLE" || !pageHero.images?.desktop || !pageHero.images?.mobile) {
+  if (
+    pageHero?.visibility !== "VISIBLE" ||
+    !pageHero.images?.desktop ||
+    !pageHero.images?.mobile
+  ) {
     return null;
   }
 
@@ -170,7 +181,8 @@ async function enrichFeaturedCollections(
 ): Promise<EnrichedCollectionType[]> {
   const featuredCollections = (collections || []).filter(
     (collection) =>
-      collection.collectionType === "FEATURED" && collection.visibility === "PUBLISHED"
+      collection.collectionType === "FEATURED" &&
+      collection.visibility === "PUBLISHED"
   );
 
   // Create a map of product IDs and their indexes
@@ -187,23 +199,40 @@ async function enrichFeaturedCollections(
   // Fetch and enrich products
   const productsFromDb = await getProducts({
     ids: productIds,
-    fields: ["name", "slug", "description", "highlights", "pricing", "images", "options", "upsell"],
+    fields: [
+      "name",
+      "slug",
+      "description",
+      "highlights",
+      "pricing",
+      "images",
+      "options",
+      "upsell",
+    ],
     visibility: "PUBLISHED",
   });
 
   const productsWithIndexes = (productsFromDb || []).map((product) => ({
     ...product,
-    index: productIdToIndexMap.find((item) => item.id === product.id)?.index ?? 0,
+    index:
+      productIdToIndexMap.find((item) => item.id === product.id)?.index ?? 0,
   }));
 
   // Enrich collections with product details
   return featuredCollections.map((collection) => {
     const enrichedProducts = (collection.products || [])
       .map((product: any) => {
-        const productDetails = productsWithIndexes.find((p) => p.id === product.id);
-        return productDetails ? { ...productDetails, index: product.index } : undefined;
+        const productDetails = productsWithIndexes.find(
+          (p) => p.id === product.id
+        );
+        return productDetails
+          ? { ...productDetails, index: product.index }
+          : undefined;
       })
-      .filter((product: any): product is NonNullable<typeof product> => product !== undefined)
+      .filter(
+        (product: any): product is NonNullable<typeof product> =>
+          product !== undefined
+      )
       .sort((a: any, b: any) => (a.index ?? 0) - (b.index ?? 0));
 
     return {

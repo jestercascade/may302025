@@ -44,7 +44,7 @@ export default async function EditCollection({
   const [collection] =
     (await getCollections({
       ids: [paramSlug.split("-").pop() as string],
-      includeProducts: true,
+      includeProductDetails: true,
     })) || [];
 
   if (!collection) {
