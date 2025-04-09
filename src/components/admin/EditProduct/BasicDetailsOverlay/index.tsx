@@ -192,8 +192,14 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
   };
 
   const handleSlugChange = (value: string) => {
-    const sanitizedSlug = value.replace(/[^a-zA-Z0-9-]/g, "").toLowerCase();
-    setSlug(sanitizedSlug);
+    const sanitizedValue = value
+      .toLowerCase()
+      .replace(/\s+/g, "-") // Replace spaces with hyphens
+      .replace(/[^a-z0-9-]+/g, "") // Remove all except letters, numbers, hyphens
+      .replace(/--+/g, "-") // Replace multiple hyphens with one
+      .replace(/^-+/, "") // Remove leading hyphens
+      .replace(/-+$/, ""); // Remove trailing hyphens
+    setSlug(sanitizedValue);
   };
 
   const handleBasePriceChange = (event: ChangeEvent<HTMLInputElement>) => {

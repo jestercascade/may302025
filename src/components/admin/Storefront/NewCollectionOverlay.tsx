@@ -229,6 +229,17 @@ export function NewCollectionOverlay() {
     );
   };
 
+  const handleSlugChange = (value: string) => {
+    const sanitizedValue = value
+      .toLowerCase()
+      .replace(/\s+/g, "-") // Replace spaces with hyphens
+      .replace(/[^a-z0-9-]+/g, "") // Remove all except letters, numbers, hyphens
+      .replace(/--+/g, "-") // Replace multiple hyphens with one
+      .replace(/^-+/, "") // Remove leading hyphens
+      .replace(/-+$/, ""); // Remove trailing hyphens
+    setSlug(sanitizedValue);
+  };
+
   return (
     <>
       {isOverlayVisible && (
@@ -397,16 +408,7 @@ export function NewCollectionOverlay() {
                       name="slug"
                       placeholder="mark-your-man"
                       value={slug}
-                      onChange={(e) => {
-                        const sanitizedValue = e.target.value
-                          .toLowerCase()
-                          .replace(/[^a-z0-9\s-]/g, "")
-                          .trim()
-                          .replace(/\s+/g, "-")
-                          .replace(/-+/g, "-");
-
-                        setSlug(sanitizedValue);
-                      }}
+                      onChange={(e) => handleSlugChange(e.target.value)}
                       className="w-full h-9 px-3 rounded-md transition duration-300 ease-in-out border focus:border-neutral-400"
                       required
                     />

@@ -150,20 +150,42 @@ const MemoizedMobileProductDetails = memo(function MobileProductDetails({
         </button>
       </div>
       <div className="w-full h-full invisible-scrollbar overflow-x-hidden overflow-y-visible">
-        <div className="h-56 min-[486px]:h-72 flex gap-2 px-5 invisible-scrollbar overflow-y-hidden overflow-x-visible">
+        <div className="h-56 min-[485px]:h-72 flex gap-2 px-5 invisible-scrollbar overflow-y-hidden overflow-x-visible">
           {[selectedProduct.images.main, ...selectedProduct.images.gallery].map(
-            (image, index) => (
-              <div key={index} className="h-full aspect-square bg-lightgray">
-                <Image
-                  src={image}
-                  alt={selectedProduct.name}
-                  sizes="(max-width: 486px) 244px, 288px"
-                  width={288}
-                  height={288}
-                  priority={index === 0}
-                />
-              </div>
-            )
+            (image, index) => {
+              const imagesCount = [
+                selectedProduct.images.main,
+                ...selectedProduct.images.gallery,
+              ].length;
+              return (
+                <div
+                  key={index}
+                  className={clsx(
+                    "h-full bg-lightgray",
+                    imagesCount === 1
+                      ? "mx-auto max-w-[446px] w-full h-auto aspect-auto"
+                      : "aspect-square"
+                  )}
+                >
+                  <Image
+                    src={image}
+                    alt={selectedProduct.name}
+                    sizes={
+                      imagesCount === 1
+                        ? "(max-width: 485px) 224px, 446px"
+                        : "(max-width: 485px) 224px, 288px"
+                    }
+                    width={446}
+                    height={288}
+                    priority={index === 0}
+                    className={clsx(
+                      "w-full h-full object-cover",
+                      imagesCount === 1 ? "!object-contain" : ""
+                    )}
+                  />
+                </div>
+              );
+            }
           )}
         </div>
         <div className="px-5 pt-5 pb-28 max-w-[486px] mx-auto">
@@ -191,7 +213,7 @@ const MemoizedMobileProductDetails = memo(function MobileProductDetails({
                         <div className="min-w-4 max-w-4 min-h-5 max-h-5 flex items-center justify-center">
                           <Check
                             color="#0A8800"
-                            size={20}
+                            size={18}
                             strokeWidth={2}
                             className="-ml-1"
                           />
@@ -384,17 +406,6 @@ const MemoizedMobileProductDetails = memo(function MobileProductDetails({
                   </div>
                 </div>
               )}
-            <div className="mt-14">
-              <div
-                className={`
-                  [&>p>img]:max-w-[500px] [&>p>img]:rounded-xl [&>p>img]:my-7 
-                  [&>:last-child]:mb-0 [&>:first-child]:mt-0 [&>:first-child>img]:mt-0 [&>:last-child>img]:mb-0
-                `}
-                dangerouslySetInnerHTML={{
-                  __html: selectedProduct.description || "",
-                }}
-              />
-            </div>
           </div>
         </div>
         <div className="h-[72px] pt-[6px] pb-5 px-5 border-t border-[#e6e8ec] bg-white fixed z-10 bottom-0 left-0 right-0">
@@ -465,7 +476,7 @@ const MemoizedDesktopProductDetails = memo(function DesktopProductDetails({
                           <div className="min-w-4 max-w-4 min-h-5 max-h-5 flex items-center justify-center">
                             <Check
                               color="#0A8800"
-                              size={20}
+                              size={18}
                               strokeWidth={2}
                               className="-ml-1"
                             />

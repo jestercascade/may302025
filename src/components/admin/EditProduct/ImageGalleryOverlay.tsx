@@ -67,26 +67,23 @@ export function ImageGalleryOverlay({ data }: { data: DataType }) {
     setLoading(true);
     try {
       const filteredImages = images.filter((image) => image !== "");
-      if (filteredImages.length === 0) {
-        showAlert({
-          message: "No images added",
-          type: ShowAlertType.ERROR,
-        });
-        setImages(data?.images.gallery ?? []);
-      } else {
-        const result = await UpdateProductAction({
-          id: data.id,
-          images: {
-            main: data.images.main,
-            gallery: filteredImages,
-          },
-        });
+      const result = await UpdateProductAction({
+        id: data.id,
+        images: {
+          main: data.images.main,
+          gallery: filteredImages,
+        },
+      });
 
-        showAlert({
-          message: result.message,
-          type: result.type,
-        });
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
+      if (result.type === ShowAlertType.SUCCESS) {
         setImages(filteredImages);
+      } else {
+        // Reset to original images if the backend rejects the update
+        setImages(data?.images.gallery ?? []);
       }
     } catch (error) {
       console.error("Error updating product", error);
@@ -94,6 +91,7 @@ export function ImageGalleryOverlay({ data }: { data: DataType }) {
         message: "Failed to update product",
         type: ShowAlertType.ERROR,
       });
+      setImages(data?.images.gallery ?? []);
     } finally {
       setLoading(false);
       onHideOverlay();

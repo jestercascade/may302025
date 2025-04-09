@@ -97,6 +97,17 @@ export function BasicDetailsOverlay({
     }
   };
 
+  const handleSlugChange = (value: string) => {
+    const sanitizedValue = value
+      .toLowerCase()
+      .replace(/\s+/g, "-") // Replace spaces with hyphens
+      .replace(/[^a-z0-9-]+/g, "") // Remove all except letters, numbers, hyphens
+      .replace(/--+/g, "-") // Replace multiple hyphens with one
+      .replace(/^-+/, "") // Remove leading hyphens
+      .replace(/-+$/, ""); // Remove trailing hyphens
+    setSlug(sanitizedValue);
+  };
+
   return (
     <>
       {isOverlayVisible && (
@@ -178,12 +189,7 @@ export function BasicDetailsOverlay({
                       name="slug"
                       placeholder="belle-jolie-lipstick-mark-your-man"
                       value={slug}
-                      onChange={(e) => {
-                        const sanitizedValue = e.target.value
-                          .replace(/[^a-zA-Z0-9-]/g, "")
-                          .toLowerCase();
-                        setSlug(sanitizedValue);
-                      }}
+                      onChange={(e) => handleSlugChange(e.target.value)}
                       className="w-full h-9 px-3 rounded-md transition-colors border focus:border-neutral-400"
                       required
                     />

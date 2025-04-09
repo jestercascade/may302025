@@ -461,7 +461,7 @@ function ProductHighlights({
                   <div className="min-w-4 max-w-4 min-h-5 max-h-5 flex items-center justify-center">
                     <Check
                       color="#0A8800"
-                      size={20}
+                      size={18}
                       strokeWidth={2}
                       className="-ml-1"
                     />
