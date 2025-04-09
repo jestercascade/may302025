@@ -20,7 +20,7 @@ export async function generateMetadata({
 
   const collections = await cachedGetCollections({
     ids: [collectionId as string],
-    includeProducts: false,
+    excludeProducts: true,
     fields: ["title"],
   });
   const [collection] = collections || [];
@@ -66,7 +66,7 @@ export default async function Collections({
     getCart(deviceIdentifier),
     cachedGetCollections({
       ids: [collectionId],
-      includeProducts: true,
+      includeProductDetails: true,
       fields: productFields,
     }),
   ]);
