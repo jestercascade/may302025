@@ -61,7 +61,8 @@ export async function UpdateCategoriesAction(data: StoreCategoriesType) {
       .doc("storeCategories");
     await categoriesRef.set(updateData);
 
-    revalidatePath("/storefront");
+    revalidatePath("/admin/storefront");
+    revalidatePath("/", "layout");
 
     return {
       type: ShowAlertType.SUCCESS,
