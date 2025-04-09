@@ -15,7 +15,7 @@ export async function NavbarWrapper() {
   return (
     <Navbar
       itemsInCart={cart ? cart.items.length : 0}
-      categories={categoriesData?.categories}
+      categoriesData={categoriesData}
     />
   );
 }

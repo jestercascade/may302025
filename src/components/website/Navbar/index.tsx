@@ -15,10 +15,10 @@ import { usePathname } from "next/navigation";
 
 export default function Navbar({
   itemsInCart,
-  categories,
+  categoriesData,
 }: {
   itemsInCart: number;
-  categories: CategoryType[] | undefined;
+  categoriesData: StoreCategoriesType | null;
 }) {
   // State for navbar visibility and dropdown
   const [shouldHideNavbar, setShouldHideNavbar] = useState(false);
@@ -140,7 +140,7 @@ export default function Navbar({
       <MobileNavbar itemsInCart={itemsInCart} />
       <DesktopNavbar
         itemsInCart={itemsInCart}
-        categories={categories}
+        categoriesData={categoriesData}
         toggleCategoriesDropdown={toggleCategoriesDropdown}
         isCategoriesDropdownVisible={isCategoriesDropdownVisible}
         categoriesRef={categoriesRef}
@@ -185,14 +185,14 @@ function MobileNavbar({ itemsInCart }: { itemsInCart: number }) {
 
 function DesktopNavbar({
   itemsInCart,
-  categories,
+  categoriesData,
   toggleCategoriesDropdown,
   isCategoriesDropdownVisible,
   categoriesRef,
   handleCategoryClick,
 }: {
   itemsInCart: number;
-  categories: CategoryType[] | undefined;
+  categoriesData: StoreCategoriesType | null;
   toggleCategoriesDropdown: () => void;
   isCategoriesDropdownVisible: boolean;
   categoriesRef: React.RefObject<HTMLDivElement | null>;
@@ -218,39 +218,40 @@ function DesktopNavbar({
           >
             New Arrivals
           </Link>
-          {categories && categories.length > 0 && (
-            <div className="relative" ref={categoriesRef}>
-              <button
-                onClick={toggleCategoriesDropdown}
-                className={clsx(
-                  "active:bg-lightgray lg:hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out",
-                  isCategoriesDropdownVisible && "bg-lightgray"
+          {categoriesData?.showOnPublicSite &&
+            categoriesData.categories?.length > 0 && (
+              <div className="relative" ref={categoriesRef}>
+                <button
+                  onClick={toggleCategoriesDropdown}
+                  className={clsx(
+                    "active:bg-lightgray lg:hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out",
+                    isCategoriesDropdownVisible && "bg-lightgray"
+                  )}
+                >
+                  <span>Categories</span>
+                  <ChevronDown
+                    size={18}
+                    strokeWidth={2}
+                    className={`-mr-1 transition-transform duration-300 ${
+                      isCategoriesDropdownVisible ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                {isCategoriesDropdownVisible && (
+                  <div className="w-36 absolute top-[48px] left-0 z-20 py-2 rounded-md shadow-dropdown bg-white before:content-[''] before:w-[10px] before:h-[10px] before:bg-white before:rounded-tl-[2px] before:rotate-45 before:origin-top-left before:absolute before:-top-2 before:border-l before:border-t before:border-[#d9d9d9] before:left-10 min-[840px]:before:right-24">
+                    {categoriesData.categories.map((category, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleCategoryClick(category.name)}
+                        className="block w-full text-left px-5 py-2 text-sm font-semibold transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
+                      >
+                        {category.name}
+                      </button>
+                    ))}
+                  </div>
                 )}
-              >
-                <span>Categories</span>
-                <ChevronDown
-                  size={18}
-                  strokeWidth={2}
-                  className={`-mr-1 transition-transform duration-300 ${
-                    isCategoriesDropdownVisible ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-              {isCategoriesDropdownVisible && (
-                <div className="w-36 absolute top-[48px] left-0 z-20 py-2 rounded-md shadow-dropdown bg-white before:content-[''] before:w-[10px] before:h-[10px] before:bg-white before:rounded-tl-[2px] before:rotate-45 before:origin-top-left before:absolute before:-top-2 before:border-l before:border-t before:border-[#d9d9d9] before:left-10 min-[840px]:before:right-24">
-                  {categories.map((category, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleCategoryClick(category.name)}
-                      className="block w-full text-left px-5 py-2 text-sm font-semibold transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
-                    >
-                      {category.name}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+              </div>
+            )}
           <Link
             href="#"
             className="active:bg-lightgray lg:hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out"
@@ -283,4 +284,9 @@ type CategoryType = {
   name: string;
   image: string;
   visibility: "VISIBLE" | "HIDDEN";
+};
+
+type StoreCategoriesType = {
+  showOnPublicSite: boolean;
+  categories: CategoryType[];
 };
