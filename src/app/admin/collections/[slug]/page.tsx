@@ -298,7 +298,7 @@ export default async function EditCollection({
                 {products.slice(0, 3).map(({ id, slug, pricing, images }) => (
                   <Link
                     key={id}
-                    href={`/admin/products/${id}-${slug}`}
+                    href={`/admin/products/${slug}-${id}`}
                     className="group aspect-square w-[calc(33.33%-14px)] select-none"
                   >
                     <div className="relative">
