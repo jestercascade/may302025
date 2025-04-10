@@ -295,62 +295,64 @@ export default async function EditCollection({
           >
             {products && products.length > 0 ? (
               <div className="w-[calc(100%-60px)] flex flex-wrap gap-5 justify-start">
-                {products.slice(0, 3).map(({ id, slug, pricing, images }) => (
-                  <Link
-                    key={id}
-                    href={`/admin/products/${slug}-${id}`}
-                    className="group aspect-square w-[calc(33.33%-14px)] select-none"
-                  >
-                    <div className="relative">
-                      <div className="w-full aspect-square overflow-hidden flex items-center justify-center shadow-[2px_2px_4px_#9E9E9E] bg-white">
-                        <Image
-                          src={images.main}
-                          alt="Upsell"
-                          width={250}
-                          height={250}
-                          priority
-                        />
+                {products
+                  .slice(0, 3)
+                  .map(({ id, slug, name, pricing, images }) => (
+                    <Link
+                      key={id}
+                      href={`/admin/products/${slug}-${id}`}
+                      className="group aspect-square w-[calc(33.33%-14px)] select-none"
+                    >
+                      <div className="relative">
+                        <div className="w-full aspect-square overflow-hidden flex items-center justify-center shadow-[2px_2px_4px_#9E9E9E] bg-white">
+                          <Image
+                            src={images.main}
+                            alt={name}
+                            width={250}
+                            height={250}
+                            priority
+                          />
+                        </div>
+                        <div className="w-full h-full absolute top-0 bottom-0 left-0 right-0 ease-in-out duration-300 transition group-hover:bg-black/20" />
                       </div>
-                      <div className="w-full h-full absolute top-0 bottom-0 left-0 right-0 ease-in-out duration-300 transition group-hover:bg-black/20" />
-                    </div>
-                    <div className="mt-2 w-max mx-auto flex items-center justify-center">
-                      {Number(pricing.salePrice) ? (
-                        <div className="flex items-center gap-[6px]">
+                      <div className="mt-2 w-max mx-auto flex items-center justify-center">
+                        {Number(pricing.salePrice) ? (
+                          <div className="flex items-center gap-[6px]">
+                            <div className="flex items-baseline">
+                              <span className="text-[0.813rem] leading-3 font-semibold">
+                                $
+                              </span>
+                              <span className="text-lg font-bold">
+                                {Math.floor(Number(pricing.salePrice))}
+                              </span>
+                              <span className="text-[0.813rem] leading-3 font-semibold">
+                                {(Number(pricing.salePrice) % 1)
+                                  .toFixed(2)
+                                  .substring(1)}
+                              </span>
+                            </div>
+                            <span className="text-[0.813rem] leading-3 text-gray line-through">
+                              ${formatThousands(Number(pricing.basePrice))}
+                            </span>
+                          </div>
+                        ) : (
                           <div className="flex items-baseline">
                             <span className="text-[0.813rem] leading-3 font-semibold">
                               $
                             </span>
                             <span className="text-lg font-bold">
-                              {Math.floor(Number(pricing.salePrice))}
+                              {Math.floor(Number(pricing.basePrice))}
                             </span>
                             <span className="text-[0.813rem] leading-3 font-semibold">
-                              {(Number(pricing.salePrice) % 1)
+                              {(Number(pricing.basePrice) % 1)
                                 .toFixed(2)
                                 .substring(1)}
                             </span>
                           </div>
-                          <span className="text-[0.813rem] leading-3 text-gray line-through">
-                            ${formatThousands(Number(pricing.basePrice))}
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="flex items-baseline">
-                          <span className="text-[0.813rem] leading-3 font-semibold">
-                            $
-                          </span>
-                          <span className="text-lg font-bold">
-                            {Math.floor(Number(pricing.basePrice))}
-                          </span>
-                          <span className="text-[0.813rem] leading-3 font-semibold">
-                            {(Number(pricing.basePrice) % 1)
-                              .toFixed(2)
-                              .substring(1)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                ))}
+                        )}
+                      </div>
+                    </Link>
+                  ))}
               </div>
             ) : (
               <span className="text-xs text-gray">Nothing here</span>
