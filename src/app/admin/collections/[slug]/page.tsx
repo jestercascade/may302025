@@ -279,7 +279,9 @@ export default async function EditCollection({
           )}
         <div>
           <div className="mb-6">
-            <h2 className="font-semibold text-xl mb-3">Products</h2>
+            <h2 className="font-semibold text-xl mb-3">
+              Products ({products?.length ?? 0})
+            </h2>
             <p className="text-sm md:max-w-[85%]">
               Pick stuff that goes well together. Choose different looks,
               colors, and prices. Make sure there's something for everyone.
@@ -293,10 +295,10 @@ export default async function EditCollection({
           >
             {products && products.length > 0 ? (
               <div className="w-[calc(100%-60px)] flex flex-wrap gap-5 justify-start">
-                {products.map(({ id, pricing, images }, index) => (
+                {products.slice(0, 3).map(({ id, slug, pricing, images }) => (
                   <Link
-                    key={index}
-                    href={`/admin/upsells/${id}`}
+                    key={id}
+                    href={`/admin/${id}-${slug}`}
                     target="_blank"
                     className="group aspect-square w-[calc(33.33%-14px)] select-none"
                   >
@@ -310,7 +312,7 @@ export default async function EditCollection({
                           priority
                         />
                       </div>
-                      <div className="w-full h-full absolute top-0 bottom-0 left-0 right-0 ease-in-out duration-300 transition group-hover:bg-black/20"></div>
+                      <div className="w-full h-full absolute top-0 bottom-0 left-0 right-0 ease-in-out duration-300 transition group-hover:bg-black/20" />
                     </div>
                     <div className="mt-2 w-max mx-auto flex items-center justify-center">
                       {Number(pricing.salePrice) ? (

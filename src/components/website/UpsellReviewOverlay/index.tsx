@@ -296,16 +296,15 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                             <div>
                               <div
                                 onClick={() => openCarousel(product)}
-                                className="mb-[2px] w-max flex items-center gap-[2px] cursor-pointer group"
+                                className="mb-[2px] w-max flex items-center gap-[7px] cursor-pointer group"
                               >
                                 <span className="pl-[3px] text-sm font-medium line-clamp-1 group-hover:underline">
                                   {product.name}
                                 </span>
                                 <ChevronRight
                                   color="#6c6c6c"
-                                  size={18}
+                                  size={14}
                                   strokeWidth={2}
-                                  className="-mt-[2px]"
                                 />
                               </div>
                               <div className="pl-[3px] text-[0.813rem] text-gray line-through line-clamp-1 w-max">
@@ -489,21 +488,21 @@ function ProductColors({
   onColorSelect,
 }: ProductColorsType) {
   return (
-    <div>
-      <div className="p-[3px] pr-5 flex gap-2 invisible-scrollbar overflow-y-hidden overflow-x-visible">
-        {colors.map(({ name, image }, index) => (
-          <div
-            onClick={() => onColorSelect(name)}
-            key={index}
-            className={clsx(
-              "relative min-w-[108px] max-w-[108px] min-h-[108px] max-h-[108px] flex items-center justify-center rounded-lg cursor-pointer overflow-hidden",
-              { "ring-1 ring-black/60 ring-offset-2": selectedColor === name }
-            )}
-          >
-            <Image src={image} alt={name} width={108} height={108} priority />
-          </div>
-        ))}
-      </div>
+    <div
+      className={`p-[3px] pr-5 flex gap-2 overflow-x-auto ${styles.customScrollbar}`}
+    >
+      {colors.map(({ name, image }, index) => (
+        <div
+          onClick={() => onColorSelect(name)}
+          key={index}
+          className={clsx(
+            "relative min-w-[108px] max-w-[108px] min-h-[108px] max-h-[108px] flex items-center justify-center rounded-lg cursor-pointer overflow-hidden",
+            { "ring-1 ring-black/60 ring-offset-2": selectedColor === name }
+          )}
+        >
+          <Image src={image} alt={name} width={108} height={108} priority />
+        </div>
+      ))}
     </div>
   );
 }
@@ -602,14 +601,27 @@ function ProductOptions({
 }: ProductOptionsProps) {
   const hasColor = product.options.colors.length > 0;
   const hasSize = Object.keys(product.options.sizes).length > 0;
+
   return (
     <div className="flex flex-col gap-3 select-none">
-      {hasColor && (
+      {hasColor ? (
         <ProductColors
           colors={product.options.colors}
           selectedColor={selectedOptions.color || ""}
           onColorSelect={(color) => onOptionSelect("color", color)}
         />
+      ) : (
+        <div className="p-[3px] pr-5">
+          <div className="relative min-w-[108px] max-w-[108px] min-h-[108px] max-h-[108px] flex items-center justify-center rounded-lg overflow-hidden">
+            <Image
+              src={product.images.main}
+              alt={product.name}
+              width={108}
+              height={108}
+              priority
+            />
+          </div>
+        </div>
       )}
       {hasSize && (
         <ProductSizeChart
@@ -652,12 +664,29 @@ type ProductSizeChartProps = {
 
 type ProductOptionsProps = {
   product: {
+    id: string;
+    name: string;
+    slug: string;
+    basePrice: number;
+    images: {
+      main: string;
+      gallery: string[];
+    };
     options: {
       colors: Array<{
         name: string;
         image: string;
       }>;
-      sizes: SizeChartType;
+      sizes: {
+        inches: {
+          columns: Array<{ label: string; order: number }>;
+          rows: Array<{ [key: string]: string }>;
+        };
+        centimeters: {
+          columns: Array<{ label: string; order: number }>;
+          rows: Array<{ [key: string]: string }>;
+        };
+      };
     };
   };
   selectedOptions: {

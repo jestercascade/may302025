@@ -43,6 +43,30 @@ export function CreateNewsletterMenuButton({
   );
 }
 
+export function CreateNewsletterEmptyTableButton() {
+  const showOverlay = useOverlayStore((state) => state.showOverlay);
+  const setNavbarMenu = useNavbarMenuStore((state) => state.setNavbarMenu);
+  const pageName = useOverlayStore((state) => state.pages.newsletter.name);
+  const overlayName = useOverlayStore(
+    (state) => state.pages.newsletter.overlays.createNewsletter.name
+  );
+
+  const openOverlay = () => {
+    setNavbarMenu(false);
+    showOverlay({ pageName, overlayName });
+  };
+
+  return (
+    <button
+      type="button"
+      className="h-9 w-max px-4 rounded-full overflow-hidden transition duration-300 ease-in-out text-white bg-blue active:bg-blue-dimmed lg:hover:bg-blue-dimmed"
+      onClick={openOverlay}
+    >
+      Create newsletter
+    </button>
+  );
+}
+
 export function CreateNewsletterOverlay() {
   const [loading, setLoading] = useState(false);
   const [newsletterData, setNewsletterData] = useState({

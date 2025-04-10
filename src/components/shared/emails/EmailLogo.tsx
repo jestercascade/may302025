@@ -17,7 +17,7 @@ export function EmailLogo({
       }}
     >
       <img
-        src="https://firebasestorage.googleapis.com/v0/b/project-2456.appspot.com/o/cherlygood-1.png?alt=media&token=8828da9d-2219-4e63-9ce9-ca5e51d4f488"
+        src="https://res.cloudinary.com/dz4xa9ibb/image/upload/v1743169060/logo-gray_auxjru.png"
         alt="Cherlygood"
         width="220"
         height="28"

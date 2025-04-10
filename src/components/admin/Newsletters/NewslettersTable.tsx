@@ -6,6 +6,7 @@ import { EditNewsletterButton } from "./EditNewsletterOverlay";
 import { capitalizeFirstLetter } from "@/lib/utils/common";
 import { useState } from "react";
 import clsx from "clsx";
+import { CreateNewsletterEmptyTableButton } from "./CreateNewsletterOverlay";
 
 export default function NewslettersTable({
   newsletters,
@@ -243,6 +244,7 @@ export default function NewslettersTable({
               <p className="text-sm text-gray mb-6">
                 Click the button below to create your first one
               </p>
+              <CreateNewsletterEmptyTableButton />
             </div>
           </div>
         </div>
