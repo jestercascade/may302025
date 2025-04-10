@@ -29,6 +29,51 @@ export function UpsellButton({ className }: { className: string }) {
   );
 }
 
+// Add this component at the bottom of UpsellOverlay.tsx
+export function RemoveUpsellButton({ productId }: { productId: string }) {
+  const [loading, setLoading] = useState(false);
+  const showAlert = useAlertStore((state) => state.showAlert);
+
+  const handleRemove = async () => {
+    setLoading(true);
+    try {
+      const result = await RemoveUpsellAction({ productId });
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
+    } catch (error) {
+      console.error("Error removing upsell:", error);
+      showAlert({
+        message: "Failed to remove upsell",
+        type: ShowAlertType.ERROR,
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleRemove}
+      disabled={loading}
+      className={clsx(
+        "relative h-9 w-max mx-auto px-4  rounded-full bg-red-100 text-red transition-colors disabled:opacity-50",
+        !loading && "hover:bg-red/20"
+      )}
+    >
+      {loading ? (
+        <div className="flex items-center justify-center gap-1">
+          <Spinner color="red" />
+          <span>Clearing...</span>
+        </div>
+      ) : (
+        "Clear reference"
+      )}
+    </button>
+  );
+}
+
 export function UpsellOverlay({ data }: { data: DataType }) {
   const [loading, setLoading] = useState(false);
   const [upsellId, setUpsellId] = useState("");

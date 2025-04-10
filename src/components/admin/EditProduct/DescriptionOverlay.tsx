@@ -37,7 +37,8 @@ export function DescriptionOverlay({
   };
 }) {
   const [description, setDescription] = useState<string>(data.description);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [saveLoading, setSaveLoading] = useState<boolean>(false);
+  const [clearLoading, setClearLoading] = useState<boolean>(false);
   const overlayRef = useRef<HTMLDivElement>(null);
 
   const showAlert = useAlertStore((state) => state.showAlert);
@@ -49,6 +50,8 @@ export function DescriptionOverlay({
   const isOverlayVisible = useOverlayStore(
     (state) => state.pages.editProduct.overlays.description.isVisible
   );
+
+  const isLoading = saveLoading || clearLoading;
 
   useEffect(() => {
     if (isOverlayVisible) {
@@ -68,13 +71,17 @@ export function DescriptionOverlay({
     setDescription(html);
   };
 
-  const handleSave = async () => {
-    setLoading(true);
+  const saveDescription = async (contentToSave: string, isClear = false) => {
+    if (isClear) {
+      setClearLoading(true);
+    } else {
+      setSaveLoading(true);
+    }
 
     try {
       const result = await UpdateProductAction({
         id: data.id,
-        description,
+        description: contentToSave,
       });
 
       showAlert({
@@ -88,9 +95,22 @@ export function DescriptionOverlay({
         type: ShowAlertType.ERROR,
       });
     } finally {
-      setLoading(false);
+      if (isClear) {
+        setClearLoading(false);
+      } else {
+        setSaveLoading(false);
+      }
       hideOverlay({ pageName, overlayName });
     }
+  };
+
+  const handleClear = () => {
+    setDescription("");
+    saveDescription("", true);
+  };
+
+  const handleSave = () => {
+    saveDescription(description, false);
   };
 
   return (
@@ -107,7 +127,8 @@ export function DescriptionOverlay({
                   hideOverlay({ pageName, overlayName });
                 }}
                 type="button"
-                className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
+                disabled={isLoading}
+                className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray disabled:hover:bg-transparent"
               >
                 <ArrowLeft
                   size={20}
@@ -121,27 +142,43 @@ export function DescriptionOverlay({
                   Product description
                 </span>
               </button>
-              <button
-                onClick={handleSave}
-                type="button"
-                disabled={loading}
-                className={clsx(
-                  "relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
-                  {
-                    "bg-opacity-50": loading,
-                    "hover:bg-neutral-600 active:bg-neutral-800": !loading,
-                  }
-                )}
-              >
-                {loading ? (
-                  <div className="flex gap-1 items-center justify-center w-full h-full">
-                    <Spinner color="white" />
-                    <span className="text-white">Saving</span>
-                  </div>
-                ) : (
-                  <span className="text-white">Save</span>
-                )}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleClear}
+                  type="button"
+                  disabled={isLoading}
+                  className="h-9 px-4 rounded-full bg-lightgray transition-colors disabled:opacity-50 disabled:hover:bg-lightgray disabled:cursor-not-allowed hover:bg-gray-300 active:bg-gray-400"
+                >
+                  {clearLoading ? (
+                    <div className="flex gap-1 items-center justify-center w-full h-full">
+                      <Spinner />
+                      <span>Clearing</span>
+                    </div>
+                  ) : (
+                    <span>Clear</span>
+                  )}
+                </button>
+                <button
+                  onClick={handleSave}
+                  type="button"
+                  disabled={isLoading}
+                  className={clsx(
+                    "relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors text-white bg-neutral-700 disabled:opacity-50 disabled:hover:bg-neutral-700 disabled:cursor-not-allowed",
+                    {
+                      "hover:bg-neutral-600 active:bg-neutral-800": !isLoading,
+                    }
+                  )}
+                >
+                  {saveLoading ? (
+                    <div className="flex gap-1 items-center justify-center w-full h-full">
+                      <Spinner color="white" />
+                      <span className="text-white">Saving</span>
+                    </div>
+                  ) : (
+                    <span className="text-white">Save</span>
+                  )}
+                </button>
+              </div>
             </div>
             <div className="p-5">
               <div className="rounded-md shadow-sm border">

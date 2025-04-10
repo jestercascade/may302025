@@ -28,6 +28,7 @@ import {
   List,
 } from "lucide-react";
 import clsx from "clsx";
+import { useEffect } from "react";
 
 export const EDITOR_LEVELS = {
   BASIC: "BASIC",
@@ -238,6 +239,12 @@ export default function TipTapEditor({
       onUpdate?.(editor.getHTML());
     },
   });
+
+  useEffect(() => {
+    if (editor && !editor.isDestroyed) {
+      editor.commands.setContent(initialContent);
+    }
+  }, [initialContent, editor]);
 
   const getToolbarItems = () => {
     const items = [];

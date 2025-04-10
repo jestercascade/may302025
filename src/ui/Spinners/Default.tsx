@@ -1,7 +1,7 @@
 const DEFAULT_SIZE = 20;
 const DEFAULT_COLOR: SpinnerColor = "gray";
 
-type SpinnerColor = "white" | "gray";
+type SpinnerColor = "white" | "gray" | "red";
 
 export function Spinner({
   size = DEFAULT_SIZE,
@@ -10,7 +10,8 @@ export function Spinner({
   size?: number;
   color?: SpinnerColor;
 }) {
-  const validColor = color === "gray" ? "#737373" : "white";
+  const validColor =
+    color === "gray" ? "#737373" : color === "red" ? "#ee3b3b" : "white";
 
   return (
     <svg
