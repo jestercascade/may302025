@@ -21,7 +21,7 @@ export default function TermsOfUse() {
         </div>
       </div>
       <div className="pt-12 max-w-[1024px] px-[30px] mx-auto">
-        <div className="w-[736px]">
+        <div className="w-full max-w-[736px]">
           <div className={styles.richtext}>
             <div>
               <p>

@@ -19,7 +19,7 @@ export default function ContactUs() {
         </div>
       </div>
       <div className="pt-12 max-w-[1024px] px-[30px] mx-auto">
-        <div className="w-[712px] space-y-6 text-xl font-light">
+        <div className="w-full max-w-[712px] space-y-6 text-xl font-light">
           <p className="font-semibold">Spill it! 💭</p>
 
           <p>Did your dress arrive two sizes too small?</p>
