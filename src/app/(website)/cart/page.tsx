@@ -20,6 +20,7 @@ export const metadata: Metadata = {
   },
 };
 
+/*
 export default async function Cart() {
   const cookieStore = await cookies();
   const deviceIdentifier = cookieStore.get("device_identifier")?.value ?? "";
@@ -136,6 +137,132 @@ export default async function Cart() {
               </ProductsProvider>
             </div>
           )}
+        </div>
+        <Footer />
+      </div>
+      <UpsellReviewOverlay cart={cart} />
+      <ResetUpsellReview />
+    </>
+  );
+}
+*/
+
+export default async function Cart() {
+  const cookieStore = await cookies();
+  const deviceIdentifier = cookieStore.get("device_identifier")?.value ?? "";
+  const cart = await getCart(deviceIdentifier);
+
+  const items = cart?.items || [];
+  const productItems = items.filter(
+    (item): item is CartProductItemType => item.type === "product"
+  );
+  const upsellItems = items.filter(
+    (item): item is CartUpsellItemType => item.type === "upsell"
+  );
+
+  const [baseProducts, cartUpsells, discoveryProductsSettings] =
+    await Promise.all([
+      getBaseProducts(productItems.map((p) => p.baseProductId).filter(Boolean)),
+      getCartUpsells(upsellItems),
+      getDiscoveryProductsSettings(),
+    ]);
+
+  const cartProducts = mapCartProductsToBaseProducts(
+    productItems,
+    baseProducts
+  );
+
+  const sortedCartItems = [...cartProducts, ...cartUpsells].sort(
+    (a, b) => b.index - a.index
+  );
+
+  const showDiscoveryProducts =
+    discoveryProductsSettings?.visibleOnPages?.cart === true;
+
+  // Function to get excluded product IDs
+  const getExcludedProductIds = (cartItems: CartItemType[]): string[] => {
+    const productIds = new Set<string>();
+
+    cartItems.forEach((item: CartItemType) => {
+      if (item.type === "product") {
+        productIds.add(item.baseProductId);
+      } else if (item.type === "upsell" && item.products) {
+        item.products.forEach(
+          (product: {
+            id: string;
+            // ... other properties
+          }) => {
+            productIds.add(product.id);
+          }
+        );
+      }
+    });
+
+    return Array.from(productIds);
+  };
+
+  const excludeIdsFromDiscoveryProducts =
+    getExcludedProductIds(sortedCartItems);
+
+  // Fetch published products only if discovery products are enabled
+  let discoveryProductsContent = null;
+  if (showDiscoveryProducts) {
+    const publishedProducts = await getProducts({
+      fields: ["id"],
+      visibility: "PUBLISHED",
+    });
+
+    const excludedIds = new Set(excludeIdsFromDiscoveryProducts);
+    const availableProducts = (publishedProducts ?? []).filter(
+      (p) => !excludedIds.has(p.id)
+    ).length;
+
+    if (availableProducts >= 3) {
+      discoveryProductsContent = (
+        <div className="px-5">
+          <ProductsProvider>
+            <Suspense fallback={null}>
+              <ShuffledDiscoveryProducts
+                page="CART"
+                heading="Add These to Your Cart"
+                excludeIds={excludeIdsFromDiscoveryProducts}
+                cart={cart}
+              />
+            </Suspense>
+          </ProductsProvider>
+        </div>
+      );
+    }
+  }
+
+  return (
+    <>
+      <div
+        id="scrollable-parent"
+        className="h-screen overflow-x-hidden overflow-y-auto max-[1024px]:invisible-scrollbar lg:custom-scrollbar"
+      >
+        <nav className="border-b">
+          <div className="h-14 px-5 flex items-center max-w-[1080px] mx-auto">
+            <Link href="/">
+              <Image
+                src="/cherlygood/logo.svg"
+                alt="Cherlygood"
+                width={220}
+                height={27}
+                priority
+                className="mt-1"
+              />
+            </Link>
+          </div>
+        </nav>
+        <div className="min-h-[calc(100vh-385px)] w-full max-w-[580px] md:max-w-5xl mx-auto flex flex-col gap-10">
+          <div className="w-full px-5 mx-auto">
+            <EmptyCartState sortedCartItems={sortedCartItems} />
+            {sortedCartItems?.length > 0 && (
+              <CartItemList cartItems={sortedCartItems} />
+            )}
+          </div>
+          {discoveryProductsContent}
         </div>
         <Footer />
       </div>
