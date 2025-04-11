@@ -6,21 +6,12 @@ import { HiMiniBars3 } from "react-icons/hi2";
 import { useRef, useEffect } from "react";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export function MobileNavbarButton() {
   const showMobileNavbarOverlay = useMobileNavbarStore(
     (state) => state.showMobileNavbarOverlay
   );
-  const isOverlayVisible = useMobileNavbarStore(
-    (state) => state.isMobileNavbarOverlayVisible
-  );
-
-  useEffect(() => {
-    document.body.style.overflow = isOverlayVisible ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOverlayVisible]);
 
   return (
     <button
@@ -34,7 +25,11 @@ export function MobileNavbarButton() {
   );
 }
 
-export function MobileNavbarOverlay() {
+export function MobileNavbarOverlay({
+  categoriesData,
+}: {
+  categoriesData: StoreCategoriesType | null;
+}) {
   const hideMobileNavbarOverlay = useMobileNavbarStore(
     (state) => state.hideMobileNavbarOverlay
   );
@@ -44,6 +39,13 @@ export function MobileNavbarOverlay() {
   const router = useRouter();
   const overlayRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    document.body.style.overflow = isMobileNavbarOverlayVisible ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileNavbarOverlayVisible]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 768px)");
@@ -95,41 +97,38 @@ export function MobileNavbarOverlay() {
         ref={overlayRef}
         className={clsx(
           isMobileNavbarOverlayVisible
-            ? "md:hidden fixed w-full h-screen top-0 bottom-0 left-0 right-0 z-40 transition duration-300 ease-in-out bg-glass-black backdrop-blur-sm md:overflow-x-hidden md:overflow-y-visible md:custom-scrollbar"
+            ? "md:hidden fixed w-full h-screen top-0 bottom-0 left-0 right-0 z-40 transition duration-300 ease-in-out bg-glass-black backdrop-blur-sm"
             : "hidden"
         )}
       >
         <div
           ref={menuRef}
-          className="absolute right-0 bottom-0 top-0 h-full w-3/4 max-w-80 p-5 pt-10 bg-white"
+          className="absolute right-0 bottom-0 top-0 h-full w-3/4 max-w-80 pl-8 pt-10 bg-white"
         >
-          <div className="flex flex-col gap-1 *:h-10 *:ml-2 *:w-max *:text-lg *:font-medium *:rounded-full *:flex *:items-center">
-            <button onClick={() => handleNavigation("/new-arrivals")}>
+          <div className="flex flex-col gap-2.5 *:w-max">
+            <button
+              onClick={() => handleNavigation("/new-arrivals")}
+              className="text-lg font-medium"
+            >
               New Arrivals
             </button>
-            <button onClick={() => handleNavigation("/category/dresses")}>
-              Dresses
-            </button>
-            <button onClick={() => handleNavigation("/category/tops")}>
-              Tops
-            </button>
-            <button onClick={() => handleNavigation("/category/bottoms")}>
-              Bottoms
-            </button>
-            <button onClick={() => handleNavigation("/category/outerwear")}>
-              Outerwear
-            </button>
-            <button onClick={() => handleNavigation("/category/shoes")}>
-              Shoes
-            </button>
-            <button onClick={() => handleNavigation("/category/accessories")}>
-              Accessories
-            </button>
-            <button onClick={() => handleNavigation("/category/men")}>
-              Men
-            </button>
-            <button onClick={() => handleNavigation("/category/catch-all")}>
-              Catch-All
+            {categoriesData?.showOnPublicSite &&
+              categoriesData.categories.map((category) => (
+                <button
+                  key={category.index}
+                  onClick={() =>
+                    handleNavigation(`/category/${category.name.toLowerCase()}`)
+                  }
+                  className="h-10 text-lg font-medium flex items-center px-4 rounded-full transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
+                >
+                  {category.name}
+                </button>
+              ))}
+            <button
+              onClick={() => handleNavigation("#")}
+              className="text-lg font-medium"
+            >
+              Track Order
             </button>
           </div>
           <button
@@ -146,3 +145,8 @@ export function MobileNavbarOverlay() {
     </>
   );
 }
+
+type StoreCategoriesType = {
+  showOnPublicSite: boolean;
+  categories: CategoryType[];
+};
