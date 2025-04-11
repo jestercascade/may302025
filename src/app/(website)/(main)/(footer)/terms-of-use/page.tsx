@@ -15,7 +15,7 @@ export default function TermsOfUse() {
   return (
     <div className={`min-h-screen relative`}>
       <div className="max-w-[1024px] mx-auto pt-8 pb-4 px-7">
-        <div className="bg-lightgray/45 border-l-4 border-neutral-200 shadow-sm rounded-lg py-6 px-8">
+        <div className="bg-lightgray/45 border-l-4 border-neutral-200 shadow-sm rounded-lg py-6 px-8 space-y-1">
           <h1 className="font-bold text-2xl">Terms of Use</h1>
           <p className="text-gray text-sm mt-1">Last Updated: March 10, 2025</p>
         </div>

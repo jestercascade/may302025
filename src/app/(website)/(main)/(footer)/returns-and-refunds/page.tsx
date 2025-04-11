@@ -16,10 +16,10 @@ export default function ReturnsAndRefunds() {
   return (
     <div className={`min-h-screen relative`}>
       <div className="max-w-[1024px] mx-auto pt-8 pb-4 px-7">
-        <div className="bg-lightgray/45 border-l-4 border-neutral-200 shadow-sm rounded-lg py-6 px-8">
+        <div className="bg-lightgray/45 border-l-4 border-neutral-200 shadow-sm rounded-lg py-6 px-8 space-y-1">
           <h1 className="font-bold text-2xl">Returns and Refunds</h1>
           <p className="text-gray text-sm mt-1 italic">
-            Returns made simple—follow this guide for a stress-free experience!
+            Easy returns—just follow this guide!
           </p>
         </div>
       </div>
@@ -511,43 +511,56 @@ export default function ReturnsAndRefunds() {
             <hr className="!mb-8" />
             <div>
               <h3>Photo Guide</h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Item</th>
-                    <th>Good Photo</th>
-                    <th>Bad Photo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <strong>T-Shirt</strong>
-                    </td>
-                    <td>
-                      Flat on a table, showing a small tear or wrong size label.
-                    </td>
-                    <td>Worn with stains or stretched out.</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <strong>Bath Towel</strong>
-                    </td>
-                    <td>Close-up of frayed edges or discoloration.</td>
-                    <td>Wadded up with dirt or pet hair.</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <strong>Car Vacuum</strong>
-                    </td>
-                    <td>
-                      Plugged in (power light on) with a short video of it
-                      failing.
-                    </td>
-                    <td>Covered in mud or with a damaged cord.</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div className="rounded-lg bg-white border overflow-hidden">
+                <div className="overflow-auto custom-x-scrollbar">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-32">
+                          Item
+                        </th>
+                        <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-72">
+                          Good Photo
+                        </th>
+                        <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-72">
+                          Bad Photo
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
+                        <td className="p-4 font-semibold">T-Shirt</td>
+                        <td className="p-4">
+                          Flat on a table, showing a small tear or wrong size
+                          label.
+                        </td>
+                        <td className="p-4">
+                          Worn with stains or stretched out.
+                        </td>
+                      </tr>
+                      <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
+                        <td className="p-4 font-semibold">Bath Towel</td>
+                        <td className="p-4">
+                          Close-up of frayed edges or discoloration.
+                        </td>
+                        <td className="p-4">
+                          Wadded up with dirt or pet hair.
+                        </td>
+                      </tr>
+                      <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
+                        <td className="p-4 font-semibold">Car Vacuum</td>
+                        <td className="p-4">
+                          Plugged in (power light on) with a short video of it
+                          failing.
+                        </td>
+                        <td className="p-4">
+                          Covered in mud or with a damaged cord.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
             <hr className="!mb-8" />
             <div>
