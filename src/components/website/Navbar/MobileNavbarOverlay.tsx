@@ -4,8 +4,8 @@ import { CloseIconThin } from "@/icons";
 import { useMobileNavbarStore } from "@/zustand/website/mobileNavbarStore";
 import { HiMiniBars3 } from "react-icons/hi2";
 import { useRef, useEffect } from "react";
-import clsx from "clsx";
 import { useRouter } from "next/navigation";
+import clsx from "clsx";
 
 export function MobileNavbarButton() {
   const showMobileNavbarOverlay = useMobileNavbarStore(
