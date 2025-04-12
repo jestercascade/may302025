@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 import { adminDb } from "@/lib/firebase/admin";
 import { FieldValue } from "firebase-admin/firestore";
 
@@ -29,7 +30,6 @@ export async function subscribeToNewsletter(
     if (existingSubscriber.exists) {
       const data = existingSubscriber.data();
 
-      // If already subscribed
       if (data?.status === ACTIVE) {
         return {
           success: false,
@@ -38,12 +38,13 @@ export async function subscribeToNewsletter(
         };
       }
 
-      // If previously unsubscribed, reactivate
       if (data?.status === UNSUBSCRIBED) {
         await newslettersRef.doc(validatedEmail).update({
           status: ACTIVE,
           updatedAt: FieldValue.serverTimestamp(),
         });
+
+        revalidatePath("/admin/newsletters");
 
         return {
           success: true,
@@ -52,12 +53,13 @@ export async function subscribeToNewsletter(
       }
     }
 
-    // Create new subscription
     await newslettersRef.doc(validatedEmail).set({
       status: ACTIVE,
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
     });
+
+    revalidatePath("/admin/newsletters");
 
     return {
       success: true,
@@ -100,6 +102,8 @@ export async function unsubscribeFromNewsletter(
       status: UNSUBSCRIBED,
       updatedAt: FieldValue.serverTimestamp(),
     });
+
+    revalidatePath("/admin/newsletters");
 
     return {
       success: true,
