@@ -6,7 +6,6 @@ import { HiMiniBars3 } from "react-icons/hi2";
 import { useRef, useEffect } from "react";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 export function MobileNavbarButton() {
   const showMobileNavbarOverlay = useMobileNavbarStore(
