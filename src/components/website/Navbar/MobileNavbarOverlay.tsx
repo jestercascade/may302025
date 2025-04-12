@@ -104,11 +104,8 @@ export function MobileNavbarOverlay({
           ref={menuRef}
           className="absolute right-0 bottom-0 top-0 h-full w-3/4 max-w-80 pl-8 pt-10 bg-white"
         >
-          <div className="flex flex-col gap-2.5 *:w-max">
-            <button
-              onClick={() => handleNavigation("/new-arrivals")}
-              className="text-lg font-medium"
-            >
+          <div className="flex flex-col gap-2.5 *:w-max *:text-lg *:font-medium">
+            <button onClick={() => handleNavigation("/new-arrivals")}>
               New Arrivals
             </button>
             {categoriesData?.showOnPublicSite &&
@@ -118,17 +115,11 @@ export function MobileNavbarOverlay({
                   onClick={() =>
                     handleNavigation(`/category/${category.name.toLowerCase()}`)
                   }
-                  className="h-10 text-lg font-medium flex items-center px-4 rounded-full transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                 >
                   {category.name}
                 </button>
               ))}
-            <button
-              onClick={() => handleNavigation("#")}
-              className="text-lg font-medium"
-            >
-              Track Order
-            </button>
+            <button onClick={() => handleNavigation("#")}>Track Order</button>
           </div>
           <button
             onClick={hideMobileNavbarOverlay}
