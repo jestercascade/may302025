@@ -64,7 +64,7 @@ export async function generateMetadata({
     title: product?.seo.metaTitle,
     description: product?.seo.metaDescription,
     alternates: {
-      canonical: `/${slug}-${productId}`,
+      canonical: `/${slug}`,
     },
   };
 }
