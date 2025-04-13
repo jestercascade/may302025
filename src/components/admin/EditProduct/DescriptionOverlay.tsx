@@ -39,6 +39,7 @@ export function DescriptionOverlay({
   const [description, setDescription] = useState<string>(data.description);
   const [saveLoading, setSaveLoading] = useState<boolean>(false);
   const [clearLoading, setClearLoading] = useState<boolean>(false);
+  const [clearFlag, setClearFlag] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
 
   const showAlert = useAlertStore((state) => state.showAlert);
@@ -107,6 +108,7 @@ export function DescriptionOverlay({
   const handleClear = () => {
     setDescription("");
     saveDescription("", true);
+    setClearFlag((f) => !f);
   };
 
   const handleSave = () => {
@@ -186,6 +188,7 @@ export function DescriptionOverlay({
                   level="FULL"
                   onUpdate={handleEditorChange}
                   initialContent={description}
+                  clearFlag={clearFlag}
                 />
               </div>
             </div>

@@ -33,6 +33,7 @@ export function HighlightsButton({ className }: { className?: string }) {
 export function HighlightsOverlay({ data }: { data: DataType }) {
   const [saveLoading, setSaveLoading] = useState(false);
   const [clearLoading, setClearLoading] = useState(false);
+  const [clearFlag, setClearFlag] = useState(false);
   const [headline, setHeadline] = useState(data.highlights.headline);
   const [keyPoints, setKeyPoints] = useState<ItemType[]>([]);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -81,6 +82,7 @@ export function HighlightsOverlay({ data }: { data: DataType }) {
     setClearLoading(true);
     setHeadline("");
     setKeyPoints([]);
+    setClearFlag((f) => !f);
 
     try {
       const result = await UpdateProductAction({
@@ -248,6 +250,7 @@ export function HighlightsOverlay({ data }: { data: DataType }) {
                     level="BASIC"
                     onUpdate={handleHeadlineChange}
                     initialContent={headline}
+                    clearFlag={clearFlag}
                   />
                 </div>
               </div>

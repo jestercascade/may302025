@@ -28,7 +28,7 @@ import {
   List,
 } from "lucide-react";
 import clsx from "clsx";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export const EDITOR_LEVELS = {
   BASIC: "BASIC",
@@ -74,6 +74,8 @@ interface TipTapEditorProps {
   customFeatures?: (keyof typeof TOOLBAR_FEATURES)[];
   initialContent?: string;
   onUpdate?: (html: string) => void;
+  clearFlag?: boolean;
+  onCleared?: () => void;
 }
 
 /**
@@ -184,6 +186,8 @@ export default function TipTapEditor({
   customFeatures,
   initialContent = "<div>Start typing...</div>",
   onUpdate,
+  clearFlag = false,
+  onCleared,
 }: TipTapEditorProps) {
   const activeFeatures = customFeatures || LEVEL_CONFIGURATIONS[level];
 
@@ -241,10 +245,11 @@ export default function TipTapEditor({
   });
 
   useEffect(() => {
-    if (editor && !editor.isDestroyed) {
-      editor.commands.setContent(initialContent);
+    if (clearFlag && editor && !editor.isDestroyed) {
+      editor.commands.clearContent();
+      onCleared?.();
     }
-  }, [initialContent, editor]);
+  }, [clearFlag, editor, onCleared]);
 
   const getToolbarItems = () => {
     const items = [];

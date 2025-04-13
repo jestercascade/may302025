@@ -460,7 +460,7 @@ export default async function EditProduct({
             </p>
           </div>
           <div className="w-full relative shadow rounded-xl bg-white">
-            {!(highlights.headline && highlights.keyPoints.length > 0) ? (
+            {(!highlights.headline && !highlights.keyPoints.length) ? (
               <div className="w-full flex items-center justify-between p-5 pr-2">
                 <span className="text-xs text-gray">Nothing here</span>
                 <HighlightsButton />
