@@ -34,7 +34,6 @@ export function OnPageSeoOverlay({ data }: { data: DataType }) {
     id: data.id,
     metaTitle: data.seo.metaTitle,
     metaDescription: data.seo.metaDescription,
-    keywords: data.seo.keywords.join(", "),
   });
 
   const showAlert = useAlertStore((state) => state.showAlert);
@@ -76,7 +75,6 @@ export function OnPageSeoOverlay({ data }: { data: DataType }) {
       seo: {
         metaTitle: formData.metaTitle,
         metaDescription: formData.metaDescription,
-        keywords: formData.keywords.split(","),
       },
     };
 
@@ -125,7 +123,6 @@ export function OnPageSeoOverlay({ data }: { data: DataType }) {
                           id: data.id,
                           metaTitle: data.seo.metaTitle,
                           metaDescription: data.seo.metaDescription,
-                          keywords: data.seo.keywords.join(", "),
                         });
                       }}
                       type="button"
@@ -143,7 +140,6 @@ export function OnPageSeoOverlay({ data }: { data: DataType }) {
                         id: data.id,
                         metaTitle: data.seo.metaTitle,
                         metaDescription: data.seo.metaDescription,
-                        keywords: data.seo.keywords.join(", "),
                       });
                     }}
                     type="button"
@@ -213,21 +209,6 @@ export function OnPageSeoOverlay({ data }: { data: DataType }) {
                       />
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <label htmlFor="keywords" className="text-xs text-gray">
-                      Keywords
-                    </label>
-                    <div className="w-full h-9 relative">
-                      <input
-                        type="text"
-                        name="keywords"
-                        value={formData.keywords}
-                        onChange={handleInputChange}
-                        className="w-full h-9 px-3 rounded-md transition-colors border focus:border-neutral-400"
-                        required
-                      />
-                    </div>
-                  </div>
                 </div>
               </div>
               <div className="md:hidden w-full pb-5 pt-2 px-5 absolute bottom-0 bg-white">
@@ -267,7 +248,6 @@ type DataType = {
   seo: {
     metaTitle: string;
     metaDescription: string;
-    keywords: string[];
   };
 };
 
@@ -275,5 +255,4 @@ type FormDataType = {
   id: string;
   metaTitle: string;
   metaDescription: string;
-  keywords: string;
 };

@@ -118,7 +118,6 @@ type ProductWithUpsellType = {
   seo: {
     metaTitle: string;
     metaDescription: string;
-    keywords: string[];
   };
   visibility: VisibilityType;
   createdAt: string;
@@ -269,7 +268,6 @@ type ProductType = {
   seo: {
     metaTitle: string;
     metaDescription: string;
-    keywords: string[];
   };
   visibility: VisibilityType;
   createdAt: string;

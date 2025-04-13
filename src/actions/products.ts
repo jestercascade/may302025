@@ -31,7 +31,7 @@ export async function CreateProductAction(data: {
       },
       images: { main: data.mainImage, gallery: [] },
       options: { colors: [], sizes: {} },
-      seo: { metaTitle: "", metaDescription: "", keywords: [] },
+      seo: { metaTitle: "", metaDescription: "" },
       visibility: "DRAFT" as const,
       createdAt: currentTime,
       updatedAt: currentTime,
