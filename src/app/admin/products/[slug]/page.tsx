@@ -144,8 +144,7 @@ export default async function EditProduct({
     : null;
 
   const hasBasicDetails = category && name && pricing.basePrice && slug && id;
-  const hasOnPageSeo =
-    seo.metaTitle && seo.metaDescription && seo.keywords.length;
+  const hasOnPageSeo = seo.metaTitle && seo.metaDescription;
   const hasSourceInfo = [
     sourceInfo.platform,
     sourceInfo.platformUrl,
@@ -529,10 +528,6 @@ export default async function EditProduct({
                   <p className="font-medium max-w-[540px]">
                     {seo.metaDescription}
                   </p>
-                </div>
-                <div className="p-5">
-                  <h3 className="text-xs text-gray mb-2">Keywords</h3>
-                  <p className="font-medium">{seo.keywords.join(", ")}</p>
                 </div>
               </div>
             ) : (
