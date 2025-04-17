@@ -502,7 +502,7 @@ function MobilePriceDetails({
   toggleAll: () => void;
 }) {
   return (
-    <div className="md:hidden pt-[6px] pb-4 px-5 border-t border-[#e6e8ec] bg-white fixed z-10 bottom-0 left-0 right-0">
+    <div className="md:hidden pt-[6px] p-2 pb-5 border-t border-[#e6e8ec] bg-white fixed z-10 bottom-0 left-0 right-0">
       <div className="flex gap-4 items-center justify-end mx-auto w-full max-w-[536px]">
         <div className="w-max flex items-center gap-1">
           {selectedItems.size > 0 ? (
