@@ -48,26 +48,12 @@ export default async function Collections({
   const cookieStore = await cookies();
   const deviceIdentifier = cookieStore.get("device_identifier")?.value || "";
 
-  const productFields: (keyof ProductType)[] = [
-    "id",
-    "name",
-    "slug",
-    "description",
-    "pricing",
-    "images",
-    "options",
-    "upsell",
-    "highlights",
-  ];
-
   const collectionId = slug.split("-").pop() as string;
-
   const [cart, collections] = await Promise.all([
     getCart(deviceIdentifier),
     cachedGetCollections({
       ids: [collectionId],
       includeProductDetails: true,
-      fields: productFields,
     }),
   ]);
 

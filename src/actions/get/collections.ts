@@ -48,7 +48,7 @@ export async function getCollections(
   } = options;
 
   let collections: CollectionType[] = [];
-  const allProductIds = new Set<string>();
+  let allProductIds = new Set<string>();
 
   // ─── 1️⃣ Load collections & collect product IDs ──────────────────────────────
   if (ids.length > 0) {
@@ -98,6 +98,22 @@ export async function getCollections(
       collections.push(col);
     }
   }
+
+  // ─── 1.5 Check product existence and filter non-existing ────────────────────
+  const existingProductIds = await checkProductExistence(
+    Array.from(allProductIds)
+  );
+
+  if (!excludeProducts) {
+    collections = collections.map((col) => ({
+      ...col,
+      products: (col.products || []).filter((p) =>
+        existingProductIds.has(p.id)
+      ),
+    }));
+  }
+
+  allProductIds = existingProductIds; // Update with filtered IDs
 
   // ─── 2️⃣ Optionally filter & embed products ─────────────────────────────────
   if (
@@ -159,6 +175,29 @@ export async function getCollections(
   return collections.sort(
     (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
   );
+}
+
+/** Helper: Check if products exist in the database */
+async function checkProductExistence(
+  productIds: string[]
+): Promise<Set<string>> {
+  const existingIds = new Set<string>();
+  if (productIds.length === 0) return existingIds;
+
+  const batches: string[][] = [];
+  for (let i = 0; i < productIds.length; i += BATCH_SIZE) {
+    batches.push(productIds.slice(i, i + BATCH_SIZE));
+  }
+
+  for (const batch of batches) {
+    const refs = batch.map((id) => adminDb.collection("products").doc(id));
+    const snaps = await adminDb.getAll(...refs);
+    snaps.forEach((snap) => {
+      if (snap.exists) existingIds.add(snap.id);
+    });
+  }
+
+  return existingIds;
 }
 
 /** Helper: which of these IDs are published? */
