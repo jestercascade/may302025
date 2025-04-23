@@ -18,6 +18,28 @@ import {
   X,
 } from "lucide-react";
 
+interface Option {
+  id: number;
+  value: string;
+  isActive: boolean;
+}
+
+interface OptionGroup {
+  id: number;
+  name: string;
+  options: Option[];
+}
+
+interface ChainingConfig {
+  enabled: boolean;
+  parentGroupId: number | null;
+  childGroupId: number | null;
+}
+
+type AvailabilityMatrix = {
+  [key: number]: number[];
+};
+
 export function OptionsButton() {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
@@ -35,7 +57,7 @@ export function OptionsButton() {
 }
 
 export function OptionsOverlay() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
@@ -60,11 +82,11 @@ export function OptionsOverlay() {
   }, [isOverlayVisible, setPreventBodyOverflowChange]);
 
   // Sample product data
-  const [productName, setProductName] = useState("BioloMix 1200W Blender");
-  const [productDescription, setProductDescription] = useState("Professional High-Speed Blender");
+  const [productName, setProductName] = useState<string>("BioloMix 1200W Blender");
+  const [productDescription, setProductDescription] = useState<string>("Professional High-Speed Blender");
 
   // Option groups data structure
-  const [optionGroups, setOptionGroups] = useState([
+  const [optionGroups, setOptionGroups] = useState<OptionGroup[]>([
     {
       id: 1,
       name: "Size",
@@ -87,40 +109,40 @@ export function OptionsOverlay() {
   ]);
 
   // Chaining configuration
-  const [chainingConfig, setChainingConfig] = useState({
+  const [chainingConfig, setChainingConfig] = useState<ChainingConfig>({
     enabled: false,
     parentGroupId: null,
     childGroupId: null,
   });
 
   // Availability matrix - defines which child options are available for each parent option
-  const [availabilityMatrix, setAvailabilityMatrix] = useState({
+  const [availabilityMatrix, setAvailabilityMatrix] = useState<AvailabilityMatrix>({
     1: [4, 5, 6], // Size S compatible with Blue, Green, Yellow
     2: [4, 6], // Size M compatible with Blue and Yellow
     3: [5, 7], // Size L compatible with Green and Red
   });
 
   // Admin state
-  const [newOptionValues, setNewOptionValues] = useState({});
-  const [editingName, setEditingName] = useState(null);
-  const [editNameValue, setEditNameValue] = useState("");
-  const [newGroupName, setNewGroupName] = useState("");
-  const [collapsedGroups, setCollapsedGroups] = useState({});
+  const [newOptionValues, setNewOptionValues] = useState<{ [key: number]: string }>({});
+  const [editingName, setEditingName] = useState<number | null>(null);
+  const [editNameValue, setEditNameValue] = useState<string>("");
+  const [newGroupName, setNewGroupName] = useState<string>("");
+  const [collapsedGroups, setCollapsedGroups] = useState<{ [key: number]: boolean }>({});
 
   // Public-facing state
-  const [selectedOptions, setSelectedOptions] = useState({});
+  const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: number }>({});
 
   // Track which parent options should be disabled based on child availability
-  const [disabledParentOptions, setDisabledParentOptions] = useState([]);
+  const [disabledParentOptions, setDisabledParentOptions] = useState<number[]>([]);
 
   // Find a group by ID
-  const findGroup = (groupId) => {
+  const findGroup = (groupId: number): OptionGroup | undefined => {
     return optionGroups.find((group) => group.id === groupId);
   };
 
   // Effect to update disabled parent options
   useEffect(() => {
-    if (!chainingConfig.enabled) {
+    if (!chainingConfig.enabled || chainingConfig.parentGroupId === null || chainingConfig.childGroupId === null) {
       setDisabledParentOptions([]);
       return;
     }
@@ -151,16 +173,19 @@ export function OptionsOverlay() {
       let parentId = chainingConfig.parentGroupId;
       let childId = chainingConfig.childGroupId;
 
-      if (parentId == null || !findGroup(parentId)) {
+      if (parentId === null || !findGroup(parentId)) {
         parentId = optionGroups[0].id;
       }
 
-      if (childId == null || !findGroup(childId) || childId === parentId) {
-        childId = optionGroups.find((g) => g.id !== parentId)?.id || optionGroups[1].id;
+      if (childId === null || !findGroup(childId) || childId === parentId) {
+        const otherGroup = optionGroups.find((g) => g.id !== parentId);
+        childId = otherGroup ? otherGroup.id : optionGroups[1] ? optionGroups[1].id : null;
       }
 
       if (parentId !== chainingConfig.parentGroupId || childId !== chainingConfig.childGroupId) {
-        setParentChildRelationship(parentId, childId);
+        if (parentId !== null && childId !== null) {
+          setParentChildRelationship(parentId, childId);
+        }
       }
     }
   }, [chainingConfig.enabled, optionGroups]);
@@ -169,7 +194,7 @@ export function OptionsOverlay() {
   const addOptionGroup = () => {
     if (newGroupName.trim() === "") return;
 
-    const newGroup = {
+    const newGroup: OptionGroup = {
       id: Date.now(),
       name: newGroupName,
       options: [],
@@ -179,7 +204,7 @@ export function OptionsOverlay() {
     setNewGroupName("");
   };
 
-  const deleteOptionGroup = (groupId) => {
+  const deleteOptionGroup = (groupId: number) => {
     if (chainingConfig.parentGroupId === groupId || chainingConfig.childGroupId === groupId) {
       setChainingConfig({
         enabled: false,
@@ -200,13 +225,13 @@ export function OptionsOverlay() {
     setSelectedOptions(newSelections);
   };
 
-  const addOption = (groupId) => {
+  const addOption = (groupId: number) => {
     if (!newOptionValues[groupId] || newOptionValues[groupId].trim() === "") return;
 
     setOptionGroups(
       optionGroups.map((group) => {
         if (group.id === groupId) {
-          const newOption = {
+          const newOption: Option = {
             id: Date.now(),
             value: newOptionValues[groupId],
             isActive: true,
@@ -234,7 +259,7 @@ export function OptionsOverlay() {
     });
   };
 
-  const toggleOptionActive = (groupId, optionId) => {
+  const toggleOptionActive = (groupId: number, optionId: number) => {
     setOptionGroups(
       optionGroups.map((group) => {
         if (group.id === groupId) {
@@ -256,7 +281,7 @@ export function OptionsOverlay() {
       const newSelections = { ...selectedOptions };
       delete newSelections[groupId];
 
-      if (chainingConfig.enabled && chainingConfig.parentGroupId === groupId) {
+      if (chainingConfig.enabled && chainingConfig.childGroupId !== null && chainingConfig.parentGroupId === groupId) {
         delete newSelections[chainingConfig.childGroupId];
       }
 
@@ -264,7 +289,7 @@ export function OptionsOverlay() {
     }
   };
 
-  const deleteOption = (groupId, optionId) => {
+  const deleteOption = (groupId: number, optionId: number) => {
     setOptionGroups(
       optionGroups.map((group) => {
         if (group.id === groupId) {
@@ -287,7 +312,7 @@ export function OptionsOverlay() {
       const newSelections = { ...selectedOptions };
       delete newSelections[groupId];
 
-      if (chainingConfig.enabled && chainingConfig.parentGroupId === groupId) {
+      if (chainingConfig.enabled && chainingConfig.childGroupId !== null && chainingConfig.parentGroupId === groupId) {
         delete newSelections[chainingConfig.childGroupId];
       }
 
@@ -295,7 +320,7 @@ export function OptionsOverlay() {
     }
   };
 
-  const saveEditName = (groupId) => {
+  const saveEditName = (groupId: number) => {
     if (editNameValue.trim() === "") return;
 
     setOptionGroups(
@@ -310,7 +335,7 @@ export function OptionsOverlay() {
     setEditingName(null);
   };
 
-  const toggleAvailability = (parentOptionId, childOptionId) => {
+  const toggleAvailability = (parentOptionId: number, childOptionId: number) => {
     const currentAvailability = availabilityMatrix[parentOptionId] || [];
 
     if (currentAvailability.includes(childOptionId)) {
@@ -336,14 +361,14 @@ export function OptionsOverlay() {
     }
   };
 
-  const setParentChildRelationship = (parentId, childId) => {
+  const setParentChildRelationship = (parentId: number | null, childId: number | null) => {
     if (parentId === null || childId === null || parentId === childId) {
       return;
     }
 
     if (!findGroup(parentId) || !findGroup(childId)) return;
 
-    const newMatrix = {};
+    const newMatrix: AvailabilityMatrix = {};
     const parentGroup = findGroup(parentId);
     if (parentGroup) {
       parentGroup.options.forEach((option) => {
@@ -362,9 +387,10 @@ export function OptionsOverlay() {
   };
 
   const swapParentChild = () => {
-    if (!chainingConfig.enabled) return;
+    if (!chainingConfig.enabled || chainingConfig.parentGroupId === null || chainingConfig.childGroupId === null)
+      return;
 
-    const newMatrix = {};
+    const newMatrix: AvailabilityMatrix = {};
     const newParentGroup = findGroup(chainingConfig.childGroupId);
     if (newParentGroup) {
       newParentGroup.options.forEach((option) => {
@@ -382,7 +408,7 @@ export function OptionsOverlay() {
     setSelectedOptions({});
   };
 
-  const moveGroupUp = (index) => {
+  const moveGroupUp = (index: number) => {
     if (index <= 0) return;
 
     const newGroups = [...optionGroups];
@@ -390,7 +416,7 @@ export function OptionsOverlay() {
     setOptionGroups(newGroups);
   };
 
-  const moveGroupDown = (index) => {
+  const moveGroupDown = (index: number) => {
     if (index >= optionGroups.length - 1) return;
 
     const newGroups = [...optionGroups];
@@ -416,18 +442,20 @@ export function OptionsOverlay() {
         config: {
           chaining: {
             enabled: chainingConfig.enabled,
-            relationships: chainingConfig.enabled
-              ? [
-                  {
-                    parentGroupId: chainingConfig.parentGroupId,
-                    childGroupId: chainingConfig.childGroupId,
-                    constraints: Object.keys(availabilityMatrix).reduce((acc, key) => {
-                      acc[key] = availabilityMatrix[key];
-                      return acc;
-                    }, {}),
-                  },
-                ]
-              : [],
+            relationships:
+              chainingConfig.enabled && chainingConfig.parentGroupId !== null && chainingConfig.childGroupId !== null
+                ? [
+                    {
+                      parentGroupId: chainingConfig.parentGroupId,
+                      childGroupId: chainingConfig.childGroupId,
+                      constraints: Object.keys(availabilityMatrix).reduce((acc, key) => {
+                        const numKey = Number(key);
+                        acc[key] = availabilityMatrix[numKey];
+                        return acc;
+                      }, {} as { [key: string]: number[] }),
+                    },
+                  ]
+                : [],
           },
         },
       },
@@ -435,12 +463,12 @@ export function OptionsOverlay() {
     console.log(product);
   };
 
-  const getParentOptionStatusText = (option) => {
+  const getParentOptionStatusText = (option: Option): string => {
     if (!option.isActive) return "Inactive";
     return "Active";
   };
 
-  const getParentOptionStatusClass = (option) => {
+  const getParentOptionStatusClass = (option: Option): string => {
     if (!option.isActive) return "bg-gray-100";
     return "bg-green-100 text-green-700";
   };
@@ -546,12 +574,12 @@ export function OptionsOverlay() {
                               value={chainingConfig.parentGroupId ?? ""}
                               onChange={(e) => {
                                 const value = parseInt(e.target.value);
-                                setParentChildRelationship(
-                                  value,
-                                  value === chainingConfig.childGroupId
-                                    ? optionGroups.find((g) => g.id !== value)?.id
-                                    : chainingConfig.childGroupId
-                                );
+                                let childId = chainingConfig.childGroupId;
+                                if (value === childId) {
+                                  const otherGroup = optionGroups.find((g) => g.id !== value);
+                                  childId = otherGroup ? otherGroup.id : null;
+                                }
+                                setParentChildRelationship(value, childId);
                               }}
                               className="w-full bg-white border rounded px-3 py-2 text-sm focus:outline-none"
                             >
@@ -570,12 +598,12 @@ export function OptionsOverlay() {
                                 value={chainingConfig.childGroupId ?? ""}
                                 onChange={(e) => {
                                   const value = parseInt(e.target.value);
-                                  setParentChildRelationship(
-                                    chainingConfig.parentGroupId === value
-                                      ? optionGroups.find((g) => g.id !== value)?.id
-                                      : chainingConfig.parentGroupId,
-                                    value
-                                  );
+                                  let parentId = chainingConfig.parentGroupId;
+                                  if (value === parentId) {
+                                    const otherGroup = optionGroups.find((g) => g.id !== value);
+                                    parentId = otherGroup ? otherGroup.id : null;
+                                  }
+                                  setParentChildRelationship(parentId, value);
                                 }}
                                 className="flex-1 bg-white border rounded px-3 py-2 text-sm focus:outline-none"
                               >
@@ -707,7 +735,7 @@ export function OptionsOverlay() {
                                   >
                                     Status
                                   </th>
-                                  {isParent && (
+                                  {isParent && chainingConfig.childGroupId !== null && (
                                     <th
                                       className="px-4 py-2 text-left text-xs font-medium text-gray uppercase tracking-wider"
                                       style={{ width: "60%" }}
@@ -745,7 +773,7 @@ export function OptionsOverlay() {
                                           : "Inactive"}
                                       </button>
                                     </td>
-                                    {isParent && (
+                                    {isParent && chainingConfig.childGroupId !== null && (
                                       <td className="px-4 py-3">
                                         <div className="grid grid-cols-3 gap-x-4 gap-y-2">
                                           {findGroup(chainingConfig.childGroupId)?.options.map((child) => (
