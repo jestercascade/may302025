@@ -7,12 +7,7 @@ import { ShowAlertType } from "@/lib/sharedTypes";
 
 const BATCH_SIZE = 500; // Firestore batch limit
 
-export async function CreateProductAction(data: {
-  name: string;
-  slug: string;
-  basePrice: string;
-  mainImage: string;
-}) {
+export async function CreateProductAction(data: { name: string; slug: string; basePrice: string; mainImage: string }) {
   try {
     const productId = generateId();
     const currentTime = currentTimestamp();
@@ -29,7 +24,7 @@ export async function CreateProductAction(data: {
         discountPercentage: 0,
       },
       images: { main: data.mainImage, gallery: [] },
-      options: { colors: [], sizes: {} },
+      options: null,
       seo: { metaTitle: "", metaDescription: "" },
       visibility: "DRAFT" as const,
       createdAt: currentTime,
@@ -58,9 +53,7 @@ export async function CreateProductAction(data: {
 }
 
 export async function UpdateProductAction(
-  data: { id: string; options?: Partial<ProductType["options"]> } & Partial<
-    Omit<ProductType, "options">
-  >
+  data: { id: string; options?: Partial<ProductType["options"]> } & Partial<Omit<ProductType, "options">>
 ) {
   try {
     const productRef = adminDb.collection("products").doc(data.id);
@@ -70,15 +63,33 @@ export async function UpdateProductAction(
     }
 
     const currentProduct = productSnap.data() as ProductType;
-    const isPricingChanged = hasPricingChanged(
-      data.pricing,
-      currentProduct.pricing
-    );
+    const isPricingChanged = hasPricingChanged(data.pricing, currentProduct.pricing);
+
+    // Properly merge options with the new structure
+    const updatedOptions = data.options
+      ? {
+          ...currentProduct.options,
+          ...data.options,
+          groups: data.options.groups || currentProduct.options?.groups || [],
+          config: {
+            ...currentProduct.options?.config,
+            ...data.options.config,
+            chaining: {
+              ...currentProduct.options?.config?.chaining,
+              ...data.options.config?.chaining,
+              relationships:
+                data.options.config?.chaining?.relationships ||
+                currentProduct.options?.config?.chaining?.relationships ||
+                [],
+            },
+          },
+        }
+      : currentProduct.options;
 
     const updatedProduct = {
       ...currentProduct,
       ...data,
-      options: { ...currentProduct.options, ...data.options },
+      options: updatedOptions,
       updatedAt: currentTimestamp(),
     };
 
@@ -88,9 +99,7 @@ export async function UpdateProductAction(
       await updateRelatedUpsells(data.id, Number(data.pricing.basePrice));
     }
 
-    revalidatePath(
-      `/admin/products/${currentProduct.slug}-${currentProduct.id}`
-    );
+    revalidatePath(`/admin/products/${currentProduct.slug}-${currentProduct.id}`);
     revalidatePath("/admin/products");
     revalidatePath("/admin/upsells/[id]", "page");
     revalidatePath("page");
@@ -115,10 +124,7 @@ export async function UpdateProductAction(
   }
 }
 
-export async function SetUpsellAction(data: {
-  productId: string;
-  upsellId: string;
-}) {
+export async function SetUpsellAction(data: { productId: string; upsellId: string }) {
   try {
     const [upsellDoc, productDoc] = await Promise.all([
       adminDb.collection("upsells").doc(data.upsellId).get(),
@@ -132,10 +138,7 @@ export async function SetUpsellAction(data: {
       return { type: ShowAlertType.ERROR, message: "Product not found" };
     }
 
-    await adminDb
-      .collection("products")
-      .doc(data.productId)
-      .update({ upsell: data.upsellId });
+    await adminDb.collection("products").doc(data.productId).update({ upsell: data.upsellId });
     const productData = productDoc.data() as ProductType;
 
     revalidatePath(`/admin/products/${productData.slug}-${productData.id}`);
@@ -209,10 +212,7 @@ export async function DeleteProductAction(data: { id: string }) {
       return { type: ShowAlertType.ERROR, message: "Product not found" };
     }
 
-    const upsellsSnap = await adminDb
-      .collection("upsells")
-      .where("products", "array-contains", { id: data.id })
-      .get();
+    const upsellsSnap = await adminDb.collection("upsells").where("products", "array-contains", { id: data.id }).get();
 
     if (!upsellsSnap.empty) {
       return {
@@ -238,27 +238,16 @@ export async function DeleteProductAction(data: { id: string }) {
 
 // -- Helper Functions --
 
-function hasPricingChanged(
-  newPricing?: Partial<PricingType>,
-  currentPricing?: PricingType
-): boolean {
+function hasPricingChanged(newPricing?: Partial<PricingType>, currentPricing?: PricingType): boolean {
   if (!newPricing || !currentPricing) return false;
   return (
-    (newPricing.basePrice !== undefined &&
-      newPricing.basePrice !== currentPricing.basePrice) ||
-    (newPricing.salePrice !== undefined &&
-      newPricing.salePrice !== currentPricing.salePrice)
+    (newPricing.basePrice !== undefined && newPricing.basePrice !== currentPricing.basePrice) ||
+    (newPricing.salePrice !== undefined && newPricing.salePrice !== currentPricing.salePrice)
   );
 }
 
-async function updateRelatedUpsells(
-  productId: string,
-  newBasePrice: number
-): Promise<void> {
-  const upsellsSnap = await adminDb
-    .collection("upsells")
-    .where("products", "array-contains", { id: productId })
-    .get();
+async function updateRelatedUpsells(productId: string, newBasePrice: number): Promise<void> {
+  const upsellsSnap = await adminDb.collection("upsells").where("products", "array-contains", { id: productId }).get();
 
   const upsellsToUpdate: {
     id: string;
@@ -269,9 +258,7 @@ async function updateRelatedUpsells(
   upsellsSnap.forEach((doc) => {
     const upsell = doc.data() as UpsellType;
     const updatedProducts = upsell.products.map((product) =>
-      product.id === productId
-        ? { ...product, basePrice: newBasePrice }
-        : product
+      product.id === productId ? { ...product, basePrice: newBasePrice } : product
     );
     upsellsToUpdate.push({
       id: doc.id,
@@ -301,14 +288,8 @@ async function updateRelatedUpsells(
   }
 }
 
-function calculateUpsellPricing(
-  products: UpsellType["products"],
-  currentPricing: PricingType
-): PricingType {
-  const totalBasePrice = products.reduce(
-    (total, product) => total + (Number(product.basePrice) || 0),
-    0
-  );
+function calculateUpsellPricing(products: UpsellType["products"], currentPricing: PricingType): PricingType {
+  const totalBasePrice = products.reduce((total, product) => total + (Number(product.basePrice) || 0), 0);
   const roundedBasePrice = Math.floor(totalBasePrice) + 0.99;
   const basePrice = Number(roundedBasePrice.toFixed(2));
   const discountPercentage = currentPricing.discountPercentage ?? 0;

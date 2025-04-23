@@ -59,18 +59,26 @@ type UpsellType = {
       gallery: string[];
     };
     options: {
-      colors: Array<{
+      groups: Array<{
+        id: number;
         name: string;
-        image: string;
+        displayOrder: number;
+        values: Array<{
+          id: number;
+          value: string;
+          isActive: boolean;
+        }>;
       }>;
-      sizes: {
-        inches: {
-          columns: Array<{ label: string; order: number }>;
-          rows: Array<{ [key: string]: string }>;
-        };
-        centimeters: {
-          columns: Array<{ label: string; order: number }>;
-          rows: Array<{ [key: string]: string }>;
+      config: {
+        chaining: {
+          enabled: boolean;
+          relationships: Array<{
+            parentGroupId: number;
+            childGroupId: number;
+            constraints: {
+              [parentOptionId: string]: number[];
+            };
+          }>;
         };
       };
     };
@@ -100,18 +108,26 @@ type ProductWithUpsellType = {
     gallery: string[];
   };
   options: {
-    colors: Array<{
+    groups: Array<{
+      id: number;
       name: string;
-      image: string;
+      displayOrder: number;
+      values: Array<{
+        id: number;
+        value: string;
+        isActive: boolean;
+      }>;
     }>;
-    sizes: {
-      inches: {
-        columns: Array<{ label: string; order: number }>;
-        rows: Array<{ [key: string]: string }>;
-      };
-      centimeters: {
-        columns: Array<{ label: string; order: number }>;
-        rows: Array<{ [key: string]: string }>;
+    config: {
+      chaining: {
+        enabled: boolean;
+        relationships: Array<{
+          parentGroupId: number;
+          childGroupId: number;
+          constraints: {
+            [parentOptionId: string]: number[];
+          };
+        }>;
       };
     };
   };
@@ -151,18 +167,26 @@ type ProductWithUpsellType = {
         gallery: string[];
       };
       options: {
-        colors: Array<{
+        groups: Array<{
+          id: number;
           name: string;
-          image: string;
+          displayOrder: number;
+          values: Array<{
+            id: number;
+            value: string;
+            isActive: boolean;
+          }>;
         }>;
-        sizes: {
-          inches: {
-            columns: Array<{ label: string; order: number }>;
-            rows: Array<{ [key: string]: string }>;
-          };
-          centimeters: {
-            columns: Array<{ label: string; order: number }>;
-            rows: Array<{ [key: string]: string }>;
+        config: {
+          chaining: {
+            enabled: boolean;
+            relationships: Array<{
+              parentGroupId: number;
+              childGroupId: number;
+              constraints: {
+                [parentOptionId: string]: number[];
+              };
+            }>;
           };
         };
       };
@@ -208,18 +232,26 @@ type UpsellReviewProductType = {
         gallery: string[];
       };
       options: {
-        colors: Array<{
+        groups: Array<{
+          id: number;
           name: string;
-          image: string;
+          displayOrder: number;
+          values: Array<{
+            id: number;
+            value: string;
+            isActive: boolean;
+          }>;
         }>;
-        sizes: {
-          inches: {
-            columns: Array<{ label: string; order: number }>;
-            rows: Array<{ [key: string]: string }>;
-          };
-          centimeters: {
-            columns: Array<{ label: string; order: number }>;
-            rows: Array<{ [key: string]: string }>;
+        config: {
+          chaining: {
+            enabled: boolean;
+            relationships: Array<{
+              parentGroupId: number;
+              childGroupId: number;
+              constraints: {
+                [parentOptionId: string]: number[];
+              };
+            }>;
           };
         };
       };
@@ -250,18 +282,26 @@ type ProductType = {
     gallery: string[];
   };
   options: {
-    colors: Array<{
+    groups: Array<{
+      id: number;
       name: string;
-      image: string;
+      displayOrder: number;
+      values: Array<{
+        id: number;
+        value: string;
+        isActive: boolean;
+      }>;
     }>;
-    sizes: {
-      inches: {
-        columns: Array<{ label: string; order: number }>;
-        rows: Array<{ [key: string]: string }>;
-      };
-      centimeters: {
-        columns: Array<{ label: string; order: number }>;
-        rows: Array<{ [key: string]: string }>;
+    config: {
+      chaining: {
+        enabled: boolean;
+        relationships: Array<{
+          parentGroupId: number;
+          childGroupId: number;
+          constraints: {
+            [parentOptionId: string]: number[];
+          };
+        }>;
       };
     };
   };

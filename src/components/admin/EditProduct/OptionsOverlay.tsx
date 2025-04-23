@@ -17,6 +17,9 @@ import {
   Pencil,
   X,
 } from "lucide-react";
+import { UpdateProductAction } from "@/actions/products";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { ShowAlertType } from "@/lib/sharedTypes";
 
 interface Option {
   id: number;
@@ -56,9 +59,10 @@ export function OptionsButton() {
   );
 }
 
-export function OptionsOverlay() {
+export function OptionsOverlay({ data }: { data: { id: string } }) {
   const [loading, setLoading] = useState<boolean>(false);
 
+  const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
   const overlayName = useOverlayStore((state) => state.pages.editProduct.overlays.options.name);
@@ -424,10 +428,11 @@ export function OptionsOverlay() {
     setOptionGroups(newGroups);
   };
 
-  const handleSave = () => {
-    const product = {
-      name: productName,
-      description: productDescription,
+  const handleSave = async () => {
+    setLoading(true);
+
+    const updatedData = {
+      id: data.id,
       options: {
         groups: optionGroups.map((group, index) => ({
           id: group.id,
@@ -460,7 +465,22 @@ export function OptionsOverlay() {
         },
       },
     };
-    console.log(product);
+
+    try {
+      const result = await UpdateProductAction(updatedData);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
+    } catch (error) {
+      console.error("Error updating product options:", error);
+      showAlert({
+        message: "Failed to update product options",
+        type: ShowAlertType.ERROR,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getParentOptionStatusText = (option: Option): string => {
