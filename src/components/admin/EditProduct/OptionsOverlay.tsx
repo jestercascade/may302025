@@ -496,13 +496,11 @@ export function OptionsOverlay() {
 
   const getParentOptionStatusText = (option) => {
     if (!option.isActive) return "Inactive";
-    if (isParentOptionDisabled(option.id)) return "No Available Child Options";
     return "Active";
   };
 
   const getParentOptionStatusClass = (option) => {
     if (!option.isActive) return "bg-gray-100";
-    if (isParentOptionDisabled(option.id)) return "bg-yellow-100 text-yellow-700";
     return "bg-green-100 text-green-700";
   };
 
@@ -555,8 +553,6 @@ export function OptionsOverlay() {
                 </button>
               </div>
               <div className="space-y-2 w-full h-full mt-[52px] md:mt-0 p-5 flex flex-col gap-5 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
-                {/* ... */}
-
                 {/* Add New Option Group Section */}
                 <div className="space-y-2">
                   <h2 className="text-sm font-medium">Option Group</h2>
@@ -674,9 +670,9 @@ export function OptionsOverlay() {
                   const isLastGroup = groupIndex === optionGroups.length - 1;
 
                   return (
-                    <div key={group.id} className="border rounded-lg overflow-hidden">
+                    <div key={group.id} className="border rounded-lg overflow-hidden mb-4">
                       <div
-                        className="flex items-center justify-between py-3 pr-4 pl-3 bg-white cursor-pointer"
+                        className="flex items-center justify-between py-3 px-4 bg-white cursor-pointer"
                         onClick={() =>
                           setCollapsedGroups((prev) => ({
                             ...prev,
@@ -709,9 +705,7 @@ export function OptionsOverlay() {
                                   </span>
                                 )}
                                 {isChild && (
-                                  <span className="ml-2 text-xs px-2 py-0.5 bg-lightgray text-gray rounded">
-                                    Child
-                                  </span>
+                                  <span className="ml-2 text-xs px-2 py-0.5 bg-lightgray text-gray rounded">Child</span>
                                 )}
                               </>
                             )}
@@ -725,7 +719,7 @@ export function OptionsOverlay() {
                                   e.stopPropagation();
                                   moveGroupUp(groupIndex);
                                 }}
-                                className="p-1 text-gray"
+                                className="p-1 text-gray hover:text-blue transition-colors"
                               >
                                 <ChevronUp size={18} />
                               </button>
@@ -736,7 +730,7 @@ export function OptionsOverlay() {
                                   e.stopPropagation();
                                   moveGroupDown(groupIndex);
                                 }}
-                                className="p-1 text-gray"
+                                className="p-1 text-gray hover:text-blue transition-colors"
                               >
                                 <ChevronDown size={18} />
                               </button>
@@ -747,89 +741,104 @@ export function OptionsOverlay() {
                               e.stopPropagation();
                               deleteOptionGroup(group.id);
                             }}
-                            className="text-gray hover:text-red-700"
+                            className="text-gray hover:text-red-700 transition-colors"
                           >
-                            <Trash2 size={20} />
+                            <Trash2 size={18} />
                           </button>
                         </div>
                       </div>
 
                       {!isCollapsed && (
                         <div className="border-t">
-                          <table className="min-w-full divide-y divide-neutral-200">
-                            <thead className="bg-neutral-50">
-                              <tr>
-                                <th className="px-4 pt-2 pb-1.5 text-left text-xs font-medium text-gray uppercase tracking-wider">
-                                  Option Value
-                                </th>
-                                <th className="px-4 pt-2 pb-1.5 min-w-28 max-w-28 text-left text-xs font-medium text-gray uppercase tracking-wider">
-                                  Status
-                                </th>
-                                {isParent && (
-                                  <th className="px-4 pt-2 pb-1.5 text-left text-xs font-medium text-gray uppercase tracking-wider">
-                                    Available Options
+                          <div className="overflow-x-auto custom-x-scrollbar">
+                            <table className="w-full table-fixed divide-y divide-neutral-200">
+                              <thead className="bg-neutral-50">
+                                <tr>
+                                  <th
+                                    className="px-4 py-2 text-left text-xs font-medium text-gray uppercase tracking-wider"
+                                    style={{ width: isParent ? "128px" : "40%" }}
+                                  >
+                                    Option Value
                                   </th>
-                                )}
-                                <th className="px-4 pt-2 pb-1.5 text-right text-xs font-medium text-gray uppercase tracking-wider">
-                                  Actions
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-neutral-200">
-                              {group.options.map((option) => (
-                                <tr key={option.id}>
-                                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">{option.value}</td>
-                                  <td className="px-4 py-3 whitespace-nowrap">
-                                    <button
-                                      onClick={() => toggleOptionActive(group.id, option.id)}
-                                      className={`px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full ${
-                                        isParent
-                                          ? getParentOptionStatusClass(option)
-                                          : option.isActive
-                                          ? "bg-green-100 text-green-700"
-                                          : "bg-neutral-100"
-                                      }`}
-                                    >
-                                      {isParent
-                                        ? getParentOptionStatusText(option)
-                                        : option.isActive
-                                        ? "Active"
-                                        : "Inactive"}
-                                    </button>
-                                  </td>
+                                  <th
+                                    className="px-4 py-2 text-left text-xs font-medium text-gray uppercase tracking-wider"
+                                    style={{ width: "20%" }}
+                                  >
+                                    Status
+                                  </th>
                                   {isParent && (
-                                    <td className="px-4 py-3 whitespace-nowrap">
-                                      <div className="flex flex-wrap gap-2">
-                                        {findGroup(chainingConfig.childGroupId)?.options.map((child) => (
-                                          <label
-                                            key={child.id}
-                                            className={`flex items-center ${!child.isActive ? "opacity-50" : ""}`}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              checked={availabilityMatrix[option.id]?.includes(child.id)}
-                                              onChange={() => toggleAvailability(option.id, child.id)}
-                                              className="h-3 w-3 text-blue rounded"
-                                              disabled={!child.isActive}
-                                            />
-                                            <span className="ml-1 text-xs text-gray">{child.value}</span>
-                                          </label>
-                                        ))}
-                                      </div>
-                                    </td>
-                                  )}
-                                  <td className="px-4 py-3 whitespace-nowrap text-right text-sm">
-                                    <button
-                                      onClick={() => deleteOption(group.id, option.id)}
-                                      className="text-gray hover:text-red-700"
+                                    <th
+                                      className="px-4 py-2 text-left text-xs font-medium text-gray uppercase tracking-wider"
+                                      style={{ width: "60%" }}
                                     >
-                                      <X size={16} />
-                                    </button>
-                                  </td>
+                                      Available Options
+                                    </th>
+                                  )}
+                                  <th
+                                    className="px-4 py-2 text-right text-xs font-medium text-gray uppercase tracking-wider"
+                                    style={{ width: "15%", minWidth: "80px" }}
+                                  >
+                                    Actions
+                                  </th>
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                              </thead>
+                              <tbody className="bg-white divide-y divide-neutral-200">
+                                {group.options.map((option) => (
+                                  <tr key={option.id}>
+                                    <td className="px-4 py-3 text-sm font-medium truncate">{option.value}</td>
+                                    <td className="px-4 py-3">
+                                      <button
+                                        onClick={() => toggleOptionActive(group.id, option.id)}
+                                        className={`px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full ${
+                                          isParent
+                                            ? getParentOptionStatusClass(option)
+                                            : option.isActive
+                                            ? "bg-green-100 text-green-700"
+                                            : "bg-neutral-100"
+                                        }`}
+                                      >
+                                        {isParent
+                                          ? getParentOptionStatusText(option)
+                                          : option.isActive
+                                          ? "Active"
+                                          : "Inactive"}
+                                      </button>
+                                    </td>
+                                    {isParent && (
+                                      <td className="px-4 py-3">
+                                        <div className="grid grid-cols-3 gap-x-4 gap-y-2">
+                                          {findGroup(chainingConfig.childGroupId)?.options.map((child) => (
+                                            <label
+                                              key={child.id}
+                                              className={`flex items-center ${!child.isActive ? "opacity-50" : ""}`}
+                                            >
+                                              <input
+                                                type="checkbox"
+                                                checked={availabilityMatrix[option.id]?.includes(child.id)}
+                                                onChange={() => toggleAvailability(option.id, child.id)}
+                                                className="h-3 w-3 text-blue rounded"
+                                                disabled={!child.isActive}
+                                              />
+                                              <span className="ml-1 text-xs text-gray truncate">{child.value}</span>
+                                            </label>
+                                          ))}
+                                        </div>
+                                      </td>
+                                    )}
+                                    <td className="px-4 py-3 text-right">
+                                      <button
+                                        onClick={() => deleteOption(group.id, option.id)}
+                                        className="text-gray hover:text-red-700 transition-colors"
+                                        aria-label="Delete option"
+                                      >
+                                        <X size={16} />
+                                      </button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
                           <div className="px-4 py-3 bg-white border-t flex">
                             <input
                               type="text"
@@ -841,9 +850,13 @@ export function OptionsOverlay() {
                                 })
                               }
                               placeholder="Add new option value"
-                              className="flex-1 border rounded-md px-4 py-2 text-sm  outline-none"
+                              className="flex-1 border rounded-md px-4 py-2 text-sm outline-none"
                             />
-                            <button onClick={() => addOption(group.id)} className="ml-2 text-gray hover:text-blue">
+                            <button
+                              onClick={() => addOption(group.id)}
+                              className="ml-2 text-gray hover:text-blue transition-colors"
+                              aria-label="Add option"
+                            >
                               <PlusCircle size={20} />
                             </button>
                           </div>
@@ -852,8 +865,6 @@ export function OptionsOverlay() {
                     </div>
                   );
                 })}
-
-                {/* ... */}
               </div>
             </div>
             <div className="md:hidden w-full pb-5 pt-2 px-5 absolute bottom-0 bg-white">
