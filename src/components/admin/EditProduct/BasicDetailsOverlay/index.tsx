@@ -4,17 +4,15 @@ import {
   FormEvent,
   useState,
   useEffect,
-  useRef,
   ChangeEvent,
   useCallback,
 } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
-import { ArrowLeft, ChevronDown, X, Pencil } from "lucide-react";
+import { ArrowLeft, X, Pencil } from "lucide-react";
 import Overlay from "@/ui/Overlay";
 import { UpdateProductAction } from "@/actions/products";
 import { ShowAlertType } from "@/lib/sharedTypes";
-import { getCategories } from "@/actions/get/categories";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import clsx from "clsx";
 import styles from "./styles.module.css";
@@ -38,11 +36,7 @@ export function BasicDetailsButton({ className }: { className: string }) {
 }
 
 export function BasicDetailsOverlay({ data }: { data: DataType }) {
-  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(data.category);
-  const [categories, setCategories] = useState<CategoryType[] | undefined>([]);
-  const [isFetchingCategories, setIsFetchingCategories] = useState(false);
   const [name, setName] = useState(data.name);
   const [slug, setSlug] = useState(data.slug);
   const [basePrice, setBasePrice] = useState(
@@ -53,8 +47,6 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
     data.pricing.discountPercentage || 0
   );
 
-  const categoryRef = useRef<HTMLDivElement>(null);
-
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
@@ -64,24 +56,6 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
   const isOverlayVisible = useOverlayStore(
     (state) => state.pages.editProduct.overlays.basicDetails.isVisible
   );
-
-  useEffect(() => {
-    (async () => {
-      try {
-        setIsFetchingCategories(true);
-        const categoriesData = await getCategories();
-        setCategories(categoriesData?.categories);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        showAlert({
-          message: "Couldn't get categories. Please refresh the page.",
-          type: ShowAlertType.ERROR,
-        });
-      } finally {
-        setIsFetchingCategories(false);
-      }
-    })();
-  }, [showAlert]);
 
   useEffect(() => {
     if (isOverlayVisible) {
@@ -96,26 +70,6 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
       }
     };
   }, [isOverlayVisible, showAlert]);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (!categoryRef.current || !(event.target instanceof Node)) {
-        return;
-      }
-
-      const targetNode = categoryRef.current as Node;
-
-      if (!targetNode.contains(event.target)) {
-        setIsCategoryDropdownOpen(false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   const calculateSalePrice = useCallback(
     (discount: number) => {
@@ -146,11 +100,6 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
     }
   }, [basePrice, discountPercentage, calculateSalePrice]);
 
-  const handleCategorySelect = (category: string) => {
-    setSelectedCategory(category);
-    setIsCategoryDropdownOpen(false);
-  };
-
   const onHideOverlay = () => {
     setLoading(false);
     hideOverlay({ pageName, overlayName });
@@ -163,7 +112,6 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
 
     const updatedData = {
       id: data.id,
-      category: selectedCategory,
       name,
       slug,
       pricing: {
@@ -194,11 +142,11 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
   const handleSlugChange = (value: string) => {
     const sanitizedValue = value
       .toLowerCase()
-      .replace(/\s+/g, "-") // Replace spaces with hyphens
-      .replace(/[^a-z0-9-]+/g, "") // Remove all except letters, numbers, hyphens
-      .replace(/--+/g, "-") // Replace multiple hyphens with one
-      .replace(/^-+/, "") // Remove leading hyphens
-      .replace(/-+$/, ""); // Remove trailing hyphens
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]+/g, "")
+      .replace(/--+/g, "-")
+      .replace(/^-+/, "")
+      .replace(/-+$/, "");
     setSlug(sanitizedValue);
   };
 
@@ -279,57 +227,6 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                 </button>
               </div>
               <div className="w-full h-full mt-[52px] md:mt-0 p-5 flex flex-col gap-5 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
-                <div className="flex flex-col gap-2">
-                  <h2 className="text-xs text-gray">Category</h2>
-                  <div ref={categoryRef} className="w-full h-9 relative">
-                    <button
-                      onClick={() => setIsCategoryDropdownOpen((prev) => !prev)}
-                      type="button"
-                      className="h-9 w-full px-3 rounded-md flex items-center justify-between transition duration-300 ease-in-out bg-lightgray active:bg-lightgray-dimmed"
-                    >
-                      <span
-                        className={clsx({
-                          "text-gray": selectedCategory === "Select",
-                        })}
-                      >
-                        {selectedCategory}
-                      </span>
-                      <ChevronDown
-                        className="-mr-[4px] stroke-gray"
-                        size={20}
-                        strokeWidth={2}
-                      />
-                    </button>
-                    <div
-                      className={clsx("w-full absolute top-10 z-10", {
-                        hidden: !isCategoryDropdownOpen,
-                        block: isCategoryDropdownOpen,
-                      })}
-                    >
-                      <div
-                        className={`overflow-hidden h-full max-h-[228px] overflow-x-hidden overflow-y-visible w-full py-[6px] flex flex-col gap-0 rounded-md shadow-dropdown bg-white ${styles.customScrollbar}`}
-                      >
-                        {isFetchingCategories ? (
-                          <div className="w-full h-12 flex items-center justify-center">
-                            <Spinner color="gray" />
-                          </div>
-                        ) : (
-                          categories?.map((category, index) => (
-                            <div
-                              key={index}
-                              className="w-full min-h-9 h-9 flex items-center px-[12px] cursor-context-menu transition duration-300 ease-in-out hover:bg-lightgray"
-                              onClick={() =>
-                                handleCategorySelect(category.name)
-                              }
-                            >
-                              {category.name}
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
                 <div className="flex flex-col gap-2">
                   <label htmlFor="name" className="text-xs text-gray">
                     Name
@@ -450,7 +347,6 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
 
 type DataType = {
   id: string;
-  category: string;
   name: string;
   slug: string;
   pricing: {
@@ -458,11 +354,4 @@ type DataType = {
     salePrice?: number;
     discountPercentage?: number;
   };
-};
-
-type CategoryType = {
-  index: number;
-  name: string;
-  image: string;
-  visibility: "VISIBLE" | "HIDDEN";
 };

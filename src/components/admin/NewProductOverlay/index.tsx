@@ -1,26 +1,26 @@
 "use client";
 
 import { CreateProductAction } from "@/actions/products";
-import { capitalizeFirstLetter, isValidRemoteImage } from "@/lib/utils/common";
-import { useState, useEffect, useRef } from "react";
+import { isValidRemoteImage } from "@/lib/utils/common";
+import { useState, useEffect } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
 import { useNavbarMenuStore } from "@/zustand/admin/navbarMenuStore";
-import { ArrowLeft, X, ChevronDown } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
 import clsx from "clsx";
 import Image from "next/image";
 import Overlay from "@/ui/Overlay";
-import { getCategories } from "@/actions/get/categories";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { useAlertStore } from "@/zustand/shared/alertStore";
-import styles from "./styles.module.css";
 import { useBodyOverflowStore } from "@/zustand/shared/bodyOverflowStore";
 
-export function NewProductMenuButton({ closeMenu }: NewProductMenuButtonType) {
+export function NewProductMenuButton({ closeMenu }: { closeMenu: () => void }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const setNavbarMenu = useNavbarMenuStore((state) => state.setNavbarMenu);
   const pageName = useOverlayStore((state) => state.pages.products.name);
-  const overlayName = useOverlayStore((state) => state.pages.products.overlays.newProduct.name);
+  const overlayName = useOverlayStore(
+    (state) => state.pages.products.overlays.newProduct.name
+  );
 
   const openOverlay = () => {
     setNavbarMenu(false);
@@ -43,7 +43,9 @@ export function NewProductEmptyGridButton() {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const setNavbarMenu = useNavbarMenuStore((state) => state.setNavbarMenu);
   const pageName = useOverlayStore((state) => state.pages.products.name);
-  const overlayName = useOverlayStore((state) => state.pages.products.overlays.newProduct.name);
+  const overlayName = useOverlayStore(
+    (state) => state.pages.products.overlays.newProduct.name
+  );
 
   const openOverlay = () => {
     setNavbarMenu(false);
@@ -62,31 +64,20 @@ export function NewProductEmptyGridButton() {
 }
 
 export function NewProductOverlay() {
-  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("Select");
-  const [categories, setCategories] = useState<CategoryType[] | undefined>([]);
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
-    category: "",
     basePrice: "",
     mainImage: "",
   });
 
-  const categoryRef = useRef(null);
-
-  useEffect(() => {
-    (async () => {
-      const categories = await getCategories();
-      setCategories(categories?.categories);
-    })();
-  }, []);
-
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.products.name);
-  const overlayName = useOverlayStore((state) => state.pages.products.overlays.newProduct.name);
+  const overlayName = useOverlayStore(
+    (state) => state.pages.products.overlays.newProduct.name
+  );
   const isOverlayVisible = useOverlayStore(
     (state) => state.pages.products.overlays.newProduct.isVisible
   );
@@ -110,31 +101,6 @@ export function NewProductOverlay() {
     };
   }, [isOverlayVisible, setPreventBodyOverflowChange]);
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (!categoryRef.current || !(event.target instanceof Node)) {
-        return;
-      }
-      const targetNode = categoryRef.current as Node;
-      if (!targetNode.contains(event.target)) {
-        setIsCategoryDropdownOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const handleCategorySelect = (category: string) => {
-    setSelectedCategory(category);
-    setIsCategoryDropdownOpen(false);
-    setFormData((prevData) => ({
-      ...prevData,
-      category: capitalizeFirstLetter(category),
-    }));
-  };
-
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     let sanitizedValue = value;
@@ -142,11 +108,11 @@ export function NewProductOverlay() {
     if (name === "slug") {
       sanitizedValue = value
         .toLowerCase()
-        .replace(/\s+/g, "-") // Replace spaces with hyphens
-        .replace(/[^a-z0-9-]+/g, "") // Remove all except letters, numbers, hyphens
-        .replace(/--+/g, "-") // Replace multiple hyphens with one
-        .replace(/^-+/, "") // Remove leading hyphens
-        .replace(/-+$/, ""); // Remove trailing hyphens
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]+/g, "")
+        .replace(/--+/g, "-")
+        .replace(/^-+/, "")
+        .replace(/-+$/, "");
     }
 
     setFormData((prevData) => ({
@@ -156,14 +122,6 @@ export function NewProductOverlay() {
   };
 
   const handleSave = async () => {
-    if (!formData.category) {
-      showAlert({
-        message: "Please select a category",
-        type: ShowAlertType.ERROR,
-      });
-      setPreventBodyOverflowChange(true);
-      return;
-    }
     if (!formData.name.trim() || formData.name.length < 3) {
       showAlert({
         message: "Product name must be at least 3 characters long",
@@ -190,7 +148,8 @@ export function NewProductOverlay() {
     }
     if (!isValidRemoteImage(formData.mainImage)) {
       showAlert({
-        message: "Invalid main image URL. Try an image from Pinterest or your Firebase Storage.",
+        message:
+          "Invalid main image URL. Try an image from Pinterest or your Firebase Storage.",
         type: ShowAlertType.ERROR,
       });
       setPreventBodyOverflowChange(true);
@@ -222,25 +181,12 @@ export function NewProductOverlay() {
   const onHideOverlay = () => {
     setLoading(false);
     hideOverlay({ pageName, overlayName });
-    setSelectedCategory("Select");
     setFormData({
-      category: "",
       name: "",
       slug: "",
       basePrice: "",
       mainImage: "",
     });
-  };
-
-  const handleCategoryDropdownClick = () => {
-    if (categories?.length === 0) {
-      showAlert({
-        message: "No published categories found. Edit categories in the storefront tab.",
-        type: ShowAlertType.ERROR,
-      });
-    } else {
-      setIsCategoryDropdownOpen((prevState) => !prevState);
-    }
   };
 
   return (
@@ -267,8 +213,14 @@ export function NewProductOverlay() {
                   type="button"
                   className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                 >
-                  <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
-                  <span className="font-semibold text-sm text-blue">New product</span>
+                  <ArrowLeft
+                    size={20}
+                    strokeWidth={2}
+                    className="-ml-1 stroke-blue"
+                  />
+                  <span className="font-semibold text-sm text-blue">
+                    New product
+                  </span>
                 </button>
                 <button
                   onClick={handleSave}
@@ -292,45 +244,6 @@ export function NewProductOverlay() {
                 </button>
               </div>
               <div className="w-full h-full mt-[52px] md:mt-0 p-5 flex flex-col gap-5 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
-                <div className="flex flex-col gap-2">
-                  <h2 className="text-xs text-gray">Category</h2>
-                  <div ref={categoryRef} className="w-full h-9 relative">
-                    <button
-                      onClick={handleCategoryDropdownClick}
-                      type="button"
-                      className="h-9 w-full px-3 rounded-md flex items-center justify-between transition duration-300 ease-in-out bg-lightgray active:bg-lightgray-dimmed"
-                    >
-                      <span
-                        className={clsx({
-                          "text-gray": selectedCategory === "Select",
-                        })}
-                      >
-                        {selectedCategory}
-                      </span>
-                      <ChevronDown className="-mr-[4px] stroke-gray" size={18} strokeWidth={2} />
-                    </button>
-                    <div
-                      className={clsx("w-full absolute top-10 z-10", {
-                        hidden: !isCategoryDropdownOpen,
-                        block: isCategoryDropdownOpen,
-                      })}
-                    >
-                      <div
-                        className={`overflow-hidden h-full max-h-[228px] overflow-x-hidden overflow-y-visible w-full py-[6px] rounded-md shadow-dropdown bg-white ${styles.customScrollbar}`}
-                      >
-                        {categories?.map((category, index) => (
-                          <div
-                            key={index}
-                            className="w-full h-9 flex items-center px-[12px] cursor-pointer transition duration-300 ease-in-out hover:bg-lightgray"
-                            onClick={() => handleCategorySelect(category.name)}
-                          >
-                            {category.name}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
                 <div className="flex flex-col gap-2">
                   <label htmlFor="name" className="text-xs text-gray">
                     Name
@@ -386,15 +299,16 @@ export function NewProductOverlay() {
                   <div>
                     <div className="w-full max-w-[383px] border rounded-md overflow-hidden">
                       <div className="w-full aspect-square flex items-center justify-center overflow-hidden">
-                        {formData.mainImage && isValidRemoteImage(formData.mainImage) && (
-                          <Image
-                            src={formData.mainImage}
-                            alt={formData.name || "mainImage"}
-                            width={383}
-                            height={383}
-                            priority
-                          />
-                        )}
+                        {formData.mainImage &&
+                          isValidRemoteImage(formData.mainImage) && (
+                            <Image
+                              src={formData.mainImage}
+                              alt={formData.name || "mainImage"}
+                              width={383}
+                              height={383}
+                              priority
+                            />
+                          )}
                       </div>
                       <div className="w-full h-9 border-t overflow-hidden">
                         <input
@@ -444,11 +358,4 @@ export function NewProductOverlay() {
 
 type NewProductMenuButtonType = {
   closeMenu: () => void;
-};
-
-type CategoryType = {
-  index: number;
-  name: string;
-  image: string;
-  visibility: "VISIBLE" | "HIDDEN";
 };

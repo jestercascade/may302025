@@ -10,6 +10,8 @@ import {
   Link2Off,
   ChevronUp,
   ChevronDown,
+  ChevronRight,
+  RefreshCw,
 } from "lucide-react";
 
 export default function FlexibleProductOptions() {
@@ -44,7 +46,7 @@ export default function FlexibleProductOptions() {
 
   // Chaining configuration
   const [chainingConfig, setChainingConfig] = useState({
-    enabled: false, // Start with chaining off to match your workflow
+    enabled: false,
     parentGroupId: null,
     childGroupId: null,
   });
@@ -61,6 +63,7 @@ export default function FlexibleProductOptions() {
   const [editingName, setEditingName] = useState(null);
   const [editNameValue, setEditNameValue] = useState("");
   const [newGroupName, setNewGroupName] = useState("");
+  const [collapsedGroups, setCollapsedGroups] = useState({});
 
   // Public-facing state
   const [selectedOptions, setSelectedOptions] = useState({});
@@ -108,18 +111,15 @@ export default function FlexibleProductOptions() {
       let parentId = chainingConfig.parentGroupId;
       let childId = chainingConfig.childGroupId;
 
-      // If parentId is null or invalid, set to first group
       if (parentId == null || !findGroup(parentId)) {
         parentId = optionGroups[0].id;
       }
 
-      // If childId is null, invalid, or same as parentId, set to a different group
       if (childId == null || !findGroup(childId) || childId === parentId) {
         childId =
           optionGroups.find((g) => g.id !== parentId)?.id || optionGroups[1].id;
       }
 
-      // Update config if changes are needed
       if (
         parentId !== chainingConfig.parentGroupId ||
         childId !== chainingConfig.childGroupId
@@ -156,6 +156,11 @@ export default function FlexibleProductOptions() {
     }
 
     setOptionGroups(optionGroups.filter((group) => group.id !== groupId));
+    setCollapsedGroups((prev) => {
+      const newState = { ...prev };
+      delete newState[groupId];
+      return newState;
+    });
 
     const newSelections = { ...selectedOptions };
     delete newSelections[groupId];
@@ -305,14 +310,12 @@ export default function FlexibleProductOptions() {
       enabled: !chainingConfig.enabled,
     });
     if (!chainingConfig.enabled) {
-      // When enabling chaining, rely on useEffect to set defaults
       setSelectedOptions({});
     }
   };
 
   const setParentChildRelationship = (parentId, childId) => {
     if (parentId === null || childId === null || parentId === childId) {
-      // If either is null or they are the same, do not proceed
       return;
     }
 
@@ -491,7 +494,7 @@ export default function FlexibleProductOptions() {
   return (
     <div className="bg-gray-50 min-h-screen p-6">
       <div className="mx-auto max-w-5xl">
-        {/* Admin Panel */}
+        {/* Product Options Management Panel */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 mb-8">
           <div className="bg-gray-100 px-4 py-2 border-b border-gray-200 flex items-center justify-between">
             <div className="flex space-x-2">
@@ -505,495 +508,404 @@ export default function FlexibleProductOptions() {
           </div>
 
           <div className="p-6">
-            {/* Add new option group */}
-            <div className="mb-6 pb-6 border-b border-gray-200">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">
-                Add New Option Group
-              </h3>
-              <div className="flex rounded-md overflow-hidden">
-                <input
-                  type="text"
-                  value={newGroupName}
-                  onChange={(e) => setNewGroupName(e.target.value)}
-                  placeholder="Group name (e.g. Size, Color, Material)"
-                  className="flex-1 py-2 px-3 border border-gray-300 rounded-l focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-                />
-                <button
-                  onClick={addOptionGroup}
-                  className="bg-blue-500 text-white px-4 py-2 hover:bg-blue-600 text-sm font-medium rounded-r"
-                >
-                  Add Group
-                </button>
+            {/* Add New Option Group Section */}
+            <div className="mb-6 bg-white border border-gray-200 rounded-lg">
+              <div className="px-4 py-3">
+                <h3 className="text-base font-medium text-gray-800">
+                  Add New Option Group
+                </h3>
+                <div className="mt-3 flex">
+                  <input
+                    type="text"
+                    value={newGroupName}
+                    onChange={(e) => setNewGroupName(e.target.value)}
+                    placeholder="Group name (e.g. Size, Color, Material)"
+                    className="flex-1 py-2 px-3 border border-gray-300 rounded-l focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+                  />
+                  <button
+                    onClick={addOptionGroup}
+                    className="bg-blue-500 text-white px-4 py-2 hover:bg-blue-600 text-sm font-medium rounded-r flex items-center"
+                  >
+                    <span className="mr-1">Add</span>
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Chaining Configuration */}
+            {/* Chain Option Groups Section */}
             {optionGroups.length >= 2 && (
-              <div className="mb-6 pb-6 border-b border-gray-200">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-gray-700">
+              <div className="mb-6 bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+                  <h3 className="text-base font-medium text-gray-800">
                     Chain Option Groups
                   </h3>
-                  <label className="inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={chainingConfig.enabled}
-                      onChange={toggleChaining}
-                      className="sr-only peer"
-                    />
-                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                  </label>
+                  <div className="flex items-center">
+                    <span className="mr-2 text-sm text-gray-500">
+                      {chainingConfig.enabled ? "Enabled" : "Disabled"}
+                    </span>
+                    <label className="inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={chainingConfig.enabled}
+                        onChange={toggleChaining}
+                        className="sr-only peer"
+                      />
+                      <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                  </div>
                 </div>
 
                 {chainingConfig.enabled && (
-                  <div className="bg-blue-50 p-4 rounded-md border border-blue-100">
-                    <div className="flex items-center mb-4">
-                      <div className="text-sm text-blue-800 font-medium mr-2">
-                        Parent Group:
-                      </div>
-                      <select
-                        value={chainingConfig.parentGroupId ?? ""}
-                        onChange={(e) => {
-                          const value = e.target.value
-                            ? parseInt(e.target.value)
-                            : null;
-                          setParentChildRelationship(
-                            value,
-                            value === chainingConfig.childGroupId
-                              ? optionGroups.find((g) => g.id !== value)?.id ||
-                                  null
-                              : chainingConfig.childGroupId
-                          );
-                        }}
-                        className="bg-white border border-blue-300 rounded px-2 py-1 text-sm"
-                      >
-                        <option value="">Select Parent Group</option>
-                        {optionGroups.map((group) => (
-                          <option key={group.id} value={group.id}>
-                            {group.name}
-                          </option>
-                        ))}
-                      </select>
-
-                      <button
-                        onClick={swapParentChild}
-                        className="ml-4 p-1 bg-blue-100 rounded hover:bg-blue-200"
-                        title="Swap Parent-Child"
-                      >
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="text-blue-600"
+                  <div className="p-4 bg-blue-50">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <div className="mb-2 text-sm font-medium text-gray-700">
+                          Parent Group:
+                        </div>
+                        <select
+                          value={chainingConfig.parentGroupId ?? ""}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value);
+                            setParentChildRelationship(
+                              value,
+                              value === chainingConfig.childGroupId
+                                ? optionGroups.find((g) => g.id !== value)?.id
+                                : chainingConfig.childGroupId
+                            );
+                          }}
+                          className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
                         >
-                          <path d="M7 16V4M7 4L3 8M7 4L11 8M17 8v12m0 0l4-4m-4 4l-4-4" />
-                        </svg>
-                      </button>
-
-                      <div className="text-sm text-blue-800 font-medium ml-8 mr-2">
-                        Child Group:
+                          <option value="">Select Parent Group</option>
+                          {optionGroups.map((group) => (
+                            <option key={group.id} value={group.id}>
+                              {group.name}
+                            </option>
+                          ))}
+                        </select>
                       </div>
-                      <select
-                        value={chainingConfig.childGroupId ?? ""}
-                        onChange={(e) => {
-                          const value = e.target.value
-                            ? parseInt(e.target.value)
-                            : null;
-                          setParentChildRelationship(
-                            chainingConfig.parentGroupId === value
-                              ? optionGroups.find((g) => g.id !== value)?.id ||
-                                  null
-                              : chainingConfig.parentGroupId,
-                            value
-                          );
-                        }}
-                        className="bg-white border border-blue-300 rounded px-2 py-1 text-sm"
-                      >
-                        <option value="">Select Child Group</option>
-                        {optionGroups.map((group) => (
-                          <option key={group.id} value={group.id}>
-                            {group.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
 
-                    <div className="text-xs text-blue-600">
-                      When chaining is enabled, selecting an option from the
-                      parent group will determine which options are available in
-                      the child group. Parent options will be disabled if all
-                      their linked child options are inactive.
+                      <div>
+                        <div className="mb-2 text-sm font-medium text-gray-700">
+                          Child Group:
+                        </div>
+                        <div className="flex items-center">
+                          <select
+                            value={chainingConfig.childGroupId ?? ""}
+                            onChange={(e) => {
+                              const value = parseInt(e.target.value);
+                              setParentChildRelationship(
+                                chainingConfig.parentGroupId === value
+                                  ? optionGroups.find((g) => g.id !== value)?.id
+                                  : chainingConfig.parentGroupId,
+                                value
+                              );
+                            }}
+                            className="flex-1 bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          >
+                            <option value="">Select Child Group</option>
+                            {optionGroups.map((group) => (
+                              <option key={group.id} value={group.id}>
+                                {group.name}
+                              </option>
+                            ))}
+                          </select>
+                          <button
+                            onClick={swapParentChild}
+                            className="ml-2 p-2 bg-gray-100 rounded hover:bg-gray-200"
+                          >
+                            <RefreshCw className="w-4 h-4 text-gray-600" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
+                    <p className="mt-3 text-xs text-blue-600">
+                      Parent options will be disabled if all their linked child
+                      options are inactive.
+                    </p>
                   </div>
                 )}
               </div>
             )}
 
             {/* Option Groups Management */}
-            {optionGroups.map((group, groupIndex) => (
-              <div
-                key={group.id}
-                className="mb-6 border-b border-gray-200 pb-6"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center">
-                    <div className="flex flex-col mr-2">
+            {optionGroups.map((group, groupIndex) => {
+              const isCollapsed = collapsedGroups[group.id];
+              const isParent =
+                chainingConfig.enabled &&
+                chainingConfig.parentGroupId === group.id;
+              const isChild =
+                chainingConfig.enabled &&
+                chainingConfig.childGroupId === group.id;
+
+              return (
+                <div
+                  key={group.id}
+                  className="mb-6 bg-white border border-gray-200 rounded-lg overflow-hidden"
+                >
+                  <div
+                    className="flex items-center justify-between px-4 py-3 border-b border-gray-200 bg-white cursor-pointer"
+                    onClick={() =>
+                      setCollapsedGroups((prev) => ({
+                        ...prev,
+                        [group.id]: !prev[group.id],
+                      }))
+                    }
+                  >
+                    <div className="flex items-center">
+                      {isCollapsed ? (
+                        <ChevronRight className="w-5 h-5 text-gray-500 mr-2" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 text-gray-500 mr-2" />
+                      )}
+                      <div className="flex items-center">
+                        {editingName === group.id ? (
+                          <input
+                            type="text"
+                            value={editNameValue}
+                            onChange={(e) => setEditNameValue(e.target.value)}
+                            className="px-2 py-1 border border-gray-300 rounded text-sm"
+                            autoFocus
+                            onBlur={() => saveEditName(group.id)}
+                          />
+                        ) : (
+                          <>
+                            <span className="font-medium text-gray-800">
+                              {group.name}
+                            </span>
+                            {isParent && (
+                              <span className="ml-2 text-xs px-2 py-0.5 bg-blue-100 text-blue-800 rounded">
+                                Parent
+                              </span>
+                            )}
+                            {isChild && (
+                              <span className="ml-2 text-xs px-2 py-0.5 bg-purple-100 text-purple-800 rounded">
+                                Child
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <div className="flex flex-col">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            moveGroupUp(groupIndex);
+                          }}
+                          disabled={groupIndex === 0}
+                          className="p-0.5 text-gray-500 hover:text-gray-700"
+                        >
+                          <ChevronUp className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            moveGroupDown(groupIndex);
+                          }}
+                          disabled={groupIndex === optionGroups.length - 1}
+                          className="p-0.5 text-gray-500 hover:text-gray-700"
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                        </button>
+                      </div>
                       <button
-                        onClick={() => moveGroupUp(groupIndex)}
-                        disabled={groupIndex === 0}
-                        className={`p-0.5 ${
-                          groupIndex === 0
-                            ? "text-gray-300 cursor-not-allowed"
-                            : "text-gray-500 hover:text-gray-700"
-                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteOptionGroup(group.id);
+                        }}
+                        className="text-gray-500 hover:text-red-500"
                       >
-                        <ChevronUp className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => moveGroupDown(groupIndex)}
-                        disabled={groupIndex === optionGroups.length - 1}
-                        className={`p-0.5 ${
-                          groupIndex === optionGroups.length - 1
-                            ? "text-gray-300 cursor-not-allowed"
-                            : "text-gray-500 hover:text-gray-700"
-                        }`}
-                      >
-                        <ChevronDown className="w-4 h-4" />
+                        <Trash2 className="w-5 h-5" />
                       </button>
                     </div>
+                  </div>
 
-                    {editingName === group.id ? (
-                      <div className="flex items-center">
+                  {!isCollapsed && (
+                    <div className="p-4">
+                      <div className="border border-gray-200 rounded-md overflow-hidden mb-4">
+                        <table className="min-w-full divide-y divide-gray-200">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                Option Value
+                              </th>
+                              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                Status
+                              </th>
+                              {isParent && (
+                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                                  Available Options
+                                </th>
+                              )}
+                              <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">
+                                Actions
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {group.options.map((option) => (
+                              <tr key={option.id}>
+                                <td className="px-4 py-2 text-sm font-medium text-gray-800">
+                                  {option.value}
+                                </td>
+                                <td className="px-4 py-2">
+                                  <button
+                                    onClick={() =>
+                                      toggleOptionActive(group.id, option.id)
+                                    }
+                                    className={`px-2.5 py-0.5 rounded-full text-xs ${
+                                      isParent
+                                        ? getParentOptionStatusClass(option)
+                                        : option.isActive
+                                        ? "bg-green-100 text-green-800"
+                                        : "bg-gray-100 text-gray-800"
+                                    }`}
+                                  >
+                                    {isParent
+                                      ? getParentOptionStatusText(option)
+                                      : option.isActive
+                                      ? "Active"
+                                      : "Inactive"}
+                                  </button>
+                                </td>
+                                {isParent && (
+                                  <td className="px-4 py-2">
+                                    <div className="flex flex-wrap gap-2">
+                                      {findGroup(
+                                        chainingConfig.childGroupId
+                                      )?.options.map((child) => (
+                                        <label
+                                          key={child.id}
+                                          className={`flex items-center ${
+                                            !child.isActive ? "opacity-50" : ""
+                                          }`}
+                                        >
+                                          <input
+                                            type="checkbox"
+                                            checked={availabilityMatrix[
+                                              option.id
+                                            ]?.includes(child.id)}
+                                            onChange={() =>
+                                              toggleAvailability(
+                                                option.id,
+                                                child.id
+                                              )
+                                            }
+                                            className="h-3 w-3 text-blue-500 rounded border-gray-300"
+                                            disabled={!child.isActive}
+                                          />
+                                          <span className="ml-1 text-xs text-gray-600">
+                                            {child.value}
+                                          </span>
+                                        </label>
+                                      ))}
+                                    </div>
+                                  </td>
+                                )}
+                                <td className="px-4 py-2 text-right">
+                                  <button
+                                    onClick={() =>
+                                      deleteOption(group.id, option.id)
+                                    }
+                                    className="text-gray-500 hover:text-red-500"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div className="flex border border-gray-300 rounded-md">
                         <input
                           type="text"
-                          value={editNameValue}
-                          onChange={(e) => setEditNameValue(e.target.value)}
-                          className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                          autoFocus
+                          value={newOptionValues[group.id] || ""}
+                          onChange={(e) =>
+                            setNewOptionValues({
+                              ...newOptionValues,
+                              [group.id]: e.target.value,
+                            })
+                          }
+                          placeholder="Add new option value"
+                          className="flex-1 px-3 py-2 text-sm focus:outline-none"
                         />
                         <button
-                          onClick={() => saveEditName(group.id)}
-                          className="ml-2 text-gray-600 hover:text-gray-800"
+                          onClick={() => addOption(group.id)}
+                          className="px-3 bg-gray-100 border-l border-gray-300 hover:bg-gray-200"
                         >
-                          <Save className="w-4 h-4" />
+                          <PlusCircle className="w-4 h-4" />
                         </button>
                       </div>
-                    ) : (
-                      <div className="flex items-center">
-                        <h3 className="font-medium text-gray-800">
-                          {group.name}
-                        </h3>
-                        {chainingConfig.enabled && (
-                          <span
-                            className={`ml-2 text-xs px-2 py-0.5 rounded ${
-                              chainingConfig.parentGroupId === group.id
-                                ? "bg-blue-100 text-blue-800"
-                                : chainingConfig.childGroupId === group.id
-                                ? "bg-purple-100 text-purple-800"
-                                : ""
-                            }`}
-                          >
-                            {chainingConfig.parentGroupId === group.id
-                              ? "Parent"
-                              : chainingConfig.childGroupId === group.id
-                              ? "Child"
-                              : ""}
-                          </span>
-                        )}
-                        <button
-                          onClick={() => startEditName(group.id, group.name)}
-                          className="ml-2 text-gray-500 hover:text-gray-700"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex items-center">
-                    {chainingConfig.enabled && (
-                      <span className="mr-4">
-                        {chainingConfig.parentGroupId === group.id ? (
-                          <Link className="w-4 h-4 text-blue-500" />
-                        ) : chainingConfig.childGroupId === group.id ? (
-                          <Link className="w-4 h-4 text-purple-500" />
-                        ) : (
-                          <Link2Off className="w-4 h-4 text-gray-400" />
-                        )}
-                      </span>
-                    )}
-                    <button
-                      onClick={() => deleteOptionGroup(group.id)}
-                      className="text-gray-500 hover:text-red-500"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                    </div>
+                  )}
                 </div>
+              );
+            })}
 
-                {/* Options Table */}
-                <div className="border border-gray-200 rounded-md overflow-hidden mb-4">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Option Value
-                        </th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
-                        </th>
-                        {chainingConfig.enabled &&
-                          chainingConfig.parentGroupId === group.id && (
-                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Available{" "}
-                              {findGroup(chainingConfig.childGroupId)?.name ||
-                                "Child"}{" "}
-                              Options
-                            </th>
-                          )}
-                        <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {group.options.map((option) => (
-                        <tr key={option.id}>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-800">
-                            {option.value}
-                          </td>
-                          <td className="px-4 py-2 whitespace-nowrap">
-                            <button
-                              onClick={() =>
-                                toggleOptionActive(group.id, option.id)
-                              }
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                chainingConfig.enabled &&
-                                chainingConfig.parentGroupId === group.id
-                                  ? getParentOptionStatusClass(option)
-                                  : option.isActive
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-gray-100 text-gray-800"
-                              }`}
-                            >
-                              {chainingConfig.enabled &&
-                              chainingConfig.parentGroupId === group.id
-                                ? getParentOptionStatusText(option)
-                                : option.isActive
-                                ? "Active"
-                                : "Inactive"}
-                            </button>
-                          </td>
-
-                          {chainingConfig.enabled &&
-                            chainingConfig.parentGroupId === group.id && (
-                              <td className="px-4 py-2">
-                                <div className="flex flex-wrap gap-2">
-                                  {findGroup(
-                                    chainingConfig.childGroupId
-                                  )?.options.map((childOption) => (
-                                    <label
-                                      key={childOption.id}
-                                      className={`flex items-center ${
-                                        !childOption.isActive
-                                          ? "opacity-50"
-                                          : ""
-                                      }`}
-                                    >
-                                      <input
-                                        type="checkbox"
-                                        checked={(
-                                          availabilityMatrix[option.id] || []
-                                        ).includes(childOption.id)}
-                                        onChange={() =>
-                                          toggleAvailability(
-                                            option.id,
-                                            childOption.id
-                                          )
-                                        }
-                                        disabled={!childOption.isActive}
-                                        className="h-3 w-3 text-blue-500 rounded border-gray-300 focus:ring-blue-500"
-                                      />
-                                      <span className="ml-1 text-xs text-gray-600">
-                                        {childOption.value}
-                                        {!childOption.isActive && " (Inactive)"}
-                                      </span>
-                                    </label>
-                                  ))}
-                                </div>
-                              </td>
-                            )}
-
-                          <td className="px-4 py-2 whitespace-nowrap text-right text-sm">
-                            <button
-                              onClick={() => deleteOption(group.id, option.id)}
-                              className="text-gray-500 hover:text-red-500"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-
-                      {group.options.length === 0 && (
-                        <tr>
-                          <td
-                            colSpan={
-                              chainingConfig.enabled &&
-                              chainingConfig.parentGroupId === group.id
-                                ? 4
-                                : 3
-                            }
-                            className="px-4 py-4 text-sm text-gray-500 text-center"
-                          >
-                            No options added yet
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Add new option */}
-                <div className="flex rounded-md overflow-hidden border border-gray-300">
-                  <input
-                    type="text"
-                    value={newOptionValues[group.id] || ""}
-                    onChange={(e) =>
-                      setNewOptionValues({
-                        ...newOptionValues,
-                        [group.id]: e.target.value,
-                      })
-                    }
-                    placeholder="Add new option value"
-                    className="flex-1 py-2 px-3 bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-                  />
-                  <button
-                    onClick={() => addOption(group.id)}
-                    className="bg-gray-100 px-3 hover:bg-gray-200 border-l border-gray-300 text-sm font-medium text-gray-600"
-                  >
-                    <PlusCircle className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
-
-            {optionGroups.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                <PlusCircle className="w-10 h-10 mx-auto mb-2 opacity-30" />
-                <p>No option groups added yet</p>
-                <p className="text-sm">Add your first option group above</p>
-              </div>
-            )}
-
-            {/* SAVE Button */}
-            <div className="mt-6 flex justify-end">
+            {/* Save Section */}
+            <div className="mt-6 flex justify-end space-x-3">
+              <button className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm">
+                Cancel
+              </button>
               <button
                 onClick={handleSave}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 text-sm font-medium"
+                className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 text-sm"
               >
-                Save Product Options
+                Save Options
               </button>
             </div>
           </div>
         </div>
 
-        {/* Divider */}
-        <hr className="my-8 border-gray-300" />
-
-        {/* Public-facing UI */}
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 p-6">
+        {/* Preview Section */}
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6">
           <h2 className="text-lg font-medium text-gray-800 mb-6">
             Product Options Preview
           </h2>
-
-          {/* Product Name */}
           <div className="mb-6">
             <h3 className="text-xl font-bold text-gray-900">{productName}</h3>
             <p className="text-gray-600">{productDescription}</p>
           </div>
 
-          {/* Options Selection */}
           {optionGroups.map((group) => (
             <div key={group.id} className="mb-6">
-              <div className="mb-2 flex items-center justify-between">
-                <h4 className="text-sm font-medium text-gray-700">
-                  {group.name}
-                </h4>
-                {selectedOptions[group.id] !== undefined && (
-                  <span className="text-sm text-gray-500">
-                    Selected:{" "}
-                    {
-                      group.options.find(
-                        (o) => o.id === selectedOptions[group.id]
-                      )?.value
-                    }
-                  </span>
-                )}
-              </div>
+              <h4 className="text-sm font-medium text-gray-700 mb-2">
+                {group.name}
+              </h4>
               <div className="flex flex-wrap gap-2">
-                {group.options.map((option) => {
-                  const isChild =
-                    chainingConfig.enabled &&
-                    chainingConfig.childGroupId === group.id;
-                  const isAvailable = isOptionAvailable(option.id);
-                  const isParentDisabled =
-                    group.id === chainingConfig.parentGroupId &&
-                    isParentOptionDisabled(option.id);
-                  const isOptionDisabled =
-                    !option.isActive ||
-                    isParentDisabled ||
-                    (isChild && !isAvailable);
-
-                  return (
-                    <button
-                      key={option.id}
-                      onClick={() => {
-                        if (option.isActive && (!isChild || isAvailable)) {
-                          selectOption(group.id, option.id);
-                        }
-                      }}
-                      disabled={isOptionDisabled}
-                      className={`
-                        px-4 py-2 text-sm font-medium rounded-md
-                        ${
-                          selectedOptions[group.id] === option.id
-                            ? "bg-blue-100 text-blue-800 border-2 border-blue-500"
-                            : isOptionDisabled
-                            ? "bg-white text-gray-400 border-2 border-dashed border-gray-300 cursor-not-allowed"
-                            : "bg-white text-gray-700 border-2 border-gray-300 hover:bg-gray-50"
-                        }
-                      `}
-                    >
-                      {option.value}
-                    </button>
-                  );
-                })}
+                {group.options.map((option) => (
+                  <button
+                    key={option.id}
+                    onClick={() => selectOption(group.id, option.id)}
+                    className={`px-4 py-2 text-sm rounded-md border-2 ${
+                      selectedOptions[group.id] === option.id
+                        ? "border-blue-500 bg-blue-100"
+                        : "border-gray-300 bg-white"
+                    } ${
+                      !option.isActive ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    disabled={!option.isActive}
+                  >
+                    {option.value}
+                  </button>
+                ))}
               </div>
             </div>
           ))}
 
-          {/* Add to Cart */}
-          <div className="mt-8">
-            <button
-              disabled={!canAddToCart()}
-              className={`
-                px-6 py-3 rounded-md text-white font-medium
-                ${
-                  !canAddToCart()
-                    ? "bg-gray-300 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
-                }
-              `}
-            >
-              Add to Cart
-            </button>
-          </div>
+          <button
+            disabled={!canAddToCart()}
+            className={`mt-6 px-6 py-3 rounded-md text-white ${
+              canAddToCart()
+                ? "bg-blue-600 hover:bg-blue-700"
+                : "bg-gray-300 cursor-not-allowed"
+            }`}
+          >
+            Add to Cart
+          </button>
         </div>
       </div>
     </div>

@@ -29,13 +29,10 @@ export function PageHeroButton({ visibility }: { visibility: string }) {
       <div className="w-full mb-4 flex items-center justify-between relative">
         <h2 className="text-left font-semibold text-sm">Page hero</h2>
         <div
-          className={clsx(
-            "w-10 h-5 rounded-full relative cursor-pointer ease-in-out duration-200",
-            {
-              "bg-white border": visibility === HIDDEN,
-              "bg-blue border border-blue": visibility === VISIBLE,
-            }
-          )}
+          className={clsx("w-10 h-5 rounded-full relative cursor-pointer ease-in-out duration-200", {
+            "bg-white border": visibility === HIDDEN,
+            "bg-blue border border-blue": visibility === VISIBLE,
+          })}
         >
           <div
             className={clsx(
@@ -63,21 +60,15 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<PageHeroType> 
   const [title, setTitle] = useState<string>(pageHero.title || "");
   const [desktopImage, setDesktopImage] = useState<string>(pageHero.images?.desktop || "");
   const [mobileImage, setMobileImage] = useState<string>(pageHero.images?.mobile || "");
-  const [visibility, setVisibility] = useState<string>(
-    pageHero.visibility?.toUpperCase() || HIDDEN
-  );
+  const [visibility, setVisibility] = useState<string>(pageHero.visibility?.toUpperCase() || HIDDEN);
   const [destinationUrl, setDestinationUrl] = useState<string>(pageHero.destinationUrl || "");
 
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.storefront.name);
   const overlayName = useOverlayStore((state) => state.pages.storefront.overlays.editPageHero.name);
-  const isOverlayVisible = useOverlayStore(
-    (state) => state.pages.storefront.overlays.editPageHero.isVisible
-  );
-  const setPreventBodyOverflowChange = useBodyOverflowStore(
-    (state) => state.setPreventBodyOverflowChange
-  );
+  const isOverlayVisible = useOverlayStore((state) => state.pages.storefront.overlays.editPageHero.isVisible);
+  const setPreventBodyOverflowChange = useBodyOverflowStore((state) => state.setPreventBodyOverflowChange);
 
   useEffect(() => {
     if (isOverlayVisible) {
@@ -205,18 +196,11 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<PageHeroType> 
                   <div className="px-[10px] py-2 w-full min-[425px]:w-max rounded-md flex gap-4 min-[425px]:gap-4 items-start justify-between bg-lightgray">
                     <div className="text-sm">Show hero on storefront</div>
                     <div
-                      onClick={() =>
-                        setVisibility((prevVisibility) =>
-                          prevVisibility === VISIBLE ? HIDDEN : VISIBLE
-                        )
-                      }
-                      className={clsx(
-                        "w-10 h-5 rounded-full relative cursor-pointer ease-in-out duration-200",
-                        {
-                          "bg-white border": visibility === HIDDEN,
-                          "bg-blue border border-blue": visibility === VISIBLE,
-                        }
-                      )}
+                      onClick={() => setVisibility((prevVisibility) => (prevVisibility === VISIBLE ? HIDDEN : VISIBLE))}
+                      className={clsx("w-10 h-5 rounded-full relative cursor-pointer ease-in-out duration-200", {
+                        "bg-white border": visibility === HIDDEN,
+                        "bg-blue border border-blue": visibility === VISIBLE,
+                      })}
                     >
                       <div
                         className={clsx(
@@ -278,13 +262,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<PageHeroType> 
                                 unoptimized={true}
                               />
                             ) : (
-                              <Image
-                                src={desktopImage}
-                                alt={title}
-                                width={725}
-                                height={86}
-                                priority={true}
-                              />
+                              <Image src={desktopImage} alt={title} width={725} height={86} priority={true} />
                             )
                           ) : (
                             <ImageIcon color="#e5e5e5" size={52} strokeWidth={0.75} />
@@ -317,13 +295,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<PageHeroType> 
                                 unoptimized={true}
                               />
                             ) : (
-                              <Image
-                                src={mobileImage}
-                                alt={title}
-                                width={725}
-                                height={86}
-                                priority={true}
-                              />
+                              <Image src={mobileImage} alt={title} width={725} height={86} priority={true} />
                             )
                           ) : (
                             <ImageIcon color="#e5e5e5" size={52} strokeWidth={0.75} />

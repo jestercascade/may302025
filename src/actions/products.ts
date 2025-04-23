@@ -10,7 +10,6 @@ const BATCH_SIZE = 500; // Firestore batch limit
 export async function CreateProductAction(data: {
   name: string;
   slug: string;
-  category: string;
   basePrice: string;
   mainImage: string;
 }) {
@@ -21,7 +20,7 @@ export async function CreateProductAction(data: {
     const product = {
       name: data.name,
       slug: data.slug,
-      category: data.category,
+      category: "",
       description: "",
       highlights: { headline: "", keyPoints: [] },
       pricing: {

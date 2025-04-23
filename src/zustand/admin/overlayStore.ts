@@ -56,6 +56,7 @@ const OVERLAY_CONFIG = {
       "basicDetails",
       "mainImage",
       "imageGallery",
+      "options",
       "sizes",
       "colors",
       "description",

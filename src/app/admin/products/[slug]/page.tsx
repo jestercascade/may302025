@@ -26,9 +26,9 @@ import {
   SizeChartOverlay,
 } from "@/components/admin/EditProduct/SizeChartOverlay";
 import {
-  ColorsButton,
-  ColorsOverlay,
-} from "@/components/admin/EditProduct/ColorsOverlay";
+  OptionsButton,
+  OptionsOverlay,
+} from "@/components/admin/EditProduct/OptionsOverlay";
 import {
   DescriptionButton,
   DescriptionOverlay,
@@ -67,7 +67,6 @@ export default async function EditProduct({
       ids: [productId],
       fields: [
         "id",
-        "category",
         "name",
         "slug",
         "pricing",
@@ -88,7 +87,6 @@ export default async function EditProduct({
 
   const {
     id,
-    category,
     name,
     slug,
     pricing,
@@ -115,9 +113,8 @@ export default async function EditProduct({
           };
         }
       | null
-      | undefined // Allow for undefined
+      | undefined
   ) {
-    // Check if upsell exists and has pricing
     if (!upsell || !upsell.pricing) return null;
 
     const originalPrice = Number(
@@ -127,7 +124,6 @@ export default async function EditProduct({
       upsell.pricing.salePrice || upsell.pricing.basePrice || 0
     );
 
-    // Prevent division by zero
     if (originalPrice === 0) return null;
 
     const additionalSpend = upsellPrice - originalPrice;
@@ -143,7 +139,7 @@ export default async function EditProduct({
     ? calculateUpsell(product.pricing, upsell)
     : null;
 
-  const hasBasicDetails = category && name && pricing.basePrice && slug && id;
+  const hasBasicDetails = name && pricing.basePrice && slug && id;
   const hasOnPageSeo = seo.metaTitle && seo.metaDescription;
   const hasSourceInfo = [
     sourceInfo.platform,
@@ -194,10 +190,6 @@ export default async function EditProduct({
                       </div>
                       <MainImageButton />
                     </div>
-                  </div>
-                  <div className="p-5">
-                    <h3 className="text-xs text-gray mb-2">Category</h3>
-                    <p className="font-medium">{category}</p>
                   </div>
                   <div className="p-5">
                     <h3 className="text-xs text-gray mb-2">Name</h3>
@@ -372,12 +364,12 @@ export default async function EditProduct({
                   ) ? (
                     <div className="w-full flex items-center justify-between p-5 pr-2">
                       <span className="text-xs text-gray">No colors</span>
-                      <ColorsButton />
+                      <OptionsButton />
                     </div>
                   ) : (
                     <div className="w-full flex items-center justify-between pl-5 pr-2 py-2">
                       <span className="text-xs text-gray">Colors</span>
-                      <ColorsButton />
+                      <OptionsButton />
                     </div>
                   )}
                 </div>
@@ -460,7 +452,7 @@ export default async function EditProduct({
             </p>
           </div>
           <div className="w-full relative shadow rounded-xl bg-white">
-            {(!highlights.headline && !highlights.keyPoints.length) ? (
+            {!highlights.headline && !highlights.keyPoints.length ? (
               <div className="w-full flex items-center justify-between p-5 pr-2">
                 <span className="text-xs text-gray">Nothing here</span>
                 <HighlightsButton />
@@ -693,12 +685,12 @@ export default async function EditProduct({
           </div>
         </div>
       </div>
-      <BasicDetailsOverlay data={{ id, category, name, slug, pricing }} />
+      <BasicDetailsOverlay data={{ id, name, slug, pricing }} />
       <OnPageSeoOverlay data={{ id, seo }} />
       <ProductSourceOverlay data={{ id, sourceInfo }} />
       <MainImageOverlay data={{ id, images }} />
       <ImageGalleryOverlay data={{ id, images }} />
-      <ColorsOverlay data={{ id, colors: options.colors }} />
+      <OptionsOverlay />
       <SizeChartOverlay
         data={{
           id,
