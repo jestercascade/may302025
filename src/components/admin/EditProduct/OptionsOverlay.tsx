@@ -295,11 +295,6 @@ export function OptionsOverlay() {
     }
   };
 
-  const startEditName = (groupId, currentName) => {
-    setEditingName(groupId);
-    setEditNameValue(currentName);
-  };
-
   const saveEditName = (groupId) => {
     if (editNameValue.trim() === "") return;
 
@@ -403,60 +398,6 @@ export function OptionsOverlay() {
     setOptionGroups(newGroups);
   };
 
-  // Helper functions
-  const isOptionAvailable = (childOptionId) => {
-    if (!chainingConfig.enabled) return true;
-
-    const parentOptionId = selectedOptions[chainingConfig.parentGroupId];
-    if (!parentOptionId) return true;
-
-    return (availabilityMatrix[parentOptionId] || []).includes(childOptionId);
-  };
-
-  const isParentOptionDisabled = (parentOptionId) => {
-    return disabledParentOptions.includes(parentOptionId);
-  };
-
-  // Public-facing functions
-  const selectOption = (groupId, optionId) => {
-    const option = findGroup(groupId).options.find((o) => o.id === optionId);
-    if (!option.isActive) return;
-
-    if (chainingConfig.enabled) {
-      if (groupId === chainingConfig.parentGroupId) {
-        if (isParentOptionDisabled(optionId)) return;
-
-        setSelectedOptions({
-          ...selectedOptions,
-          [groupId]: optionId,
-          [chainingConfig.childGroupId]: null,
-        });
-      } else if (groupId === chainingConfig.childGroupId) {
-        const parentOptionId = selectedOptions[chainingConfig.parentGroupId];
-        if (parentOptionId && isOptionAvailable(optionId)) {
-          setSelectedOptions({
-            ...selectedOptions,
-            [groupId]: optionId,
-          });
-        }
-      } else {
-        setSelectedOptions({
-          ...selectedOptions,
-          [groupId]: optionId,
-        });
-      }
-    } else {
-      setSelectedOptions({
-        ...selectedOptions,
-        [groupId]: optionId,
-      });
-    }
-  };
-
-  const canAddToCart = () => {
-    return optionGroups.every((group) => selectedOptions[group.id] !== undefined);
-  };
-
   const handleSave = () => {
     const product = {
       name: productName,
@@ -532,7 +473,7 @@ export function OptionsOverlay() {
                   <span className="font-semibold text-sm text-blue">Options</span>
                 </button>
                 <button
-                  // onClick={handleSave}
+                  onClick={handleSave}
                   disabled={loading}
                   className={clsx(
                     "relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
@@ -566,7 +507,7 @@ export function OptionsOverlay() {
                     />
                     <button
                       onClick={addOptionGroup}
-                      className="bg-blue hover:bg-blue-dimmed text-white px-4 py-2 rounded-md text-sm font-medium"
+                      className="bg-lightgray hover:bg-lightgray-dimmed px-4 py-2 rounded-md text-sm font-medium"
                     >
                       <span className="mr-1">Add</span>
                     </button>
@@ -672,7 +613,7 @@ export function OptionsOverlay() {
                   return (
                     <div key={group.id} className="border rounded-lg overflow-hidden mb-4">
                       <div
-                        className="flex items-center justify-between py-3 px-4 bg-white cursor-pointer"
+                        className="flex items-center justify-between p-3 pr-4 bg-white cursor-pointer"
                         onClick={() =>
                           setCollapsedGroups((prev) => ({
                             ...prev,
@@ -869,7 +810,7 @@ export function OptionsOverlay() {
             </div>
             <div className="md:hidden w-full pb-5 pt-2 px-5 absolute bottom-0 bg-white">
               <button
-                // onClick={handleSave}
+                onClick={handleSave}
                 disabled={loading}
                 className={clsx(
                   "relative h-12 w-full rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
