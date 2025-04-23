@@ -501,9 +501,9 @@ export function OptionsOverlay() {
   };
 
   const getParentOptionStatusClass = (option) => {
-    if (!option.isActive) return "bg-gray-100 text-gray-800";
-    if (isParentOptionDisabled(option.id)) return "bg-yellow-100 text-yellow-800";
-    return "bg-green-100 text-green-800";
+    if (!option.isActive) return "bg-gray-100";
+    if (isParentOptionDisabled(option.id)) return "bg-yellow-100 text-yellow-700";
+    return "bg-green-100 text-green-700";
   };
 
   return (
@@ -554,11 +554,11 @@ export function OptionsOverlay() {
                   )}
                 </button>
               </div>
-              <div className="w-full h-full mt-[52px] md:mt-0 p-5 flex flex-col gap-5 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
+              <div className="space-y-2 w-full h-full mt-[52px] md:mt-0 p-5 flex flex-col gap-5 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
                 {/* ... */}
 
                 {/* Add New Option Group Section */}
-                <div className="mb-4 space-y-2">
+                <div className="space-y-2">
                   <h2 className="text-sm font-medium">Option Group</h2>
                   <div className="flex space-x-2">
                     <input
@@ -566,11 +566,11 @@ export function OptionsOverlay() {
                       value={newGroupName}
                       onChange={(e) => setNewGroupName(e.target.value)}
                       placeholder="Group name (e.g. Size, Color, Material)"
-                      className="flex-1 border border-gray-300 rounded-md px-4 py-2 text-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none"
+                      className="flex-1 border rounded-md px-4 py-2 text-sm outline-none"
                     />
                     <button
                       onClick={addOptionGroup}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium"
+                      className="bg-blue hover:bg-blue-dimmed text-white px-4 py-2 rounded-md text-sm font-medium"
                     >
                       <span className="mr-1">Add</span>
                     </button>
@@ -579,28 +579,27 @@ export function OptionsOverlay() {
 
                 {/* Chain Option Groups Section */}
                 {optionGroups.length >= 2 && (
-                  <div className="mb-4 bg-gray-50 rounded-lg p-4 space-y-4 border border-gray-200">
+                  <div className="bg-neutral-50 rounded-lg space-y-4 px-4 py-[14px] border">
                     <div className="flex items-center justify-between">
                       <h2 className="text-sm font-medium">Chain Option Groups</h2>
                       <div className="flex items-center">
-                        <span className="mr-2 text-sm text-gray-600">
+                        <span className="mr-2 text-sm text-gray">
                           {chainingConfig.enabled ? "Enabled" : "Disabled"}
                         </span>
                         <div
                           onClick={toggleChaining}
                           className={`w-10 h-5 rounded-full relative cursor-pointer ease-in-out duration-200 border ${
-                            chainingConfig.enabled ? "bg-blue-100 border-blue-300" : "bg-white border-gray-300"
+                            chainingConfig.enabled ? "bg-blue-100 border-blue-300" : "bg-white border-neutral-300"
                           }`}
                         >
                           <div
                             className={`w-3 h-3 rounded-full ease-in-out duration-300 absolute top-1/2 transform -translate-y-1/2 ${
-                              chainingConfig.enabled ? "left-6 bg-blue-600" : "left-1 bg-black"
+                              chainingConfig.enabled ? "left-[22px] bg-blue" : "left-1 bg-black"
                             }`}
                           ></div>
                         </div>
                       </div>
                     </div>
-
                     {chainingConfig.enabled && (
                       <div className="p-4 border rounded-md bg-white">
                         <div className="grid grid-cols-2 gap-4">
@@ -617,9 +616,8 @@ export function OptionsOverlay() {
                                     : chainingConfig.childGroupId
                                 );
                               }}
-                              className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              className="w-full bg-white border rounded px-3 py-2 text-sm focus:outline-none"
                             >
-                              <option value="">Select Parent Group</option>
                               {optionGroups.map((group) => (
                                 <option key={group.id} value={group.id}>
                                   {group.name}
@@ -642,9 +640,8 @@ export function OptionsOverlay() {
                                     value
                                   );
                                 }}
-                                className="flex-1 bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                className="flex-1 bg-white border rounded px-3 py-2 text-sm focus:outline-none"
                               >
-                                <option value="">Select Child Group</option>
                                 {optionGroups.map((group) => (
                                   <option key={group.id} value={group.id}>
                                     {group.name}
@@ -655,12 +652,12 @@ export function OptionsOverlay() {
                                 onClick={swapParentChild}
                                 className="ml-2 p-2 bg-gray-100 rounded hover:bg-gray-200"
                               >
-                                <RefreshCw className="w-4 h-4 text-gray-600" />
+                                <RefreshCw className="w-4 h-4 text-gray" />
                               </button>
                             </div>
                           </div>
                         </div>
-                        <p className="mt-3 text-xs text-blue-600">
+                        <p className="mt-3 text-xs text-gray">
                           Parent options will be disabled if all their linked child options are inactive.
                         </p>
                       </div>
@@ -677,9 +674,9 @@ export function OptionsOverlay() {
                   const isLastGroup = groupIndex === optionGroups.length - 1;
 
                   return (
-                    <div key={group.id} className="mb-4 border border-gray-200 rounded-lg overflow-hidden">
+                    <div key={group.id} className="border rounded-lg overflow-hidden">
                       <div
-                        className="flex items-center justify-between px-6 py-4 bg-white cursor-pointer"
+                        className="flex items-center justify-between py-3 pr-4 pl-3 bg-white cursor-pointer"
                         onClick={() =>
                           setCollapsedGroups((prev) => ({
                             ...prev,
@@ -689,9 +686,9 @@ export function OptionsOverlay() {
                       >
                         <div className="flex items-center">
                           {isCollapsed ? (
-                            <ChevronRight size={18} className="text-gray-600 mr-2" />
+                            <ChevronRight size={18} className="text-gray mr-2" />
                           ) : (
-                            <ChevronDown size={18} className="text-gray-600 mr-2" />
+                            <ChevronDown size={18} className="text-gray mr-2" />
                           )}
                           <div className="flex items-center">
                             {editingName === group.id ? (
@@ -699,20 +696,20 @@ export function OptionsOverlay() {
                                 type="text"
                                 value={editNameValue}
                                 onChange={(e) => setEditNameValue(e.target.value)}
-                                className="px-2 py-1 border border-gray-300 rounded text-sm"
+                                className="px-2 py-1 border rounded text-sm"
                                 autoFocus
                                 onBlur={() => saveEditName(group.id)}
                               />
                             ) : (
                               <>
-                                <span className="font-medium text-gray-800">{group.name}</span>
+                                <span className="font-medium">{group.name}</span>
                                 {isParent && (
-                                  <span className="ml-2 text-xs px-2 py-0.5 bg-blue-100 text-blue-800 rounded">
+                                  <span className="ml-2 text-xs px-2 py-0.5 bg-lightgray text-gray rounded">
                                     Parent
                                   </span>
                                 )}
                                 {isChild && (
-                                  <span className="ml-2 text-xs px-2 py-0.5 bg-purple-100 text-purple-800 rounded">
+                                  <span className="ml-2 text-xs px-2 py-0.5 bg-lightgray text-gray rounded">
                                     Child
                                   </span>
                                 )}
@@ -728,7 +725,7 @@ export function OptionsOverlay() {
                                   e.stopPropagation();
                                   moveGroupUp(groupIndex);
                                 }}
-                                className="p-1 text-gray-500 hover:text-gray-700"
+                                className="p-1 text-gray"
                               >
                                 <ChevronUp size={18} />
                               </button>
@@ -739,7 +736,7 @@ export function OptionsOverlay() {
                                   e.stopPropagation();
                                   moveGroupDown(groupIndex);
                                 }}
-                                className="p-1 text-gray-500 hover:text-gray-700"
+                                className="p-1 text-gray"
                               >
                                 <ChevronDown size={18} />
                               </button>
@@ -750,49 +747,47 @@ export function OptionsOverlay() {
                               e.stopPropagation();
                               deleteOptionGroup(group.id);
                             }}
-                            className="text-gray-500 hover:text-red-500"
+                            className="text-gray hover:text-red-700"
                           >
-                            <Trash2 size={18} />
+                            <Trash2 size={20} />
                           </button>
                         </div>
                       </div>
 
                       {!isCollapsed && (
-                        <div className="border-t border-gray-200">
-                          <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                        <div className="border-t">
+                          <table className="min-w-full divide-y divide-neutral-200">
+                            <thead className="bg-neutral-50">
                               <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-4 pt-2 pb-1.5 text-left text-xs font-medium text-gray uppercase tracking-wider">
                                   Option Value
                                 </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-4 pt-2 pb-1.5 min-w-28 max-w-28 text-left text-xs font-medium text-gray uppercase tracking-wider">
                                   Status
                                 </th>
                                 {isParent && (
-                                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                  <th className="px-4 pt-2 pb-1.5 text-left text-xs font-medium text-gray uppercase tracking-wider">
                                     Available Options
                                   </th>
                                 )}
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-4 pt-2 pb-1.5 text-right text-xs font-medium text-gray uppercase tracking-wider">
                                   Actions
                                 </th>
                               </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
+                            <tbody className="bg-white divide-y divide-neutral-200">
                               {group.options.map((option) => (
                                 <tr key={option.id}>
-                                  <td className="px-6 py-3 whitespace-nowrap text-sm font-medium text-gray-800">
-                                    {option.value}
-                                  </td>
-                                  <td className="px-6 py-3 whitespace-nowrap">
+                                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">{option.value}</td>
+                                  <td className="px-4 py-3 whitespace-nowrap">
                                     <button
                                       onClick={() => toggleOptionActive(group.id, option.id)}
                                       className={`px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full ${
                                         isParent
                                           ? getParentOptionStatusClass(option)
                                           : option.isActive
-                                          ? "bg-green-100 text-green-800"
-                                          : "bg-gray-100 text-gray-800"
+                                          ? "bg-green-100 text-green-700"
+                                          : "bg-neutral-100"
                                       }`}
                                     >
                                       {isParent
@@ -803,7 +798,7 @@ export function OptionsOverlay() {
                                     </button>
                                   </td>
                                   {isParent && (
-                                    <td className="px-6 py-3 whitespace-nowrap">
+                                    <td className="px-4 py-3 whitespace-nowrap">
                                       <div className="flex flex-wrap gap-2">
                                         {findGroup(chainingConfig.childGroupId)?.options.map((child) => (
                                           <label
@@ -814,28 +809,28 @@ export function OptionsOverlay() {
                                               type="checkbox"
                                               checked={availabilityMatrix[option.id]?.includes(child.id)}
                                               onChange={() => toggleAvailability(option.id, child.id)}
-                                              className="h-3 w-3 text-blue-500 rounded border-gray-300"
+                                              className="h-3 w-3 text-blue rounded"
                                               disabled={!child.isActive}
                                             />
-                                            <span className="ml-1 text-xs text-gray-600">{child.value}</span>
+                                            <span className="ml-1 text-xs text-gray">{child.value}</span>
                                           </label>
                                         ))}
                                       </div>
                                     </td>
                                   )}
-                                  <td className="px-6 py-3 whitespace-nowrap text-right text-sm">
+                                  <td className="px-4 py-3 whitespace-nowrap text-right text-sm">
                                     <button
                                       onClick={() => deleteOption(group.id, option.id)}
-                                      className="text-gray-500 hover:text-red-500"
+                                      className="text-gray hover:text-red-700"
                                     >
-                                      <Trash2 size={16} />
+                                      <X size={16} />
                                     </button>
                                   </td>
                                 </tr>
                               ))}
                             </tbody>
                           </table>
-                          <div className="px-6 py-3 bg-white border-t border-gray-200 flex">
+                          <div className="px-4 py-3 bg-white border-t flex">
                             <input
                               type="text"
                               value={newOptionValues[group.id] || ""}
@@ -846,12 +841,9 @@ export function OptionsOverlay() {
                                 })
                               }
                               placeholder="Add new option value"
-                              className="flex-1 border border-gray-300 rounded-md px-4 py-2 text-sm focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none"
+                              className="flex-1 border rounded-md px-4 py-2 text-sm  outline-none"
                             />
-                            <button
-                              onClick={() => addOption(group.id)}
-                              className="ml-2 text-gray-500 hover:text-blue-500"
-                            >
+                            <button onClick={() => addOption(group.id)} className="ml-2 text-gray hover:text-blue">
                               <PlusCircle size={20} />
                             </button>
                           </div>
