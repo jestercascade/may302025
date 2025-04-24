@@ -20,13 +20,14 @@ import {
   ArrowDown,
   ArrowRight,
   ArrowLeft as ArrowLeftIcon,
+  Table,
 } from "lucide-react";
 import { UpdateProductAction } from "@/actions/products";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import SizesTable from "./SizesTable";
 
-// Define interfaces for internal use within the component
+// **Interfaces**
 interface Option {
   id: number;
   value: string;
@@ -46,32 +47,20 @@ interface ChainingConfig {
   relationships?: Array<{
     parentGroupId: number;
     childGroupId: number;
-    constraints: {
-      [parentOptionId: string]: number[];
-    };
+    constraints: { [parentOptionId: string]: number[] };
   }>;
 }
 
-type AvailabilityMatrix = {
-  [key: number]: number[];
-};
+type AvailabilityMatrix = { [key: number]: number[] };
 
 type SizeChartType = {
-  inches: {
-    columns: { label: string; order: number }[];
-    rows: TableRowType[];
-  };
-  centimeters: {
-    columns: { label: string; order: number }[];
-    rows: TableRowType[];
-  };
+  inches: { columns: { label: string; order: number }[]; rows: TableRowType[] };
+  centimeters: { columns: { label: string; order: number }[]; rows: TableRowType[] };
 };
 
-type TableRowType = {
-  [key: string]: string;
-};
+type TableRowType = { [key: string]: string };
 
-// OptionsButton component
+// **OptionsButton Component**
 export function OptionsButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
@@ -88,7 +77,7 @@ export function OptionsButton({ className }: { className: string }) {
   );
 }
 
-// OptionsOverlay component with the fix applied
+// **OptionsOverlay Component**
 export function OptionsOverlay({
   data,
 }: {
@@ -98,11 +87,7 @@ export function OptionsOverlay({
       groups: Array<{
         id: number;
         name: string;
-        values: Array<{
-          id: number;
-          value: string;
-          isActive: boolean;
-        }>;
+        values: Array<{ id: number; value: string; isActive: boolean }>;
       }>;
       config: { chaining: ChainingConfig };
       sizes?: SizeChartType;
@@ -110,7 +95,10 @@ export function OptionsOverlay({
     };
   };
 }) {
+  // **State Declarations**
   const [loading, setLoading] = useState<boolean>(false);
+  const [sizeChartEnabled, setSizeChartEnabled] = useState<boolean>(data.options.sizeChartGroupId !== null);
+  const [showSizeChart, setShowSizeChart] = useState<boolean>(false);
 
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
@@ -119,6 +107,7 @@ export function OptionsOverlay({
   const isOverlayVisible = useOverlayStore((state) => state.pages.editProduct.overlays.options.isVisible);
   const setPreventBodyOverflowChange = useBodyOverflowStore((state) => state.setPreventBodyOverflowChange);
 
+  // **Body Overflow Effect**
   useEffect(() => {
     if (isOverlayVisible) {
       document.body.style.overflow = "hidden";
@@ -135,34 +124,24 @@ export function OptionsOverlay({
     };
   }, [isOverlayVisible, setPreventBodyOverflowChange]);
 
-  // Initialize option groups from props with corrected property name and safety check
+  // **Initialize Option Groups**
   const [optionGroups, setOptionGroups] = useState<OptionGroup[]>(() => {
     if (!data.options || !data.options.groups) return [];
-
     return data.options.groups.map((group) => ({
       id: group.id,
       name: group.name,
       options: group.values
-        ? group.values.map((opt) => ({
-            id: opt.id,
-            value: opt.value,
-            isActive: opt.isActive,
-          }))
+        ? group.values.map((opt) => ({ id: opt.id, value: opt.value, isActive: opt.isActive }))
         : [],
     }));
   });
 
-  // Initialize chaining configuration from props
+  // **Initialize Chaining Configuration**
   const [chainingConfig, setChainingConfig] = useState<ChainingConfig>(() => {
     const config = data.options?.config?.chaining;
     if (!config || !config.enabled || !config.relationships || config.relationships.length === 0) {
-      return {
-        enabled: false,
-        parentGroupId: null,
-        childGroupId: null,
-      };
+      return { enabled: false, parentGroupId: null, childGroupId: null };
     }
-
     const relationship = config.relationships[0];
     return {
       enabled: config.enabled,
@@ -171,82 +150,62 @@ export function OptionsOverlay({
     };
   });
 
-  // Initialize availability matrix from props
+  // **Initialize Availability Matrix**
   const [availabilityMatrix, setAvailabilityMatrix] = useState<AvailabilityMatrix>(() => {
     const config = data.options?.config?.chaining;
-    if (!config || !config.enabled || !config.relationships || config.relationships.length === 0) {
-      return {};
-    }
-
+    if (!config || !config.enabled || !config.relationships || config.relationships.length === 0) return {};
     const constraints = config.relationships[0].constraints;
     const matrix: AvailabilityMatrix = {};
-
     Object.keys(constraints).forEach((key) => {
       matrix[Number(key)] = constraints[key];
     });
-
     return matrix;
   });
 
-  // Size chart states
+  // **Size Chart States**
   const [sizeChartGroupId, setSizeChartGroupId] = useState<number | null>(data.options.sizeChartGroupId || null);
   const [activeTab, setActiveTab] = useState<"inches" | "centimeters">("inches");
   const [tableData, setTableData] = useState<SizeChartType>(
-    data.options.sizes || {
-      inches: { columns: [], rows: [] },
-      centimeters: { columns: [], rows: [] },
-    }
+    data.options.sizes || { inches: { columns: [], rows: [] }, centimeters: { columns: [], rows: [] } }
   );
   const [rowsCount, setRowsCount] = useState<number>(0);
   const [columnsCount, setColumnsCount] = useState<number>(0);
 
-  // Initialize size chart group and counts
+  // **Initialize Size Chart Group and Counts**
   useEffect(() => {
     setRowsCount(tableData[activeTab].rows.length);
     setColumnsCount(tableData[activeTab].columns.length);
-
     if (data.options.sizes && !sizeChartGroupId) {
       const sizeGroup = optionGroups.find((group) => group.name.toLowerCase() === "size");
-      if (sizeGroup) {
-        setSizeChartGroupId(sizeGroup.id);
-      }
+      if (sizeGroup) setSizeChartGroupId(sizeGroup.id);
     }
   }, [data.options.sizes, optionGroups, tableData, activeTab, sizeChartGroupId]);
 
-  // Admin state
+  // **Admin State**
   const [newOptionValues, setNewOptionValues] = useState<{ [key: number]: string }>({});
   const [editingName, setEditingName] = useState<number | null>(null);
   const [editNameValue, setEditNameValue] = useState<string>("");
   const [newGroupName, setNewGroupName] = useState<string>("");
-  const [collapsedGroups, setCollapsedGroups] = useState<{
-    [key: number]: boolean;
-  }>({});
+  const [collapsedGroups, setCollapsedGroups] = useState<{ [key: number]: boolean }>({});
 
-  // Public-facing state
+  // **Public-Facing State**
   const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: number }>({});
 
-  // Track which parent options should be disabled based on child availability
+  // **Track Disabled Parent Options**
   const [disabledParentOptions, setDisabledParentOptions] = useState<number[]>([]);
 
-  // Find a group by ID
-  const findGroup = (groupId: number): OptionGroup | undefined => {
-    return optionGroups.find((group) => group.id === groupId);
-  };
+  // **Helper Functions**
+  const findGroup = (groupId: number): OptionGroup | undefined => optionGroups.find((group) => group.id === groupId);
 
-  // Effect to update disabled parent options
   useEffect(() => {
     if (!chainingConfig.enabled || chainingConfig.parentGroupId === null || chainingConfig.childGroupId === null) {
       setDisabledParentOptions([]);
       return;
     }
-
     const childGroup = findGroup(chainingConfig.childGroupId);
     const parentGroup = findGroup(chainingConfig.parentGroupId);
-
     if (!childGroup || !parentGroup) return;
-
     const activeChildOptionIds = childGroup.options.filter((option) => option.isActive).map((option) => option.id);
-
     const newDisabledParentOptions = parentGroup.options
       .filter((parentOption) => {
         const availableChildOptions = availabilityMatrix[parentOption.id] || [];
@@ -256,67 +215,46 @@ export function OptionsOverlay({
         return parentOption.isActive && !hasActiveChildOption;
       })
       .map((option) => option.id);
-
     setDisabledParentOptions(newDisabledParentOptions);
   }, [optionGroups, availabilityMatrix, chainingConfig]);
 
-  // Effect to set default parent and child groups when chaining is enabled
   useEffect(() => {
     if (chainingConfig.enabled && optionGroups.length >= 2) {
       let parentId = chainingConfig.parentGroupId;
       let childId = chainingConfig.childGroupId;
-
-      if (parentId === null || !findGroup(parentId)) {
-        parentId = optionGroups[0].id;
-      }
-
+      if (parentId === null || !findGroup(parentId)) parentId = optionGroups[0].id;
       if (childId === null || !findGroup(childId) || childId === parentId) {
         const otherGroup = optionGroups.find((g) => g.id !== parentId);
         childId = otherGroup ? otherGroup.id : optionGroups[1] ? optionGroups[1].id : null;
       }
-
       if (parentId !== chainingConfig.parentGroupId || childId !== chainingConfig.childGroupId) {
-        if (parentId !== null && childId !== null) {
-          setParentChildRelationship(parentId, childId);
-        }
+        if (parentId !== null && childId !== null) setParentChildRelationship(parentId, childId);
       }
     }
   }, [chainingConfig.enabled, optionGroups]);
 
-  // Admin functions
+  // **Admin Functions**
   const addOptionGroup = () => {
     if (newGroupName.trim() === "") return;
-
-    const newGroup: OptionGroup = {
-      id: Date.now(),
-      name: newGroupName,
-      options: [],
-    };
-
+    const newGroup: OptionGroup = { id: Date.now(), name: newGroupName, options: [] };
     setOptionGroups([...optionGroups, newGroup]);
     setNewGroupName("");
   };
 
   const deleteOptionGroup = (groupId: number) => {
     if (chainingConfig.parentGroupId === groupId || chainingConfig.childGroupId === groupId) {
-      setChainingConfig({
-        enabled: false,
-        parentGroupId: null,
-        childGroupId: null,
-      });
+      setChainingConfig({ enabled: false, parentGroupId: null, childGroupId: null });
     }
-
     if (sizeChartGroupId === groupId) {
       setSizeChartGroupId(null);
+      setSizeChartEnabled(false);
     }
-
     setOptionGroups(optionGroups.filter((group) => group.id !== groupId));
     setCollapsedGroups((prev) => {
       const newState = { ...prev };
       delete newState[groupId];
       return newState;
     });
-
     const newSelections = { ...selectedOptions };
     delete newSelections[groupId];
     setSelectedOptions(newSelections);
@@ -324,36 +262,19 @@ export function OptionsOverlay({
 
   const addOption = (groupId: number) => {
     if (!newOptionValues[groupId] || newOptionValues[groupId].trim() === "") return;
-
     setOptionGroups(
       optionGroups.map((group) => {
         if (group.id === groupId) {
-          const newOption: Option = {
-            id: Date.now(),
-            value: newOptionValues[groupId],
-            isActive: true,
-          };
-
+          const newOption: Option = { id: Date.now(), value: newOptionValues[groupId], isActive: true };
           if (chainingConfig.enabled && chainingConfig.parentGroupId === groupId) {
-            setAvailabilityMatrix({
-              ...availabilityMatrix,
-              [newOption.id]: [],
-            });
+            setAvailabilityMatrix({ ...availabilityMatrix, [newOption.id]: [] });
           }
-
-          return {
-            ...group,
-            options: [...group.options, newOption],
-          };
+          return { ...group, options: [...group.options, newOption] };
         }
         return group;
       })
     );
-
-    setNewOptionValues({
-      ...newOptionValues,
-      [groupId]: "",
-    });
+    setNewOptionValues({ ...newOptionValues, [groupId]: "" });
   };
 
   const toggleOptionActive = (groupId: number, optionId: number) => {
@@ -362,26 +283,20 @@ export function OptionsOverlay({
         if (group.id === groupId) {
           return {
             ...group,
-            options: group.options.map((option) => {
-              if (option.id === optionId) {
-                return { ...option, isActive: !option.isActive };
-              }
-              return option;
-            }),
+            options: group.options.map((option) =>
+              option.id === optionId ? { ...option, isActive: !option.isActive } : option
+            ),
           };
         }
         return group;
       })
     );
-
     if (selectedOptions[groupId] === optionId) {
       const newSelections = { ...selectedOptions };
       delete newSelections[groupId];
-
       if (chainingConfig.enabled && chainingConfig.childGroupId !== null && chainingConfig.parentGroupId === groupId) {
         delete newSelections[chainingConfig.childGroupId];
       }
-
       setSelectedOptions(newSelections);
     }
   };
@@ -389,96 +304,56 @@ export function OptionsOverlay({
   const deleteOption = (groupId: number, optionId: number) => {
     setOptionGroups(
       optionGroups.map((group) => {
-        if (group.id === groupId) {
-          return {
-            ...group,
-            options: group.options.filter((option) => option.id !== optionId),
-          };
-        }
+        if (group.id === groupId)
+          return { ...group, options: group.options.filter((option) => option.id !== optionId) };
         return group;
       })
     );
-
     if (chainingConfig.enabled && chainingConfig.parentGroupId === groupId) {
       const newMatrix = { ...availabilityMatrix };
       delete newMatrix[optionId];
       setAvailabilityMatrix(newMatrix);
     }
-
     if (selectedOptions[groupId] === optionId) {
       const newSelections = { ...selectedOptions };
       delete newSelections[groupId];
-
       if (chainingConfig.enabled && chainingConfig.childGroupId !== null && chainingConfig.parentGroupId === groupId) {
         delete newSelections[chainingConfig.childGroupId];
       }
-
       setSelectedOptions(newSelections);
     }
   };
 
   const saveEditName = (groupId: number) => {
     if (editNameValue.trim() === "") return;
-
-    setOptionGroups(
-      optionGroups.map((group) => {
-        if (group.id === groupId) {
-          return { ...group, name: editNameValue };
-        }
-        return group;
-      })
-    );
-
+    setOptionGroups(optionGroups.map((group) => (group.id === groupId ? { ...group, name: editNameValue } : group)));
     setEditingName(null);
   };
 
   const toggleAvailability = (parentOptionId: number, childOptionId: number) => {
     const currentAvailability = availabilityMatrix[parentOptionId] || [];
-
     if (currentAvailability.includes(childOptionId)) {
       setAvailabilityMatrix({
         ...availabilityMatrix,
         [parentOptionId]: currentAvailability.filter((id) => id !== childOptionId),
       });
     } else {
-      setAvailabilityMatrix({
-        ...availabilityMatrix,
-        [parentOptionId]: [...currentAvailability, childOptionId],
-      });
+      setAvailabilityMatrix({ ...availabilityMatrix, [parentOptionId]: [...currentAvailability, childOptionId] });
     }
   };
 
   const toggleChaining = () => {
-    setChainingConfig({
-      ...chainingConfig,
-      enabled: !chainingConfig.enabled,
-    });
-    if (!chainingConfig.enabled) {
-      setSelectedOptions({});
-    }
+    setChainingConfig({ ...chainingConfig, enabled: !chainingConfig.enabled });
+    if (!chainingConfig.enabled) setSelectedOptions({});
   };
 
   const setParentChildRelationship = (parentId: number | null, childId: number | null) => {
-    if (parentId === null || childId === null || parentId === childId) {
-      return;
-    }
-
+    if (parentId === null || childId === null || parentId === childId) return;
     if (!findGroup(parentId) || !findGroup(childId)) return;
-
     const newMatrix: AvailabilityMatrix = {};
     const parentGroup = findGroup(parentId);
-    if (parentGroup) {
-      parentGroup.options.forEach((option) => {
-        newMatrix[option.id] = [];
-      });
-    }
-
-    setChainingConfig({
-      enabled: true,
-      parentGroupId: parentId,
-      childGroupId: childId,
-    });
-
+    if (parentGroup) parentGroup.options.forEach((option) => (newMatrix[option.id] = []));
+    setChainingConfig({ enabled: true, parentGroupId: parentId, childGroupId: childId });
     setAvailabilityMatrix(newMatrix);
     setSelectedOptions({});
   };
@@ -486,28 +361,20 @@ export function OptionsOverlay({
   const swapParentChild = () => {
     if (!chainingConfig.enabled || chainingConfig.parentGroupId === null || chainingConfig.childGroupId === null)
       return;
-
     const newMatrix: AvailabilityMatrix = {};
     const newParentGroup = findGroup(chainingConfig.childGroupId);
-    if (newParentGroup) {
-      newParentGroup.options.forEach((option) => {
-        newMatrix[option.id] = [];
-      });
-    }
-
+    if (newParentGroup) newParentGroup.options.forEach((option) => (newMatrix[option.id] = []));
     setChainingConfig({
       enabled: true,
       parentGroupId: chainingConfig.childGroupId,
       childGroupId: chainingConfig.parentGroupId,
     });
-
     setAvailabilityMatrix(newMatrix);
     setSelectedOptions({});
   };
 
   const moveGroupUp = (index: number) => {
     if (index <= 0) return;
-
     const newGroups = [...optionGroups];
     [newGroups[index], newGroups[index - 1]] = [newGroups[index - 1], newGroups[index]];
     setOptionGroups(newGroups);
@@ -515,23 +382,19 @@ export function OptionsOverlay({
 
   const moveGroupDown = (index: number) => {
     if (index >= optionGroups.length - 1) return;
-
     const newGroups = [...optionGroups];
     [newGroups[index], newGroups[index + 1]] = [newGroups[index + 1], newGroups[index]];
     setOptionGroups(newGroups);
   };
 
-  // Size chart functions
+  // **Size Chart Functions**
   const columns = tableData[activeTab].columns.sort((a, b) => a.order - b.order).map((col) => col.label);
 
   const addRow = () => {
     if (rowsCount === 0 && columnsCount === 0) {
       setTableData((prevData) => ({
         ...prevData,
-        [activeTab]: {
-          columns: [{ label: "Column1", order: 0 }],
-          rows: [{ Column1: "" }],
-        },
+        [activeTab]: { columns: [{ label: "Column1", order: 0 }], rows: [{ Column1: "" }] },
       }));
       setRowsCount(1);
       setColumnsCount(1);
@@ -539,10 +402,7 @@ export function OptionsOverlay({
       const newRow = columns.reduce((acc, col) => ({ ...acc, [col]: "" }), {});
       setTableData((prevData) => ({
         ...prevData,
-        [activeTab]: {
-          ...prevData[activeTab],
-          rows: [...prevData[activeTab].rows, newRow],
-        },
+        [activeTab]: { ...prevData[activeTab], rows: [...prevData[activeTab].rows, newRow] },
       }));
       setRowsCount((prev) => prev + 1);
     }
@@ -552,10 +412,7 @@ export function OptionsOverlay({
     if (rowsCount === 0 && columnsCount === 0) {
       setTableData((prevData) => ({
         ...prevData,
-        [activeTab]: {
-          columns: [{ label: "Column1", order: 0 }],
-          rows: [{ Column1: "" }],
-        },
+        [activeTab]: { columns: [{ label: "Column1", order: 0 }], rows: [{ Column1: "" }] },
       }));
       setRowsCount(1);
       setColumnsCount(1);
@@ -566,10 +423,7 @@ export function OptionsOverlay({
         ...prevData,
         [activeTab]: {
           columns: [...prevData[activeTab].columns, { label: newColumnName, order: newColumnOrder }],
-          rows: prevData[activeTab].rows.map((row) => ({
-            ...row,
-            [newColumnName]: "",
-          })),
+          rows: prevData[activeTab].rows.map((row) => ({ ...row, [newColumnName]: "" })),
         },
       }));
       setColumnsCount((prev) => prev + 1);
@@ -578,22 +432,13 @@ export function OptionsOverlay({
 
   const removeRow = () => {
     if (rowsCount === 1) {
-      setTableData((prevData) => ({
-        ...prevData,
-        [activeTab]: {
-          columns: [],
-          rows: [],
-        },
-      }));
+      setTableData((prevData) => ({ ...prevData, [activeTab]: { columns: [], rows: [] } }));
       setRowsCount(0);
       setColumnsCount(0);
     } else if (rowsCount > 1) {
       setTableData((prevData) => ({
         ...prevData,
-        [activeTab]: {
-          ...prevData[activeTab],
-          rows: prevData[activeTab].rows.slice(0, -1),
-        },
+        [activeTab]: { ...prevData[activeTab], rows: prevData[activeTab].rows.slice(0, -1) },
       }));
       setRowsCount((prev) => prev - 1);
     }
@@ -601,13 +446,7 @@ export function OptionsOverlay({
 
   const removeColumn = () => {
     if (columnsCount === 1) {
-      setTableData((prevData) => ({
-        ...prevData,
-        [activeTab]: {
-          columns: [],
-          rows: [],
-        },
-      }));
+      setTableData((prevData) => ({ ...prevData, [activeTab]: { columns: [], rows: [] } }));
       setRowsCount(0);
       setColumnsCount(0);
     } else if (columnsCount > 1) {
@@ -631,24 +470,14 @@ export function OptionsOverlay({
       const text = await navigator.clipboard.readText();
       const rows = text.split("\n").map((row) => row.split("\t"));
       const headers = rows[0];
-
       const newRows = rows.slice(1).map((row) => {
         const newRow: { [key: string]: string } = {};
-        headers.forEach((header, index) => {
-          newRow[header.trim()] = row[index]?.trim() || "";
-        });
+        headers.forEach((header, index) => (newRow[header.trim()] = row[index]?.trim() || ""));
         return newRow;
       });
-
       setTableData((prevData) => ({
         ...prevData,
-        [activeTab]: {
-          columns: headers.map((label, order) => ({
-            label: label.trim(),
-            order,
-          })),
-          rows: newRows,
-        },
+        [activeTab]: { columns: headers.map((label, order) => ({ label: label.trim(), order })), rows: newRows },
       }));
     } catch (error) {
       console.error("Failed to paste data:", error);
@@ -661,13 +490,7 @@ export function OptionsOverlay({
   };
 
   const updateData = (updatedData: Array<{ [key: string]: string }>) => {
-    setTableData((prevData) => ({
-      ...prevData,
-      [activeTab]: {
-        ...prevData[activeTab],
-        rows: updatedData,
-      },
-    }));
+    setTableData((prevData) => ({ ...prevData, [activeTab]: { ...prevData[activeTab], rows: updatedData } }));
   };
 
   const updateColumns = (updatedColumns: { label: string; order: number }[]) => {
@@ -675,25 +498,15 @@ export function OptionsOverlay({
       const updateRows = (rows: TableRowType[]) =>
         rows.map((row) => {
           const newRow: TableRowType = {};
-          updatedColumns.forEach(({ label }) => {
-            newRow[label] = row[label] || "";
-          });
+          updatedColumns.forEach(({ label }) => (newRow[label] = row[label] || ""));
           return newRow;
         });
-
-      return {
-        ...prevData,
-        [activeTab]: {
-          columns: updatedColumns,
-          rows: updateRows(prevData[activeTab].rows),
-        },
-      };
+      return { ...prevData, [activeTab]: { columns: updatedColumns, rows: updateRows(prevData[activeTab].rows) } };
     });
   };
 
   const handleSave = async () => {
     setLoading(true);
-
     const updatedData = {
       id: data.id,
       options: {
@@ -701,11 +514,7 @@ export function OptionsOverlay({
           id: group.id,
           name: group.name,
           displayOrder: index + 1,
-          values: group.options.map((option) => ({
-            id: option.id,
-            value: option.value,
-            isActive: option.isActive,
-          })),
+          values: group.options.map((option) => ({ id: option.id, value: option.value, isActive: option.isActive })),
         })),
         config: {
           chaining: {
@@ -726,45 +535,45 @@ export function OptionsOverlay({
                 : [],
           },
         },
-        sizes: sizeChartGroupId !== null ? tableData : undefined,
-        sizeChartGroupId: sizeChartGroupId,
+        sizes: sizeChartEnabled && sizeChartGroupId !== null ? tableData : undefined,
+        sizeChartGroupId: sizeChartEnabled ? sizeChartGroupId : null,
       },
     };
-
     try {
       const result = await UpdateProductAction(updatedData);
-      showAlert({
-        message: result.message,
-        type: result.type,
-      });
+      showAlert({ message: result.message, type: result.type });
     } catch (error) {
       console.error("Error updating product options:", error);
-      showAlert({
-        message: "Failed to update product options",
-        type: ShowAlertType.ERROR,
-      });
+      showAlert({ message: "Failed to update product options", type: ShowAlertType.ERROR });
     } finally {
       setLoading(false);
       hideOverlay({ pageName, overlayName });
     }
   };
 
-  const getParentOptionStatusText = (option: Option): string => {
-    if (!option.isActive) return "Inactive";
-    return "Active";
+  const getParentOptionStatusText = (option: Option): string => (!option.isActive ? "Inactive" : "Active");
+
+  const getParentOptionStatusClass = (option: Option): string =>
+    !option.isActive ? "bg-neutral-100" : "bg-green-100 text-green-700";
+
+  const toggleSizeChartEnabled = () => {
+    const sizeGroup = optionGroups.find((group) => group.name.toLowerCase() === "size");
+    if (sizeGroup) {
+      setSizeChartEnabled(!sizeChartEnabled);
+      setSizeChartGroupId(sizeChartEnabled ? null : sizeGroup.id);
+    }
   };
 
-  const getParentOptionStatusClass = (option: Option): string => {
-    if (!option.isActive) return "bg-gray-100";
-    return "bg-green-100 text-green-700";
-  };
+  const toggleSizeChart = () => setShowSizeChart(!showSizeChart);
 
+  // **Render**
   return (
     <>
       {isOverlayVisible && (
         <Overlay>
           <div className="absolute bottom-0 left-0 right-0 w-full h-[calc(100%-60px)] rounded-t-[20px] overflow-hidden bg-white md:w-[700px] md:rounded-2xl md:shadow md:h-max md:mx-auto md:mt-20 md:mb-[50vh] md:relative md:bottom-auto md:left-auto md:right-auto md:top-auto md:-translate-x-0">
             <div className="w-full h-[calc(100vh-188px)] md:h-auto">
+              {/* Mobile Header */}
               <div className="md:hidden flex items-end justify-center pt-4 pb-2 absolute top-0 left-0 right-0 bg-white">
                 <div className="relative flex justify-center items-center w-full h-7">
                   <h2 className="font-semibold text-lg">Options</h2>
@@ -777,6 +586,8 @@ export function OptionsOverlay({
                   </button>
                 </div>
               </div>
+
+              {/* Desktop Header */}
               <div className="hidden md:flex md:items-center md:justify-between py-2 pr-4 pl-2">
                 <button
                   onClick={() => hideOverlay({ pageName, overlayName })}
@@ -791,10 +602,7 @@ export function OptionsOverlay({
                   disabled={loading}
                   className={clsx(
                     "relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
-                    {
-                      "bg-opacity-50": loading,
-                      "hover:bg-neutral-600 active:bg-neutral-800": !loading,
-                    }
+                    { "bg-opacity-50": loading, "hover:bg-neutral-600 active:bg-neutral-800": !loading }
                   )}
                 >
                   {loading ? (
@@ -807,8 +615,10 @@ export function OptionsOverlay({
                   )}
                 </button>
               </div>
+
+              {/* Main Content */}
               <div className="space-y-2 w-full h-full mt-[52px] md:mt-0 p-5 flex flex-col gap-5 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
-                {/* Add New Option Group Section */}
+                {/* Add New Option Group */}
                 <div className="space-y-2">
                   <h2 className="text-sm font-medium">Option Group</h2>
                   <div className="flex space-x-2">
@@ -828,7 +638,7 @@ export function OptionsOverlay({
                   </div>
                 </div>
 
-                {/* Chain Option Groups Section */}
+                {/* Chain Option Groups */}
                 {optionGroups.length >= 2 && (
                   <div className="bg-neutral-50 rounded-lg space-y-4 px-4 py-[14px] border">
                     <div className="flex items-center justify-between">
@@ -876,7 +686,6 @@ export function OptionsOverlay({
                               ))}
                             </select>
                           </div>
-
                           <div>
                             <div className="mb-2 text-sm font-medium">Child Group:</div>
                             <div className="flex items-center">
@@ -901,7 +710,7 @@ export function OptionsOverlay({
                               </select>
                               <button
                                 onClick={swapParentChild}
-                                className="ml-2 p-2 bg-gray-100 rounded hover:bg-gray-200"
+                                className="ml-2 p-2 bg-neutral-100 rounded hover:bg-neutral-200"
                               >
                                 <RefreshCw className="w-4 h-4 text-gray" />
                               </button>
@@ -928,12 +737,7 @@ export function OptionsOverlay({
                     <div key={group.id} className="border rounded-lg overflow-hidden mb-4">
                       <div
                         className="flex items-center justify-between p-3 pr-4 bg-white cursor-pointer"
-                        onClick={() =>
-                          setCollapsedGroups((prev) => ({
-                            ...prev,
-                            [group.id]: !prev[group.id],
-                          }))
-                        }
+                        onClick={() => setCollapsedGroups((prev) => ({ ...prev, [group.id]: !prev[group.id] }))}
                       >
                         <div className="flex items-center">
                           {isCollapsed ? (
@@ -1000,25 +804,6 @@ export function OptionsOverlay({
                           >
                             <Trash2 size={18} />
                           </button>
-                          {group.name.toLowerCase() === "size" && (
-                            <div
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSizeChartGroupId(sizeChartGroupId === group.id ? null : group.id);
-                              }}
-                              className={`w-10 h-5 rounded-full relative cursor-pointer ease-in-out duration-200 border ${
-                                sizeChartGroupId === group.id
-                                  ? "bg-blue-100 border-blue-300"
-                                  : "bg-white border-neutral-300"
-                              }`}
-                            >
-                              <div
-                                className={`w-3 h-3 rounded-full ease-in-out duration-300 absolute top-1/2 transform -translate-y-1/2 ${
-                                  sizeChartGroupId === group.id ? "left-[22px] bg-blue" : "left-1 bg-black"
-                                }`}
-                              ></div>
-                            </div>
-                          )}
                         </div>
                       </div>
 
@@ -1117,12 +902,7 @@ export function OptionsOverlay({
                             <input
                               type="text"
                               value={newOptionValues[group.id] || ""}
-                              onChange={(e) =>
-                                setNewOptionValues({
-                                  ...newOptionValues,
-                                  [group.id]: e.target.value,
-                                })
-                              }
+                              onChange={(e) => setNewOptionValues({ ...newOptionValues, [group.id]: e.target.value })}
                               placeholder="Add new option value"
                               className="flex-1 border rounded-md px-4 py-2 text-sm outline-none"
                             />
@@ -1134,87 +914,143 @@ export function OptionsOverlay({
                               <PlusCircle size={20} />
                             </button>
                           </div>
-                          {sizeChartGroupId === group.id && (
-                            <div className="p-4 border-t">
-                              <div className="space-y-2 mb-6">
-                                <p className="text-xs text-gray">Unit</p>
-                                <div className="inline-flex p-1 bg-lightgray rounded-lg">
-                                  <button
-                                    onClick={() => setActiveTab("inches")}
-                                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
-                                      activeTab === "inches" ? "bg-white shadow-sm" : "text-gray hover:text-black"
-                                    }`}
-                                  >
-                                    Inches
-                                  </button>
-                                  <button
-                                    onClick={() => setActiveTab("centimeters")}
-                                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
-                                      activeTab === "centimeters" ? "bg-white shadow-sm" : "text-gray hover:text-black"
-                                    }`}
-                                  >
-                                    Centimeters
-                                  </button>
+
+                          {/* Size Chart Section for "Size" Group */}
+                          {group.name.toLowerCase() === "size" && (
+                            <div className="mb-4 pt-4 border-t">
+                              <div className="w-[calc(100%-32px)] mx-auto flex items-center justify-between bg-neutral-50 p-4 rounded-md">
+                                <div className="flex items-center">
+                                  <Table size={20} className="text-gray mr-3" />
+                                  <span className="font-medium text-gray">Size Chart</span>
                                 </div>
-                              </div>
-                              <div className="space-y-2 mb-5">
-                                <p className="text-xs text-gray">Grid Size</p>
-                                <div className="inline-flex items-center bg-gray-100 p-1 rounded-md">
-                                  <button
-                                    onClick={removeRow}
-                                    className="w-7 h-7 flex items-center justify-center text-gray hover:bg-white hover:shadow-sm rounded"
-                                  >
-                                    <ArrowUp size={14} />
-                                  </button>
-                                  <button
-                                    onClick={addRow}
-                                    className="w-7 h-7 flex items-center justify-center text-gray hover:bg-white hover:shadow-sm rounded"
-                                  >
-                                    <ArrowDown size={14} />
-                                  </button>
-                                  <div className="w-px h-5 bg-gray-300 mx-1"></div>
-                                  <span className="text-sm font-medium px-2">
-                                    {rowsCount}×{columnsCount}
+                                <div className="flex items-center">
+                                  <span className="mr-2 text-sm text-gray">
+                                    {sizeChartEnabled ? "Enabled" : "Disabled"}
                                   </span>
-                                  <div className="w-px h-5 bg-gray-300 mx-1"></div>
-                                  <button
-                                    onClick={removeColumn}
-                                    className="w-7 h-7 flex items-center justify-center text-gray hover:bg-white hover:shadow-sm rounded"
+                                  <div
+                                    onClick={toggleSizeChartEnabled}
+                                    className={`w-10 h-5 rounded-full relative cursor-pointer ease-in-out duration-200 border ${
+                                      sizeChartEnabled ? "bg-blue-100 border-blue-300" : "bg-white border-neutral-300"
+                                    }`}
                                   >
-                                    <ArrowLeftIcon size={14} />
-                                  </button>
-                                  <button
-                                    onClick={addColumn}
-                                    className="w-7 h-7 flex items-center justify-center text-gray hover:bg-white hover:shadow-sm rounded"
-                                  >
-                                    <ArrowRight size={14} />
-                                  </button>
+                                    <div
+                                      className={`w-3 h-3 rounded-full ease-in-out duration-300 absolute top-1/2 transform -translate-y-1/2 ${
+                                        sizeChartEnabled ? "left-[22px] bg-blue" : "left-1 bg-black"
+                                      }`}
+                                    ></div>
+                                  </div>
                                 </div>
                               </div>
-                              <div className="flex justify-end mb-4">
-                                <button
-                                  onClick={handlePasteData}
-                                  className="relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors bg-lightgray hover:bg-lightgray-dimmed"
-                                >
-                                  Paste from Clipboard
-                                </button>
-                              </div>
-                              {tableData[activeTab].rows.length > 0 ? (
-                                <SizesTable
-                                  data={tableData[activeTab].rows}
-                                  columns={columns}
-                                  onUpdate={updateData}
-                                  onColumnUpdate={updateColumns}
-                                />
-                              ) : (
-                                <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg">
-                                  <p className="text-gray-500 mb-4">No data available. Add a row to start.</p>
-                                  <button
-                                    onClick={addRow}
-                                    className="px-4 py-2 text-sm font-medium text-white bg-neutral-700 rounded-full hover:bg-neutral-600 active:bg-neutral-800"
-                                  >
-                                    Add Row
-                                  </button>
+
+                              {sizeChartEnabled && (
+                                <div className="mt-3">
+                                  <div className="w-[calc(100%-32px)] mx-auto mb-3">
+                                    <button
+                                      onClick={toggleSizeChart}
+                                      className="flex items-center text-blue hover:text-blue-700 transition-colors text-xs font-medium"
+                                    >
+                                      {showSizeChart ? (
+                                        <>
+                                          <ChevronUp size={16} className="mr-1" />
+                                          Hide size chart
+                                        </>
+                                      ) : (
+                                        <>
+                                          <ChevronDown size={16} className="mr-1" />
+                                          Show size chart
+                                        </>
+                                      )}
+                                    </button>
+                                  </div>
+                                  {showSizeChart && sizeChartGroupId === group.id && (
+                                    <div className="p-4 border-t">
+                                      <div className="space-y-2 mb-6">
+                                        <p className="text-xs text-gray">Unit</p>
+                                        <div className="inline-flex p-1 bg-lightgray rounded-lg">
+                                          <button
+                                            onClick={() => setActiveTab("inches")}
+                                            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                              activeTab === "inches"
+                                                ? "bg-white shadow-sm"
+                                                : "text-gray hover:text-black"
+                                            }`}
+                                          >
+                                            Inches
+                                          </button>
+                                          <button
+                                            onClick={() => setActiveTab("centimeters")}
+                                            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                              activeTab === "centimeters"
+                                                ? "bg-white shadow-sm"
+                                                : "text-gray hover:text-black"
+                                            }`}
+                                          >
+                                            Centimeters
+                                          </button>
+                                        </div>
+                                      </div>
+                                      <div className="space-y-2 mb-5">
+                                        <p className="text-xs text-gray">Grid Size</p>
+                                        <div className="inline-flex items-center bg-lightgray p-1 rounded-md">
+                                          <button
+                                            onClick={removeRow}
+                                            className="w-7 h-7 flex items-center justify-center text-gray hover:bg-white hover:shadow-sm rounded"
+                                          >
+                                            <ArrowUp size={14} />
+                                          </button>
+                                          <button
+                                            onClick={addRow}
+                                            className="w-7 h-7 flex items-center justify-center text-gray hover:bg-white hover:shadow-sm rounded"
+                                          >
+                                            <ArrowDown size={14} />
+                                          </button>
+                                          <div className="w-px h-5 bg-neutral-300 mx-1"></div>
+                                          <span className="text-sm font-medium px-2">
+                                            {rowsCount}×{columnsCount}
+                                          </span>
+                                          <div className="w-px h-5 bg-neutral-300 mx-1"></div>
+                                          <button
+                                            onClick={removeColumn}
+                                            className="w-7 h-7 flex items-center justify-center text-gray hover:bg-white hover:shadow-sm rounded"
+                                          >
+                                            <ArrowLeftIcon size={14} />
+                                          </button>
+                                          <button
+                                            onClick={addColumn}
+                                            className="w-7 h-7 flex items-center justify-center text-gray hover:bg-white hover:shadow-sm rounded"
+                                          >
+                                            <ArrowRight size={14} />
+                                          </button>
+                                        </div>
+                                      </div>
+                                      <div className="flex justify-end mb-4">
+                                        <button
+                                          onClick={handlePasteData}
+                                          className="relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors bg-lightgray hover:bg-lightgray-dimmed"
+                                        >
+                                          Paste from Clipboard
+                                        </button>
+                                      </div>
+                                      {tableData[activeTab].rows.length > 0 ? (
+                                        <SizesTable
+                                          data={tableData[activeTab].rows}
+                                          columns={columns}
+                                          onUpdate={updateData}
+                                          onColumnUpdate={updateColumns}
+                                        />
+                                      ) : (
+                                        <div className="flex flex-col items-center justify-center p-6 bg-neutral-50 rounded-lg">
+                                          <p className="text-gray-500 mb-4">No data available. Add a row to start.</p>
+                                          <button
+                                            onClick={addRow}
+                                            className="px-4 py-2 text-sm font-medium text-white bg-neutral-700 rounded-full hover:bg-neutral-600 active:bg-neutral-800"
+                                          >
+                                            Add Row
+                                          </button>
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -1226,16 +1062,15 @@ export function OptionsOverlay({
                 })}
               </div>
             </div>
+
+            {/* Mobile Save Button */}
             <div className="md:hidden w-full pb-5 pt-2 px-5 absolute bottom-0 bg-white">
               <button
                 onClick={handleSave}
                 disabled={loading}
                 className={clsx(
                   "relative h-12 w-full rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
-                  {
-                    "bg-opacity-50": loading,
-                    "hover:bg-neutral-600 active:bg-neutral-800": !loading,
-                  }
+                  { "bg-opacity-50": loading, "hover:bg-neutral-600 active:bg-neutral-800": !loading }
                 )}
               >
                 {loading ? (
