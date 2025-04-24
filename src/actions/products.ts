@@ -24,7 +24,15 @@ export async function CreateProductAction(data: { name: string; slug: string; ba
         discountPercentage: 0,
       },
       images: { main: data.mainImage, gallery: [] },
-      options: null,
+      options: {
+        groups: [],
+        config: {
+          chaining: {
+            enabled: false,
+            relationships: [],
+          },
+        },
+      },
       seo: { metaTitle: "", metaDescription: "" },
       visibility: "DRAFT" as const,
       createdAt: currentTime,
@@ -65,22 +73,19 @@ export async function UpdateProductAction(
     const currentProduct = productSnap.data() as ProductType;
     const isPricingChanged = hasPricingChanged(data.pricing, currentProduct.pricing);
 
-    // Properly merge options with the new structure
+    // Properly merge options with the correct structure from types
     const updatedOptions = data.options
       ? {
-          ...currentProduct.options,
-          ...data.options,
-          groups: data.options.groups || currentProduct.options?.groups || [],
+          groups: Array.isArray(data.options.groups) ? data.options.groups : currentProduct.options?.groups || [],
           config: {
-            ...currentProduct.options?.config,
-            ...data.options.config,
             chaining: {
-              ...currentProduct.options?.config?.chaining,
-              ...data.options.config?.chaining,
-              relationships:
-                data.options.config?.chaining?.relationships ||
-                currentProduct.options?.config?.chaining?.relationships ||
-                [],
+              enabled:
+                data.options.config?.chaining?.enabled !== undefined
+                  ? data.options.config.chaining.enabled
+                  : currentProduct.options?.config?.chaining?.enabled || false,
+              relationships: Array.isArray(data.options.config?.chaining?.relationships)
+                ? data.options.config.chaining.relationships
+                : currentProduct.options?.config?.chaining?.relationships || [],
             },
           },
         }

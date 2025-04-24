@@ -37,6 +37,42 @@ type CollectionType = {
   updatedAt: string;
 };
 
+// Define size chart type for reusability
+type SizeChartType = {
+  centimeters?: {
+    columns: Array<{
+      label: string;
+      order: number;
+    }>;
+    rows: Array<{
+      [key: string]: string;
+    }>;
+  };
+  inches?: {
+    columns: Array<{
+      label: string;
+      order: number;
+    }>;
+    rows: Array<{
+      [key: string]: string;
+    }>;
+  };
+};
+
+// Define updated options group type for reusability
+type OptionGroupType = {
+  id: number;
+  name: string;
+  displayOrder: number;
+  values: Array<{
+    id: number;
+    value: string;
+    isActive: boolean;
+  }>;
+  // Add size chart directly to option group when needed
+  sizeChart?: SizeChartType;
+};
+
 type UpsellType = {
   id: string;
   mainImage: string;
@@ -59,16 +95,7 @@ type UpsellType = {
       gallery: string[];
     };
     options: {
-      groups: Array<{
-        id: number;
-        name: string;
-        displayOrder: number;
-        values: Array<{
-          id: number;
-          value: string;
-          isActive: boolean;
-        }>;
-      }>;
+      groups: Array<OptionGroupType>;
       config: {
         chaining: {
           enabled: boolean;
@@ -108,16 +135,7 @@ type ProductWithUpsellType = {
     gallery: string[];
   };
   options: {
-    groups: Array<{
-      id: number;
-      name: string;
-      displayOrder: number;
-      values: Array<{
-        id: number;
-        value: string;
-        isActive: boolean;
-      }>;
-    }>;
+    groups: Array<OptionGroupType>;
     config: {
       chaining: {
         enabled: boolean;
@@ -167,16 +185,7 @@ type ProductWithUpsellType = {
         gallery: string[];
       };
       options: {
-        groups: Array<{
-          id: number;
-          name: string;
-          displayOrder: number;
-          values: Array<{
-            id: number;
-            value: string;
-            isActive: boolean;
-          }>;
-        }>;
+        groups: Array<OptionGroupType>;
         config: {
           chaining: {
             enabled: boolean;
@@ -232,16 +241,7 @@ type UpsellReviewProductType = {
         gallery: string[];
       };
       options: {
-        groups: Array<{
-          id: number;
-          name: string;
-          displayOrder: number;
-          values: Array<{
-            id: number;
-            value: string;
-            isActive: boolean;
-          }>;
-        }>;
+        groups: Array<OptionGroupType>;
         config: {
           chaining: {
             enabled: boolean;
@@ -282,16 +282,7 @@ type ProductType = {
     gallery: string[];
   };
   options: {
-    groups: Array<{
-      id: number;
-      name: string;
-      displayOrder: number;
-      values: Array<{
-        id: number;
-        value: string;
-        isActive: boolean;
-      }>;
-    }>;
+    groups: Array<OptionGroupType>;
     config: {
       chaining: {
         enabled: boolean;

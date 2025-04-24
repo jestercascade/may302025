@@ -16,10 +16,15 @@ import {
   ArrowLeft,
   Pencil,
   X,
+  ArrowUp,
+  ArrowDown,
+  ArrowRight,
+  ArrowLeft as ArrowLeftIcon,
 } from "lucide-react";
 import { UpdateProductAction } from "@/actions/products";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { ShowAlertType } from "@/lib/sharedTypes";
+import SizesTable from "./SizesTable";
 
 interface Option {
   id: number;
@@ -43,6 +48,21 @@ type AvailabilityMatrix = {
   [key: number]: number[];
 };
 
+type SizeChartType = {
+  inches: {
+    columns: { label: string; order: number }[];
+    rows: TableRowType[];
+  };
+  centimeters: {
+    columns: { label: string; order: number }[];
+    rows: TableRowType[];
+  };
+};
+
+type TableRowType = {
+  [key: string]: string;
+};
+
 export function OptionsButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
@@ -59,7 +79,14 @@ export function OptionsButton({ className }: { className: string }) {
   );
 }
 
-export function OptionsOverlay({ data }: { data: { id: string; options: ProductType["options"] } }) {
+export function OptionsOverlay({
+  data,
+}: {
+  data: { id: string; options: ProductType["options"]; sizes?: SizeChartType };
+}) {
+
+  console.log(data);
+
   const [loading, setLoading] = useState<boolean>(false);
 
   const showAlert = useAlertStore((state) => state.showAlert);
@@ -135,6 +162,31 @@ export function OptionsOverlay({ data }: { data: { id: string; options: ProductT
 
     return matrix;
   });
+
+  // Size chart states
+  const [sizeChartGroupId, setSizeChartGroupId] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<"inches" | "centimeters">("inches");
+  const [tableData, setTableData] = useState<SizeChartType>(
+    data.sizes || {
+      inches: { columns: [], rows: [] },
+      centimeters: { columns: [], rows: [] },
+    }
+  );
+  const [rowsCount, setRowsCount] = useState<number>(0);
+  const [columnsCount, setColumnsCount] = useState<number>(0);
+
+  // Initialize size chart group and counts
+  useEffect(() => {
+    setRowsCount(tableData[activeTab].rows.length);
+    setColumnsCount(tableData[activeTab].columns.length);
+
+    if (data.sizes && !sizeChartGroupId) {
+      const sizeGroup = optionGroups.find((group) => group.name.toLowerCase() === "size");
+      if (sizeGroup) {
+        setSizeChartGroupId(sizeGroup.id);
+      }
+    }
+  }, [data.sizes, optionGroups, tableData, activeTab, sizeChartGroupId]);
 
   // Admin state
   const [newOptionValues, setNewOptionValues] = useState<{ [key: number]: string }>({});
@@ -225,6 +277,10 @@ export function OptionsOverlay({ data }: { data: { id: string; options: ProductT
         parentGroupId: null,
         childGroupId: null,
       });
+    }
+
+    if (sizeChartGroupId === groupId) {
+      setSizeChartGroupId(null);
     }
 
     setOptionGroups(optionGroups.filter((group) => group.id !== groupId));
@@ -438,6 +494,176 @@ export function OptionsOverlay({ data }: { data: { id: string; options: ProductT
     setOptionGroups(newGroups);
   };
 
+  // Size chart functions
+  const columns = tableData[activeTab].columns.sort((a, b) => a.order - b.order).map((col) => col.label);
+
+  const addRow = () => {
+    if (rowsCount === 0 && columnsCount === 0) {
+      setTableData((prevData) => ({
+        ...prevData,
+        [activeTab]: {
+          columns: [{ label: "Column1", order: 0 }],
+          rows: [{ Column1: "" }],
+        },
+      }));
+      setRowsCount(1);
+      setColumnsCount(1);
+    } else {
+      const newRow = columns.reduce((acc, col) => ({ ...acc, [col]: "" }), {});
+      setTableData((prevData) => ({
+        ...prevData,
+        [activeTab]: {
+          ...prevData[activeTab],
+          rows: [...prevData[activeTab].rows, newRow],
+        },
+      }));
+      setRowsCount((prev) => prev + 1);
+    }
+  };
+
+  const addColumn = () => {
+    if (rowsCount === 0 && columnsCount === 0) {
+      setTableData((prevData) => ({
+        ...prevData,
+        [activeTab]: {
+          columns: [{ label: "Column1", order: 0 }],
+          rows: [{ Column1: "" }],
+        },
+      }));
+      setRowsCount(1);
+      setColumnsCount(1);
+    } else {
+      const newColumnName = `Column${columns.length + 1}`;
+      const newColumnOrder = Math.max(...tableData[activeTab].columns.map((col) => col.order), 0) + 1;
+      setTableData((prevData) => ({
+        ...prevData,
+        [activeTab]: {
+          columns: [...prevData[activeTab].columns, { label: newColumnName, order: newColumnOrder }],
+          rows: prevData[activeTab].rows.map((row) => ({
+            ...row,
+            [newColumnName]: "",
+          })),
+        },
+      }));
+      setColumnsCount((prev) => prev + 1);
+    }
+  };
+
+  const removeRow = () => {
+    if (rowsCount === 1) {
+      setTableData((prevData) => ({
+        ...prevData,
+        [activeTab]: {
+          columns: [],
+          rows: [],
+        },
+      }));
+      setRowsCount(0);
+      setColumnsCount(0);
+    } else if (rowsCount > 1) {
+      setTableData((prevData) => ({
+        ...prevData,
+        [activeTab]: {
+          ...prevData[activeTab],
+          rows: prevData[activeTab].rows.slice(0, -1),
+        },
+      }));
+      setRowsCount((prev) => prev - 1);
+    }
+  };
+
+  const removeColumn = () => {
+    if (columnsCount === 1) {
+      setTableData((prevData) => ({
+        ...prevData,
+        [activeTab]: {
+          columns: [],
+          rows: [],
+        },
+      }));
+      setRowsCount(0);
+      setColumnsCount(0);
+    } else if (columnsCount > 1) {
+      const lastColumn = columns[columns.length - 1];
+      setTableData((prevData) => ({
+        ...prevData,
+        [activeTab]: {
+          columns: prevData[activeTab].columns.slice(0, -1),
+          rows: prevData[activeTab].rows.map((row) => {
+            const { [lastColumn]: _omitted, ...rest } = row;
+            return rest;
+          }),
+        },
+      }));
+      setColumnsCount((prev) => prev - 1);
+    }
+  };
+
+  const handlePasteData = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      const rows = text.split("\n").map((row) => row.split("\t"));
+      const headers = rows[0];
+
+      const newRows = rows.slice(1).map((row) => {
+        const newRow: { [key: string]: string } = {};
+        headers.forEach((header, index) => {
+          newRow[header.trim()] = row[index]?.trim() || "";
+        });
+        return newRow;
+      });
+
+      setTableData((prevData) => ({
+        ...prevData,
+        [activeTab]: {
+          columns: headers.map((label, order) => ({
+            label: label.trim(),
+            order,
+          })),
+          rows: newRows,
+        },
+      }));
+    } catch (error) {
+      console.error("Failed to paste data:", error);
+      showAlert({
+        message: "Failed to paste data. Make sure you have copied a valid table.",
+        type: ShowAlertType.NEUTRAL,
+      });
+      setPreventBodyOverflowChange(true);
+    }
+  };
+
+  const updateData = (updatedData: Array<{ [key: string]: string }>) => {
+    setTableData((prevData) => ({
+      ...prevData,
+      [activeTab]: {
+        ...prevData[activeTab],
+        rows: updatedData,
+      },
+    }));
+  };
+
+  const updateColumns = (updatedColumns: { label: string; order: number }[]) => {
+    setTableData((prevData) => {
+      const updateRows = (rows: TableRowType[]) =>
+        rows.map((row) => {
+          const newRow: TableRowType = {};
+          updatedColumns.forEach(({ label }) => {
+            newRow[label] = row[label] || "";
+          });
+          return newRow;
+        });
+
+      return {
+        ...prevData,
+        [activeTab]: {
+          columns: updatedColumns,
+          rows: updateRows(prevData[activeTab].rows),
+        },
+      };
+    });
+  };
+
   const handleSave = async () => {
     setLoading(true);
 
@@ -473,6 +699,8 @@ export function OptionsOverlay({ data }: { data: { id: string; options: ProductT
                 : [],
           },
         },
+        sizes: sizeChartGroupId !== null ? tableData : undefined,
+        sizeChartGroupId: sizeChartGroupId,
       },
     };
 
@@ -490,6 +718,7 @@ export function OptionsOverlay({ data }: { data: { id: string; options: ProductT
       });
     } finally {
       setLoading(false);
+      hideOverlay({ pageName, overlayName });
     }
   };
 
@@ -744,6 +973,25 @@ export function OptionsOverlay({ data }: { data: { id: string; options: ProductT
                           >
                             <Trash2 size={18} />
                           </button>
+                          {group.name.toLowerCase() === "size" && (
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSizeChartGroupId(sizeChartGroupId === group.id ? null : group.id);
+                              }}
+                              className={`w-10 h-5 rounded-full relative cursor-pointer ease-in-out duration-200 border ${
+                                sizeChartGroupId === group.id
+                                  ? "bg-blue-100 border-blue-300"
+                                  : "bg-white border-neutral-300"
+                              }`}
+                            >
+                              <div
+                                className={`w-3 h-3 rounded-full ease-in-out duration-300 absolute top-1/2 transform -translate-y-1/2 ${
+                                  sizeChartGroupId === group.id ? "left-[22px] bg-blue" : "left-1 bg-black"
+                                }`}
+                              ></div>
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -859,6 +1107,91 @@ export function OptionsOverlay({ data }: { data: { id: string; options: ProductT
                               <PlusCircle size={20} />
                             </button>
                           </div>
+                          {sizeChartGroupId === group.id && (
+                            <div className="p-4 border-t">
+                              <div className="space-y-2 mb-6">
+                                <p className="text-xs text-gray">Unit</p>
+                                <div className="inline-flex p-1 bg-lightgray rounded-lg">
+                                  <button
+                                    onClick={() => setActiveTab("inches")}
+                                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                      activeTab === "inches" ? "bg-white shadow-sm" : "text-gray hover:text-black"
+                                    }`}
+                                  >
+                                    Inches
+                                  </button>
+                                  <button
+                                    onClick={() => setActiveTab("centimeters")}
+                                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                      activeTab === "centimeters" ? "bg-white shadow-sm" : "text-gray hover:text-black"
+                                    }`}
+                                  >
+                                    Centimeters
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="space-y-2 mb-5">
+                                <p className="text-xs text-gray">Grid Size</p>
+                                <div className="inline-flex items-center bg-gray-100 p-1 rounded-md">
+                                  <button
+                                    onClick={removeRow}
+                                    className="w-7 h-7 flex items-center justify-center text-gray hover:bg-white hover:shadow-sm rounded"
+                                  >
+                                    <ArrowUp size={14} />
+                                  </button>
+                                  <button
+                                    onClick={addRow}
+                                    className="w-7 h-7 flex items-center justify-center text-gray hover:bg-white hover:shadow-sm rounded"
+                                  >
+                                    <ArrowDown size={14} />
+                                  </button>
+                                  <div className="w-px h-5 bg-gray-300 mx-1"></div>
+                                  <span className="text-sm font-medium px-2">
+                                    {rowsCount}×{columnsCount}
+                                  </span>
+                                  <div className="w-px h-5 bg-gray-300 mx-1"></div>
+                                  <button
+                                    onClick={removeColumn}
+                                    className="w-7 h-7 flex items-center justify-center text-gray hover:bg-white hover:shadow-sm rounded"
+                                  >
+                                    <ArrowLeftIcon size={14} />
+                                  </button>
+                                  <button
+                                    onClick={addColumn}
+                                    className="w-7 h-7 flex items-center justify-center text-gray hover:bg-white hover:shadow-sm rounded"
+                                  >
+                                    <ArrowRight size={14} />
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="flex justify-end mb-4">
+                                <button
+                                  onClick={handlePasteData}
+                                  className="relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors bg-lightgray hover:bg-lightgray-dimmed"
+                                >
+                                  Paste from Clipboard
+                                </button>
+                              </div>
+                              {tableData[activeTab].rows.length > 0 ? (
+                                <SizesTable
+                                  data={tableData[activeTab].rows}
+                                  columns={columns}
+                                  onUpdate={updateData}
+                                  onColumnUpdate={updateColumns}
+                                />
+                              ) : (
+                                <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg">
+                                  <p className="text-gray-500 mb-4">No data available. Add a row to start.</p>
+                                  <button
+                                    onClick={addRow}
+                                    className="px-4 py-2 text-sm font-medium text-white bg-neutral-700 rounded-full hover:bg-neutral-600 active:bg-neutral-800"
+                                  >
+                                    Add Row
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
