@@ -43,7 +43,7 @@ type AvailabilityMatrix = {
   [key: number]: number[];
 };
 
-export function OptionsButton() {
+export function OptionsButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
   const overlayName = useOverlayStore((state) => state.pages.editProduct.overlays.options.name);
@@ -52,14 +52,14 @@ export function OptionsButton() {
     <button
       onClick={() => showOverlay({ pageName, overlayName })}
       type="button"
-      className="w-9 h-9 rounded-full flex items-center justify-center transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
+      className={`w-9 h-9 rounded-full flex items-center justify-center transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray ${className}`}
     >
       <Pencil size={18} strokeWidth={1.75} />
     </button>
   );
 }
 
-export function OptionsOverlay({ data }: { data: { id: string } }) {
+export function OptionsOverlay({ data }: { data: { id: string; options: ProductType["options"] } }) {
   const [loading, setLoading] = useState<boolean>(false);
 
   const showAlert = useAlertStore((state) => state.showAlert);
@@ -85,45 +85,55 @@ export function OptionsOverlay({ data }: { data: { id: string } }) {
     };
   }, [isOverlayVisible, setPreventBodyOverflowChange]);
 
-  // Sample product data
-  const [productName, setProductName] = useState<string>("BioloMix 1200W Blender");
-  const [productDescription, setProductDescription] = useState<string>("Professional High-Speed Blender");
+  // Initialize option groups from props
+  const [optionGroups, setOptionGroups] = useState<OptionGroup[]>(() => {
+    if (!data.options || !data.options.groups) return [];
 
-  // Option groups data structure
-  const [optionGroups, setOptionGroups] = useState<OptionGroup[]>([
-    {
-      id: 1,
-      name: "Size",
-      options: [
-        { id: 1, value: "S", isActive: true },
-        { id: 2, value: "M", isActive: true },
-        { id: 3, value: "L", isActive: true },
-      ],
-    },
-    {
-      id: 2,
-      name: "Color",
-      options: [
-        { id: 4, value: "Blue", isActive: true },
-        { id: 5, value: "Green", isActive: true },
-        { id: 6, value: "Yellow", isActive: true },
-        { id: 7, value: "Red", isActive: true },
-      ],
-    },
-  ]);
-
-  // Chaining configuration
-  const [chainingConfig, setChainingConfig] = useState<ChainingConfig>({
-    enabled: false,
-    parentGroupId: null,
-    childGroupId: null,
+    return data.options.groups.map((group) => ({
+      id: group.id,
+      name: group.name,
+      options: group.values.map((opt) => ({
+        id: opt.id,
+        value: opt.value,
+        isActive: opt.isActive,
+      })),
+    }));
   });
 
-  // Availability matrix - defines which child options are available for each parent option
-  const [availabilityMatrix, setAvailabilityMatrix] = useState<AvailabilityMatrix>({
-    1: [4, 5, 6], // Size S compatible with Blue, Green, Yellow
-    2: [4, 6], // Size M compatible with Blue and Yellow
-    3: [5, 7], // Size L compatible with Green and Red
+  // Initialize chaining configuration from props
+  const [chainingConfig, setChainingConfig] = useState<ChainingConfig>(() => {
+    const config = data.options?.config?.chaining;
+    if (!config || !config.enabled || !config.relationships || config.relationships.length === 0) {
+      return {
+        enabled: false,
+        parentGroupId: null,
+        childGroupId: null,
+      };
+    }
+
+    const relationship = config.relationships[0];
+    return {
+      enabled: config.enabled,
+      parentGroupId: relationship.parentGroupId,
+      childGroupId: relationship.childGroupId,
+    };
+  });
+
+  // Initialize availability matrix from props
+  const [availabilityMatrix, setAvailabilityMatrix] = useState<AvailabilityMatrix>(() => {
+    const config = data.options?.config?.chaining;
+    if (!config || !config.enabled || !config.relationships || config.relationships.length === 0) {
+      return {};
+    }
+
+    const constraints = config.relationships[0].constraints;
+    const matrix: AvailabilityMatrix = {};
+
+    Object.keys(constraints).forEach((key) => {
+      matrix[Number(key)] = constraints[key];
+    });
+
+    return matrix;
   });
 
   // Admin state

@@ -225,18 +225,16 @@ export default async function EditProduct({ params }: { params: Promise<{ slug: 
                 <div className="w-[calc(100%-60px)] p-5">
                   {options.groups.map((group) => (
                     <div key={group.id} className="mb-6 last:mb-0">
-                      <h3 className="text-xs text-gray mb-2">{group.name}</h3>
+                      <h3 className="text-xs text-gray-500 mb-2">{group.name}</h3>
                       <div className="flex gap-2 flex-wrap">
                         {group.values.map((value) => (
                           <button
                             key={value.id}
                             className={clsx(
-                              "px-4 py-2 rounded-lg text-sm font-medium border",
+                              "px-4 py-2 rounded-lg text-sm font-medium",
                               value.isActive
-                                ? group.name.toLowerCase() === "size"
-                                  ? "bg-blue-200 text-blue-800 border-blue-300"
-                                  : "bg-gray-200 text-gray-800 border-gray-300"
-                                : "bg-white text-gray-500 border-gray-300"
+                                ? "bg-lightgray text-gray-800"
+                                : "bg-white text-gray-400 border border-gray-300 border-dashed opacity-70"
                             )}
                           >
                             {value.value}
@@ -246,12 +244,12 @@ export default async function EditProduct({ params }: { params: Promise<{ slug: 
                     </div>
                   ))}
                 </div>
-                <OptionsButton />
+                <OptionsButton className="absolute top-2 right-2" />
               </>
             ) : (
               <div className="w-full flex items-center justify-between p-5 pr-2">
-                <span className="text-xs text-gray">Nothing here</span>
-                <OptionsButton />
+                <span className="text-xs text-gray-500">Nothing here</span>
+                <OptionsButton className="absolute top-2 right-2" />
               </div>
             )}
           </div>
@@ -504,7 +502,7 @@ export default async function EditProduct({ params }: { params: Promise<{ slug: 
       <ProductSourceOverlay data={{ id, sourceInfo }} />
       <MainImageOverlay data={{ id, images }} />
       <ImageGalleryOverlay data={{ id, images }} />
-      <OptionsOverlay data={{ id }} />
+      <OptionsOverlay data={{ id, options }} />
       {/* <SizeChartOverlay
         data={{
           id,
