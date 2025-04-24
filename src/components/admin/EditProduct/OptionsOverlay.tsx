@@ -97,8 +97,6 @@ export function OptionsOverlay({
 }) {
   // **State Declarations**
   const [loading, setLoading] = useState<boolean>(false);
-  const [sizeChartEnabled, setSizeChartEnabled] = useState<boolean>(data.options.sizeChartGroupId !== null);
-  const [showSizeChart, setShowSizeChart] = useState<boolean>(false);
 
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
@@ -162,8 +160,22 @@ export function OptionsOverlay({
     return matrix;
   });
 
-  // **Size Chart States**
-  const [sizeChartGroupId, setSizeChartGroupId] = useState<number | null>(data.options.sizeChartGroupId || null);
+  // **Initialize Size Chart Group ID**
+  const [sizeChartGroupId, setSizeChartGroupId] = useState<number | null>(() => {
+    const providedId = data.options.sizeChartGroupId;
+    if (providedId) {
+      const group = optionGroups.find((g) => g.id === providedId);
+      if (group && group.name.toLowerCase() === "size") {
+        return providedId;
+      }
+    }
+    const sizeGroup = optionGroups.find((g) => g.name.toLowerCase() === "size");
+    return sizeGroup ? sizeGroup.id : null;
+  });
+
+  const [sizeChartEnabled, setSizeChartEnabled] = useState<boolean>(sizeChartGroupId !== null);
+  const [showSizeChart, setShowSizeChart] = useState<boolean>(false);
+
   const [activeTab, setActiveTab] = useState<"inches" | "centimeters">("inches");
   const [tableData, setTableData] = useState<SizeChartType>(
     data.options.sizes || { inches: { columns: [], rows: [] }, centimeters: { columns: [], rows: [] } }
@@ -171,15 +183,30 @@ export function OptionsOverlay({
   const [rowsCount, setRowsCount] = useState<number>(0);
   const [columnsCount, setColumnsCount] = useState<number>(0);
 
-  // **Initialize Size Chart Group and Counts**
+  // **Initialize Size Chart Counts**
   useEffect(() => {
     setRowsCount(tableData[activeTab].rows.length);
     setColumnsCount(tableData[activeTab].columns.length);
-    if (data.options.sizes && !sizeChartGroupId) {
+  }, [tableData, activeTab]);
+
+  // **Ensure Size Chart Group ID Consistency**
+  useEffect(() => {
+    if (sizeChartEnabled) {
       const sizeGroup = optionGroups.find((group) => group.name.toLowerCase() === "size");
-      if (sizeGroup) setSizeChartGroupId(sizeGroup.id);
+      if (sizeGroup) {
+        setSizeChartGroupId(sizeGroup.id);
+      } else {
+        setSizeChartEnabled(false);
+        setSizeChartGroupId(null);
+        showAlert({
+          message: "No 'Size' group found. Size chart cannot be enabled.",
+          type: ShowAlertType.NEUTRAL,
+        });
+      }
+    } else {
+      setSizeChartGroupId(null);
     }
-  }, [data.options.sizes, optionGroups, tableData, activeTab, sizeChartGroupId]);
+  }, [optionGroups, sizeChartEnabled, showAlert]);
 
   // **Admin State**
   const [newOptionValues, setNewOptionValues] = useState<{ [key: number]: string }>({});
@@ -557,11 +584,18 @@ export function OptionsOverlay({
     !option.isActive ? "bg-neutral-100" : "bg-green-100 text-green-700";
 
   const toggleSizeChartEnabled = () => {
-    const sizeGroup = optionGroups.find((group) => group.name.toLowerCase() === "size");
-    if (sizeGroup) {
-      setSizeChartEnabled(!sizeChartEnabled);
-      setSizeChartGroupId(sizeChartEnabled ? null : sizeGroup.id);
+    const newEnabled = !sizeChartEnabled;
+    if (newEnabled) {
+      const sizeGroup = optionGroups.find((group) => group.name.toLowerCase() === "size");
+      if (!sizeGroup) {
+        showAlert({
+          message: "No 'Size' group found. Cannot enable size chart.",
+          type: ShowAlertType.NEUTRAL,
+        });
+        return;
+      }
     }
+    setSizeChartEnabled(newEnabled);
   };
 
   const toggleSizeChart = () => setShowSizeChart(!showSizeChart);
