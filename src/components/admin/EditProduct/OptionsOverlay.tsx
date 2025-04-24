@@ -99,8 +99,6 @@ export function OptionsOverlay({
     };
   };
 }) {
-  console.log(data);
-
   // **State Declarations**
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -662,6 +660,14 @@ export function OptionsOverlay({
     try {
       const result = await UpdateProductAction(updatedData);
       showAlert({ message: result.message, type: result.type });
+
+      // Clear the size chart data on the frontend if size chart is disabled
+      if (!sizeChartEnabled) {
+        setTableData({
+          inches: { columns: [], rows: [] },
+          centimeters: { columns: [], rows: [] },
+        });
+      }
     } catch (error) {
       console.error("Error updating product options:", error);
       showAlert({
