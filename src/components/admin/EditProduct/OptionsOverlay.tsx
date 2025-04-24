@@ -26,6 +26,7 @@ import { useAlertStore } from "@/zustand/shared/alertStore";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import SizesTable from "./SizesTable";
 
+// Define interfaces for internal use within the component
 interface Option {
   id: number;
   value: string;
@@ -42,6 +43,13 @@ interface ChainingConfig {
   enabled: boolean;
   parentGroupId: number | null;
   childGroupId: number | null;
+  relationships?: Array<{
+    parentGroupId: number;
+    childGroupId: number;
+    constraints: {
+      [parentOptionId: string]: number[];
+    };
+  }>;
 }
 
 type AvailabilityMatrix = {
@@ -63,6 +71,7 @@ type TableRowType = {
   [key: string]: string;
 };
 
+// OptionsButton component
 export function OptionsButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
@@ -79,14 +88,28 @@ export function OptionsButton({ className }: { className: string }) {
   );
 }
 
+// OptionsOverlay component with the fix applied
 export function OptionsOverlay({
   data,
 }: {
-  data: { id: string; options: ProductType["options"]; sizes?: SizeChartType };
+  data: {
+    id: string;
+    options: {
+      groups: Array<{
+        id: number;
+        name: string;
+        values: Array<{
+          id: number;
+          value: string;
+          isActive: boolean;
+        }>;
+      }>;
+      config: { chaining: ChainingConfig };
+      sizes?: SizeChartType;
+      sizeChartGroupId?: number;
+    };
+  };
 }) {
-
-  console.log(data);
-
   const [loading, setLoading] = useState<boolean>(false);
 
   const showAlert = useAlertStore((state) => state.showAlert);
@@ -112,18 +135,20 @@ export function OptionsOverlay({
     };
   }, [isOverlayVisible, setPreventBodyOverflowChange]);
 
-  // Initialize option groups from props
+  // Initialize option groups from props with corrected property name and safety check
   const [optionGroups, setOptionGroups] = useState<OptionGroup[]>(() => {
     if (!data.options || !data.options.groups) return [];
 
     return data.options.groups.map((group) => ({
       id: group.id,
       name: group.name,
-      options: group.values.map((opt) => ({
-        id: opt.id,
-        value: opt.value,
-        isActive: opt.isActive,
-      })),
+      options: group.values
+        ? group.values.map((opt) => ({
+            id: opt.id,
+            value: opt.value,
+            isActive: opt.isActive,
+          }))
+        : [],
     }));
   });
 
@@ -164,10 +189,10 @@ export function OptionsOverlay({
   });
 
   // Size chart states
-  const [sizeChartGroupId, setSizeChartGroupId] = useState<number | null>(null);
+  const [sizeChartGroupId, setSizeChartGroupId] = useState<number | null>(data.options.sizeChartGroupId || null);
   const [activeTab, setActiveTab] = useState<"inches" | "centimeters">("inches");
   const [tableData, setTableData] = useState<SizeChartType>(
-    data.sizes || {
+    data.options.sizes || {
       inches: { columns: [], rows: [] },
       centimeters: { columns: [], rows: [] },
     }
@@ -180,20 +205,22 @@ export function OptionsOverlay({
     setRowsCount(tableData[activeTab].rows.length);
     setColumnsCount(tableData[activeTab].columns.length);
 
-    if (data.sizes && !sizeChartGroupId) {
+    if (data.options.sizes && !sizeChartGroupId) {
       const sizeGroup = optionGroups.find((group) => group.name.toLowerCase() === "size");
       if (sizeGroup) {
         setSizeChartGroupId(sizeGroup.id);
       }
     }
-  }, [data.sizes, optionGroups, tableData, activeTab, sizeChartGroupId]);
+  }, [data.options.sizes, optionGroups, tableData, activeTab, sizeChartGroupId]);
 
   // Admin state
   const [newOptionValues, setNewOptionValues] = useState<{ [key: number]: string }>({});
   const [editingName, setEditingName] = useState<number | null>(null);
   const [editNameValue, setEditNameValue] = useState<string>("");
   const [newGroupName, setNewGroupName] = useState<string>("");
-  const [collapsedGroups, setCollapsedGroups] = useState<{ [key: number]: boolean }>({});
+  const [collapsedGroups, setCollapsedGroups] = useState<{
+    [key: number]: boolean;
+  }>({});
 
   // Public-facing state
   const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: number }>({});
@@ -534,7 +561,7 @@ export function OptionsOverlay({
       setColumnsCount(1);
     } else {
       const newColumnName = `Column${columns.length + 1}`;
-      const newColumnOrder = Math.max(...tableData[activeTab].columns.map((col) => col.order), 0) + 1;
+      const newColumnOrder = Math.max(...tableData[activeTab].columns.map((col) => col.order), -1) + 1;
       setTableData((prevData) => ({
         ...prevData,
         [activeTab]: {
