@@ -55,7 +55,10 @@ type AvailabilityMatrix = { [key: number]: number[] };
 
 type SizeChartType = {
   inches: { columns: { label: string; order: number }[]; rows: TableRowType[] };
-  centimeters: { columns: { label: string; order: number }[]; rows: TableRowType[] };
+  centimeters: {
+    columns: { label: string; order: number }[];
+    rows: TableRowType[];
+  };
 };
 
 type TableRowType = { [key: string]: string };
@@ -88,6 +91,7 @@ export function OptionsOverlay({
         id: number;
         name: string;
         values: Array<{ id: number; value: string; isActive: boolean }>;
+        sizeChart?: SizeChartType;
       }>;
       config: { chaining: ChainingConfig };
       sizes?: SizeChartType;
@@ -95,6 +99,8 @@ export function OptionsOverlay({
     };
   };
 }) {
+  console.log(data);
+
   // **State Declarations**
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -129,7 +135,11 @@ export function OptionsOverlay({
       id: group.id,
       name: group.name,
       options: group.values
-        ? group.values.map((opt) => ({ id: opt.id, value: opt.value, isActive: opt.isActive }))
+        ? group.values.map((opt) => ({
+            id: opt.id,
+            value: opt.value,
+            isActive: opt.isActive,
+          }))
         : [],
     }));
   });
@@ -160,26 +170,18 @@ export function OptionsOverlay({
     return matrix;
   });
 
-  // **Initialize Size Chart Group ID**
-  const [sizeChartGroupId, setSizeChartGroupId] = useState<number | null>(() => {
-    const providedId = data.options.sizeChartGroupId;
-    if (providedId) {
-      const group = optionGroups.find((g) => g.id === providedId);
-      if (group && group.name.toLowerCase() === "size") {
-        return providedId;
-      }
-    }
-    const sizeGroup = optionGroups.find((g) => g.name.toLowerCase() === "size");
-    return sizeGroup ? sizeGroup.id : null;
-  });
-
-  const [sizeChartEnabled, setSizeChartEnabled] = useState<boolean>(sizeChartGroupId !== null);
+  // **Initialize Size Chart States**
+  const sizeGroup = data.options.groups.find((g) => g.name.toLowerCase() === "size");
+  const initialTableData = sizeGroup?.sizeChart || {
+    inches: { columns: [], rows: [] },
+    centimeters: { columns: [], rows: [] },
+  };
+  const [tableData, setTableData] = useState<SizeChartType>(initialTableData);
+  const [sizeChartGroupId, setSizeChartGroupId] = useState<number | null>(sizeGroup ? sizeGroup.id : null);
+  const [sizeChartEnabled, setSizeChartEnabled] = useState<boolean>(sizeGroup !== undefined);
   const [showSizeChart, setShowSizeChart] = useState<boolean>(false);
 
   const [activeTab, setActiveTab] = useState<"inches" | "centimeters">("inches");
-  const [tableData, setTableData] = useState<SizeChartType>(
-    data.options.sizes || { inches: { columns: [], rows: [] }, centimeters: { columns: [], rows: [] } }
-  );
   const [rowsCount, setRowsCount] = useState<number>(0);
   const [columnsCount, setColumnsCount] = useState<number>(0);
 
@@ -209,14 +211,20 @@ export function OptionsOverlay({
   }, [optionGroups, sizeChartEnabled, showAlert]);
 
   // **Admin State**
-  const [newOptionValues, setNewOptionValues] = useState<{ [key: number]: string }>({});
+  const [newOptionValues, setNewOptionValues] = useState<{
+    [key: number]: string;
+  }>({});
   const [editingName, setEditingName] = useState<number | null>(null);
   const [editNameValue, setEditNameValue] = useState<string>("");
   const [newGroupName, setNewGroupName] = useState<string>("");
-  const [collapsedGroups, setCollapsedGroups] = useState<{ [key: number]: boolean }>({});
+  const [collapsedGroups, setCollapsedGroups] = useState<{
+    [key: number]: boolean;
+  }>({});
 
   // **Public-Facing State**
-  const [selectedOptions, setSelectedOptions] = useState<{ [key: number]: number }>({});
+  const [selectedOptions, setSelectedOptions] = useState<{
+    [key: number]: number;
+  }>({});
 
   // **Track Disabled Parent Options**
   const [disabledParentOptions, setDisabledParentOptions] = useState<number[]>([]);
@@ -263,14 +271,22 @@ export function OptionsOverlay({
   // **Admin Functions**
   const addOptionGroup = () => {
     if (newGroupName.trim() === "") return;
-    const newGroup: OptionGroup = { id: Date.now(), name: newGroupName, options: [] };
+    const newGroup: OptionGroup = {
+      id: Date.now(),
+      name: newGroupName,
+      options: [],
+    };
     setOptionGroups([...optionGroups, newGroup]);
     setNewGroupName("");
   };
 
   const deleteOptionGroup = (groupId: number) => {
     if (chainingConfig.parentGroupId === groupId || chainingConfig.childGroupId === groupId) {
-      setChainingConfig({ enabled: false, parentGroupId: null, childGroupId: null });
+      setChainingConfig({
+        enabled: false,
+        parentGroupId: null,
+        childGroupId: null,
+      });
     }
     if (sizeChartGroupId === groupId) {
       setSizeChartGroupId(null);
@@ -292,9 +308,16 @@ export function OptionsOverlay({
     setOptionGroups(
       optionGroups.map((group) => {
         if (group.id === groupId) {
-          const newOption: Option = { id: Date.now(), value: newOptionValues[groupId], isActive: true };
+          const newOption: Option = {
+            id: Date.now(),
+            value: newOptionValues[groupId],
+            isActive: true,
+          };
           if (chainingConfig.enabled && chainingConfig.parentGroupId === groupId) {
-            setAvailabilityMatrix({ ...availabilityMatrix, [newOption.id]: [] });
+            setAvailabilityMatrix({
+              ...availabilityMatrix,
+              [newOption.id]: [],
+            });
           }
           return { ...group, options: [...group.options, newOption] };
         }
@@ -332,7 +355,10 @@ export function OptionsOverlay({
     setOptionGroups(
       optionGroups.map((group) => {
         if (group.id === groupId)
-          return { ...group, options: group.options.filter((option) => option.id !== optionId) };
+          return {
+            ...group,
+            options: group.options.filter((option) => option.id !== optionId),
+          };
         return group;
       })
     );
@@ -365,7 +391,10 @@ export function OptionsOverlay({
         [parentOptionId]: currentAvailability.filter((id) => id !== childOptionId),
       });
     } else {
-      setAvailabilityMatrix({ ...availabilityMatrix, [parentOptionId]: [...currentAvailability, childOptionId] });
+      setAvailabilityMatrix({
+        ...availabilityMatrix,
+        [parentOptionId]: [...currentAvailability, childOptionId],
+      });
     }
   };
 
@@ -380,7 +409,11 @@ export function OptionsOverlay({
     const newMatrix: AvailabilityMatrix = {};
     const parentGroup = findGroup(parentId);
     if (parentGroup) parentGroup.options.forEach((option) => (newMatrix[option.id] = []));
-    setChainingConfig({ enabled: true, parentGroupId: parentId, childGroupId: childId });
+    setChainingConfig({
+      enabled: true,
+      parentGroupId: parentId,
+      childGroupId: childId,
+    });
     setAvailabilityMatrix(newMatrix);
     setSelectedOptions({});
   };
@@ -421,7 +454,10 @@ export function OptionsOverlay({
     if (rowsCount === 0 && columnsCount === 0) {
       setTableData((prevData) => ({
         ...prevData,
-        [activeTab]: { columns: [{ label: "Column1", order: 0 }], rows: [{ Column1: "" }] },
+        [activeTab]: {
+          columns: [{ label: "Column1", order: 0 }],
+          rows: [{ Column1: "" }],
+        },
       }));
       setRowsCount(1);
       setColumnsCount(1);
@@ -429,7 +465,10 @@ export function OptionsOverlay({
       const newRow = columns.reduce((acc, col) => ({ ...acc, [col]: "" }), {});
       setTableData((prevData) => ({
         ...prevData,
-        [activeTab]: { ...prevData[activeTab], rows: [...prevData[activeTab].rows, newRow] },
+        [activeTab]: {
+          ...prevData[activeTab],
+          rows: [...prevData[activeTab].rows, newRow],
+        },
       }));
       setRowsCount((prev) => prev + 1);
     }
@@ -439,7 +478,10 @@ export function OptionsOverlay({
     if (rowsCount === 0 && columnsCount === 0) {
       setTableData((prevData) => ({
         ...prevData,
-        [activeTab]: { columns: [{ label: "Column1", order: 0 }], rows: [{ Column1: "" }] },
+        [activeTab]: {
+          columns: [{ label: "Column1", order: 0 }],
+          rows: [{ Column1: "" }],
+        },
       }));
       setRowsCount(1);
       setColumnsCount(1);
@@ -450,7 +492,10 @@ export function OptionsOverlay({
         ...prevData,
         [activeTab]: {
           columns: [...prevData[activeTab].columns, { label: newColumnName, order: newColumnOrder }],
-          rows: prevData[activeTab].rows.map((row) => ({ ...row, [newColumnName]: "" })),
+          rows: prevData[activeTab].rows.map((row) => ({
+            ...row,
+            [newColumnName]: "",
+          })),
         },
       }));
       setColumnsCount((prev) => prev + 1);
@@ -459,13 +504,19 @@ export function OptionsOverlay({
 
   const removeRow = () => {
     if (rowsCount === 1) {
-      setTableData((prevData) => ({ ...prevData, [activeTab]: { columns: [], rows: [] } }));
+      setTableData((prevData) => ({
+        ...prevData,
+        [activeTab]: { columns: [], rows: [] },
+      }));
       setRowsCount(0);
       setColumnsCount(0);
     } else if (rowsCount > 1) {
       setTableData((prevData) => ({
         ...prevData,
-        [activeTab]: { ...prevData[activeTab], rows: prevData[activeTab].rows.slice(0, -1) },
+        [activeTab]: {
+          ...prevData[activeTab],
+          rows: prevData[activeTab].rows.slice(0, -1),
+        },
       }));
       setRowsCount((prev) => prev - 1);
     }
@@ -473,7 +524,10 @@ export function OptionsOverlay({
 
   const removeColumn = () => {
     if (columnsCount === 1) {
-      setTableData((prevData) => ({ ...prevData, [activeTab]: { columns: [], rows: [] } }));
+      setTableData((prevData) => ({
+        ...prevData,
+        [activeTab]: { columns: [], rows: [] },
+      }));
       setRowsCount(0);
       setColumnsCount(0);
     } else if (columnsCount > 1) {
@@ -504,7 +558,13 @@ export function OptionsOverlay({
       });
       setTableData((prevData) => ({
         ...prevData,
-        [activeTab]: { columns: headers.map((label, order) => ({ label: label.trim(), order })), rows: newRows },
+        [activeTab]: {
+          columns: headers.map((label, order) => ({
+            label: label.trim(),
+            order,
+          })),
+          rows: newRows,
+        },
       }));
     } catch (error) {
       console.error("Failed to paste data:", error);
@@ -517,7 +577,10 @@ export function OptionsOverlay({
   };
 
   const updateData = (updatedData: Array<{ [key: string]: string }>) => {
-    setTableData((prevData) => ({ ...prevData, [activeTab]: { ...prevData[activeTab], rows: updatedData } }));
+    setTableData((prevData) => ({
+      ...prevData,
+      [activeTab]: { ...prevData[activeTab], rows: updatedData },
+    }));
   };
 
   const updateColumns = (updatedColumns: { label: string; order: number }[]) => {
@@ -528,50 +591,83 @@ export function OptionsOverlay({
           updatedColumns.forEach(({ label }) => (newRow[label] = row[label] || ""));
           return newRow;
         });
-      return { ...prevData, [activeTab]: { columns: updatedColumns, rows: updateRows(prevData[activeTab].rows) } };
+      return {
+        ...prevData,
+        [activeTab]: {
+          columns: updatedColumns,
+          rows: updateRows(prevData[activeTab].rows),
+        },
+      };
     });
   };
 
   const handleSave = async () => {
     setLoading(true);
+
+    // Format the options data according to ProductType structure
+    const formattedGroups = optionGroups.map((group, index) => {
+      const baseGroup = {
+        id: group.id,
+        name: group.name,
+        displayOrder: index,
+        values: group.options.map((opt) => ({
+          id: opt.id,
+          value: opt.value,
+          isActive: opt.isActive,
+        })),
+      };
+
+      // If this is the size group and size chart is enabled, add the size chart data
+      if (sizeChartEnabled && sizeChartGroupId === group.id) {
+        return {
+          ...baseGroup,
+          sizeChart: {
+            inches: tableData.inches,
+            centimeters: tableData.centimeters,
+          },
+        };
+      }
+
+      return baseGroup;
+    });
+
+    // Format chaining relationships
+    const relationships = [];
+    if (chainingConfig.enabled && chainingConfig.parentGroupId !== null && chainingConfig.childGroupId !== null) {
+      const constraints: { [key: string]: number[] } = {};
+      Object.keys(availabilityMatrix).forEach((parentId) => {
+        constraints[parentId] = availabilityMatrix[Number(parentId)] || [];
+      });
+
+      relationships.push({
+        parentGroupId: chainingConfig.parentGroupId,
+        childGroupId: chainingConfig.childGroupId,
+        constraints,
+      });
+    }
+
     const updatedData = {
       id: data.id,
       options: {
-        groups: optionGroups.map((group, index) => ({
-          id: group.id,
-          name: group.name,
-          displayOrder: index + 1,
-          values: group.options.map((option) => ({ id: option.id, value: option.value, isActive: option.isActive })),
-        })),
+        groups: formattedGroups,
         config: {
           chaining: {
             enabled: chainingConfig.enabled,
-            relationships:
-              chainingConfig.enabled && chainingConfig.parentGroupId !== null && chainingConfig.childGroupId !== null
-                ? [
-                    {
-                      parentGroupId: chainingConfig.parentGroupId,
-                      childGroupId: chainingConfig.childGroupId,
-                      constraints: Object.keys(availabilityMatrix).reduce((acc, key) => {
-                        const numKey = Number(key);
-                        acc[key] = availabilityMatrix[numKey];
-                        return acc;
-                      }, {} as { [key: string]: number[] }),
-                    },
-                  ]
-                : [],
+            relationships,
           },
         },
-        sizes: sizeChartEnabled && sizeChartGroupId !== null ? tableData : undefined,
-        sizeChartGroupId: sizeChartEnabled ? sizeChartGroupId : null,
       },
     };
+
     try {
       const result = await UpdateProductAction(updatedData);
       showAlert({ message: result.message, type: result.type });
     } catch (error) {
       console.error("Error updating product options:", error);
-      showAlert({ message: "Failed to update product options", type: ShowAlertType.ERROR });
+      showAlert({
+        message: "Failed to update product options",
+        type: ShowAlertType.ERROR,
+      });
     } finally {
       setLoading(false);
       hideOverlay({ pageName, overlayName });
@@ -636,7 +732,10 @@ export function OptionsOverlay({
                   disabled={loading}
                   className={clsx(
                     "relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
-                    { "bg-opacity-50": loading, "hover:bg-neutral-600 active:bg-neutral-800": !loading }
+                    {
+                      "bg-opacity-50": loading,
+                      "hover:bg-neutral-600 active:bg-neutral-800": !loading,
+                    }
                   )}
                 >
                   {loading ? (
@@ -771,7 +870,12 @@ export function OptionsOverlay({
                     <div key={group.id} className="border rounded-lg overflow-hidden mb-4">
                       <div
                         className="flex items-center justify-between p-3 pr-4 bg-white cursor-pointer"
-                        onClick={() => setCollapsedGroups((prev) => ({ ...prev, [group.id]: !prev[group.id] }))}
+                        onClick={() =>
+                          setCollapsedGroups((prev) => ({
+                            ...prev,
+                            [group.id]: !prev[group.id],
+                          }))
+                        }
                       >
                         <div className="flex items-center">
                           {isCollapsed ? (
@@ -849,7 +953,9 @@ export function OptionsOverlay({
                                 <tr>
                                   <th
                                     className="px-4 py-2 text-left text-xs font-medium text-gray uppercase tracking-wider"
-                                    style={{ width: isParent ? "128px" : "40%" }}
+                                    style={{
+                                      width: isParent ? "128px" : "40%",
+                                    }}
                                   >
                                     Option Value
                                   </th>
@@ -936,7 +1042,12 @@ export function OptionsOverlay({
                             <input
                               type="text"
                               value={newOptionValues[group.id] || ""}
-                              onChange={(e) => setNewOptionValues({ ...newOptionValues, [group.id]: e.target.value })}
+                              onChange={(e) =>
+                                setNewOptionValues({
+                                  ...newOptionValues,
+                                  [group.id]: e.target.value,
+                                })
+                              }
                               placeholder="Add new option value"
                               className="flex-1 border rounded-md px-4 py-2 text-sm outline-none"
                             />
@@ -1104,7 +1215,10 @@ export function OptionsOverlay({
                 disabled={loading}
                 className={clsx(
                   "relative h-12 w-full rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
-                  { "bg-opacity-50": loading, "hover:bg-neutral-600 active:bg-neutral-800": !loading }
+                  {
+                    "bg-opacity-50": loading,
+                    "hover:bg-neutral-600 active:bg-neutral-800": !loading,
+                  }
                 )}
               >
                 {loading ? (

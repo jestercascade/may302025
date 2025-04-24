@@ -73,20 +73,14 @@ export async function UpdateProductAction(
     const currentProduct = productSnap.data() as ProductType;
     const isPricingChanged = hasPricingChanged(data.pricing, currentProduct.pricing);
 
-    // Properly merge options with the correct structure from types
-    const updatedOptions = data.options
+    // Merge options properly
+    const mergedOptions = data.options
       ? {
-          groups: Array.isArray(data.options.groups) ? data.options.groups : currentProduct.options?.groups || [],
+          ...currentProduct.options,
+          groups: data.options.groups || currentProduct.options.groups,
           config: {
-            chaining: {
-              enabled:
-                data.options.config?.chaining?.enabled !== undefined
-                  ? data.options.config.chaining.enabled
-                  : currentProduct.options?.config?.chaining?.enabled || false,
-              relationships: Array.isArray(data.options.config?.chaining?.relationships)
-                ? data.options.config.chaining.relationships
-                : currentProduct.options?.config?.chaining?.relationships || [],
-            },
+            ...currentProduct.options.config,
+            chaining: data.options.config?.chaining || currentProduct.options.config.chaining,
           },
         }
       : currentProduct.options;
@@ -94,7 +88,7 @@ export async function UpdateProductAction(
     const updatedProduct = {
       ...currentProduct,
       ...data,
-      options: updatedOptions,
+      options: mergedOptions,
       updatedAt: currentTimestamp(),
     };
 
