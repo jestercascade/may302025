@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import { MainImageButton, MainImageOverlay } from "@/components/admin/EditProduct/MainImageOverlay";
 import { ImageGalleryButton, ImageGalleryOverlay } from "@/components/admin/EditProduct/ImageGalleryOverlay";
 import { VisibilityButton, VisibilityOverlay } from "@/components/admin/EditProduct/VisibilityOverlay";
-import { SizeChartButton, SizeChartOverlay } from "@/components/admin/EditProduct/SizeChartOverlay";
 import { OptionsButton, OptionsOverlay } from "@/components/admin/EditProduct/OptionsOverlay";
 import { DescriptionButton, DescriptionOverlay } from "@/components/admin/EditProduct/DescriptionOverlay";
 import Link from "next/link";

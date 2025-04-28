@@ -86,17 +86,7 @@ export function OptionsOverlay({
 }: {
   data: {
     id: string;
-    options: {
-      groups: Array<{
-        id: number;
-        name: string;
-        values: Array<{ id: number; value: string; isActive: boolean }>;
-        sizeChart?: SizeChartType;
-      }>;
-      config: { chaining: ChainingConfig };
-      sizes?: SizeChartType;
-      sizeChartGroupId?: number;
-    };
+    options: ProductType["options"];
   };
 }) {
   // **State Declarations**
@@ -170,9 +160,9 @@ export function OptionsOverlay({
 
   // **Initialize Size Chart States**
   const sizeGroup = data.options.groups.find((g) => g.name.toLowerCase() === "size");
-  const initialTableData = sizeGroup?.sizeChart || {
-    inches: { columns: [], rows: [] },
-    centimeters: { columns: [], rows: [] },
+  const initialTableData: SizeChartType = {
+    inches: sizeGroup?.sizeChart?.inches ?? { columns: [], rows: [] },
+    centimeters: sizeGroup?.sizeChart?.centimeters ?? { columns: [], rows: [] },
   };
   const [tableData, setTableData] = useState<SizeChartType>(initialTableData);
   const [sizeChartGroupId, setSizeChartGroupId] = useState<number | null>(sizeGroup ? sizeGroup.id : null);

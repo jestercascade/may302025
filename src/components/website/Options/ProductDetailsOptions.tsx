@@ -1,208 +1,161 @@
 "use client";
 
-import { StickyBarInCartIndicator } from "../ProductDetails/StickyBarInCartIndicator";
-import { InCartIndicator } from "../ProductDetails/InCartIndicator";
-import { useOverlayStore } from "@/zustand/website/overlayStore";
-import { useOptionsStore } from "@/zustand/website/optionsStore";
-import { useScrollStore } from "@/zustand/website/scrollStore";
-import { ProductColors, ProductSizes } from "./ProductOptions";
-import { memo, useEffect, useState } from "react";
-import { ChevronRight } from "lucide-react";
+import { memo, useState, useEffect, useRef } from "react";
+import { ChevronDown } from "lucide-react";
 import clsx from "clsx";
+import { useOptionsStore } from "@/zustand/website/optionsStore";
 
-export const ProductDetailsOptions = memo(function Options({
-  productInfo,
-  isStickyBarInCartIndicator,
-}: {
-  productInfo: {
-    id: string;
-    name: string;
-    pricing: {
-      basePrice: number;
-      salePrice?: number;
-      discountPercentage?: number;
-    };
-    images: {
-      main: string;
-      gallery: string[];
-    };
-    options: {
-      colors: Array<{
-        name: string;
-        image: string;
-      }>;
-      sizes: {
-        inches: {
-          columns: Array<{ label: string; order: number }>;
-          rows: Array<{ [key: string]: string }>;
-        };
-        centimeters: {
-          columns: Array<{ label: string; order: number }>;
-          rows: Array<{ [key: string]: string }>;
-        };
-      };
-    };
-  };
-  isStickyBarInCartIndicator: boolean;
-}) {
-  // Calculate static values first
-  const hasColor = productInfo.options.colors.length > 0;
-  const hasSize = Object.keys(productInfo.options.sizes).length > 0;
+type OptionType = {
+  id: number;
+  value: string;
+  isActive: boolean;
+};
 
-  // Initialize all state hooks
+type OptionGroupType = {
+  id: number;
+  name: string;
+  displayOrder: number;
+  values: OptionType[];
+};
+
+type ProductOptionsType = {
+  groups: OptionGroupType[];
+};
+
+type ProductDetailsOptionsProps = {
+  options: ProductOptionsType;
+  isStickyBarInCartIndicator?: boolean;
+};
+
+export const ProductDetailsOptions = memo(function ProductDetailsOptions({
+  options,
+  isStickyBarInCartIndicator = false,
+}: ProductDetailsOptionsProps) {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
+  const { selectedOptions, setSelectedOption } = useOptionsStore();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Initialize all store hooks
-  const selectedColor = useOptionsStore((state) => state.selectedColor);
-  const selectedSize = useOptionsStore((state) => state.selectedSize);
-  const showOverlay = useOverlayStore((state) => state.showOverlay);
-  const productDetailsPage = useOverlayStore(
-    (state) => state.pages.productDetails
-  );
-  const shouldShowStickyBar = useScrollStore(
-    (state) => state.shouldShowStickyBar
-  );
-  const isInCart = useOptionsStore((state) => state.isInCart);
+  // Sort groups by display order
+  const sortedGroups = [...options.groups].sort((a, b) => a.displayOrder - b.displayOrder);
 
-  useEffect(() => {
-    if (!shouldShowStickyBar) {
-      setDropdownVisible(false);
-    }
-  }, [shouldShowStickyBar]);
+  // Return null if no option groups exist
+  if (sortedGroups.length === 0) return null;
 
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element;
-      if (
-        isDropdownVisible &&
-        !target.closest(".dropdown-container") &&
-        !target.closest(".overlay")
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownVisible(false);
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isDropdownVisible]);
+  }, []);
 
-  if (!hasColor && !hasSize) {
-    return null;
-  }
-
+  // Generate button text based on selections
   const getButtonText = () => {
-    if (hasColor && hasSize) {
-      if (!selectedColor && !selectedSize) return "Select Color & Size";
-      if (selectedColor && !selectedSize)
-        return (
-          <>
-            <span className="text-gray">Color: </span>
-            <span className="text-gray">{selectedColor} - </span>
-            <span className="text-xs font-semibold">Select Size</span>
-          </>
-        );
-      if (!selectedColor && selectedSize)
-        return (
-          <>
-            <span className="text-gray">Size: </span>
-            <span className="text-gray">{selectedSize} - </span>
-            <span className="text-xs font-semibold">Select Color</span>
-          </>
-        );
-      return (
-        <>
-          <span className="text-gray">Color: </span>
-          <span>{selectedColor}</span>
-          <span>, </span>
-          <span className="text-gray">Size: </span>
-          <span>{selectedSize}</span>
-        </>
-      );
+    const selectedCount = Object.keys(selectedOptions).length;
+    const totalGroups = sortedGroups.length;
+
+    // If nothing is selected
+    if (selectedCount === 0) {
+      return "Select Options";
     }
-    if (hasColor) {
-      return selectedColor ? (
-        <>
-          <span className="text-gray">Color: </span>
-          <span>{selectedColor}</span>
-        </>
-      ) : (
-        "Select Color"
-      );
+
+    // If everything is selected
+    if (selectedCount === totalGroups) {
+      return sortedGroups
+        .map((group) => {
+          const selectedOption = group.values.find((opt) => opt.id === selectedOptions[group.id]);
+          return `${group.name}: ${selectedOption?.value || ""}`;
+        })
+        .join(", ");
     }
-    if (hasSize) {
-      return selectedSize ? (
-        <>
-          <span className="text-gray">Size: </span>
-          <span>{selectedSize}</span>
-        </>
-      ) : (
-        "Select Size"
-      );
-    }
-    return "";
+
+    // If some options are selected
+    const selectedText = sortedGroups
+      .filter((group) => selectedOptions[group.id])
+      .map((group) => {
+        const selectedOption = group.values.find((opt) => opt.id === selectedOptions[group.id]);
+        return `${group.name}: ${selectedOption?.value || ""}`;
+      })
+      .join(", ");
+
+    return `${selectedText} + ${totalGroups - selectedCount} more`;
   };
 
-  const handleSizeChartClick = () => {
-    showOverlay({
-      pageName: productDetailsPage.name,
-      overlayName: productDetailsPage.overlays.sizeChart.name,
-    });
+  // Handle option selection
+  const handleSelectOption = (groupId: number, optionId: number) => {
+    setSelectedOption(groupId, optionId);
+
+    // Check if all options are selected after this change
+    const updatedSelections = { ...selectedOptions, [groupId]: optionId };
+    const allSelected = sortedGroups.every((group) => updatedSelections[group.id] !== undefined);
+
+    // Close dropdown if all options are selected
+    if (allSelected) {
+      setDropdownVisible(false);
+    }
   };
 
   return (
     <div
+      ref={dropdownRef}
       className={clsx(
-        "dropdown-container w-max rounded-full relative",
-        !isStickyBarInCartIndicator &&
-          "h-max flex flex-col gap-3 items-start lg:h-8 lg:flex-row lg:items-center",
-        isStickyBarInCartIndicator && "h-8 flex gap-3 items-center"
+        "dropdown-container relative",
+        !isStickyBarInCartIndicator && "flex flex-col gap-3 items-start lg:flex-row lg:items-center",
+        isStickyBarInCartIndicator && "flex gap-3 items-center"
       )}
     >
-      <div className="relative">
-        <button
-          onClick={() => setDropdownVisible((prev) => !prev)}
-          className="h-8 w-max px-4 rounded-full flex items-center justify-center gap-[2px] ease-in-out duration-300 transition bg-lightgray active:bg-lightgray-dimmed lg:hover:bg-lightgray-dimmed"
-        >
-          <div className="text-sm font-medium">{getButtonText()}</div>
-          <ChevronRight
-            color="#828282"
-            size={18}
-            strokeWidth={2}
-            className="-mr-[8px]"
-          />
-        </button>
-        {isDropdownVisible && (
-          <div className="absolute top-[42px] left-0 z-20 pb-2">
-            <div className="space-y-4 w-max min-w-[238px] max-w-[288px] p-5 rounded-xl shadow-dropdown bg-white before:content-[''] before:w-[14px] before:h-[14px] before:bg-white before:rounded-tl-[2px] before:rotate-45 before:origin-top-left before:absolute before:-top-[10px] before:border-l before:border-t before:border-[#d9d9d9] before:left-14 min-[840px]:before:right-24">
-              {hasColor && hasSize && (
-                <div className="flex flex-col gap-4 select-none">
-                  <ProductColors colors={productInfo.options.colors} />
-                  <ProductSizes
-                    sizeChart={productInfo.options.sizes}
-                    onSizeChartClick={handleSizeChartClick}
-                  />
-                </div>
-              )}
-              {hasColor && !hasSize && (
-                <ProductColors colors={productInfo.options.colors} />
-              )}
-              {!hasColor && hasSize && (
-                <ProductSizes
-                  sizeChart={productInfo.options.sizes}
-                  onSizeChartClick={handleSizeChartClick}
-                />
-              )}
-            </div>
-          </div>
+      <button
+        onClick={() => setDropdownVisible((prev) => !prev)}
+        className={clsx(
+          "h-10 px-4 rounded-full flex items-center justify-between gap-2",
+          "transition-all duration-200 ease-in-out",
+          "border border-gray-200 bg-white hover:bg-gray-50 active:bg-gray-100",
+          "text-sm font-medium min-w-[180px]",
+          isDropdownVisible && "ring-2 ring-gray-300"
         )}
-      </div>
-      {isInCart &&
-        !isDropdownVisible &&
-        (isStickyBarInCartIndicator ? (
-          <StickyBarInCartIndicator />
-        ) : (
-          <InCartIndicator />
-        ))}
+      >
+        <span className="truncate">{getButtonText()}</span>
+        <ChevronDown
+          size={16}
+          strokeWidth={2}
+          className={clsx("transition-transform duration-200", isDropdownVisible && "rotate-180")}
+        />
+      </button>
+
+      {isDropdownVisible && (
+        <div className="absolute top-12 left-0 z-20 w-full min-w-[240px]">
+          <div className="p-4 rounded-lg shadow-lg bg-white border border-gray-200">
+            {sortedGroups.map((group) => (
+              <div key={group.id} className="mb-4 last:mb-0">
+                <h3 className="text-sm font-medium mb-2 text-gray-700">{group.name}</h3>
+                <div className="flex flex-wrap gap-2">
+                  {group.values
+                    .filter((option) => option.isActive)
+                    .map((option) => (
+                      <button
+                        key={option.id}
+                        onClick={() => handleSelectOption(group.id, option.id)}
+                        className={clsx(
+                          "px-3 py-1.5 rounded-full text-sm",
+                          "transition-all duration-150 ease-in-out",
+                          selectedOptions[group.id] === option.id
+                            ? "bg-amber-500 text-white"
+                            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                        )}
+                      >
+                        {option.value}
+                      </button>
+                    ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 });

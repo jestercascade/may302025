@@ -14,31 +14,24 @@ import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 export function ProductDetailsWrapper({
   children,
   cart,
-  hasColor,
-  hasSize,
   productInfo,
   categoriesData,
 }: {
   readonly children: React.ReactNode;
   cart: CartType | null;
-  hasColor: boolean;
-  hasSize: boolean;
   productInfo: ProductInfoType;
   categoriesData: StoreCategoriesType | null;
 }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { push } = useNavigation();
 
-  const [isCategoriesDropdownVisible, setCategoriesDropdownVisible] =
-    useState(false);
+  const [isCategoriesDropdownVisible, setCategoriesDropdownVisible] = useState(false);
   const categoriesRef = useRef<HTMLDivElement>(null);
   const setScrollPosition = useScrollStore((state) => state.setScrollPosition);
   const resetOptions = useOptionsStore((state) => state.resetOptions);
 
   const itemsInCart = cart?.items.length || 0;
-  const categories = categoriesData?.showOnPublicSite
-    ? categoriesData.categories
-    : undefined;
+  const categories = categoriesData?.showOnPublicSite ? categoriesData.categories : undefined;
 
   useEffect(() => resetOptions(), [productInfo.id, resetOptions]);
 
@@ -57,10 +50,7 @@ export function ProductDetailsWrapper({
   }, [handleScroll]);
 
   const handleClickOutside = useCallback((event: MouseEvent) => {
-    if (
-      categoriesRef.current &&
-      !categoriesRef.current.contains(event.target as Node)
-    ) {
+    if (categoriesRef.current && !categoriesRef.current.contains(event.target as Node)) {
       setCategoriesDropdownVisible(false);
     }
   }, []);
@@ -70,10 +60,7 @@ export function ProductDetailsWrapper({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [handleClickOutside]);
 
-  const toggleCategoriesDropdown = useCallback(
-    () => setCategoriesDropdownVisible((prev) => !prev),
-    []
-  );
+  const toggleCategoriesDropdown = useCallback(() => setCategoriesDropdownVisible((prev) => !prev), []);
 
   const handleCategoryClick = useCallback(
     (categoryName: string) => {
@@ -100,18 +87,11 @@ export function ProductDetailsWrapper({
         />
       </nav>
       {children}
-      <StickyBar
+      {/* <StickyBar
         productInfo={productInfo}
-        optionsComponent={
-          <ProductDetailsOptions
-            productInfo={productInfo}
-            isStickyBarInCartIndicator={true}
-          />
-        }
-        hasColor={hasColor}
-        hasSize={hasSize}
+        optionsComponent={<ProductDetailsOptions productInfo={productInfo} isStickyBarInCartIndicator={true} />}
         cart={cart}
-      />
+      /> */}
       <Footer />
     </div>
   );
@@ -136,14 +116,7 @@ function DesktopNavbar({
     <div className="hidden md:flex w-full max-w-[1080px] mx-auto px-6 py-2 flex-col md:flex-row justify-between gap-1 relative">
       <div className="flex items-center gap-7">
         <Link href="/">
-          <Image
-            src="/cherlygood/logo.svg"
-            alt="Cherlygood"
-            width={220}
-            height={27}
-            priority
-            className="mt-1"
-          />
+          <Image src="/cherlygood/logo.svg" alt="Cherlygood" width={220} height={27} priority className="mt-1" />
         </Link>
         <div className="flex gap-3 h-10">
           <Link
@@ -228,60 +201,35 @@ function Footer() {
                 Subscribe
               </button>
               <div className="peer-hover:bg-[#cc8100] peer-hover:[background:linear-gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] peer-active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)] w-full h-full p-[2px] rounded-lg shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear-gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000]">
-                <input
-                  className="w-40 h-[40px] px-3 rounded-md"
-                  type="text"
-                  placeholder="Enter your email"
-                />
+                <input className="w-40 h-[40px] px-3 rounded-md" type="text" placeholder="Enter your email" />
               </div>
             </div>
           </div>
           <div className="grid grid-cols-2">
             <div>
               <h3 className="font-semibold mb-4">Company</h3>
-              <Link
-                href="/about-us"
-                className="block w-max text-sm text-gray mb-2 hover:underline"
-              >
+              <Link href="/about-us" className="block w-max text-sm text-gray mb-2 hover:underline">
                 About us
               </Link>
-              <Link
-                href="/privacy-policy"
-                className="block w-max text-sm text-gray mb-2 hover:underline"
-              >
+              <Link href="/privacy-policy" className="block w-max text-sm text-gray mb-2 hover:underline">
                 Privacy policy
               </Link>
-              <Link
-                href="/terms-of-use"
-                className="block w-max text-sm text-gray mb-2 hover:underline"
-              >
+              <Link href="/terms-of-use" className="block w-max text-sm text-gray mb-2 hover:underline">
                 Terms of use
               </Link>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Get Help</h3>
-              <Link
-                href="/contact-us"
-                className="block w-max text-sm text-gray mb-2 hover:underline"
-              >
+              <Link href="/contact-us" className="block w-max text-sm text-gray mb-2 hover:underline">
                 Contact us
               </Link>
-              <Link
-                href="#"
-                className="block w-max text-sm text-gray mb-2 hover:underline"
-              >
+              <Link href="#" className="block w-max text-sm text-gray mb-2 hover:underline">
                 Track order
               </Link>
-              <Link
-                href="/returns-and-refunds"
-                className="block w-max text-sm text-gray mb-2 hover:underline"
-              >
+              <Link href="/returns-and-refunds" className="block w-max text-sm text-gray mb-2 hover:underline">
                 Returns & refunds
               </Link>
-              <Link
-                href="/faq"
-                className="block w-max text-sm text-gray mb-2 hover:underline"
-              >
+              <Link href="/faq" className="block w-max text-sm text-gray mb-2 hover:underline">
                 FAQs
               </Link>
             </div>
@@ -292,49 +240,28 @@ function Footer() {
         <div className="flex gap-10">
           <div className="w-full">
             <h3 className="font-semibold mb-4">Company</h3>
-            <Link
-              href="/about-us"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/about-us" className="block w-max text-sm text-gray mb-2 hover:underline">
               About us
             </Link>
-            <Link
-              href="/privacy-policy"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/privacy-policy" className="block w-max text-sm text-gray mb-2 hover:underline">
               Privacy policy
             </Link>
-            <Link
-              href="/terms-of-use"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/terms-of-use" className="block w-max text-sm text-gray mb-2 hover:underline">
               Terms of use
             </Link>
           </div>
           <div className="w-full">
             <h3 className="font-semibold mb-4">Get Help</h3>
-            <Link
-              href="/contact-us"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/contact-us" className="block w-max text-sm text-gray mb-2 hover:underline">
               Contact us
             </Link>
-            <Link
-              href="#"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="#" className="block w-max text-sm text-gray mb-2 hover:underline">
               Track order
             </Link>
-            <Link
-              href="/returns-and-refunds"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/returns-and-refunds" className="block w-max text-sm text-gray mb-2 hover:underline">
               Returns & refunds
             </Link>
-            <Link
-              href="/faq"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/faq" className="block w-max text-sm text-gray mb-2 hover:underline">
               FAQs
             </Link>
           </div>
@@ -347,11 +274,7 @@ function Footer() {
                 Subscribe
               </button>
               <div className="peer-hover:bg-[#cc8100] peer-hover:[background:linear-gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] peer-active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)] w-full h-full p-[2px] rounded-lg shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear-gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000]">
-                <input
-                  className="w-40 h-[40px] px-3 rounded-md"
-                  type="text"
-                  placeholder="Enter your email"
-                />
+                <input className="w-40 h-[40px] px-3 rounded-md" type="text" placeholder="Enter your email" />
               </div>
             </div>
           </div>
@@ -375,22 +298,7 @@ type ProductInfoType = {
     main: string;
     gallery: string[];
   };
-  options: {
-    colors: Array<{
-      name: string;
-      image: string;
-    }>;
-    sizes: {
-      inches: {
-        columns: Array<{ label: string; order: number }>;
-        rows: Array<{ [key: string]: string }>;
-      };
-      centimeters: {
-        columns: Array<{ label: string; order: number }>;
-        rows: Array<{ [key: string]: string }>;
-      };
-    };
-  };
+  options: ProductType["options"];
   upsell: {
     id: string;
     mainImage: string;
@@ -411,22 +319,7 @@ type ProductInfoType = {
         main: string;
         gallery: string[];
       };
-      options: {
-        colors: Array<{
-          name: string;
-          image: string;
-        }>;
-        sizes: {
-          inches: {
-            columns: Array<{ label: string; order: number }>;
-            rows: Array<{ [key: string]: string }>;
-          };
-          centimeters: {
-            columns: Array<{ label: string; order: number }>;
-            rows: Array<{ [key: string]: string }>;
-          };
-        };
-      };
+      options: ProductType["options"];
     }>;
   };
 };

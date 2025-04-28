@@ -1,30 +1,28 @@
 import { create } from "zustand";
 
 type OptionsStoreType = {
-  selectedColor: string;
-  selectedSize: string;
+  selectedOptions: { [groupId: number]: number | null };
   isInCart: boolean;
   productId: string | null;
-  setSelectedColor: (color: string) => void;
-  setSelectedSize: (size: string) => void;
+  setSelectedOption: (groupId: number, optionId: number | null) => void;
   setIsInCart: (isInCart: boolean) => void;
   setProductId: (productId: string) => void;
   resetOptions: () => void;
 };
 
 export const useOptionsStore = create<OptionsStoreType>((set) => ({
-  selectedColor: "",
-  selectedSize: "",
+  selectedOptions: {},
   isInCart: false,
   productId: null,
-  setSelectedColor: (color) => set({ selectedColor: color }),
-  setSelectedSize: (size) => set({ selectedSize: size }),
+  setSelectedOption: (groupId, optionId) =>
+    set((state) => ({
+      selectedOptions: { ...state.selectedOptions, [groupId]: optionId },
+    })),
   setIsInCart: (isInCart) => set({ isInCart }),
   setProductId: (productId) => set({ productId }),
   resetOptions: () =>
     set({
-      selectedColor: "",
-      selectedSize: "",
+      selectedOptions: {},
       isInCart: false,
       productId: null,
     }),

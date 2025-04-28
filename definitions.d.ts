@@ -1,5 +1,54 @@
 type VisibilityType = "DRAFT" | "PUBLISHED" | "HIDDEN";
 
+type SizeChartType = {
+  centimeters?: {
+    columns: Array<{
+      label: string;
+      order: number;
+    }>;
+    rows: Array<{
+      [key: string]: string;
+    }>;
+  };
+  inches?: {
+    columns: Array<{
+      label: string;
+      order: number;
+    }>;
+    rows: Array<{
+      [key: string]: string;
+    }>;
+  };
+};
+
+type OptionGroupType = {
+  id: number;
+  name: string;
+  displayOrder: number;
+  values: Array<{
+    id: number;
+    value: string;
+    isActive: boolean;
+  }>;
+  sizeChart?: SizeChartType;
+};
+
+type ProductOptionsType = {
+  groups: Array<OptionGroupType>;
+  config: {
+    chaining: {
+      enabled: boolean;
+      relationships: Array<{
+        parentGroupId: number;
+        childGroupId: number;
+        constraints: {
+          [parentOptionId: string]: number[];
+        };
+      }>;
+    };
+  };
+};
+
 type CategoryType = {
   index: number;
   name: string;
@@ -28,49 +77,10 @@ type CollectionType = {
     desktopImage: string;
     mobileImage: string;
   };
-  products: Array<{
-    index: number;
-    id: string;
-  }>;
+  products: Array<CollectionProductType>;
   visibility: VisibilityType;
   createdAt: string;
   updatedAt: string;
-};
-
-// Define size chart type for reusability
-type SizeChartType = {
-  centimeters?: {
-    columns: Array<{
-      label: string;
-      order: number;
-    }>;
-    rows: Array<{
-      [key: string]: string;
-    }>;
-  };
-  inches?: {
-    columns: Array<{
-      label: string;
-      order: number;
-    }>;
-    rows: Array<{
-      [key: string]: string;
-    }>;
-  };
-};
-
-// Define updated options group type for reusability
-type OptionGroupType = {
-  id: number;
-  name: string;
-  displayOrder: number;
-  values: Array<{
-    id: number;
-    value: string;
-    isActive: boolean;
-  }>;
-  // Add size chart directly to option group when needed
-  sizeChart?: SizeChartType;
 };
 
 type UpsellType = {
@@ -94,21 +104,63 @@ type UpsellType = {
       main: string;
       gallery: string[];
     };
-    options: {
-      groups: Array<OptionGroupType>;
-      config: {
-        chaining: {
-          enabled: boolean;
-          relationships: Array<{
-            parentGroupId: number;
-            childGroupId: number;
-            constraints: {
-              [parentOptionId: string]: number[];
-            };
-          }>;
-        };
-      };
-    };
+    options: ProductOptionsType;
+  }>;
+};
+
+type ProductType = {
+  id: string;
+  name: string;
+  slug: string;
+  category: string;
+  description: string;
+  highlights: {
+    headline: string;
+    keyPoints: Array<{
+      index: number;
+      text: string;
+    }>;
+  };
+  pricing: {
+    basePrice: number;
+    salePrice: number;
+    discountPercentage: number;
+  };
+  images: {
+    main: string;
+    gallery: string[];
+  };
+  options: ProductOptionsType;
+  seo: {
+    metaTitle: string;
+    metaDescription: string;
+  };
+  visibility: VisibilityType;
+  createdAt: string;
+  updatedAt: string;
+  sourceInfo: {
+    platform: string;
+    platformUrl: string;
+    store: string;
+    storeId: string;
+    storeUrl: string;
+    productUrl: string;
+  };
+  upsell: string | UpsellType;
+  averageOrderValueBooster?: {
+    name: string;
+    promotionalMessage: string;
+    quantityBreaks?: Array<{
+      quantity: number;
+      discount: number;
+      pricePerItem: number;
+      totalPrice: number;
+    }>;
+  };
+  frequentlyBoughtTogether?: Array<{
+    id: string;
+    name: string;
+    price: number;
   }>;
 };
 
@@ -134,21 +186,7 @@ type ProductWithUpsellType = {
     main: string;
     gallery: string[];
   };
-  options: {
-    groups: Array<OptionGroupType>;
-    config: {
-      chaining: {
-        enabled: boolean;
-        relationships: Array<{
-          parentGroupId: number;
-          childGroupId: number;
-          constraints: {
-            [parentOptionId: string]: number[];
-          };
-        }>;
-      };
-    };
-  };
+  options: ProductOptionsType;
   seo: {
     metaTitle: string;
     metaDescription: string;
@@ -184,21 +222,7 @@ type ProductWithUpsellType = {
         main: string;
         gallery: string[];
       };
-      options: {
-        groups: Array<OptionGroupType>;
-        config: {
-          chaining: {
-            enabled: boolean;
-            relationships: Array<{
-              parentGroupId: number;
-              childGroupId: number;
-              constraints: {
-                [parentOptionId: string]: number[];
-              };
-            }>;
-          };
-        };
-      };
+      options: ProductOptionsType;
     }>;
   };
   averageOrderValueBooster?: {
@@ -240,93 +264,9 @@ type UpsellReviewProductType = {
         main: string;
         gallery: string[];
       };
-      options: {
-        groups: Array<OptionGroupType>;
-        config: {
-          chaining: {
-            enabled: boolean;
-            relationships: Array<{
-              parentGroupId: number;
-              childGroupId: number;
-              constraints: {
-                [parentOptionId: string]: number[];
-              };
-            }>;
-          };
-        };
-      };
+      options: ProductOptionsType;
     }>;
   };
-};
-
-type ProductType = {
-  id: string;
-  name: string;
-  slug: string;
-  category: string;
-  description: string;
-  highlights: {
-    headline: string;
-    keyPoints: Array<{
-      index: number;
-      text: string;
-    }>;
-  };
-  pricing: {
-    basePrice: number;
-    salePrice: number;
-    discountPercentage: number;
-  };
-  images: {
-    main: string;
-    gallery: string[];
-  };
-  options: {
-    groups: Array<OptionGroupType>;
-    config: {
-      chaining: {
-        enabled: boolean;
-        relationships: Array<{
-          parentGroupId: number;
-          childGroupId: number;
-          constraints: {
-            [parentOptionId: string]: number[];
-          };
-        }>;
-      };
-    };
-  };
-  seo: {
-    metaTitle: string;
-    metaDescription: string;
-  };
-  visibility: VisibilityType;
-  createdAt: string;
-  updatedAt: string;
-  sourceInfo: {
-    platform: string;
-    platformUrl: string;
-    store: string;
-    storeId: string;
-    storeUrl: string;
-    productUrl: string;
-  };
-  upsell: string | UpsellType;
-  averageOrderValueBooster?: {
-    name: string;
-    promotionalMessage: string;
-    quantityBreaks?: Array<{
-      quantity: number;
-      discount: number;
-      pricePerItem: number;
-      totalPrice: number;
-    }>;
-  };
-  frequentlyBoughtTogether?: Array<{
-    id: string;
-    name: string;
-    price: number;
-  }>;
 };
 
 type NewsletterType = {
