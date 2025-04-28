@@ -3,15 +3,9 @@
 import React, { useRef, useEffect, useCallback } from "react";
 import { useScrollStore } from "@/zustand/website/scrollStore";
 
-export function ProductInfoWrapper({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function ProductInfoWrapper({ children }: { children: React.ReactNode }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const setProductInfoWrapperHeight = useScrollStore(
-    (state) => state.setProductInfoWrapperHeight
-  );
+  const setProductInfoWrapperHeight = useScrollStore((state) => state.setProductInfoWrapperHeight);
 
   const updateHeight = useCallback(() => {
     if (wrapperRef.current) {
@@ -37,7 +31,7 @@ export function ProductInfoWrapper({
   }, [updateHeight]);
 
   return (
-    <div ref={wrapperRef} className="sticky top-5 pt-5 min-w-[372px]">
+    <div ref={wrapperRef} className="sticky top-5 pt-5 min-w-[372px] z-10">
       {children}
     </div>
   );
