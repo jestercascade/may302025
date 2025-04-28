@@ -4,6 +4,7 @@ import { useOptionsStore } from "@/zustand/website/optionsStore";
 import { memo, useState, useEffect, useRef } from "react";
 import { ChevronDown, Ruler } from "lucide-react";
 import clsx from "clsx";
+import styles from "./styles.module.css";
 
 type OptionType = {
   id: number;
@@ -226,7 +227,9 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
 
       {isDropdownVisible && (
         <div className="absolute top-full left-0 z-20 w-full mt-2">
-          <div className="p-4 rounded-lg shadow-lg bg-white border border-gray-200">
+          <div
+            className={`${styles.customScrollbar} p-4 rounded-md shadow-lg bg-white border border-gray-200 max-h-60 overflow-y-auto`}
+          >
             {sortedGroups.map((group) => (
               <div key={group.id} className="mb-4 last:mb-0">
                 <h3 className="text-sm font-medium mb-2">{group.name}</h3>
@@ -242,7 +245,7 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
                           "transition-all duration-150 ease-in-out",
                           selectedOptions[group.id] === option.id
                             ? "bg-black text-white"
-                            : "bg-gray-100 text-black hover:bg-gray-200"
+                            : "bg-neutral-100 text-black hover:bg-neutral-200"
                         )}
                       >
                         {option.value}
@@ -258,7 +261,7 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
                           const measurement = selectedSizeRow[column.label];
                           if (!measurement) return null;
                           return (
-                            <div key={column.label} className="flex items-center text-xs text-gray-700">
+                            <div key={column.label} className="flex items-center text-xs text-black">
                               <span className="mr-1">{column.label}:</span>
                               <span className="font-semibold">{formatMeasurement(column.label, measurement)}</span>
                             </div>
