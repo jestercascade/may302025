@@ -45,38 +45,32 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
   const [isDropdownVisible, setDropdownVisible] = useState(false);
   const { selectedOptions, setSelectedOption } = useOptionsStore();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [highlightedOptions, setHighlightedOptions] = useState<Record<number, boolean>>({});
+  const previousSelections = useRef<Record<number, number | null>>({});
 
-  // Maximum characters to display in the primary dropdown button
   const MAX_DISPLAY_CHARS = 28;
 
-  // Filter groups to only include those with active options and sort by display order
   const sortedGroups = [...options.groups]
     .filter((group) => group.values.some((opt) => opt.isActive))
     .sort((a, b) => a.displayOrder - b.displayOrder);
 
-  // Find the size group if it exists
   const sizeGroup = sortedGroups.find((group) => group.name.toLowerCase() === "size");
   const isSizeSelected = sizeGroup && selectedOptions[sizeGroup.id] !== undefined;
 
-  // Get selected size value
   const selectedSize =
     isSizeSelected && sizeGroup
       ? sizeGroup.values.find((opt) => opt.id === selectedOptions[sizeGroup.id])?.value
       : null;
 
   const sizeChartData = sizeGroup?.sizeChart;
-
-  // Find the row in the size chart that matches the selected size
   const selectedSizeRow =
     selectedSize &&
     sizeChartData?.inches?.rows.find((row) => Object.values(row).some((value) => value === selectedSize));
 
-  // Get measurement columns excluding size identifiers
   const measurementColumns =
     sizeChartData?.inches?.columns.filter((col) => !["size", "name", "label size"].includes(col.label.toLowerCase())) ||
     [];
 
-  // Format measurement values with appropriate units
   const formatMeasurement = (label: string, value: string) => {
     if (sizeLabels.has(value) || countryCodes.has(value)) return value;
     if (value.includes("'") || value.includes('"') || value.includes("cm") || value.includes("in")) return value;
@@ -85,7 +79,6 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
     return value + " in";
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -96,65 +89,66 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Format selected options for display
+  useEffect(() => {
+    const changedGroups: number[] = [];
+
+    Object.entries(selectedOptions).forEach(([groupId, optionId]) => {
+      const groupIdNum = Number(groupId);
+      if (previousSelections.current[groupIdNum] !== undefined && previousSelections.current[groupIdNum] !== optionId) {
+        changedGroups.push(groupIdNum);
+      }
+      previousSelections.current[groupIdNum] = optionId;
+    });
+
+    changedGroups.forEach((groupId) => {
+      setHighlightedOptions((prev) => ({ ...prev, [groupId]: true }));
+      setTimeout(() => {
+        setHighlightedOptions((prev) => ({ ...prev, [groupId]: false }));
+      }, 800);
+    });
+  }, [selectedOptions]);
+
   const getFormattedSelections = () => {
-    const selectedList = sortedGroups
+    return sortedGroups
       .filter((group) => selectedOptions[group.id] !== undefined)
       .map((group) => {
         const selected = group.values.find((opt) => opt.id === selectedOptions[group.id]);
-        return { name: group.name, value: selected?.value || "" };
+        return { id: group.id, name: group.name, value: selected?.value || "" };
       });
-
-    return selectedList;
   };
 
-  // Intelligently format selected options for the primary display
   const getSmartDisplayText = () => {
     const selections = getFormattedSelections();
-
     if (selections.length === 0) return { display: "Select Options", remaining: 0 };
 
-    // Try to fit as many options as possible within MAX_DISPLAY_CHARS
     let displayText = "";
-    let separator = ", "; // Changed from dot to comma
+    let separator = ", ";
     let index = 0;
     let remaining = selections.length;
 
-    // Always include at least the first selection
     displayText = selections[0].value;
     index++;
     remaining--;
 
-    // Add more selections as long as they fit within the character limit
     while (index < selections.length) {
       const nextOption = selections[index].value;
       const nextDisplayText = displayText + separator + nextOption;
-
-      // Check if adding this option would exceed the character limit
       if (nextDisplayText.length <= MAX_DISPLAY_CHARS) {
         displayText = nextDisplayText;
         index++;
         remaining--;
-      } else {
-        break;
-      }
+      } else break;
     }
 
     return { display: displayText, remaining };
   };
 
-  // Handle option selection
   const handleSelectOption = (groupId: number, optionId: number) => {
     setSelectedOption(groupId, optionId);
-
-    // Check if all required options are selected
     const updated = { ...selectedOptions, [groupId]: optionId };
-    const allSelected = sortedGroups.every((g) => updated[g.id] !== undefined);
-
-    if (allSelected) setDropdownVisible(false);
+    if (sortedGroups.every((g) => updated[g.id] !== undefined)) setDropdownVisible(false);
   };
 
-  // Handle size chart click
   const handleSizeChartClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     onSizeChartClick?.();
@@ -166,6 +160,14 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
   const hasSelections = selections.length > 0;
   const { display, remaining } = getSmartDisplayText();
 
+  const highlightKeyframes = `
+    @keyframes highlightPulse {
+      0% { background-color: rgb(254, 243, 199); color: rgb(146, 64, 14); }
+      70% { background-color: rgb(254, 243, 199); color: rgb(146, 64, 14); }
+      100% { background-color: rgb(243, 244, 246); color: rgb(75, 85, 99); }
+    }
+  `;
+
   return (
     <div
       ref={dropdownRef}
@@ -175,6 +177,8 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
         isStickyBarInCartIndicator && "flex gap-2 items-center"
       )}
     >
+      <style jsx>{highlightKeyframes}</style>
+
       <button
         onClick={() => setDropdownVisible((prev) => !prev)}
         className={clsx(
@@ -191,10 +195,16 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
                 <span className="text-base font-medium">{display}</span>
                 {remaining > 0 && <span className="text-sm text-gray-500 ml-2">+{remaining}</span>}
               </div>
-              {/* Changed to a pill-style display for the subtext */}
               <div className="flex flex-wrap gap-1 mt-1 w-full">
                 {selections.map((s) => (
-                  <span key={s.name} className="inline-flex text-xs bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">
+                  <span
+                    key={s.name}
+                    className={clsx(
+                      "inline-flex text-xs px-1.5 py-0.5 rounded",
+                      highlightedOptions[s.id] ? "bg-amber-100 text-amber-800" : "bg-gray-100 text-gray-600"
+                    )}
+                    style={highlightedOptions[s.id] ? { animation: "highlightPulse 800ms ease-out" } : {}}
+                  >
                     {s.name}: {s.value}
                   </span>
                 ))}
