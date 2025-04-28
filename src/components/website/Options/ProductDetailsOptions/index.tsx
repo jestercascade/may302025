@@ -202,7 +202,7 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
                     key={s.name}
                     className={clsx(
                       "inline-flex text-xs px-1.5 py-0.5 rounded",
-                      highlightedOptions[s.id] ? "bg-amber-100 text-amber-800" : "bg-gray-100 text-gray-600"
+                      highlightedOptions[s.id] ? "bg-amber-100 text-amber-800" : "bg-neutral-100 text-gray-600"
                     )}
                     style={highlightedOptions[s.id] ? { animation: "highlightPulse 800ms ease-out" } : {}}
                   >
