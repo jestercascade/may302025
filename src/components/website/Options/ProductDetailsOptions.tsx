@@ -53,50 +53,61 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Generate button text based on selections
-  const getButtonText = () => {
+  // Render button content with styled keys and values
+  const renderButtonText = () => {
     const selectedCount = Object.keys(selectedOptions).length;
     const totalGroups = sortedGroups.length;
 
-    // If nothing is selected
     if (selectedCount === 0) {
-      return "Select Options";
+      return <span>Select Options</span>;
     }
 
-    // If everything is selected
-    if (selectedCount === totalGroups) {
-      return sortedGroups
-        .map((group) => {
-          const selectedOption = group.values.find((opt) => opt.id === selectedOptions[group.id]);
-          return `${group.name}: ${selectedOption?.value || ""}`;
-        })
-        .join(", ");
-    }
-
-    // If some options are selected
-    const selectedText = sortedGroups
-      .filter((group) => selectedOptions[group.id])
+    // Helper to build list of groups
+    const list = sortedGroups
+      .filter((group) => selectedOptions[group.id] !== undefined)
       .map((group) => {
-        const selectedOption = group.values.find((opt) => opt.id === selectedOptions[group.id]);
-        return `${group.name}: ${selectedOption?.value || ""}`;
-      })
-      .join(", ");
+        const selected = group.values.find((opt) => opt.id === selectedOptions[group.id]);
+        return { id: group.id, name: group.name, value: selected?.value || "" };
+      });
 
-    return `${selectedText} + ${totalGroups - selectedCount} more`;
+    // If all selected
+    if (selectedCount === totalGroups) {
+      return (
+        <>
+          {list.map((item, idx) => (
+            <span key={item.id} className="truncate inline-block">
+              <span className="text-gray-500">{item.name}: </span>
+              <span className="text-gray-900 font-medium">{item.value}</span>
+              {idx < list.length - 1 && <span className="text-gray-500">,&nbsp;</span>}
+            </span>
+          ))}
+        </>
+      );
+    }
+
+    // Partial selection
+    return (
+      <>
+        {list.map((item, idx) => (
+          <span key={item.id} className="inline-block">
+            <span className="text-gray-500">{item.name}: </span>
+            <span className="text-gray-900 font-medium">{item.value}</span>
+            {idx < list.length - 1 && <span className="text-gray-500">,&nbsp;</span>}
+          </span>
+        ))}
+        <span className="text-gray-500">&nbsp;+{totalGroups - selectedCount} more</span>
+      </>
+    );
   };
 
   // Handle option selection
   const handleSelectOption = (groupId: number, optionId: number) => {
     setSelectedOption(groupId, optionId);
 
-    // Check if all options are selected after this change
-    const updatedSelections = { ...selectedOptions, [groupId]: optionId };
-    const allSelected = sortedGroups.every((group) => updatedSelections[group.id] !== undefined);
+    const updated = { ...selectedOptions, [groupId]: optionId };
+    const allSelected = sortedGroups.every((g) => updated[g.id] !== undefined);
 
-    // Close dropdown if all options are selected
-    if (allSelected) {
-      setDropdownVisible(false);
-    }
+    if (allSelected) setDropdownVisible(false);
   };
 
   return (
@@ -118,7 +129,7 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
           isDropdownVisible && "ring-2 ring-gray-300"
         )}
       >
-        <span className="truncate">{getButtonText()}</span>
+        <span className="truncate flex">{renderButtonText()}</span>
         <ChevronDown
           size={16}
           strokeWidth={2}
