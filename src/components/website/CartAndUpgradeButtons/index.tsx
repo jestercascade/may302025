@@ -1,5 +1,4 @@
 "use client";
-
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { useOptionsStore } from "@/zustand/website/optionsStore";
 import { useTransition, useEffect } from "react";
@@ -13,12 +12,75 @@ import { UpsellReviewButton } from "../UpsellReviewOverlay";
 import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 import styles from "./styles.module.css";
 import clsx from "clsx";
+import { capitalizeFirstLetter } from "@/lib/utils/common";
 
-export function CartAndUpgradeButtons({ product, cart }: CartAndUpgradeButtonsType) {
+export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithUpsellType; cart: CartType | null }) {
   const [isPending, startTransition] = useTransition();
+  const { showAlert } = useAlertStore();
+  const { selectedOptions } = useOptionsStore();
 
   const handleAddToCart = async () => {
-    // ...
+    // Identify active option groups (those with at least one active option)
+    const activeOptionGroups =
+      product.options?.groups.filter((group) => group.values.some((opt) => opt.isActive)) || [];
+
+    // Find any unselected active option groups
+    const unselectedOptions = activeOptionGroups.filter(
+      (group) => selectedOptions[group.id] === undefined || selectedOptions[group.id] === null
+    );
+
+    // If there are unselected options, show a specific alert
+    if (unselectedOptions.length > 0) {
+      // Get the name of the first missing option
+      const firstMissingOption = unselectedOptions[0].name;
+
+      // Construct a clear, specific message
+      let message = `${capitalizeFirstLetter(firstMissingOption)} not selected.`;
+
+      // If there are multiple missing options, add additional context
+      if (unselectedOptions.length > 1) {
+        message += " Select all options to continue.";
+      } else {
+        // Add a message for the single missing option
+        message += " Please select all options.";
+      }
+
+      return showAlert({
+        message,
+        type: ShowAlertType.NEUTRAL,
+      });
+    }
+
+    // If all options are selected, proceed to add to cart
+    startTransition(async () => {
+      try {
+        // Here you would call your AddToCartAction function
+        console.log("Adding to cart with options:", selectedOptions);
+
+        // Uncomment when ready to implement the actual cart action
+        // const result = await AddToCartAction({
+        //   productId: product.id,
+        //   selectedOptions,
+        // });
+
+        // if (result.success) {
+        //   showAlert({
+        //     message: "Added to cart successfully!",
+        //     type: ShowAlertType.SUCCESS,
+        //   });
+        // } else {
+        //   showAlert({
+        //     message: result.error || "Failed to add to cart",
+        //     type: ShowAlertType.ERROR,
+        //   });
+        // }
+      } catch (error) {
+        showAlert({
+          message: "An error occurred while adding to cart",
+          type: ShowAlertType.ERROR,
+        });
+      }
+    });
   };
 
   return (
@@ -36,10 +98,3 @@ export function CartAndUpgradeButtons({ product, cart }: CartAndUpgradeButtonsTy
     </button>
   );
 }
-
-// -- Type Definitions --
-
-type CartAndUpgradeButtonsType = {
-  product: ProductWithUpsellType;
-  cart: CartType | null;
-};
