@@ -82,7 +82,7 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
 
         showAlert({
           message: result.message,
-          type: result.type === ShowAlertType.ERROR ? ShowAlertType.ERROR : ShowAlertType.NEUTRAL,
+          type: result.type === ShowAlertType.ERROR ? ShowAlertType.ERROR : ShowAlertType.SUCCESS,
         });
       } catch (error) {
         console.error("Add to cart error:", error);
