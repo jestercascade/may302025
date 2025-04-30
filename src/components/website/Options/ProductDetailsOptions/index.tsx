@@ -190,8 +190,8 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
         className={clsx(
           "w-full px-4 py-2.5 rounded-lg flex items-center justify-between",
           "transition-all duration-200 ease-in-out",
-          "border border-gray-200 bg-white hover:bg-gray-50 active:bg-gray-100",
-          isDropdownVisible ? "ring-2 ring-gray-300" : ""
+          "border bg-white hover:bg-neutral-50 active:bg-neutral-100",
+          isDropdownVisible ? "ring-2 ring-neutral-300" : ""
         )}
       >
         <div className="flex flex-col items-start w-full">
