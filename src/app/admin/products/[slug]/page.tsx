@@ -502,16 +502,10 @@ export default async function EditProduct({ params }: { params: Promise<{ slug: 
       <MainImageOverlay data={{ id, images }} />
       <ImageGalleryOverlay data={{ id, images }} />
       <OptionsOverlay data={{ id, options }} />
-      {/* <SizeChartOverlay
-        data={{
-          id,
-          sizes: options.sizes,
-        }}
-      /> */}
       <DescriptionOverlay data={{ id, description }} />
       <HighlightsOverlay data={{ id, highlights }} />
       <VisibilityOverlay data={{ id, visibility }} />
-      {/* <UpsellOverlay data={{ id, upsell, upsellDetails }} /> */}
+      <UpsellOverlay data={{ id, upsell, upsellDetails }} />
     </>
   );
 }

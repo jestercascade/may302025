@@ -14,9 +14,7 @@ import { ShowAlertType } from "@/lib/sharedTypes";
 export function UpsellButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.editProduct.overlays.upsell.name
-  );
+  const overlayName = useOverlayStore((state) => state.pages.editProduct.overlays.upsell.name);
 
   return (
     <button
@@ -83,12 +81,8 @@ export function UpsellOverlay({ data }: { data: DataType }) {
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.editProduct.overlays.upsell.name
-  );
-  const isOverlayVisible = useOverlayStore(
-    (state) => state.pages.editProduct.overlays.upsell.isVisible
-  );
+  const overlayName = useOverlayStore((state) => state.pages.editProduct.overlays.upsell.name);
+  const isOverlayVisible = useOverlayStore((state) => state.pages.editProduct.overlays.upsell.isVisible);
 
   useEffect(() => {
     if (isOverlayVisible) {
@@ -203,14 +197,8 @@ export function UpsellOverlay({ data }: { data: DataType }) {
                   type="button"
                   className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                 >
-                  <ArrowLeft
-                    size={20}
-                    strokeWidth={2}
-                    className="-ml-1 stroke-blue"
-                  />
-                  <span className="font-semibold text-sm text-blue">
-                    Upsell
-                  </span>
+                  <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
+                  <span className="font-semibold text-sm text-blue">Upsell</span>
                 </button>
               </div>
               <div className="w-full h-full mt-[52px] md:mt-0 px-5 pb-8 flex flex-col gap-5 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
@@ -220,44 +208,29 @@ export function UpsellOverlay({ data }: { data: DataType }) {
                       <div className="relative">
                         <div className="w-60 select-none">
                           <div className="w-full aspect-square rounded-lg overflow-hidden flex items-center justify-center bg-white">
-                            <Image
-                              src={upsell.mainImage}
-                              alt="Upsell"
-                              width={240}
-                              height={240}
-                              priority
-                            />
+                            <Image src={upsell.mainImage} alt="Upsell" width={240} height={240} priority />
                           </div>
                         </div>
                         <button
                           onClick={handleRemoveUpsell}
                           className="h-8 w-8 rounded-full flex items-center justify-center absolute top-2 right-2 transition duration-300 ease-in-out backdrop-blur border border-red bg-red/70 active:bg-red"
                         >
-                          {loading ? (
-                            <Spinner color="white" />
-                          ) : (
-                            <Minus color="#ffffff" strokeWidth={1.75} />
-                          )}
+                          {loading ? <Spinner color="white" /> : <Minus color="#ffffff" strokeWidth={1.75} />}
                         </button>
                       </div>
                     </div>
                     <div className="p-5 pt-4 pr-12">
                       <p className="mb-1 font-bold text-[#C45500]">
-                        ${upsell.pricing.salePrice || upsell.pricing.basePrice}{" "}
-                        ({upsellDetails.percentageIncrease}%)
+                        ${upsell.pricing.salePrice || upsell.pricing.basePrice} ({upsellDetails.percentageIncrease}%)
                       </p>
-                      <p className="text-xs text-[#C45500]/85">
-                        Customer spends ${upsellDetails.additionalSpend} more
-                      </p>
+                      <p className="text-xs text-[#C45500]/85">Customer spends ${upsellDetails.additionalSpend} more</p>
                     </div>
                   </div>
                 ) : (
                   <div className="w-full flex flex-col gap-4 items-center mt-[52px] md:mt-0 p-5 md:pb-[70px]">
                     <div className="flex flex-col gap-2 items-center">
                       <h2 className="font-semibold text-lg">No upsell</h2>
-                      <p className="text-sm text-center">
-                        Enter ID below to set one
-                      </p>
+                      <p className="text-sm text-center">Enter ID below to set one</p>
                     </div>
                     <div className="w-full min-[588px]:w-56 h-9 rounded-full overflow-hidden flex items-center border shadow-sm">
                       <input
@@ -276,16 +249,11 @@ export function UpsellOverlay({ data }: { data: DataType }) {
                           className={clsx(
                             "w-11 h-9 rounded-full flex items-center justify-center transition duration-300 ease-in-out",
                             {
-                              "active:bg-lightgray lg:hover:bg-lightgray":
-                                !loading,
+                              "active:bg-lightgray lg:hover:bg-lightgray": !loading,
                             }
                           )}
                         >
-                          {loading ? (
-                            <Spinner color="gray" />
-                          ) : (
-                            <Plus strokeWidth={1.75} />
-                          )}
+                          {loading ? <Spinner color="gray" /> : <Plus strokeWidth={1.75} />}
                         </button>
                       </div>
                     </div>
@@ -324,22 +292,7 @@ type DataType = {
         main: string;
         gallery: string[];
       };
-      options: {
-        colors: Array<{
-          name: string;
-          image: string;
-        }>;
-        sizes: {
-          inches: {
-            columns: Array<{ label: string; order: number }>;
-            rows: Array<{ [key: string]: string }>;
-          };
-          centimeters: {
-            columns: Array<{ label: string; order: number }>;
-            rows: Array<{ [key: string]: string }>;
-          };
-        };
-      };
+      options: ProductOptionsType;
     }>;
   } | null;
   upsellDetails: {

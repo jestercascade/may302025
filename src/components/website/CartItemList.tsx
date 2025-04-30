@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { RemoveFromCartButton } from "@/components/website/RemoveFromCartButton";
+// import { RemoveFromCartButton } from "@/components/website/RemoveFromCartButton";
 import { formatThousands } from "@/lib/utils/common";
 import { PiShieldCheckBold } from "react-icons/pi";
 import { TbLock, TbTruck } from "react-icons/tb";
@@ -12,19 +12,14 @@ import clsx from "clsx";
 import { Check } from "lucide-react";
 
 export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
-  const [selectedItems, setSelectedItems] = useState<Set<string>>(
-    new Set(cartItems.map((item) => item.variantId))
-  );
+  // Initialize with all items selected by default
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set(cartItems.map((item) => item.variantId)));
 
   // Keep track of manually deselected items
-  const [deselectedItems, setDeselectedItems] = useState<Set<string>>(
-    new Set()
-  );
+  const [deselectedItems, setDeselectedItems] = useState<Set<string>>(new Set());
 
   // Keep track of manually selected items
-  const [manuallySelectedItems, setManuallySelectedItems] = useState<
-    Set<string>
-  >(new Set());
+  const [manuallySelectedItems, setManuallySelectedItems] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Update selections when cart items change
@@ -37,16 +32,11 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
         // Keep item selected if:
         // 1. It was manually selected previously
         // 2. OR it's a new item AND wasn't manually deselected before
+        // 3. OR it was previously selected and not manually deselected
         if (
           manuallySelectedItems.has(variantId) ||
-          (!prevSelected.has(variantId) && !deselectedItems.has(variantId))
-        ) {
-          newSelected.add(variantId);
-        }
-        // Keep item selected if it was previously selected and not manually deselected
-        else if (
-          prevSelected.has(variantId) &&
-          !deselectedItems.has(variantId)
+          (!prevSelected.has(variantId) && !deselectedItems.has(variantId)) ||
+          (prevSelected.has(variantId) && !deselectedItems.has(variantId))
         ) {
           newSelected.add(variantId);
         }
@@ -61,20 +51,12 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
       const newSet = new Set(prev);
       if (newSet.has(variantId)) {
         newSet.delete(variantId);
-        // Track manually deselected items
         setDeselectedItems(new Set([...deselectedItems, variantId]));
-        setManuallySelectedItems(
-          new Set([...manuallySelectedItems].filter((id) => id !== variantId))
-        );
+        setManuallySelectedItems(new Set([...manuallySelectedItems].filter((id) => id !== variantId)));
       } else {
         newSet.add(variantId);
-        // Track manually selected items
-        setManuallySelectedItems(
-          new Set([...manuallySelectedItems, variantId])
-        );
-        setDeselectedItems(
-          new Set([...deselectedItems].filter((id) => id !== variantId))
-        );
+        setManuallySelectedItems(new Set([...manuallySelectedItems, variantId]));
+        setDeselectedItems(new Set([...deselectedItems].filter((id) => id !== variantId)));
       }
       return newSet;
     });
@@ -83,23 +65,19 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
   const toggleAll = () => {
     if (selectedItems.size === cartItems.length) {
       setSelectedItems(new Set());
-      // Add all current items to deselected set
       setDeselectedItems(new Set(cartItems.map((item) => item.variantId)));
       setManuallySelectedItems(new Set());
     } else {
       setSelectedItems(new Set(cartItems.map((item) => item.variantId)));
-      // Clear deselected items when selecting all
       setDeselectedItems(new Set());
-      setManuallySelectedItems(
-        new Set(cartItems.map((item) => item.variantId))
-      );
+      setManuallySelectedItems(new Set(cartItems.map((item) => item.variantId)));
     }
   };
 
-  const formatProductOptions = (color?: string, size?: string) => {
-    if (!color && !size) return null;
-    if (color && size) return `${color} / ${size}`;
-    return color || `Size (${size})`;
+  const formatProductOptions = (options: Record<string, string>) => {
+    return Object.entries(options)
+      .map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`)
+      .join(", ");
   };
 
   const calculateTotal = () => {
@@ -107,8 +85,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
       if (!selectedItems.has(item.variantId)) return total;
 
       const itemPrice = item.pricing.salePrice || item.pricing.basePrice;
-      const price =
-        typeof itemPrice === "number" ? itemPrice : parseFloat(itemPrice);
+      const price = typeof itemPrice === "number" ? itemPrice : parseFloat(itemPrice);
       return isNaN(price) ? total : total + price;
     }, 0);
 
@@ -129,21 +106,15 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                 onClick={toggleAll}
                 className={clsx(
                   "w-5 h-5 cursor-pointer rounded-full flex items-center justify-center ease-in-out duration-200 transition",
-                  selectedItems.size === cartItems.length
-                    ? "bg-black"
-                    : "border border-neutral-400"
+                  selectedItems.size === cartItems.length ? "bg-black" : "border border-neutral-400"
                 )}
               >
-                {selectedItems.size > 0 && (
-                  <Check color="#ffffff" size={16} strokeWidth={2} />
-                )}
+                {selectedItems.size === cartItems.length && <Check color="#ffffff" size={16} strokeWidth={2} />}
               </div>
             </div>
             <span className="font-semibold">
               {selectedItems.size > 0
-                ? `Checkout (${selectedItems.size} ${
-                    selectedItems.size === 1 ? "Item" : "Items"
-                  })`
+                ? `Checkout (${selectedItems.size} ${selectedItems.size === 1 ? "Item" : "Items"})`
                 : "Select items for checkout"}
             </span>
           </div>
@@ -152,10 +123,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
               const isSelected = selectedItems.has(item.variantId);
 
               if (item.type === "product") {
-                const productOptions = formatProductOptions(
-                  item.color,
-                  item.size
-                );
+                const productOptions = formatProductOptions(item.selectedOptions);
                 return (
                   <div key={item.index} className="flex gap-3">
                     <div className="flex items-center">
@@ -166,29 +134,15 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                           isSelected ? "bg-black" : "border border-neutral-400"
                         )}
                       >
-                        {isSelected && (
-                          <Check color="#ffffff" size={16} strokeWidth={2} />
-                        )}
+                        {isSelected && <Check color="#ffffff" size={16} strokeWidth={2} />}
                       </div>
                     </div>
                     <div>
                       <div className="min-[580px]:hidden flex items-center justify-center min-w-[108px] max-w-[108px] min-h-[108px] max-h-[108px] overflow-hidden rounded-lg">
-                        <Image
-                          src={item.mainImage}
-                          alt={item.name}
-                          width={108}
-                          height={108}
-                          priority
-                        />
+                        <Image src={item.mainImage} alt={item.name} width={108} height={108} priority />
                       </div>
                       <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[146px] min-[580px]:max-w-[146px] min-[580px]:min-h-[146px] min-[580px]:max-h-[146px] overflow-hidden rounded-lg">
-                        <Image
-                          src={item.mainImage}
-                          alt={item.name}
-                          width={146}
-                          height={146}
-                          priority
-                        />
+                        <Image src={item.mainImage} alt={item.name} width={146} height={146} priority />
                       </div>
                     </div>
                     <div className="w-full pr-3 flex flex-col gap-1">
@@ -200,30 +154,17 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                         >
                           {item.name}
                         </Link>
-                        <RemoveFromCartButton
-                          type="product"
-                          variantId={item.variantId}
-                        />
+                        {/* <RemoveFromCartButton type="product" variantId={item.variantId} /> */}
                       </div>
-                      {productOptions && (
-                        <span className="mb-1 text-xs font-medium">
-                          {productOptions}
-                        </span>
-                      )}
+                      {productOptions && <span className="mb-1 text-xs font-medium">{productOptions}</span>}
                       <div className="w-max flex items-center justify-center">
                         {Number(item.pricing.salePrice) ? (
                           <div className="flex items-center gap-[6px]">
                             <div className="flex items-baseline text-[rgb(168,100,0)]">
+                              <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                              <span className="text-lg font-bold">{Math.floor(Number(item.pricing.salePrice))}</span>
                               <span className="text-[0.813rem] leading-3 font-semibold">
-                                $
-                              </span>
-                              <span className="text-lg font-bold">
-                                {Math.floor(Number(item.pricing.salePrice))}
-                              </span>
-                              <span className="text-[0.813rem] leading-3 font-semibold">
-                                {(Number(item.pricing.salePrice) % 1)
-                                  .toFixed(2)
-                                  .substring(1)}
+                                {(Number(item.pricing.salePrice) % 1).toFixed(2).substring(1)}
                               </span>
                             </div>
                             <span className="text-[0.813rem] leading-3 text-gray line-through">
@@ -232,16 +173,10 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                           </div>
                         ) : (
                           <div className="flex items-baseline">
+                            <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                            <span className="text-lg font-bold">{Math.floor(Number(item.pricing.basePrice))}</span>
                             <span className="text-[0.813rem] leading-3 font-semibold">
-                              $
-                            </span>
-                            <span className="text-lg font-bold">
-                              {Math.floor(Number(item.pricing.basePrice))}
-                            </span>
-                            <span className="text-[0.813rem] leading-3 font-semibold">
-                              {(Number(item.pricing.basePrice) % 1)
-                                .toFixed(2)
-                                .substring(1)}
+                              {(Number(item.pricing.basePrice) % 1).toFixed(2).substring(1)}
                             </span>
                           </div>
                         )}
@@ -260,9 +195,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                           isSelected ? "bg-black" : "border border-neutral-400"
                         )}
                       >
-                        {isSelected && (
-                          <Check color="#ffffff" size={16} strokeWidth={2} />
-                        )}
+                        {isSelected && <Check color="#ffffff" size={16} strokeWidth={2} />}
                       </div>
                     </div>
                     <div className="relative w-[calc(100%-32px)] p-5 pr-0 rounded-lg bg-[#fffbf6] border border-[#fceddf]">
@@ -271,73 +204,38 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                           {Number(item.pricing.salePrice) ? (
                             <div className="flex items-center gap-[6px]">
                               <div className="flex items-baseline text-[rgb(168,100,0)]">
+                                <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                                <span className="text-lg font-bold">{Math.floor(Number(item.pricing.salePrice))}</span>
                                 <span className="text-[0.813rem] leading-3 font-semibold">
-                                  $
-                                </span>
-                                <span className="text-lg font-bold">
-                                  {Math.floor(Number(item.pricing.salePrice))}
-                                </span>
-                                <span className="text-[0.813rem] leading-3 font-semibold">
-                                  {(Number(item.pricing.salePrice) % 1)
-                                    .toFixed(2)
-                                    .substring(1)}
+                                  {(Number(item.pricing.salePrice) % 1).toFixed(2).substring(1)}
                                 </span>
                               </div>
                               <span className="text-[0.813rem] leading-3 text-gray line-through">
-                                $
-                                {formatThousands(
-                                  Number(item.pricing.basePrice)
-                                )}
+                                ${formatThousands(Number(item.pricing.basePrice))}
                               </span>
                             </div>
                           ) : (
                             <div className="flex items-baseline text-[rgb(168,100,0)]">
+                              <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                              <span className="text-lg font-bold">{Math.floor(Number(item.pricing.basePrice))}</span>
                               <span className="text-[0.813rem] leading-3 font-semibold">
-                                $
+                                {(Number(item.pricing.basePrice) % 1).toFixed(2).substring(1)}
                               </span>
-                              <span className="text-lg font-bold">
-                                {Math.floor(Number(item.pricing.basePrice))}
-                              </span>
-                              <span className="text-[0.813rem] leading-3 font-semibold">
-                                {(Number(item.pricing.basePrice) % 1)
-                                  .toFixed(2)
-                                  .substring(1)}
-                              </span>
-                              <span className="ml-1 text-[0.813rem] leading-3 font-semibold">
-                                today
-                              </span>
+                              <span className="ml-1 text-[0.813rem] leading-3 font-semibold">today</span>
                             </div>
                           )}
                         </div>
                       </div>
                       <div className="pr-5 flex gap-2 invisible-scrollbar overflow-y-hidden overflow-x-visible">
                         {item.products.map((product) => {
-                          const productOptions = formatProductOptions(
-                            product.color,
-                            product.size
-                          );
+                          const productOptions = formatProductOptions(product.selectedOptions);
                           return (
-                            <div
-                              key={product.id}
-                              className="last:mb-0 min-w-[108px] min-[580px]:min-w-[146px]"
-                            >
+                            <div key={product.id} className="last:mb-0 min-w-[108px] min-[580px]:min-w-[146px]">
                               <div className="min-[580px]:hidden flex items-center justify-center mb-2 w-full h-[108px] rounded-md overflow-hidden border border-[#fceddf] bg-white">
-                                <Image
-                                  src={product.mainImage}
-                                  alt={product.name}
-                                  width={108}
-                                  height={108}
-                                  priority
-                                />
+                                <Image src={product.mainImage} alt={product.name} width={108} height={108} priority />
                               </div>
                               <div className="hidden min-[580px]:flex items-center justify-center mb-2 w-full h-[146px] rounded-md overflow-hidden border border-[#fceddf] bg-white">
-                                <Image
-                                  src={product.mainImage}
-                                  alt={product.name}
-                                  width={146}
-                                  height={146}
-                                  priority
-                                />
+                                <Image src={product.mainImage} alt={product.name} width={146} height={146} priority />
                               </div>
                               <div className="flex flex-col gap-[2px]">
                                 <Link
@@ -345,24 +243,15 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                                   target="_blank"
                                   className="text-gray text-xs hover:underline w-max"
                                 >
-                                  {product.name.length > 18
-                                    ? `${product.name.slice(0, 18)}...`
-                                    : product.name}
+                                  {product.name.length > 18 ? `${product.name.slice(0, 18)}...` : product.name}
                                 </Link>
-                                {productOptions && (
-                                  <span className="text-xs font-medium">
-                                    {productOptions}
-                                  </span>
-                                )}
+                                {productOptions && <span className="text-xs font-medium">{productOptions}</span>}
                               </div>
                             </div>
                           );
                         })}
                       </div>
-                      <RemoveFromCartButton
-                        type="upsell"
-                        variantId={item.variantId}
-                      />
+                      {/* <RemoveFromCartButton type="upsell" variantId={item.variantId} /> */}
                     </div>
                   </div>
                 );
@@ -376,15 +265,11 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
         <div className="flex flex-col gap-2">
           <div className="flex gap-[6px] items-center">
             <TbLock className="stroke-green -ml-[1px]" size={20} />
-            <span className="text-sm text-gray">
-              Secure Checkout with SSL Encryption
-            </span>
+            <span className="text-sm text-gray">Secure Checkout with SSL Encryption</span>
           </div>
           <div className="flex gap-[6px] items-center">
             <PiShieldCheckBold className="fill-green" size={18} />
-            <span className="text-sm text-gray ml-[1px]">
-              Safe and Trusted Payment Methods
-            </span>
+            <span className="text-sm text-gray ml-[1px]">Safe and Trusted Payment Methods</span>
           </div>
           <div className="flex gap-[6px] items-center">
             <TbTruck className="stroke-green" size={20} />
@@ -395,17 +280,12 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
           {selectedItems.size > 0 ? (
             <>
               <span className="text-sm font-semibold">
-                Total ({selectedItems.size}{" "}
-                {selectedItems.size === 1 ? "Item" : "Items"}):
+                Total ({selectedItems.size} {selectedItems.size === 1 ? "Item" : "Items"}):
               </span>
               <div className="flex items-baseline">
                 <span className="text-sm font-semibold">$</span>
-                <span className="text-xl font-bold">
-                  {Math.floor(Number(calculateTotal()))}
-                </span>
-                <span className="text-sm font-semibold">
-                  {(Number(calculateTotal()) % 1).toFixed(2).substring(1)}
-                </span>
+                <span className="text-xl font-bold">{Math.floor(Number(calculateTotal()))}</span>
+                <span className="text-sm font-semibold">{(Number(calculateTotal()) % 1).toFixed(2).substring(1)}</span>
               </div>
             </>
           ) : (
@@ -417,11 +297,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
             </button>
           )}
         </div>
-        <div
-          className={clsx(
-            selectedItems.size ? "flex items-center mb-2" : "hidden"
-          )}
-        >
+        <div className={clsx(selectedItems.size ? "flex items-center mb-2" : "hidden")}>
           <div className="h-[20px] rounded-[3px] flex items-center justify-center">
             <Image
               src="/images/payment-methods/visa.svg"
@@ -474,9 +350,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
             />
           </div>
         </div>
-        {selectedItems.size > 0 && (
-          <PayPalButton showLabel={true} cart={getSelectedCartItems()} />
-        )}
+        {/* {selectedItems.size > 0 && <PayPalButton showLabel={true} cart={getSelectedCartItems()} />} */}
       </div>
       <MobilePriceDetails
         selectedItems={selectedItems}
@@ -508,12 +382,8 @@ function MobilePriceDetails({
           {selectedItems.size > 0 ? (
             <div className="flex items-baseline">
               <span className="text-sm font-semibold">$</span>
-              <span className="text-lg font-bold">
-                {Math.floor(Number(calculateTotal()))}
-              </span>
-              <span className="text-sm font-semibold">
-                {(Number(calculateTotal()) % 1).toFixed(2).substring(1)}
-              </span>
+              <span className="text-lg font-bold">{Math.floor(Number(calculateTotal()))}</span>
+              <span className="text-sm font-semibold">{(Number(calculateTotal()) % 1).toFixed(2).substring(1)}</span>
             </div>
           ) : (
             <button
@@ -524,11 +394,9 @@ function MobilePriceDetails({
             </button>
           )}
         </div>
-        <div className="w-[200px] h-[35px]">
-          {selectedItems.size > 0 && (
-            <PayPalButton showLabel={false} cart={getSelectedCartItems()} />
-          )}
-        </div>
+        {/* <div className="w-[200px] h-[35px]">
+          {selectedItems.size > 0 && <PayPalButton showLabel={false} cart={getSelectedCartItems()} />}
+        </div> */}
       </div>
     </div>
   );
@@ -541,11 +409,13 @@ type ProductItemType = {
   baseProductId: string;
   name: string;
   slug: string;
-  pricing: any;
+  pricing: {
+    basePrice: number;
+    salePrice: number | null;
+  };
   mainImage: string;
   variantId: string;
-  size: string;
-  color: string;
+  selectedOptions: Record<string, string>;
   index: number;
 };
 
@@ -555,16 +425,17 @@ type UpsellItemType = {
   variantId: string;
   index: number;
   mainImage: string;
-  pricing: any;
+  pricing: {
+    basePrice: number;
+    salePrice: number | null;
+  };
   products: Array<{
-    index: number;
     id: string;
-    slug: string;
     name: string;
+    slug: string;
     mainImage: string;
     basePrice: number;
-    size: string;
-    color: string;
+    selectedOptions: Record<string, string>;
   }>;
 };
 
