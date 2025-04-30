@@ -1,15 +1,10 @@
 "use client";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { useOptionsStore } from "@/zustand/website/optionsStore";
-import { useTransition, useEffect } from "react";
+import { useTransition } from "react";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { AddToCartAction } from "@/actions/cart";
 import { Spinner } from "@/ui/Spinners/Default";
-import { useUpsellReviewStore } from "@/zustand/website/upsellReviewStore";
-import { usePathname } from "next/navigation";
-import { useQuickviewStore } from "@/zustand/website/quickviewStore";
-import { UpsellReviewButton } from "../UpsellReviewOverlay";
-import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 import styles from "./styles.module.css";
 import clsx from "clsx";
 import { capitalizeFirstLetter } from "@/lib/utils/common";
@@ -54,26 +49,31 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
     // If all options are selected, proceed to add to cart
     startTransition(async () => {
       try {
-        // Here you would call your AddToCartAction function
-        console.log("Adding to cart with options:", selectedOptions);
+        // Convert selectedOptions from { [groupId: number]: number | null } to Record<string, string>
+        const formattedOptions: Record<string, string> = {};
+        Object.entries(selectedOptions).forEach(([key, value]) => {
+          if (value !== null) {
+            formattedOptions[key] = value.toString();
+          }
+        });
 
-        // Uncomment when ready to implement the actual cart action
-        // const result = await AddToCartAction({
-        //   productId: product.id,
-        //   selectedOptions,
-        // });
+        const result = await AddToCartAction({
+          type: "product",
+          baseProductId: product.id,
+          selectedOptions: formattedOptions,
+        });
 
-        // if (result.success) {
-        //   showAlert({
-        //     message: "Added to cart successfully!",
-        //     type: ShowAlertType.SUCCESS,
-        //   });
-        // } else {
-        //   showAlert({
-        //     message: result.error || "Failed to add to cart",
-        //     type: ShowAlertType.ERROR,
-        //   });
-        // }
+        if (result.success) {
+          showAlert({
+            message: result.message,
+            type: result.type,
+          });
+        } else {
+          showAlert({
+            message: result.message,
+            type: result.type,
+          });
+        }
       } catch (error) {
         showAlert({
           message: "An error occurred while adding to cart",
