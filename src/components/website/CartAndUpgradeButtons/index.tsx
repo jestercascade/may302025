@@ -12,7 +12,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 import { useUpsellReviewStore } from "@/zustand/website/upsellReviewStore";
 
-// Define types
 type CartProductItemType = {
   type: "product";
   baseProductId: string;
@@ -109,7 +108,6 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
     }
   };
 
-  // Check if current product with selected options is already in cart
   const isProductInCart = (): boolean => {
     if (!cart?.items || !product.options?.groups) return false;
 
@@ -236,7 +234,6 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
     });
   };
 
-  // Check if product is in cart
   const productAlreadyInCart = isProductInCart();
 
   return (
