@@ -100,7 +100,7 @@ export default async function ProductDetails({ params }: { params: Promise<{ slu
         }}
       >
         <main>
-          {/* <MobileProductDetails product={product} cart={cart} /> */}
+          <MobileProductDetails product={product} cart={cart} />
           <DesktopProductDetails product={product} cart={cart} />
         </main>
         <SizeChartOverlay
@@ -157,71 +157,41 @@ function DesktopProductDetails({ product, cart }: ProductDetailsType) {
   );
 }
 
-// function MobileProductDetails({
-//   product,
-//   cart,
-//   hasColor,
-//   hasSize,
-// }: ProductDetailsType) {
-//   const {
-//     name,
-//     pricing,
-//     images,
-//     highlights,
-//     upsell,
-//     description,
-//     options,
-//     id,
-//   } = product;
+function MobileProductDetails({ product, cart }: ProductDetailsType) {
+  const { name, pricing, images, highlights, upsell, description, options, id } = product;
 
-//   return (
-//     <div className="md:hidden">
-//       <div>
-//         <div className="w-full relative select-none">
-//           <BackButton />
-//           <MobileImageCarousel images={images} productName={name} />
-//         </div>
-//         <div className="max-w-[486px] mx-auto">
-//           <div className="px-5 pt-3 flex flex-col gap-4">
-//             <ProductName name={name} />
-//             <ProductHighlights highlights={highlights} />
-//             <div className="flex flex-col gap-5">
-//               <PriceDisplay pricing={pricing} upsellAvailable={!!upsell} />
-//               {(hasColor || hasSize) && (
-//                 <ProductDetailsOptions
-//                   productInfo={{
-//                     id,
-//                     name,
-//                     pricing,
-//                     images,
-//                     options,
-//                   }}
-//                   isStickyBarInCartIndicator={false}
-//                 />
-//               )}
-//             </div>
-//           </div>
-//           <div className="px-5">
-//             {upsell?.products?.length > 0 && <ProductUpsell upsell={upsell} />}
-//             <div className="mt-14">
-//               <ProductDescription description={description} />
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//       <div className="h-[72px] pt-[6px] pb-5 px-5 border-t border-[#e6e8ec] bg-white fixed z-10 bottom-0 left-0 right-0">
-//         <div className="max-w-[486px] mx-auto flex gap-[6px] justify-center">
-//           <CartAndUpgradeButtons
-//             product={product}
-//             cart={cart}
-//             hasColor={hasColor}
-//             hasSize={hasSize}
-//           />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
+  return (
+    <div className="md:hidden">
+      <div>
+        <div className="w-full relative select-none">
+          <BackButton />
+          <MobileImageCarousel images={images} productName={name} />
+        </div>
+        <div className="max-w-[486px] mx-auto">
+          <div className="px-5 pt-3 flex flex-col gap-4">
+            <ProductName name={name} />
+            <ProductHighlights highlights={highlights} />
+            <div className="flex flex-col gap-5">
+              <PriceDisplay pricing={pricing} upsellAvailable={!!upsell} />
+              <ProductDetailsOptions options={options} isStickyBarInCartIndicator={false} />
+            </div>
+          </div>
+          <div className="px-5">
+            {upsell?.products?.length > 0 && <ProductUpsell upsell={upsell} />}
+            <div className="mt-14">
+              <ProductDescription description={description} />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="h-[72px] pt-[6px] pb-5 px-5 border-t border-[#e6e8ec] bg-white fixed z-10 bottom-0 left-0 right-0">
+        <div className="max-w-[486px] mx-auto flex gap-[6px] justify-center">
+          <CartAndUpgradeButtons product={product} cart={cart} />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function ProductUpsell({ upsell }: { upsell: ProductWithUpsellType["upsell"] }) {
   return (
