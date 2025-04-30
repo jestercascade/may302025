@@ -117,7 +117,7 @@ export default async function ProductDetails({ params }: { params: Promise<{ slu
 
 // -- UI Components --
 function DesktopProductDetails({ product, cart }: ProductDetailsType) {
-  const { name, pricing, images, highlights, upsell, description, options, id } = product;
+  const { name, pricing, images, highlights, upsell, description, options } = product;
 
   return (
     <div className="hidden md:block">
@@ -140,10 +140,7 @@ function DesktopProductDetails({ product, cart }: ProductDetailsType) {
             </div>
             <div className="sticky left-0 right-0 bottom-0 z-10 mt-6 pt-1 pb-5 shadow-[0_-12px_16px_2px_white] bg-white">
               <div className="flex gap-2">
-                {/* <CartAndUpgradeButtons
-                  product={product}
-                  cart={cart}
-                /> */}
+                <CartAndUpgradeButtons product={product} cart={cart} />
               </div>
             </div>
           </ProductInfoWrapper>
