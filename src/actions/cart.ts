@@ -8,39 +8,15 @@ import { generateId } from "@/lib/utils/common";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { FieldValue } from "firebase-admin/firestore";
 
-type AddToCartParams = {
+type SelectedOptionsType = Record<string, string>;
+
+export async function AddToCartAction(data: {
   type: "product" | "upsell";
   baseProductId?: string;
+  selectedOptions?: SelectedOptionsType;
   baseUpsellId?: string;
-  selectedOptions: Record<string, string>;
-};
-
-type CartResponse = {
-  success: boolean;
-  type: ShowAlertType;
-  message: string;
-  error?: string;
-};
-
-export async function AddToCartAction(data: AddToCartParams): Promise<CartResponse> {
-  // Input validation
-  if (data.type === "product" && !data.baseProductId) {
-    return {
-      success: false,
-      type: ShowAlertType.ERROR,
-      message: "Base Product ID is required",
-      error: "Missing baseProductId",
-    };
-  }
-  if (data.type === "upsell" && !data.baseUpsellId) {
-    return {
-      success: false,
-      type: ShowAlertType.ERROR,
-      message: "Base Upsell ID is required",
-      error: "Missing baseUpsellId",
-    };
-  }
-
+  products?: Array<{ id: string; selectedOptions?: SelectedOptionsType }>;
+}) {
   const setNewDeviceIdentifier = async () => {
     const newDeviceIdentifier = nanoid();
     const cookieStore = await cookies();
@@ -51,27 +27,29 @@ export async function AddToCartAction(data: AddToCartParams): Promise<CartRespon
       secure: true,
       sameSite: "strict",
       path: "/",
-      maxAge: 30 * 24 * 60 * 60, // 30 days
+      maxAge: 30 * 24 * 60 * 60,
     });
     return newDeviceIdentifier;
   };
 
   const createCartItem = (index: number) => {
-    const variantId = generateId();
     if (data.type === "product") {
       return {
         type: "product",
         baseProductId: data.baseProductId,
-        selectedOptions: data.selectedOptions,
-        variantId,
+        selectedOptions: data.selectedOptions || {},
+        variantId: generateId(),
         index,
       };
     } else {
       return {
         type: "upsell",
         baseUpsellId: data.baseUpsellId,
-        selectedOptions: data.selectedOptions,
-        variantId,
+        products: data.products?.map((product) => ({
+          id: product.id,
+          selectedOptions: product.selectedOptions || {},
+        })),
+        variantId: generateId(),
         index,
       };
     }
@@ -80,11 +58,9 @@ export async function AddToCartAction(data: AddToCartParams): Promise<CartRespon
   const generateNewCart = async () => {
     try {
       const newDeviceIdentifier = await setNewDeviceIdentifier();
-      const newCartId = generateId();
-      const newCartRef = adminDb.collection("carts").doc(newCartId);
+      const newCartRef = adminDb.collection("carts").doc(generateId());
 
       await newCartRef.set({
-        id: newCartId,
         device_identifier: newDeviceIdentifier,
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
@@ -103,70 +79,105 @@ export async function AddToCartAction(data: AddToCartParams): Promise<CartRespon
         success: false,
         type: ShowAlertType.ERROR,
         message: "Please reload and try again",
-        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   };
 
   const updateExistingCart = async (cartDoc: FirebaseFirestore.DocumentReference, items: any[]) => {
-    try {
-      const nextIndex = items.length + 1;
-      const newItem = createCartItem(nextIndex);
+    const nextIndex = items.length + 1;
+    const newItem = createCartItem(nextIndex);
 
-      // Check for duplicates
+    if (data.type === "product") {
+      // Check if item with same product ID and options already exists
       const exists = items.some((item) => {
-        if (data.type === "product" && item.type === "product") {
-          return (
-            item.baseProductId === data.baseProductId &&
-            JSON.stringify(item.selectedOptions) === JSON.stringify(data.selectedOptions)
-          );
-        } else if (data.type === "upsell" && item.type === "upsell") {
-          return (
-            item.baseUpsellId === data.baseUpsellId &&
-            JSON.stringify(item.selectedOptions) === JSON.stringify(data.selectedOptions)
-          );
+        if (item.type !== "product" || item.baseProductId !== data.baseProductId) {
+          return false;
         }
-        return false;
+
+        // Compare selectedOptions objects
+        const existingOptions = item.selectedOptions || {};
+        const newOptions = data.selectedOptions || {};
+
+        // Check if all options match
+        for (const key in newOptions) {
+          if (existingOptions[key] !== newOptions[key]) {
+            return false;
+          }
+        }
+
+        // Check if existing item has same number of options
+        return Object.keys(existingOptions).length === Object.keys(newOptions).length;
       });
 
       if (exists) {
         return {
           success: false,
-          type: ShowAlertType.NEUTRAL,
-          message: "This item is already in your cart",
+          type: ShowAlertType.ERROR,
+          message: "Item already in cart",
         };
       }
+    } else if (data.type === "upsell") {
+      // Check for duplicate upsell bundles
+      const exists = items.some((item) => {
+        if (item.type !== "upsell" || item.baseUpsellId !== data.baseUpsellId) {
+          return false;
+        }
 
-      // Update cart with new item
-      await cartDoc.update({
-        items: [...items, newItem],
-        updatedAt: FieldValue.serverTimestamp(),
+        // Must have same number of products
+        if (!item.products || !data.products || item.products.length !== data.products.length) {
+          return false;
+        }
+
+        // Check if all products in bundle match
+        return item.products.every((itemProduct: any, index: number) => {
+          const newProduct = data.products?.[index];
+
+          // First check if newProduct exists
+          if (!newProduct || itemProduct.id !== newProduct.id) {
+            return false;
+          }
+
+          // Compare options (safely access selectedOptions)
+          const itemOptions = itemProduct.selectedOptions || {};
+          const newOptions = newProduct?.selectedOptions || {};
+
+          // Check all options match
+          for (const key in newOptions) {
+            if (itemOptions[key] !== newOptions[key]) {
+              return false;
+            }
+          }
+
+          return Object.keys(itemOptions).length === Object.keys(newOptions).length;
+        });
       });
 
-      revalidatePath("/cart");
-      return {
-        success: true,
-        type: ShowAlertType.SUCCESS,
-        message: "Item added to cart",
-      };
-    } catch (error) {
-      console.error("Update cart error:", error);
-      return {
-        success: false,
-        type: ShowAlertType.ERROR,
-        message: "Failed to update cart",
-        error: error instanceof Error ? error.message : "Unknown error",
-      };
+      if (exists) {
+        return {
+          success: false,
+          type: ShowAlertType.ERROR,
+          message: "Item already in cart",
+        };
+      }
     }
+
+    await cartDoc.update({
+      items: [...items, newItem],
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+
+    revalidatePath("/cart");
+    return {
+      success: true,
+      type: ShowAlertType.SUCCESS,
+      message: "Item added to cart",
+    };
   };
 
   try {
     const cookieStore = await cookies();
     const deviceIdentifier = cookieStore.get("device_identifier")?.value;
-
-    if (!deviceIdentifier) {
-      return await generateNewCart();
-    }
+    if (!deviceIdentifier) return await generateNewCart();
 
     const snapshot = await adminDb
       .collection("carts")
@@ -174,9 +185,7 @@ export async function AddToCartAction(data: AddToCartParams): Promise<CartRespon
       .limit(1)
       .get();
 
-    if (snapshot.empty) {
-      return await generateNewCart();
-    }
+    if (snapshot.empty) return await generateNewCart();
 
     const cartDoc = snapshot.docs[0];
     return await updateExistingCart(cartDoc.ref, cartDoc.data().items || []);
@@ -186,105 +195,6 @@ export async function AddToCartAction(data: AddToCartParams): Promise<CartRespon
       success: false,
       type: ShowAlertType.ERROR,
       message: "Please reload and try again",
-      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
-
-// export async function RemoveFromCartAction({
-//   variantId,
-// }: {
-//   variantId: string;
-// }) {
-//   try {
-//     const cookieStore = await cookies();
-//     const deviceIdentifier = cookieStore.get("device_identifier")?.value;
-//     if (!deviceIdentifier)
-//       return { type: ShowAlertType.ERROR, message: "Cart not found" };
-
-//     const snapshot = await adminDb
-//       .collection("carts")
-//       .where("device_identifier", "==", deviceIdentifier)
-//       .limit(1)
-//       .get();
-
-//     if (snapshot.empty)
-//       return { type: ShowAlertType.ERROR, message: "Cart not found" };
-
-//     const cartDoc = snapshot.docs[0];
-//     const existingItems = snapshot.docs[0].data().items;
-//     const filteredItems = existingItems
-//       .filter((item: { variantId: string }) => item.variantId !== variantId)
-//       .map((item: any, index: number) => ({ ...item, index: index + 1 }));
-
-//     if (filteredItems.length === 0) {
-//       await cartDoc.ref.delete();
-//       const cookieStore = await cookies();
-//       cookieStore.delete("device_identifier");
-//     } else {
-//       await cartDoc.ref.update({
-//         items: filteredItems,
-//         updatedAt: FieldValue.serverTimestamp(),
-//       });
-//     }
-
-//     revalidatePath("/cart");
-//     return { type: ShowAlertType.SUCCESS, message: "Item removed from cart" };
-//   } catch (error) {
-//     console.error("Remove item error:", error);
-//     return {
-//       type: ShowAlertType.ERROR,
-//       message: "Please reload and try again",
-//     };
-//   }
-// }
-
-// export async function ClearPurchasedItemsAction({
-//   variantIds,
-// }: {
-//   variantIds: string[];
-// }) {
-//   try {
-//     const cookieStore = await cookies();
-//     const deviceIdentifier = cookieStore.get("device_identifier")?.value;
-//     if (!deviceIdentifier)
-//       return { type: ShowAlertType.ERROR, message: "Cart not found" };
-
-//     const snapshot = await adminDb
-//       .collection("carts")
-//       .where("device_identifier", "==", deviceIdentifier)
-//       .limit(1)
-//       .get();
-
-//     if (snapshot.empty)
-//       return { type: ShowAlertType.ERROR, message: "Cart not found" };
-
-//     const cartDoc = snapshot.docs[0];
-//     const existingItems = cartDoc.data().items || [];
-//     const remainingItems = existingItems
-//       .filter(
-//         (item: { variantId: string }) => !variantIds.includes(item.variantId)
-//       )
-//       .map((item: any, index: number) => ({ ...item, index: index + 1 }));
-
-//     if (remainingItems.length === 0) {
-//       await cartDoc.ref.delete();
-//       const cookieStore = await cookies();
-//       cookieStore.delete("device_identifier");
-//     } else {
-//       await cartDoc.ref.update({
-//         items: remainingItems,
-//         updatedAt: FieldValue.serverTimestamp(),
-//       });
-//     }
-
-//     revalidatePath("/cart");
-//     return {
-//       type: ShowAlertType.SUCCESS,
-//       message: "Cart updated successfully",
-//     };
-//   } catch (error) {
-//     console.error("Clear purchased error:", error);
-//     return { type: ShowAlertType.ERROR, message: "Failed to update cart" };
-//   }
-// }

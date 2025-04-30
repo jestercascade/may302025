@@ -15,9 +15,16 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
   const { selectedOptions } = useOptionsStore();
 
   const handleAddToCart = async () => {
+    // Safety check for product options
+    if (!product.options?.groups) {
+      return showAlert({
+        message: "Product configuration is incomplete",
+        type: ShowAlertType.ERROR,
+      });
+    }
+
     // Identify active option groups (those with at least one active option)
-    const activeOptionGroups =
-      product.options?.groups.filter((group) => group.values.some((opt) => opt.isActive)) || [];
+    const activeOptionGroups = product.options.groups.filter((group) => group.values.some((opt) => opt.isActive));
 
     // Find any unselected active option groups
     const unselectedOptions = activeOptionGroups.filter(
@@ -49,32 +56,39 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
     // If all options are selected, proceed to add to cart
     startTransition(async () => {
       try {
-        // Convert selectedOptions from { [groupId: number]: number | null } to Record<string, string>
-        const formattedOptions: Record<string, string> = {};
-        Object.entries(selectedOptions).forEach(([key, value]) => {
-          if (value !== null) {
-            formattedOptions[key] = value.toString();
+        // Transform selectedOptions to human-readable format
+        const readableSelectedOptions: Record<string, string> = {};
+
+        for (const [groupIdStr, optionId] of Object.entries(selectedOptions)) {
+          if (optionId === null || optionId === undefined) continue;
+
+          const groupId = Number(groupIdStr);
+          const group = product.options.groups.find((g) => g.id === groupId);
+
+          if (group) {
+            const option = group.values.find((v) => v.id === optionId);
+            if (option) {
+              // Use group name as key (lowercase for case-insensitive lookup later)
+              readableSelectedOptions[group.name.toLowerCase()] = option.value;
+            }
           }
+        }
+
+        console.log("Adding to cart with human-readable options:", {
+          type: "product",
+          baseProductId: product.id,
+          selectedOptions: readableSelectedOptions,
         });
 
         const result = await AddToCartAction({
           type: "product",
           baseProductId: product.id,
-          selectedOptions: formattedOptions,
+          selectedOptions: readableSelectedOptions,
         });
 
-        if (result.success) {
-          showAlert({
-            message: result.message,
-            type: result.type,
-          });
-        } else {
-          showAlert({
-            message: result.message,
-            type: result.type,
-          });
-        }
+        console.log(result);
       } catch (error) {
+        console.error("Add to cart error:", error);
         showAlert({
           message: "An error occurred while adding to cart",
           type: ShowAlertType.ERROR,
