@@ -74,19 +74,16 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
           }
         }
 
-        console.log("Adding to cart with human-readable options:", {
-          type: "product",
-          baseProductId: product.id,
-          selectedOptions: readableSelectedOptions,
-        });
-
         const result = await AddToCartAction({
           type: "product",
           baseProductId: product.id,
           selectedOptions: readableSelectedOptions,
         });
 
-        console.log(result);
+        showAlert({
+          message: result.message,
+          type: result.type === ShowAlertType.ERROR ? ShowAlertType.ERROR : ShowAlertType.NEUTRAL,
+        });
       } catch (error) {
         console.error("Add to cart error:", error);
         showAlert({
