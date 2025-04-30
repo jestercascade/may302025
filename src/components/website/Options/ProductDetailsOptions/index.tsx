@@ -5,6 +5,7 @@ import { memo, useState, useEffect, useRef } from "react";
 import { ChevronDown, Ruler } from "lucide-react";
 import clsx from "clsx";
 import styles from "./styles.module.css";
+import { useOverlayStore } from "@/zustand/website/overlayStore";
 
 type OptionType = {
   id: number;
@@ -41,13 +42,15 @@ const countryCodes = new Set(["US", "UK", "EU", "FR", "IT", "JP", "AU", "CN"]);
 export const ProductDetailsOptions = memo(function ProductDetailsOptions({
   options,
   isStickyBarInCartIndicator = false,
-  onSizeChartClick,
 }: ProductDetailsOptionsProps) {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
   const { selectedOptions, setSelectedOption } = useOptionsStore();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [highlightedOptions, setHighlightedOptions] = useState<Record<number, boolean>>({});
   const previousSelections = useRef<Record<number, number | null>>({});
+
+  const showOverlay = useOverlayStore((state) => state.showOverlay);
+  const productDetailsPage = useOverlayStore((state) => state.pages.productDetails);
 
   const MAX_DISPLAY_CHARS = 28;
 
@@ -150,9 +153,11 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
     if (sortedGroups.every((g) => updated[g.id] !== undefined)) setDropdownVisible(false);
   };
 
-  const handleSizeChartClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    onSizeChartClick?.();
+  const handleSizeChartClick = () => {
+    showOverlay({
+      pageName: productDetailsPage.name,
+      overlayName: productDetailsPage.overlays.sizeChart.name,
+    });
   };
 
   if (sortedGroups.length === 0) return null;
@@ -241,7 +246,7 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
                         key={option.id}
                         onClick={() => handleSelectOption(group.id, option.id)}
                         className={clsx(
-                          "px-3 py-1.5 rounded-full text-sm",
+                          "px-3 py-1.5 min-w-12 rounded-full text-sm",
                           "transition-all duration-150 ease-in-out",
                           selectedOptions[group.id] === option.id
                             ? "bg-black text-white"
@@ -252,7 +257,6 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
                       </button>
                     ))}
                 </div>
-
                 {group.name.toLowerCase() === "size" && selectedOptions[group.id] !== undefined && selectedSizeRow && (
                   <div className="mt-3">
                     <div className="bg-neutral-50 rounded-lg px-3 py-2.5 border border-neutral-100">
@@ -268,14 +272,13 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
                           );
                         })}
                       </div>
-
                       {sizeChartData && (
                         <button
                           onClick={handleSizeChartClick}
-                          className="mt-2 text-xs text-blue-600 hover:text-blue-800 transition-colors flex items-center"
+                          className="mt-2 text-xs text-blue hover:text-blue-dimmed transition-colors flex items-center"
                         >
                           <Ruler size={12} className="mr-1.5" />
-                          View Size Chart
+                          View Measurements
                         </button>
                       )}
                     </div>

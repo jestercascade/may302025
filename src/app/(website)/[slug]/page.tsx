@@ -103,15 +103,12 @@ export default async function ProductDetails({ params }: { params: Promise<{ slu
           {/* <MobileProductDetails product={product} cart={cart} /> */}
           <DesktopProductDetails product={product} cart={cart} />
         </main>
-        {/* <SizeChartOverlay
+        <SizeChartOverlay
           productInfo={{
             id: product.id,
-            name: product.name,
-            pricing: product.pricing,
-            images: product.images,
             options: product.options,
           }}
-        /> */}
+        />
       </ProductDetailsWrapper>
       <UpsellReviewOverlay cart={cart} />
     </>
