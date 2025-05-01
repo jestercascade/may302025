@@ -94,11 +94,10 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
     const entries = Object.entries(options || {});
     if (entries.length === 0) return null;
 
-    // Sort options by groupDisplayOrder
     const sortedEntries = entries.sort(([, a], [, b]) => a.groupDisplayOrder - b.groupDisplayOrder);
 
     return (
-      <div className="flex flex-wrap gap-1 mt-1 w-full">
+      <div className="flex flex-wrap gap-1 mt-1 max-w-72">
         {sortedEntries.map(([key, option]) => {
           const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
           const id = `${key}:${option.value}`;
