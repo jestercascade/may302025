@@ -171,7 +171,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                         <RemoveFromCartButton type="product" variantId={item.variantId} />
                       </div>
                       {formatProductOptions(item.selectedOptions)}
-                      <div className="w-max flex items-center justify-center">
+                      <div className="mt-1 w-max flex items-center justify-center">
                         {Number(item.pricing.salePrice) ? (
                           <div className="flex items-center gap-[6px]">
                             <div className="flex items-baseline text-[rgb(168,100,0)]">
