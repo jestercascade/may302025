@@ -404,14 +404,15 @@ function MobilePriceDetails({
 
 // -- Type Definitions --
 
-type ProductItemType = {
+type CartProductItemType = {
   type: "product";
   baseProductId: string;
   name: string;
   slug: string;
   pricing: {
     basePrice: number;
-    salePrice: number | null;
+    salePrice: number;
+    discountPercentage: number;
   };
   mainImage: string;
   variantId: string;
@@ -419,7 +420,7 @@ type ProductItemType = {
   index: number;
 };
 
-type UpsellItemType = {
+type CartUpsellItemType = {
   type: "upsell";
   baseUpsellId: string;
   variantId: string;
@@ -427,7 +428,8 @@ type UpsellItemType = {
   mainImage: string;
   pricing: {
     basePrice: number;
-    salePrice: number | null;
+    salePrice: number;
+    discountPercentage: number;
   };
   products: Array<{
     id: string;
@@ -439,4 +441,4 @@ type UpsellItemType = {
   }>;
 };
 
-type CartItemType = ProductItemType | UpsellItemType;
+type CartItemType = CartProductItemType | CartUpsellItemType;

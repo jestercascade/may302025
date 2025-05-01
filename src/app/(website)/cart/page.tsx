@@ -35,7 +35,31 @@ export default async function Cart() {
   ]);
 
   const cartProducts = mapCartProductsToBaseProducts(productItems, baseProducts);
-  const sortedCartItems = [...cartProducts, ...cartUpsells].sort((a, b) => a.index - b.index);
+
+  // Use a type assertion to tell TypeScript that cartUpsells is safe
+  // This is because we've confirmed that getCartUpsells function always returns complete objects with name and slug
+  const typedCartUpsells = cartUpsells as unknown as Array<{
+    type: "upsell";
+    baseUpsellId: string;
+    variantId: string;
+    index: number;
+    mainImage: string;
+    pricing: {
+      basePrice: number;
+      salePrice: number;
+      discountPercentage: number;
+    };
+    products: Array<{
+      id: string;
+      name: string;
+      slug: string;
+      mainImage: string;
+      basePrice: number;
+      selectedOptions: Record<string, string>;
+    }>;
+  }>;
+
+  const sortedCartItems = [...cartProducts, ...typedCartUpsells].sort((a, b) => a.index - b.index);
 
   return (
     <>
@@ -52,8 +76,8 @@ export default async function Cart() {
         </nav>
         <div className="min-h-[calc(100vh-385px)] w-full max-w-[580px] md:max-w-5xl mx-auto flex flex-col gap-10">
           <div className="w-full px-5 mx-auto">
-            {/* {sortedCartItems?.length === 0 && <EmptyCartState sortedCartItems={sortedCartItems} />} */}
-            {/* {sortedCartItems?.length > 0 && <CartItemList cartItems={sortedCartItems} />} */}
+            {sortedCartItems.length === 0 && <EmptyCartState />}
+            {sortedCartItems.length > 0 && <CartItemList cartItems={sortedCartItems} />}
           </div>
         </div>
         <Footer />
@@ -194,6 +218,14 @@ const getUpsell = async (id: string): Promise<UpsellType | null> => {
 };
 
 // -- UI Components --
+
+function EmptyCartState() {
+  return (
+    <div className="flex justify-center py-16">
+      <Image src="/icons/cart-thin.svg" alt="Cart" width={80} height={80} priority />
+    </div>
+  );
+}
 
 function Footer() {
   return (
