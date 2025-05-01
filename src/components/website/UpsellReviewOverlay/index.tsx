@@ -1,7 +1,6 @@
 "use client";
 
 import { useUpsellReviewStore } from "@/zustand/website/upsellReviewStore";
-import { useOverlayStore } from "@/zustand/website/overlayStore";
 import { ProductImagesOverlay } from "../ProductImagesOverlay";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { useEffect, useState, useTransition } from "react";
@@ -40,6 +39,12 @@ export function UpsellReviewButton({ product }: { product: UpsellReviewProductTy
 
 // -- UpsellReviewOverlay Component --
 
+type SelectedOptionType = {
+  value: string;
+  optionDisplayOrder: number;
+  groupDisplayOrder: number;
+};
+
 export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
   const {
     hideOverlay,
@@ -60,47 +65,27 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
   const [isInCart, setIsInCart] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
-  useEffect(() => {
-    if (cart && selectedProduct) {
-      const upsells = cart.items.filter((item): item is CartUpsellItemType => item.type === "upsell");
-      const sameBaseUpsells = upsells.filter((upsell) => upsell.baseUpsellId === selectedProduct.upsell.id);
+  // Check if the upsell is already in the cart based on baseUpsellId
+  const isUpsellInCart = (): boolean => {
+    if (!cart?.items || !selectedProduct?.upsell) return false;
 
-      const upsellInCart = sameBaseUpsells.some((cartUpsell) => {
-        return selectedProduct.upsell.products.every((product, index) => {
-          const cartProduct = cartUpsell.products[index];
-          const productOptions = selectedOptions[product.id] || {};
-          const readableOptions: Record<string, string> = {};
-          for (const [groupId, optionId] of Object.entries(productOptions)) {
-            const group = product.options.groups.find((g) => g.id === Number(groupId));
-            const option = group?.values.find((v) => v.id === optionId);
-            if (group && option) {
-              readableOptions[group.name.toLowerCase()] = option.value;
-            }
-          }
-          // Assuming CartUpsellItemType is updated to use selectedOptions
-          const cartOptions = (cartProduct as any).selectedOptions || {
-            color: cartProduct.color,
-            size: cartProduct.size,
-          };
-          return (
-            cartProduct.id === product.id &&
-            Object.keys(readableOptions).every((key) => cartOptions[key] === readableOptions[key])
-          );
-        });
-      });
-      setIsInCart(upsellInCart);
-    }
-  }, [cart, selectedProduct, selectedOptions]);
+    return cart.items.some((item) => item.type === "upsell" && item.baseUpsellId === selectedProduct.upsell.id);
+  };
 
+  // Initialize state when the overlay opens
   useEffect(() => {
     if (isVisible && selectedProduct) {
+      // Automatically mark products as ready if they have no active option groups
       const autoReadyProducts = selectedProduct.upsell.products
         .filter((product) => product.options.groups.every((group) => group.values.every((option) => !option.isActive)))
         .map((product) => product.id);
       setReadyProducts(autoReadyProducts);
       setSelectedOptions({});
+
+      // Set initial in-cart status
+      setIsInCart(isUpsellInCart());
     }
-  }, [isVisible, selectedProduct, setReadyProducts, setSelectedOptions]);
+  }, [isVisible, selectedProduct, setReadyProducts, setSelectedOptions, cart]);
 
   const handleOptionSelect = (productId: string, groupId: number, optionId: number) => {
     const updatedOptions = {
@@ -145,12 +130,18 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
     startTransition(async () => {
       const productsToAdd = selectedProduct!.upsell.products.map((product) => {
         const productSelectedOptions = selectedOptions[product.id] || {};
-        const readableOptions: Record<string, string> = {};
+        const readableOptions: Record<string, SelectedOptionType> = {};
         for (const [groupIdStr, optionId] of Object.entries(productSelectedOptions)) {
-          const group = product.options.groups.find((g) => g.id === Number(groupIdStr));
-          const option = group?.values.find((v) => v.id === optionId);
-          if (group && option) {
-            readableOptions[group.name.toLowerCase()] = option.value;
+          const groupId = Number(groupIdStr);
+          const group = product.options.groups.find((g) => g.id === groupId);
+          const optionIndex = group?.values.findIndex((v) => v.id === optionId);
+          if (group && optionIndex !== undefined && optionIndex !== -1) {
+            const option = group.values[optionIndex];
+            readableOptions[group.name.toLowerCase()] = {
+              value: option.value,
+              optionDisplayOrder: optionIndex,
+              groupDisplayOrder: group.displayOrder,
+            };
           }
         }
         return {
@@ -312,7 +303,7 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                           </button>
                           <button
                             onClick={handleInCartButtonClick}
-                            className="hidden animate-fade px-4 min-[365px]:flex items-center justify-center w-full h-11 rounded-full cursor-pointer border border-[#c5c3c0] text-blue text-sm font-semibold shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,_#faf9f8_5%,_#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear-gradient(to_bottom,_#eae8e6_5%,_#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
+                            className="hidden animate-fade px-4 min-[365px]:flex items-center justify-center w-full h-11 rounded-full cursor-pointer border border-[#c5c3c0] text-blue text-sm font-semibold shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,_#faf9f8_5%,_#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear_gradient(to_bottom,_#eae8e6_5%,_#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
                           >
                             In Cart - See Now
                           </button>
@@ -324,7 +315,7 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                               "min-[375px]:hidden text-sm flex items-center justify-center min-w-28 max-w-28 px-[10px] h-11 rounded-full border border-[#b27100] text-white font-semibold shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear-gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000] transition-opacity duration-200",
                               readyProducts.length !== selectedProduct?.upsell.products.length || isAddingToCart
                                 ? "opacity-50 cursor-context-menu"
-                                : "cursor-pointer hover:bg-[#cc8100] hover:[background:linear-gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
+                                : "cursor-pointer hover:bg-[#cc8100] hover:[background:linear_gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
                             )}
                             disabled={
                               readyProducts.length !== selectedProduct?.upsell.products.length || isAddingToCart
@@ -335,10 +326,10 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                           </button>
                           <button
                             className={clsx(
-                              "hidden text-sm min-[375px]:flex items-center justify-center min-w-[160px] max-w-60 min-[425px]:min-w-[172px] px-[10px] min-[425px]:px-4 min-[480px]:px-5 h-11 rounded-full border border-[#b27100] text-white font-semibold shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear-gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000] transition-opacity duration-200",
+                              "hidden text-sm min-[375px]:flex items-center justify-center min-w-[160px] max-w-60 min-[425px]:min-w-[172px] px-[10px] min-[425px]:px-4 min-[480px]:px-5 h-11 rounded-full border border-[#b27100] text-white font-semibold shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear_gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000] transition-opacity duration-200",
                               readyProducts.length !== selectedProduct?.upsell.products.length || isAddingToCart
                                 ? "opacity-50 cursor-context-menu"
-                                : "cursor-pointer hover:bg-[#cc8100] hover:[background:linear-gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
+                                : "cursor-pointer hover:bg-[#cc8100] hover:[background:linear_gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
                             )}
                             disabled={
                               readyProducts.length !== selectedProduct?.upsell.products.length || isAddingToCart
@@ -445,7 +436,7 @@ function ProductOptionGroups({ product, selectedOptions, onOptionSelect }: Produ
             )}
           </div>
         ))}
-      {product.options.groups.every((group) => !group.values.some((opt) => opt.isActive)) && (
+      {product.options.groups.every((group) => group.values.every((opt) => !opt.isActive)) && (
         <div className="p-[3px]">
           <Image
             src={product.images.main}
@@ -460,73 +451,3 @@ function ProductOptionGroups({ product, selectedOptions, onOptionSelect }: Produ
     </div>
   );
 }
-
-// -- Type Definitions --
-
-// Assuming these are defined elsewhere in the project
-type OptionGroupType = {
-  id: number;
-  name: string;
-  displayOrder: number;
-  values: Array<{
-    id: number;
-    value: string;
-    isActive: boolean;
-  }>;
-  sizeChart?: {
-    inches?: {
-      columns: Array<{ label: string; order: number }>;
-      rows: Array<{ [key: string]: string }>;
-    };
-  };
-};
-
-type ProductOptionsType = {
-  groups: OptionGroupType[];
-};
-
-type UpsellReviewProductType = {
-  id: string;
-  upsell: {
-    id: string;
-    mainImage: string;
-    pricing: {
-      basePrice: number;
-      salePrice: number;
-      discountPercentage: number;
-    };
-    visibility: string;
-    createdAt: string;
-    updatedAt: string;
-    products: Array<{
-      id: string;
-      name: string;
-      slug: string;
-      basePrice: number;
-      images: {
-        main: string;
-        gallery: string[];
-      };
-      options: ProductOptionsType;
-    }>;
-  };
-};
-
-type CartUpsellItemType = {
-  index: number;
-  baseUpsellId: string;
-  variantId: string;
-  type: "upsell";
-  products: Array<{
-    id: string;
-    selectedOptions: Record<string, string>; // Updated from color/size
-  }>;
-};
-
-type CartType = {
-  id: string;
-  device_identifier: string;
-  items: Array<any>;
-  createdAt: string;
-  updatedAt: string;
-};
