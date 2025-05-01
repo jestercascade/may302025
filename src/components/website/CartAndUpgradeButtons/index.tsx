@@ -17,7 +17,7 @@ import clsx from "clsx";
 type SelectedOptionType = {
   value: string;
   optionDisplayOrder: number;
-  groupDisplayOrder: number; 
+  groupDisplayOrder: number;
 };
 
 type CartProductItemType = {
