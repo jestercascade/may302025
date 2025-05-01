@@ -10,6 +10,7 @@ import Image from "next/image";
 import Link from "next/link";
 import clsx from "clsx";
 import { Check } from "lucide-react";
+import { RemoveFromCartButton } from "./RemoveFromCartButton";
 
 export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
   // Initialize with all items selected by default
@@ -166,7 +167,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                         >
                           {item.name}
                         </Link>
-                        {/* <RemoveFromCartButton type="product" variantId={item.variantId} /> */}
+                        <RemoveFromCartButton type="product" variantId={item.variantId} />
                       </div>
                       {formatProductOptions(item.selectedOptions)}
                       <div className="w-max flex items-center justify-center">
@@ -260,7 +261,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                           </div>
                         ))}
                       </div>
-                      {/* <RemoveFromCartButton type="upsell" variantId={item.variantId} /> */}
+                      <RemoveFromCartButton type="upsell" variantId={item.variantId} />
                     </div>
                   </div>
                 );
