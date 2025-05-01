@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-// import { RemoveFromCartButton } from "@/components/website/RemoveFromCartButton";
 import { formatThousands } from "@/lib/utils/common";
 import { PiShieldCheckBold } from "react-icons/pi";
 import { TbLock, TbTruck } from "react-icons/tb";
@@ -91,18 +90,21 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
     return cartItems.filter((item) => selectedItems.has(item.variantId));
   };
 
-  const formatProductOptions = (options: Record<string, string>) => {
+  const formatProductOptions = (options: Record<string, SelectedOptionType>) => {
     const entries = Object.entries(options || {});
     if (entries.length === 0) return null;
 
+    // Sort options by groupDisplayOrder
+    const sortedEntries = entries.sort(([, a], [, b]) => a.groupDisplayOrder - b.groupDisplayOrder);
+
     return (
       <div className="flex flex-wrap gap-1 mt-1 w-full">
-        {entries.map(([key, value]) => {
+        {sortedEntries.map(([key, option]) => {
           const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
-          const id = `${key}:${value}`;
+          const id = `${key}:${option.value}`;
           return (
             <span key={id} className="inline-flex text-xs px-1.5 py-0.5 rounded bg-neutral-100 text-gray-600">
-              {formattedKey}: {value}
+              {formattedKey}: {option.value}
             </span>
           );
         })}
@@ -414,6 +416,12 @@ function MobilePriceDetails({
 
 // -- Type Definitions --
 
+type SelectedOptionType = {
+  value: string;
+  optionDisplayOrder: number;
+  groupDisplayOrder: number;
+};
+
 type CartProductItemType = {
   type: "product";
   baseProductId: string;
@@ -426,7 +434,7 @@ type CartProductItemType = {
   };
   mainImage: string;
   variantId: string;
-  selectedOptions: Record<string, string>;
+  selectedOptions: Record<string, SelectedOptionType>;
   index: number;
 };
 
@@ -447,7 +455,7 @@ type CartUpsellItemType = {
     slug: string;
     mainImage: string;
     basePrice: number;
-    selectedOptions: Record<string, string>;
+    selectedOptions: Record<string, SelectedOptionType>;
   }>;
 };
 

@@ -14,10 +14,16 @@ import { Spinner } from "@/ui/Spinners/Default";
 import styles from "./styles.module.css";
 import clsx from "clsx";
 
+type SelectedOptionType = {
+  value: string;
+  optionDisplayOrder: number;
+  groupDisplayOrder: number; 
+};
+
 type CartProductItemType = {
   type: "product";
   baseProductId: string;
-  selectedOptions: Record<string, string>;
+  selectedOptions: Record<string, SelectedOptionType>;
   variantId: string;
   index: number;
 };
@@ -59,8 +65,7 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
   const isProductInCart = (): boolean => {
     if (!cart?.items || !product.options?.groups) return false;
 
-    // Get currently selected options in readable format
-    const currentSelectedOptions: Record<string, string> = {};
+    const currentSelectedValues: Record<string, string> = {};
 
     for (const [groupIdStr, optionId] of Object.entries(selectedOptions)) {
       if (optionId === null || optionId === undefined) continue;
@@ -71,39 +76,30 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
       if (group) {
         const option = group.values.find((v) => v.id === optionId);
         if (option) {
-          currentSelectedOptions[group.name.toLowerCase()] = option.value;
+          currentSelectedValues[group.name.toLowerCase()] = option.value;
         }
       }
     }
 
-    // Check if there's a matching item in the cart
     return cart.items.some((item) => {
-      // Must be the same product
       if (item.type !== "product" || item.baseProductId !== product.id) {
         return false;
       }
 
-      // Must have the same options
-      const itemOptions = item.selectedOptions || {};
-
-      // Both should have the same number of options
-      if (Object.keys(currentSelectedOptions).length !== Object.keys(itemOptions).length) {
-        return false;
+      const itemOptionsValues: Record<string, string> = {};
+      for (const [key, opt] of Object.entries(item.selectedOptions)) {
+        itemOptionsValues[key] = opt.value;
       }
 
-      // All option values must match
-      for (const key in currentSelectedOptions) {
-        if (itemOptions[key] !== currentSelectedOptions[key]) {
-          return false;
-        }
-      }
+      const currentKeys = Object.keys(currentSelectedValues);
+      const itemKeys = Object.keys(itemOptionsValues);
+      if (currentKeys.length !== itemKeys.length) return false;
 
-      return true;
+      return currentKeys.every((key) => currentSelectedValues[key] === itemOptionsValues[key]);
     });
   };
 
   const handleAddToCart = async () => {
-    // Safety check for product options
     if (!product.options?.groups) {
       return showAlert({
         message: "Product configuration is incomplete",
@@ -111,41 +107,28 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
       });
     }
 
-    // Identify active option groups (those with at least one active option)
     const activeOptionGroups = product.options.groups.filter((group) => group.values.some((opt) => opt.isActive));
-
-    // Find any unselected active option groups
     const unselectedOptions = activeOptionGroups.filter(
       (group) => selectedOptions[group.id] === undefined || selectedOptions[group.id] === null
     );
 
-    // If there are unselected options, show a specific alert
     if (unselectedOptions.length > 0) {
-      // Get the name of the first missing option
       const firstMissingOption = unselectedOptions[0].name;
-
-      // Construct a clear, specific message
       let message = `${capitalizeFirstLetter(firstMissingOption)} not selected.`;
-
-      // If there are multiple missing options, add additional context
       if (unselectedOptions.length > 1) {
         message += " Select all options to continue.";
       } else {
-        // Add a message for the single missing option
         message += " Please select all options.";
       }
-
       return showAlert({
         message,
         type: ShowAlertType.NEUTRAL,
       });
     }
 
-    // If all options are selected, proceed to add to cart
     startTransition(async () => {
       try {
-        // Transform selectedOptions to human-readable format
-        const readableSelectedOptions: Record<string, string> = {};
+        const readableSelectedOptions: Record<string, SelectedOptionType> = {};
 
         for (const [groupIdStr, optionId] of Object.entries(selectedOptions)) {
           if (optionId === null || optionId === undefined) continue;
@@ -154,10 +137,15 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
           const group = product.options.groups.find((g) => g.id === groupId);
 
           if (group) {
-            const option = group.values.find((v) => v.id === optionId);
-            if (option) {
-              // Use group name as key (lowercase for case-insensitive lookup later)
-              readableSelectedOptions[group.name.toLowerCase()] = option.value;
+            const optionIndex = group.values.findIndex((v) => v.id === optionId);
+            if (optionIndex !== -1) {
+              const option = group.values[optionIndex];
+              const groupNameLower = group.name.toLowerCase();
+              readableSelectedOptions[groupNameLower] = {
+                value: option.value,
+                optionDisplayOrder: optionIndex,
+                groupDisplayOrder: group.displayOrder,
+              };
             }
           }
         }

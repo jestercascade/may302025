@@ -8,7 +8,14 @@ import { generateId } from "@/lib/utils/common";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { FieldValue } from "firebase-admin/firestore";
 
-type SelectedOptionsType = Record<string, string>;
+// Type for selected options with index information
+type SelectedOptionType = {
+  value: string;
+  optionDisplayOrder: number;
+  groupDisplayOrder: number;
+};
+
+type SelectedOptionsType = Record<string, SelectedOptionType>;
 
 export async function AddToCartAction(data: {
   type: "product" | "upsell";
@@ -94,19 +101,23 @@ export async function AddToCartAction(data: {
           return false;
         }
 
-        // Compare selectedOptions objects
+        // Compare selectedOptions values
         const existingOptions = item.selectedOptions || {};
         const newOptions = data.selectedOptions || {};
 
-        // Check if all options match
+        // Check if both have the same number of options
+        if (Object.keys(existingOptions).length !== Object.keys(newOptions).length) {
+          return false;
+        }
+
+        // Check if all option values match
         for (const key in newOptions) {
-          if (existingOptions[key] !== newOptions[key]) {
+          if (!existingOptions[key] || existingOptions[key].value !== newOptions[key].value) {
             return false;
           }
         }
 
-        // Check if existing item has same number of options
-        return Object.keys(existingOptions).length === Object.keys(newOptions).length;
+        return true;
       });
 
       if (exists) {
@@ -141,14 +152,19 @@ export async function AddToCartAction(data: {
           const itemOptions = itemProduct.selectedOptions || {};
           const newOptions = newProduct?.selectedOptions || {};
 
-          // Check all options match
+          // Check if both have the same number of options
+          if (Object.keys(itemOptions).length !== Object.keys(newOptions).length) {
+            return false;
+          }
+
+          // Check all option values match
           for (const key in newOptions) {
-            if (itemOptions[key] !== newOptions[key]) {
+            if (!itemOptions[key] || itemOptions[key].value !== newOptions[key].value) {
               return false;
             }
           }
 
-          return Object.keys(itemOptions).length === Object.keys(newOptions).length;
+          return true;
         });
       });
 

@@ -11,7 +11,6 @@ import { Suspense } from "react";
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import clsx from "clsx";
 import { getDiscoveryProductsSettings } from "@/actions/get/discoveryProducts";
 
 export const metadata: Metadata = {
@@ -29,9 +28,10 @@ export default async function Cart() {
   const productItems = items.filter((item): item is CartProductItemType => item.type === "product");
   const upsellItems = items.filter((item): item is CartUpsellItemType => item.type === "upsell");
 
-  const [baseProducts, cartUpsells] = await Promise.all([
+  const [baseProducts, cartUpsells, discoveryProductsSettings] = await Promise.all([
     getBaseProducts(productItems.map((p) => p.baseProductId).filter(Boolean)),
     getCartUpsells(upsellItems),
+    getDiscoveryProductsSettings(),
   ]);
 
   const cartProducts = mapCartProductsToBaseProducts(productItems, baseProducts);
@@ -55,11 +55,55 @@ export default async function Cart() {
       slug: string;
       mainImage: string;
       basePrice: number;
-      selectedOptions: Record<string, string>;
+      selectedOptions: Record<string, SelectedOptionType>;
     }>;
   }>;
 
   const sortedCartItems = [...cartProducts, ...typedCartUpsells].sort((a, b) => a.index - b.index);
+
+  const showDiscoveryProducts = discoveryProductsSettings?.visibleOnPages?.cart === true;
+
+  const getExcludedProductIds = (cartItems: CartItemType[]): string[] => {
+    const productIds = new Set<string>();
+    cartItems.forEach((item: CartItemType) => {
+      if (item.type === "product") {
+        productIds.add(item.baseProductId);
+      } else if (item.type === "upsell" && item.products) {
+        item.products.forEach((product) => productIds.add(product.id));
+      }
+    });
+    return Array.from(productIds);
+  };
+
+  const excludeIdsFromDiscoveryProducts = getExcludedProductIds(sortedCartItems);
+
+  let discoveryProductsContent = null;
+  if (showDiscoveryProducts) {
+    const publishedProducts = await getProducts({
+      fields: ["id"],
+      visibility: "PUBLISHED",
+    });
+
+    const excludedIds = new Set(excludeIdsFromDiscoveryProducts);
+    const availableProducts = (publishedProducts ?? []).filter((p) => !excludedIds.has(p.id)).length;
+
+    if (availableProducts >= 3) {
+      discoveryProductsContent = (
+        <div className="px-5">
+          <ProductsProvider>
+            <Suspense fallback={null}>
+              <ShuffledDiscoveryProducts
+                page="CART"
+                heading="Add These to Your Cart"
+                excludeIds={excludeIdsFromDiscoveryProducts}
+                cart={cart}
+              />
+            </Suspense>
+          </ProductsProvider>
+        </div>
+      );
+    }
+  }
 
   return (
     <>
@@ -79,6 +123,7 @@ export default async function Cart() {
             {sortedCartItems.length === 0 && <EmptyCartState />}
             {sortedCartItems.length > 0 && <CartItemList cartItems={sortedCartItems} />}
           </div>
+          {discoveryProductsContent}
         </div>
         <Footer />
       </div>
@@ -101,7 +146,7 @@ const mapCartProductsToBaseProducts = (
   cartProducts: Array<{
     type: "product";
     baseProductId: string;
-    selectedOptions: Record<string, string>;
+    selectedOptions: Record<string, SelectedOptionType>;
     variantId: string;
     index: number;
   }>,
@@ -134,7 +179,7 @@ const getCartUpsells = async (
     variantId: string;
     products: Array<{
       id: string;
-      selectedOptions: Record<string, string>;
+      selectedOptions: Record<string, SelectedOptionType>;
     }>;
   }>
 ) => {
@@ -299,10 +344,16 @@ function Footer() {
 
 // -- Type Definitions --
 
+type SelectedOptionType = {
+  value: string;
+  optionDisplayOrder: number;
+  groupDisplayOrder: number;
+};
+
 type CartProductItemType = {
   type: "product";
   baseProductId: string;
-  selectedOptions: Record<string, string>;
+  selectedOptions: Record<string, SelectedOptionType>;
   variantId: string;
   index: number;
 };
@@ -314,7 +365,7 @@ type CartUpsellItemType = {
   index: number;
   products: Array<{
     id: string;
-    selectedOptions: Record<string, string>;
+    selectedOptions: Record<string, SelectedOptionType>;
   }>;
 };
 
