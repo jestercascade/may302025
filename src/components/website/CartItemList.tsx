@@ -74,12 +74,6 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
     }
   };
 
-  const formatProductOptions = (options: Record<string, string>) => {
-    return Object.entries(options)
-      .map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)}: ${value}`)
-      .join(", ");
-  };
-
   const calculateTotal = () => {
     const totalBasePrice = cartItems.reduce((total, item) => {
       if (!selectedItems.has(item.variantId)) return total;
@@ -94,6 +88,25 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
 
   const getSelectedCartItems = () => {
     return cartItems.filter((item) => selectedItems.has(item.variantId));
+  };
+
+  const formatProductOptions = (options: Record<string, string>) => {
+    const entries = Object.entries(options || {});
+    if (entries.length === 0) return null;
+
+    return (
+      <div className="flex flex-wrap gap-1 mt-1 w-full">
+        {entries.map(([key, value]) => {
+          const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
+          const id = `${key}:${value}`;
+          return (
+            <span key={id} className="inline-flex text-xs px-1.5 py-0.5 rounded bg-neutral-100 text-gray-600">
+              {formattedKey}: {value}
+            </span>
+          );
+        })}
+      </div>
+    );
   };
 
   return (
@@ -123,7 +136,6 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
               const isSelected = selectedItems.has(item.variantId);
 
               if (item.type === "product") {
-                const productOptions = formatProductOptions(item.selectedOptions);
                 return (
                   <div key={item.index} className="flex gap-3">
                     <div className="flex items-center">
@@ -156,7 +168,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                         </Link>
                         {/* <RemoveFromCartButton type="product" variantId={item.variantId} /> */}
                       </div>
-                      {productOptions && <span className="mb-1 text-xs font-medium">{productOptions}</span>}
+                      {formatProductOptions(item.selectedOptions)}
                       <div className="w-max flex items-center justify-center">
                         {Number(item.pricing.salePrice) ? (
                           <div className="flex items-center gap-[6px]">
@@ -227,29 +239,26 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                         </div>
                       </div>
                       <div className="pr-5 flex gap-2 invisible-scrollbar overflow-y-hidden overflow-x-visible">
-                        {item.products.map((product) => {
-                          const productOptions = formatProductOptions(product.selectedOptions);
-                          return (
-                            <div key={product.id} className="last:mb-0 min-w-[108px] min-[580px]:min-w-[146px]">
-                              <div className="min-[580px]:hidden flex items-center justify-center mb-2 w-[108px] h-[108px] rounded-md overflow-hidden border border-[#fceddf] bg-white">
-                                <Image src={product.mainImage} alt={product.name} width={108} height={108} priority />
-                              </div>
-                              <div className="hidden min-[580px]:flex items-center justify-center mb-2 w-[146px] h-[146px] rounded-md overflow-hidden border border-[#fceddf] bg-white">
-                                <Image src={product.mainImage} alt={product.name} width={146} height={146} priority />
-                              </div>
-                              <div className="flex flex-col gap-[2px]">
-                                <Link
-                                  href={`${product.slug}-${product.id}`}
-                                  target="_blank"
-                                  className="text-gray text-xs hover:underline w-max"
-                                >
-                                  {product.name.length > 18 ? `${product.name.slice(0, 18)}...` : product.name}
-                                </Link>
-                                {productOptions && <span className="text-xs font-medium">{productOptions}</span>}
-                              </div>
+                        {item.products.map((product) => (
+                          <div key={product.id} className="last:mb-0 min-w-[108px] min-[580px]:min-w-[146px]">
+                            <div className="min-[580px]:hidden flex items-center justify-center mb-2 w-[108px] h-[108px] rounded-md overflow-hidden border border-[#fceddf] bg-white">
+                              <Image src={product.mainImage} alt={product.name} width={108} height={108} priority />
                             </div>
-                          );
-                        })}
+                            <div className="hidden min-[580px]:flex items-center justify-center mb-2 w-[146px] h-[146px] rounded-md overflow-hidden border border-[#fceddf] bg-white">
+                              <Image src={product.mainImage} alt={product.name} width={146} height={146} priority />
+                            </div>
+                            <div className="flex flex-col gap-[2px]">
+                              <Link
+                                href={`${product.slug}-${product.id}`}
+                                target="_blank"
+                                className="text-gray text-xs hover:underline w-max"
+                              >
+                                {product.name.length > 18 ? `${product.name.slice(0, 18)}...` : product.name}
+                              </Link>
+                              {formatProductOptions(product.selectedOptions)}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                       {/* <RemoveFromCartButton type="upsell" variantId={item.variantId} /> */}
                     </div>
