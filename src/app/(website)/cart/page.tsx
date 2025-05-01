@@ -25,32 +25,13 @@ export default async function Cart() {
   const deviceIdentifier = cookieStore.get("device_identifier")?.value ?? "";
   const cart = await getCart(deviceIdentifier);
 
-  type CartProductItemType = {
-    type: "product";
-    baseProductId: string;
-    selectedOptions: Record<string, string>;
-    variantId: string;
-    index: number;
-  };
-
-  type CartUpsellItemType = {
-    type: "upsell";
-    baseProductId: string;
-    selectedOptions: Record<string, string>;
-    variantId: string;
-    index: number;
-  };
-
-  type CartItemType = CartProductItemType | CartUpsellItemType;
-
   const items = cart?.items || ([] as CartItemType[]);
   const productItems = items.filter((item): item is CartProductItemType => item.type === "product");
   const upsellItems = items.filter((item): item is CartUpsellItemType => item.type === "upsell");
 
-  const [baseProducts, cartUpsells, discoveryProductsSettings] = await Promise.all([
+  const [baseProducts, cartUpsells] = await Promise.all([
     getBaseProducts(productItems.map((p) => p.baseProductId).filter(Boolean)),
     getCartUpsells(upsellItems),
-    getDiscoveryProductsSettings(),
   ]);
 
   const cartProducts = mapCartProductsToBaseProducts(productItems, baseProducts);
@@ -72,7 +53,7 @@ export default async function Cart() {
         <div className="min-h-[calc(100vh-385px)] w-full max-w-[580px] md:max-w-5xl mx-auto flex flex-col gap-10">
           <div className="w-full px-5 mx-auto">
             {/* {sortedCartItems?.length === 0 && <EmptyCartState sortedCartItems={sortedCartItems} />} */}
-            {sortedCartItems?.length > 0 && <CartItemList cartItems={sortedCartItems} />}
+            {/* {sortedCartItems?.length > 0 && <CartItemList cartItems={sortedCartItems} />} */}
           </div>
         </div>
         <Footer />
@@ -92,7 +73,16 @@ const getBaseProducts = async (productIds: string[]) =>
     visibility: "PUBLISHED",
   }) as Promise<ProductType[]>;
 
-const mapCartProductsToBaseProducts = (cartProducts: CartProductItemType[], baseProducts: ProductType[]) =>
+const mapCartProductsToBaseProducts = (
+  cartProducts: Array<{
+    type: "product";
+    baseProductId: string;
+    selectedOptions: Record<string, string>;
+    variantId: string;
+    index: number;
+  }>,
+  baseProducts: ProductType[]
+) =>
   cartProducts
     .map((cartProduct) => {
       const baseProduct = baseProducts.find((p) => p.id === cartProduct.baseProductId);
@@ -112,7 +102,18 @@ const mapCartProductsToBaseProducts = (cartProducts: CartProductItemType[], base
     })
     .filter((p): p is NonNullable<typeof p> => p !== null);
 
-const getCartUpsells = async (upsellItems: CartUpsellItemType[]) => {
+const getCartUpsells = async (
+  upsellItems: Array<{
+    type: "upsell";
+    index: number;
+    baseUpsellId: string;
+    variantId: string;
+    products: Array<{
+      id: string;
+      selectedOptions: Record<string, string>;
+    }>;
+  }>
+) => {
   if (!upsellItems || upsellItems.length === 0) return [];
 
   const upsellPromises = upsellItems.map(async (upsell) => {
@@ -124,12 +125,13 @@ const getCartUpsells = async (upsellItems: CartUpsellItemType[]) => {
         const baseProduct = upsellData.products.find((p) => p.id === selectedProduct.id);
         if (!baseProduct) return null;
 
+        if (!baseProduct.images) return null;
+
         return {
           id: baseProduct.id,
           name: baseProduct.name,
           slug: baseProduct.slug,
-          // mainImage: baseProduct.images.main,
-          mainImage: "",
+          mainImage: baseProduct.images.main,
           basePrice: baseProduct.basePrice,
           selectedOptions: selectedProduct.selectedOptions,
         };
@@ -168,36 +170,30 @@ const getUpsell = async (id: string): Promise<UpsellType | null> => {
 
   if (!products || products.length === 0) return null;
 
+  // Type assertion to match the UpsellType.products structure
   const updatedProducts = data.products
     .map((product) => {
       const matchedProduct = products.find((p) => p.id === product.id);
-      return matchedProduct
-        ? {
-            ...product,
-            name: matchedProduct.name,
-            slug: matchedProduct.slug,
-            options: matchedProduct.options,
-            images: matchedProduct.images,
-          }
-        : null;
+      if (!matchedProduct) return null;
+
+      return {
+        id: product.id,
+        basePrice: product.basePrice,
+        name: matchedProduct.name,
+        slug: matchedProduct.slug,
+        options: matchedProduct.options as unknown as ProductOptionsType | undefined,
+        images: matchedProduct.images,
+      };
     })
     .filter((p): p is NonNullable<typeof p> => p !== null);
 
   return {
     ...data,
-    products: updatedProducts,
+    products: updatedProducts as UpsellType["products"],
   };
 };
 
 // -- UI Components --
-
-// function EmptyCartState({ sortedCartItems }: { sortedCartItems: CartItemType[] }) {
-//   return (
-//     <div className={clsx("flex justify-center py-16")}>
-//       <Image src="/icons/cart-thin.svg" alt="Cart" width={80} height={80} priority />
-//     </div>
-//   );
-// }
 
 function Footer() {
   return (
@@ -281,45 +277,16 @@ type CartProductItemType = {
 
 type CartUpsellItemType = {
   type: "upsell";
-  index: number;
   baseUpsellId: string;
   variantId: string;
+  index: number;
   products: Array<{
     id: string;
     selectedOptions: Record<string, string>;
   }>;
 };
 
-type ProductItemType = {
-  type: "product";
-  baseProductId: string;
-  name: string;
-  slug: string;
-  pricing: any;
-  mainImage: string;
-  variantId: string;
-  selectedOptions: Record<string, string>;
-  index: number;
-};
-
-type UpsellItemType = {
-  type: "upsell";
-  baseUpsellId: string;
-  variantId: string;
-  index: number;
-  mainImage: string;
-  pricing: any;
-  products: Array<{
-    id: string;
-    name: string;
-    slug: string;
-    mainImage: string;
-    basePrice: number;
-    selectedOptions: Record<string, string>;
-  }>;
-};
-
-type CartItemType = ProductItemType | UpsellItemType;
+type CartItemType = CartProductItemType | CartUpsellItemType;
 
 type ProductType = {
   id: string;
@@ -358,17 +325,37 @@ type UpsellType = {
   }>;
 };
 
-type ProductOptionsType = {
-  groups: Array<{
-    id: number;
-    name: string;
-    displayOrder: number;
-    values: Array<{
-      id: number;
-      value: string;
-      isActive: boolean;
+type SizeChartType = {
+  inches?: {
+    columns: Array<{
+      label: string;
+      order: number;
     }>;
+    rows: Array<Record<string, string>>;
+  };
+  centimeters?: {
+    columns: Array<{
+      label: string;
+      order: number;
+    }>;
+    rows: Array<Record<string, string>>;
+  };
+};
+
+type OptionGroupType = {
+  id: number;
+  name: string;
+  displayOrder: number;
+  values: Array<{
+    id: number;
+    value: string;
+    isActive: boolean;
   }>;
+  sizeChart?: SizeChartType;
+};
+
+type ProductOptionsType = {
+  groups: Array<OptionGroupType>;
   config: {
     chaining: {
       enabled: boolean;

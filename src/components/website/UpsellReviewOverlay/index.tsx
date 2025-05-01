@@ -16,15 +16,11 @@ import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 import { Spinner } from "@/ui/Spinners/Default";
 import { X, ChevronRight, Check } from "lucide-react";
 
-export function UpsellReviewButton({
-  product,
-}: {
-  product: UpsellReviewProductType;
-}) {
+// -- UpsellReviewButton Component --
+
+export function UpsellReviewButton({ product }: { product: UpsellReviewProductType }) {
   const showOverlay = useUpsellReviewStore((state) => state.showOverlay);
-  const setSelectedProduct = useUpsellReviewStore(
-    (state) => state.setSelectedProduct
-  );
+  const setSelectedProduct = useUpsellReviewStore((state) => state.setSelectedProduct);
 
   const openOverlay = () => {
     setSelectedProduct(product);
@@ -42,108 +38,93 @@ export function UpsellReviewButton({
   );
 }
 
+// -- UpsellReviewOverlay Component --
+
 export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
-  const hideOverlay = useUpsellReviewStore((state) => state.hideOverlay);
-  const selectedOptions = useUpsellReviewStore(
-    (state) => state.selectedOptions
-  );
-  const readyProducts = useUpsellReviewStore((state) => state.readyProducts);
-  const isVisible = useUpsellReviewStore((state) => state.isVisible);
-  const selectedProduct = useUpsellReviewStore(
-    (state) => state.selectedProduct
-  );
-  const setSelectedOptions = useUpsellReviewStore(
-    (state) => state.setSelectedOptions
-  );
-  const setReadyProducts = useUpsellReviewStore(
-    (state) => state.setReadyProducts
-  );
+  const {
+    hideOverlay,
+    selectedOptions,
+    readyProducts,
+    isVisible,
+    selectedProduct,
+    setSelectedOptions,
+    setReadyProducts,
+  } = useUpsellReviewStore();
   const hideQuickviewOverlay = useQuickviewStore((state) => state.hideOverlay);
   const showAlert = useAlertStore((state) => state.showAlert);
-
   const pathname = usePathname();
   const router = useRouter();
   const [showCarousel, setShowCarousel] = useState(false);
-  const [selectedProductForCarousel, setSelectedProductForCarousel] =
-    useState<any>(null);
+  const [selectedProductForCarousel, setSelectedProductForCarousel] = useState<any>(null);
   const [, startTransition] = useTransition();
   const [isInCart, setIsInCart] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   useEffect(() => {
     if (cart && selectedProduct) {
-      const upsells = cart.items.filter(
-        (cartItem): cartItem is CartUpsellItemType => cartItem.type === "upsell"
-      );
-
-      const sameBaseUpsells = upsells.filter(
-        (upsell) => upsell.baseUpsellId === selectedProduct.upsell.id
-      );
+      const upsells = cart.items.filter((item): item is CartUpsellItemType => item.type === "upsell");
+      const sameBaseUpsells = upsells.filter((upsell) => upsell.baseUpsellId === selectedProduct.upsell.id);
 
       const upsellInCart = sameBaseUpsells.some((cartUpsell) => {
         return selectedProduct.upsell.products.every((product, index) => {
           const cartProduct = cartUpsell.products[index];
-          const selectedOption = selectedOptions[product.id];
+          const productOptions = selectedOptions[product.id] || {};
+          const readableOptions: Record<string, string> = {};
+          for (const [groupId, optionId] of Object.entries(productOptions)) {
+            const group = product.options.groups.find((g) => g.id === Number(groupId));
+            const option = group?.values.find((v) => v.id === optionId);
+            if (group && option) {
+              readableOptions[group.name.toLowerCase()] = option.value;
+            }
+          }
+          // Assuming CartUpsellItemType is updated to use selectedOptions
+          const cartOptions = (cartProduct as any).selectedOptions || {
+            color: cartProduct.color,
+            size: cartProduct.size,
+          };
           return (
             cartProduct.id === product.id &&
-            cartProduct.color === (selectedOption?.color || "") &&
-            cartProduct.size === (selectedOption?.size || "")
+            Object.keys(readableOptions).every((key) => cartOptions[key] === readableOptions[key])
           );
         });
       });
-
       setIsInCart(upsellInCart);
     }
   }, [cart, selectedProduct, selectedOptions]);
 
   useEffect(() => {
     if (isVisible && selectedProduct) {
-      setSelectedOptions({});
-      setReadyProducts([]);
-
-      const autoSelectedProducts = selectedProduct.upsell.products
-        .filter(
-          (product) =>
-            product.options.colors.length === 0 &&
-            Object.keys(product.options.sizes).length === 0
-        )
+      const autoReadyProducts = selectedProduct.upsell.products
+        .filter((product) => product.options.groups.every((group) => group.values.every((option) => !option.isActive)))
         .map((product) => product.id);
-
-      setReadyProducts(autoSelectedProducts);
+      setReadyProducts(autoReadyProducts);
+      setSelectedOptions({});
     }
   }, [isVisible, selectedProduct, setReadyProducts, setSelectedOptions]);
 
-  const updateSelectedOptions = (
-    productId: string,
-    option: string,
-    value: string
-  ) => {
+  const handleOptionSelect = (productId: string, groupId: number, optionId: number) => {
     const updatedOptions = {
       ...selectedOptions,
-      [productId]: { ...selectedOptions[productId], [option]: value },
+      [productId]: {
+        ...selectedOptions[productId],
+        [groupId]: optionId,
+      },
     };
     setSelectedOptions(updatedOptions);
 
-    const product = selectedProduct?.upsell.products.find(
-      (p) => p.id === productId
-    );
-
+    const product = selectedProduct?.upsell.products.find((p) => p.id === productId);
     if (product) {
-      const allOptionsSelected =
-        (!product.options.colors.length || updatedOptions[productId].color) &&
-        (!Object.keys(product.options.sizes).length ||
-          updatedOptions[productId].size);
-
-      if (allOptionsSelected && !readyProducts.includes(productId)) {
+      const requiredGroups = product.options.groups.filter((group) => group.values.some((option) => option.isActive));
+      const isReady = requiredGroups.every((group) => updatedOptions[productId]?.[group.id] !== undefined);
+      if (isReady && !readyProducts.includes(productId)) {
         setReadyProducts([...readyProducts, productId]);
-      } else if (!allOptionsSelected && readyProducts.includes(productId)) {
+      } else if (!isReady && readyProducts.includes(productId)) {
         setReadyProducts(readyProducts.filter((id) => id !== productId));
       }
     }
   };
 
-  const isProductReady = (productId: string) =>
-    readyProducts.includes(productId);
+  const isProductReady = (productId: string) => readyProducts.includes(productId);
 
   const openCarousel = (product: any) => {
     setSelectedProductForCarousel(product);
@@ -155,42 +136,39 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
     setSelectedProductForCarousel(null);
   };
 
-  const calculateSavings = (pricing: {
-    salePrice: number;
-    basePrice: number;
-    discountPercentage: number;
-  }) => {
+  const calculateSavings = (pricing: { salePrice: number; basePrice: number; discountPercentage: number }) => {
     return (Number(pricing.basePrice) - Number(pricing.salePrice)).toFixed(2);
   };
 
   const handleAddToCart = () => {
     setIsAddingToCart(true);
     startTransition(async () => {
-      const productsToAdd = selectedProduct?.upsell.products
-        .filter((product) => readyProducts.includes(product.id))
-        .map((product) => ({
+      const productsToAdd = selectedProduct!.upsell.products.map((product) => {
+        const productSelectedOptions = selectedOptions[product.id] || {};
+        const readableOptions: Record<string, string> = {};
+        for (const [groupIdStr, optionId] of Object.entries(productSelectedOptions)) {
+          const group = product.options.groups.find((g) => g.id === Number(groupIdStr));
+          const option = group?.values.find((v) => v.id === optionId);
+          if (group && option) {
+            readableOptions[group.name.toLowerCase()] = option.value;
+          }
+        }
+        return {
           id: product.id,
-          color: selectedOptions[product.id]?.color || "",
-          size: selectedOptions[product.id]?.size || "",
-        }));
+          selectedOptions: readableOptions,
+        };
+      });
 
-      const upsellToAdd: {
-        type: "upsell";
-        baseUpsellId?: string;
-        products: Array<{ id: string; color: string; size: string }>;
-      } = {
-        type: "upsell",
-        baseUpsellId: selectedProduct?.upsell.id,
-        products: productsToAdd || [],
+      const upsellToAdd = {
+        type: "upsell" as const,
+        baseUpsellId: selectedProduct!.upsell.id,
+        products: productsToAdd,
       };
 
       const result = await AddToCartAction(upsellToAdd);
       showAlert({
         message: result.message,
-        type:
-          result.type === ShowAlertType.ERROR
-            ? ShowAlertType.ERROR
-            : ShowAlertType.NEUTRAL,
+        type: result.type === ShowAlertType.ERROR ? ShowAlertType.ERROR : ShowAlertType.NEUTRAL,
       });
 
       setIsAddingToCart(false);
@@ -204,9 +182,7 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
     if (pathname === "/cart") {
       hideOverlay();
       hideQuickviewOverlay();
-      document
-        .getElementById("scrollable-parent")
-        ?.scrollTo({ top: 0, behavior: "smooth" });
+      document.getElementById("scrollable-parent")?.scrollTo({ top: 0, behavior: "smooth" });
     } else {
       router.push("/cart");
     }
@@ -223,47 +199,28 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                   {Number(selectedProduct.upsell.pricing.salePrice) ? (
                     <div className="flex items-center gap-[6px]">
                       <div className="flex items-baseline text-[rgb(168,100,0)]">
-                        <span className="text-[0.813rem] leading-3 font-semibold">
-                          $
-                        </span>
+                        <span className="text-[0.813rem] leading-3 font-semibold">$</span>
                         <span className="text-xl font-bold">
-                          {Math.floor(
-                            Number(selectedProduct.upsell.pricing.salePrice)
-                          )}
+                          {Math.floor(Number(selectedProduct.upsell.pricing.salePrice))}
                         </span>
                         <span className="text-[0.813rem] leading-3 font-semibold">
-                          {(
-                            Number(selectedProduct.upsell.pricing.salePrice) % 1
-                          )
-                            .toFixed(2)
-                            .substring(1)}
+                          {(Number(selectedProduct.upsell.pricing.salePrice) % 1).toFixed(2).substring(1)}
                         </span>
                       </div>
                       <span className="text-[0.813rem] leading-3 text-gray line-through">
-                        $
-                        {formatThousands(
-                          Number(selectedProduct.upsell.pricing.basePrice)
-                        )}
+                        ${formatThousands(Number(selectedProduct.upsell.pricing.basePrice))}
                       </span>
                     </div>
                   ) : (
                     <div className="flex items-baseline text-[rgb(168,100,0)]">
-                      <span className="text-[0.813rem] leading-3 font-semibold">
-                        $
-                      </span>
+                      <span className="text-[0.813rem] leading-3 font-semibold">$</span>
                       <span className="text-lg font-bold">
-                        {Math.floor(
-                          Number(selectedProduct.upsell.pricing.basePrice)
-                        )}
+                        {Math.floor(Number(selectedProduct.upsell.pricing.basePrice))}
                       </span>
                       <span className="text-[0.813rem] leading-3 font-semibold">
-                        {(Number(selectedProduct.upsell.pricing.basePrice) % 1)
-                          .toFixed(2)
-                          .substring(1)}
+                        {(Number(selectedProduct.upsell.pricing.basePrice) % 1).toFixed(2).substring(1)}
                       </span>
-                      <span className="ml-1 text-[0.813rem] leading-3 font-semibold">
-                        today
-                      </span>
+                      <span className="ml-1 text-[0.813rem] leading-3 font-semibold">today</span>
                     </div>
                   )}
                 </div>
@@ -277,18 +234,10 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                           <div
                             className={clsx(
                               "w-5 h-5 rounded-full mb-11 flex items-center justify-center",
-                              isProductReady(product.id)
-                                ? "bg-black"
-                                : "border border-gray"
+                              isProductReady(product.id) ? "bg-black" : "border border-gray"
                             )}
                           >
-                            {isProductReady(product.id) && (
-                              <Check
-                                color="#ffffff"
-                                size={16}
-                                strokeWidth={2}
-                              />
-                            )}
+                            {isProductReady(product.id) && <Check color="#ffffff" size={16} strokeWidth={2} />}
                           </div>
                         </div>
                         <div className="flex gap-5 w-[calc(100%-28px)] overflow-hidden">
@@ -301,29 +250,18 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                                 <span className="pl-[3px] text-sm font-medium line-clamp-1 group-hover:underline">
                                   {product.name}
                                 </span>
-                                <ChevronRight
-                                  color="#6c6c6c"
-                                  size={14}
-                                  strokeWidth={2}
-                                />
+                                <ChevronRight color="#6c6c6c" size={14} strokeWidth={2} />
                               </div>
                               <div className="pl-[3px] text-[0.813rem] text-gray line-through line-clamp-1 w-max">
                                 ${product.basePrice}
                               </div>
                             </div>
-                            <ProductOptions
+                            <ProductOptionGroups
                               product={product}
-                              selectedOptions={
-                                selectedOptions[product.id] || {}
-                              }
-                              onOptionSelect={(option: string, value: string) =>
-                                updateSelectedOptions(product.id, option, value)
-                              }
+                              selectedOptions={selectedOptions[product.id] || {}}
+                              onOptionSelect={handleOptionSelect}
                             />
-                            {index <
-                              selectedProduct.upsell.products.length - 1 && (
-                              <hr className="ml-[3px] mt-2" />
-                            )}
+                            {index < selectedProduct.upsell.products.length - 1 && <hr className="ml-[3px] mt-2" />}
                           </div>
                         </div>
                       </div>
@@ -339,14 +277,10 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                         <div
                           className={clsx(
                             "w-5 h-5 rounded-full flex items-center justify-center",
-                            readyProducts.length > 0
-                              ? "bg-black"
-                              : "border border-gray"
+                            readyProducts.length > 0 ? "bg-black" : "border border-gray"
                           )}
                         >
-                          {readyProducts.length > 0 && (
-                            <Check color="#ffffff" size={16} strokeWidth={2} />
-                          )}
+                          {readyProducts.length > 0 && <Check color="#ffffff" size={16} strokeWidth={2} />}
                         </div>
                       </div>
                       {readyProducts.length > 0 ? (
@@ -360,9 +294,7 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                         </>
                       ) : (
                         <>
-                          <span className="min-[480px]:hidden font-semibold text-sm">
-                            Selections (0)
-                          </span>
+                          <span className="min-[480px]:hidden font-semibold text-sm">Selections (0)</span>
                           <span className="hidden min-[480px]:block font-semibold text-sm min-[520px]:text-base">
                             Selections (0)
                           </span>
@@ -390,46 +322,30 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                           <button
                             className={clsx(
                               "min-[375px]:hidden text-sm flex items-center justify-center min-w-28 max-w-28 px-[10px] h-11 rounded-full border border-[#b27100] text-white font-semibold shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear-gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000] transition-opacity duration-200",
-                              readyProducts.length !==
-                                selectedProduct?.upsell.products.length ||
-                                isAddingToCart
+                              readyProducts.length !== selectedProduct?.upsell.products.length || isAddingToCart
                                 ? "opacity-50 cursor-context-menu"
                                 : "cursor-pointer hover:bg-[#cc8100] hover:[background:linear-gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
                             )}
                             disabled={
-                              readyProducts.length !==
-                                selectedProduct?.upsell.products.length ||
-                              isAddingToCart
+                              readyProducts.length !== selectedProduct?.upsell.products.length || isAddingToCart
                             }
                             onClick={handleAddToCart}
                           >
-                            {isAddingToCart ? (
-                              <Spinner size={24} color="white" />
-                            ) : (
-                              "Get Upgrade"
-                            )}
+                            {isAddingToCart ? <Spinner size={24} color="white" /> : "Get Upgrade"}
                           </button>
                           <button
                             className={clsx(
                               "hidden text-sm min-[375px]:flex items-center justify-center min-w-[160px] max-w-60 min-[425px]:min-w-[172px] px-[10px] min-[425px]:px-4 min-[480px]:px-5 h-11 rounded-full border border-[#b27100] text-white font-semibold shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear-gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000] transition-opacity duration-200",
-                              readyProducts.length !==
-                                selectedProduct?.upsell.products.length ||
-                                isAddingToCart
+                              readyProducts.length !== selectedProduct?.upsell.products.length || isAddingToCart
                                 ? "opacity-50 cursor-context-menu"
                                 : "cursor-pointer hover:bg-[#cc8100] hover:[background:linear-gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
                             )}
                             disabled={
-                              readyProducts.length !==
-                                selectedProduct?.upsell.products.length ||
-                              isAddingToCart
+                              readyProducts.length !== selectedProduct?.upsell.products.length || isAddingToCart
                             }
                             onClick={handleAddToCart}
                           >
-                            {isAddingToCart ? (
-                              <Spinner size={24} color="white" />
-                            ) : (
-                              "Add Upgrade to Cart"
-                            )}
+                            {isAddingToCart ? <Spinner size={24} color="white" /> : "Add Upgrade to Cart"}
                           </button>
                         </>
                       )}
@@ -437,19 +353,14 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                         className={clsx(
                           "animate-fade-right absolute right-0 bottom-12 min-[520px]:bottom-14 w-[248px] py-3 px-4 rounded-xl bg-[#373737] before:content-[''] before:w-[10px] before:h-[10px] before:bg-[#373737] before:rounded-br-[2px] before:rotate-45 before:origin-bottom-left before:absolute before:-bottom-0 before:right-12",
                           {
-                            hidden:
-                              readyProducts.length !==
-                                selectedProduct?.upsell.products.length ||
-                              isInCart,
+                            hidden: readyProducts.length !== selectedProduct?.upsell.products.length || isInCart,
                           }
                         )}
                       >
                         <p className="text-white text-sm">
                           <span className="text-[#ffe6ba]">
                             {selectedProduct?.upsell.pricing.salePrice
-                              ? `Congrats! Saved $${calculateSavings(
-                                  selectedProduct.upsell.pricing
-                                )} -`
+                              ? `Congrats! Saved $${calculateSavings(selectedProduct.upsell.pricing)} -`
                               : `Congrats! You're all set -`}
                           </span>{" "}
                           <b>grab it before it's gone!</b>
@@ -471,122 +382,78 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
         </div>
       )}
       {showCarousel && selectedProductForCarousel && (
-        <ProductImagesOverlay
-          product={selectedProductForCarousel}
-          onClose={closeCarousel}
-        />
+        <ProductImagesOverlay product={selectedProductForCarousel} onClose={closeCarousel} />
       )}
     </>
   );
 }
 
-// -- UI Components --
+// -- ProductOptionGroups Component --
 
-function ProductColors({
-  colors,
-  selectedColor,
-  onColorSelect,
-}: ProductColorsType) {
-  return (
-    <div
-      className={`p-[3px] pr-5 flex gap-2 overflow-x-auto ${styles.customScrollbar}`}
-    >
-      {colors.map(({ name, image }, index) => (
-        <div
-          onClick={() => onColorSelect(name)}
-          key={index}
-          className={clsx(
-            "relative min-w-[108px] max-w-[108px] min-h-[108px] max-h-[108px] flex items-center justify-center rounded-lg cursor-pointer overflow-hidden",
-            { "ring-1 ring-black/60 ring-offset-2": selectedColor === name }
-          )}
-        >
-          <Image src={image} alt={name} width={108} height={108} priority />
-        </div>
-      ))}
-    </div>
-  );
-}
+type ProductOptionGroupsProps = {
+  product: UpsellReviewProductType["upsell"]["products"][number];
+  selectedOptions: Record<number, number>;
+  onOptionSelect: (productId: string, groupId: number, optionId: number) => void;
+};
 
-function ProductSizeChart({
-  sizeChart,
-  selectedSize,
-  onSizeSelect,
-}: ProductSizeChartProps) {
-  const showOverlay = useOverlayStore((state) => state.showOverlay);
-  const pageName = useOverlayStore((state) => state.pages.productDetails.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.productDetails.overlays.sizeChart.name
-  );
-
-  const { columns, rows } = sizeChart.inches;
-  const sizes = rows.map((row) => row[columns[0].label]);
-
-  const isFeetInchFormat = (value: string) =>
-    /\d+'(?:\d{1,2}")?-?\d*'?(?:\d{1,2}")?/.test(value);
+function ProductOptionGroups({ product, selectedOptions, onOptionSelect }: ProductOptionGroupsProps) {
+  const getMeasurements = (group: OptionGroupType, selectedOptionId: number) => {
+    if (!group.sizeChart?.inches) return [];
+    const selectedOption = group.values.find((v) => v.id === selectedOptionId);
+    if (!selectedOption) return [];
+    const keyColumn = group.sizeChart.inches.columns[0].label;
+    const row = group.sizeChart.inches.rows.find((r) => r[keyColumn] === selectedOption.value);
+    if (!row) return [];
+    return group.sizeChart.inches.columns
+      .filter((col) => col.label !== keyColumn)
+      .map((col) => ({ label: col.label, value: row[col.label] }));
+  };
 
   return (
-    <div className="w-full pl-[3px] pr-5">
-      <div className="w-full max-w-[298px] flex flex-wrap gap-2">
-        {sizes.map((size, index) => (
-          <div key={index} className="relative cursor-pointer">
-            <div
-              onClick={() => onSizeSelect(size)}
-              className={clsx(
-                "font-medium text-sm bg-lightgray rounded-full relative px-4 h-7 flex items-center justify-center",
-                { "ring-1 ring-black/60 ring-offset-2": selectedSize === size }
-              )}
-            >
-              {size}
+    <div className="flex flex-col gap-3 pl-[3px] pr-5">
+      {product.options.groups
+        .filter((group) => group.values.some((opt) => opt.isActive))
+        .map((group) => (
+          <div key={group.id}>
+            <h3 className="text-sm font-medium mb-2">{group.name}</h3>
+            <div className="flex flex-wrap gap-2">
+              {group.values
+                .filter((option) => option.isActive)
+                .map((option) => (
+                  <button
+                    key={option.id}
+                    onClick={() => onOptionSelect(product.id, group.id, option.id)}
+                    className={clsx(
+                      "px-3 py-1.5 min-w-12 rounded-full text-sm",
+                      selectedOptions[group.id] === option.id
+                        ? "bg-black text-white"
+                        : "bg-neutral-100 text-black hover:bg-neutral-200"
+                    )}
+                  >
+                    {option.value}
+                  </button>
+                ))}
             </div>
-          </div>
-        ))}
-      </div>
-      {selectedSize && (
-        <div
-          onClick={() => {
-            showOverlay({ pageName, overlayName });
-          }}
-          className="w-full py-3 pl-[14px] pr-8 mt-2 rounded-lg relative cursor-pointer bg-lightgray"
-        >
-          <div>
-            {rows.find((row) => row[columns[0].label] === selectedSize) && (
-              <ul className="leading-3 max-w-[calc(100%-20px)] flex flex-row flex-wrap gap-2">
-                {columns
-                  .filter(
-                    (column) =>
-                      column.label !== "Size" &&
-                      !["US", "EU", "UK", "NZ", "AU", "DE"].includes(
-                        column.label
-                      )
-                  )
-                  .sort((a, b) => a.order - b.order)
-                  .map((column) => {
-                    const selectedRow = rows.find(
-                      (row) => row[columns[0].label] === selectedSize
-                    );
-                    const measurement = selectedRow
-                      ? selectedRow[column.label]
-                      : "";
-                    return (
-                      <li key={column.label} className="text-nowrap">
-                        <span className="text-xs font-medium text-gray">{`${column.label}: `}</span>
-                        <span className="text-xs font-semibold">
-                          {measurement}
-                          {!isFeetInchFormat(measurement) && measurement !== ""
-                            ? " in"
-                            : ""}
-                        </span>
-                      </li>
-                    );
-                  })}
-              </ul>
+            {group.sizeChart && selectedOptions[group.id] && (
+              <div className="mt-2 bg-lightgray rounded-lg p-2">
+                {getMeasurements(group, selectedOptions[group.id]).map((m) => (
+                  <div key={m.label} className="text-xs">
+                    {m.label}: {m.value}
+                  </div>
+                ))}
+              </div>
             )}
           </div>
-          <ChevronRight
-            color="#828282"
-            size={18}
-            strokeWidth={2}
-            className="absolute top-[50%] -translate-y-1/2 right-[6px]"
+        ))}
+      {product.options.groups.every((group) => !group.values.some((opt) => opt.isActive)) && (
+        <div className="p-[3px]">
+          <Image
+            src={product.images.main}
+            alt={product.name}
+            width={108}
+            height={108}
+            priority
+            className="rounded-lg"
           />
         </div>
       )}
@@ -594,104 +461,72 @@ function ProductSizeChart({
   );
 }
 
-function ProductOptions({
-  product,
-  selectedOptions,
-  onOptionSelect,
-}: ProductOptionsProps) {
-  const hasColor = product.options.colors.length > 0;
-  const hasSize = Object.keys(product.options.sizes).length > 0;
-
-  return (
-    <div className="flex flex-col gap-3 select-none">
-      {hasColor ? (
-        <ProductColors
-          colors={product.options.colors}
-          selectedColor={selectedOptions.color || ""}
-          onColorSelect={(color) => onOptionSelect("color", color)}
-        />
-      ) : (
-        <div className="p-[3px] pr-5">
-          <div className="relative min-w-[108px] max-w-[108px] min-h-[108px] max-h-[108px] flex items-center justify-center rounded-lg overflow-hidden">
-            <Image
-              src={product.images.main}
-              alt={product.name}
-              width={108}
-              height={108}
-              priority
-            />
-          </div>
-        </div>
-      )}
-      {hasSize && (
-        <ProductSizeChart
-          sizeChart={product.options.sizes}
-          selectedSize={selectedOptions.size || ""}
-          onSizeSelect={(size) => onOptionSelect("size", size)}
-        />
-      )}
-    </div>
-  );
-}
-
 // -- Type Definitions --
 
-type ProductColorsType = {
-  colors: Array<{
-    name: string;
-    image: string;
+// Assuming these are defined elsewhere in the project
+type OptionGroupType = {
+  id: number;
+  name: string;
+  displayOrder: number;
+  values: Array<{
+    id: number;
+    value: string;
+    isActive: boolean;
   }>;
-  selectedColor: string;
-  onColorSelect: (color: string) => void;
-};
-
-type SizeChartType = {
-  inches: {
-    columns: Array<{ label: string; order: number }>;
-    rows: Array<{ [key: string]: string }>;
-  };
-  centimeters: {
-    columns: Array<{ label: string; order: number }>;
-    rows: Array<{ [key: string]: string }>;
+  sizeChart?: {
+    inches?: {
+      columns: Array<{ label: string; order: number }>;
+      rows: Array<{ [key: string]: string }>;
+    };
   };
 };
 
-type ProductSizeChartProps = {
-  sizeChart: SizeChartType;
-  selectedSize: string;
-  onSizeSelect: (size: string) => void;
+type ProductOptionsType = {
+  groups: OptionGroupType[];
 };
 
-type ProductOptionsProps = {
-  product: {
+type UpsellReviewProductType = {
+  id: string;
+  upsell: {
     id: string;
-    name: string;
-    slug: string;
-    basePrice: number;
-    images: {
-      main: string;
-      gallery: string[];
+    mainImage: string;
+    pricing: {
+      basePrice: number;
+      salePrice: number;
+      discountPercentage: number;
     };
-    options: {
-      colors: Array<{
-        name: string;
-        image: string;
-      }>;
-      sizes: {
-        inches: {
-          columns: Array<{ label: string; order: number }>;
-          rows: Array<{ [key: string]: string }>;
-        };
-        centimeters: {
-          columns: Array<{ label: string; order: number }>;
-          rows: Array<{ [key: string]: string }>;
-        };
+    visibility: string;
+    createdAt: string;
+    updatedAt: string;
+    products: Array<{
+      id: string;
+      name: string;
+      slug: string;
+      basePrice: number;
+      images: {
+        main: string;
+        gallery: string[];
       };
-    };
+      options: ProductOptionsType;
+    }>;
   };
-  selectedOptions: {
-    color?: string;
-    size?: string;
-  };
-  onOptionSelect: (option: string, value: string) => void;
+};
+
+type CartUpsellItemType = {
+  index: number;
+  baseUpsellId: string;
+  variantId: string;
+  type: "upsell";
+  products: Array<{
+    id: string;
+    selectedOptions: Record<string, string>; // Updated from color/size
+  }>;
+};
+
+type CartType = {
+  id: string;
+  device_identifier: string;
+  items: Array<any>;
+  createdAt: string;
+  updatedAt: string;
 };

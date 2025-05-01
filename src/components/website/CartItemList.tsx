@@ -231,10 +231,10 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                           const productOptions = formatProductOptions(product.selectedOptions);
                           return (
                             <div key={product.id} className="last:mb-0 min-w-[108px] min-[580px]:min-w-[146px]">
-                              <div className="min-[580px]:hidden flex items-center justify-center mb-2 w-full h-[108px] rounded-md overflow-hidden border border-[#fceddf] bg-white">
+                              <div className="min-[580px]:hidden flex items-center justify-center mb-2 w-[108px] h-[108px] rounded-md overflow-hidden border border-[#fceddf] bg-white">
                                 <Image src={product.mainImage} alt={product.name} width={108} height={108} priority />
                               </div>
-                              <div className="hidden min-[580px]:flex items-center justify-center mb-2 w-full h-[146px] rounded-md overflow-hidden border border-[#fceddf] bg-white">
+                              <div className="hidden min-[580px]:flex items-center justify-center mb-2 w-[146px] h-[146px] rounded-md overflow-hidden border border-[#fceddf] bg-white">
                                 <Image src={product.mainImage} alt={product.name} width={146} height={146} priority />
                               </div>
                               <div className="flex flex-col gap-[2px]">

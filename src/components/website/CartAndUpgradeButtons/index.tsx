@@ -1,16 +1,18 @@
 "use client";
+
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { useOptionsStore } from "@/zustand/website/optionsStore";
 import { useTransition } from "react";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { AddToCartAction } from "@/actions/cart";
+import { UpsellReviewButton } from "../UpsellReviewOverlay";
+import { useUpsellReviewStore } from "@/zustand/website/upsellReviewStore";
+import { useQuickviewStore } from "@/zustand/website/quickviewStore";
+import { capitalizeFirstLetter } from "@/lib/utils/common";
+import { usePathname, useRouter } from "next/navigation";
 import { Spinner } from "@/ui/Spinners/Default";
 import styles from "./styles.module.css";
 import clsx from "clsx";
-import { capitalizeFirstLetter } from "@/lib/utils/common";
-import { usePathname, useRouter } from "next/navigation";
-import { useQuickviewStore } from "@/zustand/website/quickviewStore";
-import { useUpsellReviewStore } from "@/zustand/website/upsellReviewStore";
 
 type CartProductItemType = {
   type: "product";
@@ -26,60 +28,6 @@ type CartType = {
   items: CartProductItemType[];
   createdAt: string;
   updatedAt: string;
-};
-
-type SizeChartType = {
-  centimeters?: {
-    columns: Array<{
-      label: string;
-      order: number;
-    }>;
-    rows: Array<{
-      [key: string]: string;
-    }>;
-  };
-  inches?: {
-    columns: Array<{
-      label: string;
-      order: number;
-    }>;
-    rows: Array<{
-      [key: string]: string;
-    }>;
-  };
-};
-
-type OptionGroupType = {
-  id: number;
-  name: string;
-  displayOrder: number;
-  values: Array<{
-    id: number;
-    value: string;
-    isActive: boolean;
-  }>;
-  sizeChart?: SizeChartType;
-};
-
-type ProductOptionsType = {
-  groups: Array<OptionGroupType>;
-  config: {
-    chaining: {
-      enabled: boolean;
-      relationships: Array<{
-        parentGroupId: number;
-        childGroupId: number;
-        constraints: {
-          [parentOptionId: string]: number[];
-        };
-      }>;
-    };
-  };
-};
-
-type ProductWithUpsellType = {
-  id: string;
-  options: ProductOptionsType;
 };
 
 export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithUpsellType; cart: CartType | null }) {
@@ -258,6 +206,14 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
         >
           {isPending ? <Spinner size={28} color="white" /> : "Add to Cart"}
         </button>
+      )}
+      {product.upsell && (
+        <UpsellReviewButton
+          product={{
+            id: product.id,
+            upsell: product.upsell,
+          }}
+        />
       )}
     </>
   );
