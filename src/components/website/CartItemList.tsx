@@ -162,8 +162,8 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                       <div className="min-[580px]:hidden flex items-center justify-center min-w-[108px] max-w-[108px] min-h-[108px] max-h-[108px] overflow-hidden rounded-lg">
                         <Image src={item.mainImage} alt={item.name} width={108} height={108} priority />
                       </div>
-                      <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[146px] min-[580px]:max-w-[146px] min-[580px]:min-h-[146px] min-[580px]:max-h-[146px] overflow-hidden rounded-lg">
-                        <Image src={item.mainImage} alt={item.name} width={146} height={146} priority />
+                      <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
+                        <Image src={item.mainImage} alt={item.name} width={128} height={128} priority />
                       </div>
                     </div>
                     <div className="w-full pr-3 flex flex-col gap-1">
@@ -266,10 +266,10 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                               <div className="min-[580px]:hidden flex items-center justify-center min-w-[80px] max-w-[80px] min-h-[80px] max-h-[80px] overflow-hidden rounded-lg bg-gradient-to-br from-amber-50 to-amber-100 border border-[#fceddf]">
                                 <Image src={product.mainImage} alt={product.name} width={80} height={80} priority />
                               </div>
-                              <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[80px] min-[580px]:max-w-[80px] min-[580px]:min-h-[80px] min-[580px]:max-h-[80px] overflow-hidden rounded-lg bg-gradient-to-br from-amber-50 to-amber-100 border border-[#fceddf]">
-                                <Image src={product.mainImage} alt={product.name} width={80} height={80} priority />
+                              <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[120px] min-[580px]:max-w-[120px] min-[580px]:min-h-[120px] min-[580px]:max-h-[120px] overflow-hidden rounded-lg bg-gradient-to-br from-amber-50 to-amber-120 border border-[#fceddf]">
+                                <Image src={product.mainImage} alt={product.name} width={120} height={120} priority />
                               </div>
-                              <div className="space-y-2">
+                              <div className="space-y-3">
                                 <Link
                                   href={`${product.slug}-${product.id}`}
                                   target="_blank"
@@ -643,8 +643,8 @@ type CartItemType = CartProductItemType | CartUpsellItemType;
 //                         <div className="min-[580px]:hidden flex items-center justify-center min-w-[108px] max-w-[108px] min-h-[108px] max-h-[108px] overflow-hidden rounded-lg border border-gray-200">
 //                           <Image src={item.mainImage} alt={item.name} width={108} height={108} priority />
 //                         </div>
-//                         <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[146px] min-[580px]:max-w-[146px] min-[580px]:min-h-[146px] min-[580px]:max-h-[146px] overflow-hidden rounded-lg border border-gray-200">
-//                           <Image src={item.mainImage} alt={item.name} width={146} height={146} priority />
+//                         <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg border border-gray-200">
+//                           <Image src={item.mainImage} alt={item.name} width={128} height={128} priority />
 //                         </div>
 //                       </div>
 //                       <div className="flex-grow">
