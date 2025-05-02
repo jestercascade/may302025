@@ -98,7 +98,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
 
     const getClassNames = () => {
       if (type === "upsell") {
-        return "inline-flex text-xs px-1.5 py-0.5 rounded border border-[#fceddf] text-[#B4513C]";
+        return "inline-flex text-xs px-1.5 py-0.5 rounded border border-[#fceddf] text-neutral-500 bg-rose-50/70";
       }
       return "inline-flex text-xs px-1.5 py-0.5 rounded bg-[#F7F7F7] text-neutral-500";
     };
@@ -171,7 +171,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                         <Link
                           href={`${item.slug}-${item.baseProductId}`}
                           target="_blank"
-                          className="text-gray text-xs line-clamp-1 hover:underline"
+                          className="text-xs line-clamp-1 hover:underline"
                         >
                           {item.name}
                         </Link>
@@ -221,38 +221,33 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                     </div>
                     <div className="relative w-[calc(100%-32px)] p-5 rounded-lg bg-[#fffbf6] border border-[#fceddf]">
                       <div className="flex items-center justify-between mb-4">
-                        <Gift color="#CC7866" size={18} />
-                        <div className="flex items-center">
-                          <div className="min-w-full h-5 flex gap-5 items-center justify-between">
-                            <div className="w-max flex items-center justify-center">
-                              {Number(item.pricing.salePrice) ? (
-                                <div className="flex items-center gap-[6px]">
-                                  <span className="text-[0.813rem] leading-3 text-gray line-through">
-                                    ${formatThousands(Number(item.pricing.basePrice))}
-                                  </span>
-                                  <div className="flex items-baseline text-[rgb(168,100,0)]">
-                                    <span className="text-[0.813rem] leading-3 font-semibold">$</span>
-                                    <span className="text-lg font-bold">
-                                      {Math.floor(Number(item.pricing.salePrice))}
-                                    </span>
-                                    <span className="text-[0.813rem] leading-3 font-semibold">
-                                      {(Number(item.pricing.salePrice) % 1).toFixed(2).substring(1)}
-                                    </span>
-                                  </div>
-                                </div>
-                              ) : (
+                        <div className="min-w-full h-5 flex gap-5 items-center justify-center">
+                          <div className="w-max flex items-center justify-center">
+                            {Number(item.pricing.salePrice) ? (
+                              <div className="flex items-center gap-[6px]">
+                                <span className="text-[0.813rem] leading-3 text-gray line-through">
+                                  ${formatThousands(Number(item.pricing.basePrice))}
+                                </span>
                                 <div className="flex items-baseline text-[rgb(168,100,0)]">
                                   <span className="text-[0.813rem] leading-3 font-semibold">$</span>
                                   <span className="text-lg font-bold">
-                                    {Math.floor(Number(item.pricing.basePrice))}
+                                    {Math.floor(Number(item.pricing.salePrice))}
                                   </span>
                                   <span className="text-[0.813rem] leading-3 font-semibold">
-                                    {(Number(item.pricing.basePrice) % 1).toFixed(2).substring(1)}
+                                    {(Number(item.pricing.salePrice) % 1).toFixed(2).substring(1)}
                                   </span>
-                                  <span className="ml-1 text-[0.813rem] leading-3 font-semibold">today</span>
                                 </div>
-                              )}
-                            </div>
+                              </div>
+                            ) : (
+                              <div className="flex items-baseline text-[rgb(168,100,0)]">
+                                <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                                <span className="text-lg font-bold">{Math.floor(Number(item.pricing.basePrice))}</span>
+                                <span className="text-[0.813rem] leading-3 font-semibold">
+                                  {(Number(item.pricing.basePrice) % 1).toFixed(2).substring(1)}
+                                </span>
+                                <span className="ml-1 text-[0.813rem] leading-3 font-semibold">today</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -273,7 +268,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                                 <Link
                                   href={`${product.slug}-${product.id}`}
                                   target="_blank"
-                                  className="text-gray text-xs line-clamp-1 hover:underline"
+                                  className="text-xs line-clamp-1 hover:underline"
                                 >
                                   {product.name}
                                 </Link>
