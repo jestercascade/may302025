@@ -100,7 +100,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
       if (type === "upsell") {
         return "inline-flex text-xs px-1.5 py-0.5 rounded border border-[#fceddf] text-[#B4513C]";
       }
-      return "inline-flex text-xs px-1.5 py-0.5 rounded bg-neutral-100 text-gray-600";
+      return "inline-flex text-xs px-1.5 py-0.5 rounded bg-[#F7F7F7] text-neutral-500";
     };
 
     return (
@@ -221,7 +221,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                     </div>
                     <div className="relative w-[calc(100%-32px)] p-5 rounded-lg bg-[#fffbf6] border border-[#fceddf]">
                       <div className="flex items-center justify-between mb-4">
-                        <Gift color="#c25d47" size={18} />
+                        <Gift color="#CC7866" size={18} />
                         <div className="flex items-center">
                           <div className="min-w-full h-5 flex gap-5 items-center justify-between">
                             <div className="w-max flex items-center justify-center">

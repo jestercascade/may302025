@@ -35,7 +35,7 @@ export function RemoveFromCartButton({ type, variantId }: { type: "product" | "u
         type === "upsell" && "absolute right-3 top-3",
         type === "upsell" && "bg-white shadow-sm border border-amber-100",
         type === "upsell" && !isPending && "hover:bg-[#fceddf]",
-        type === "product" && !isPending && "hover:bg-gray-100",
+        type === "product" && !isPending && "hover:bg-[#F7F7F7]",
         isPending ? "cursor-not-allowed" : "cursor-pointer"
       )}
     >
