@@ -33,12 +33,17 @@ export function RemoveFromCartButton({ type, variantId }: { type: "product" | "u
       className={clsx(
         "min-w-8 max-w-8 min-h-8 max-h-8 rounded-full flex items-center justify-center ease-in-out duration-300 transition",
         type === "upsell" && "absolute right-3 top-3",
+        type === "upsell" && "bg-white shadow-sm border border-amber-100",
         type === "upsell" && !isPending && "hover:bg-[#fceddf]",
-        type === "product" && !isPending && "hover:bg-lightgray",
-        isPending && "cursor-context-menu"
+        type === "product" && !isPending && "hover:bg-gray-100",
+        isPending ? "cursor-not-allowed" : "cursor-pointer"
       )}
     >
-      {isPending ? <DashSpinner size={18} color="#6c6c6c" /> : <Trash color="#a3a3a3" size={18} strokeWidth={1.5} />}
+      {isPending ? (
+        <DashSpinner size={18} color="#6c6c6c" />
+      ) : (
+        <Trash color={type === "upsell" ? "#f59e0b" : "#a3a3a3"} size={18} strokeWidth={1.5} />
+      )}
     </button>
   );
 }
