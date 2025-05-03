@@ -280,7 +280,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                           </div>
                         ))}
                       </div>
-                      {/* <RemoveFromCartButton type="upsell" variantId={item.variantId} /> */}
+                      <RemoveFromCartButton type="upsell" variantId={item.variantId} />
                     </div>
                   </div>
                 );
