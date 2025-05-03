@@ -12,27 +12,16 @@ import { Check, Gift } from "lucide-react";
 import { RemoveFromCartButton } from "./RemoveFromCartButton";
 
 export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
-  // Initialize with all items selected by default
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set(cartItems.map((item) => item.variantId)));
-
-  // Keep track of manually deselected items
   const [deselectedItems, setDeselectedItems] = useState<Set<string>>(new Set());
-
-  // Keep track of manually selected items
   const [manuallySelectedItems, setManuallySelectedItems] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    // Update selections when cart items change
     setSelectedItems((prevSelected) => {
       const newSelected = new Set<string>();
 
       cartItems.forEach((item) => {
         const variantId = item.variantId;
-
-        // Keep item selected if:
-        // 1. It was manually selected previously
-        // 2. OR it's a new item AND wasn't manually deselected before
-        // 3. OR it was previously selected and not manually deselected
         if (
           manuallySelectedItems.has(variantId) ||
           (!prevSelected.has(variantId) && !deselectedItems.has(variantId)) ||

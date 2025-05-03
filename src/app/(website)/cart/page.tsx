@@ -59,7 +59,7 @@ export default async function Cart() {
     }>;
   }>;
 
-  const sortedCartItems = [...cartProducts, ...typedCartUpsells].sort((a, b) => a.index - b.index);
+  const sortedCartItems = [...cartProducts, ...typedCartUpsells].sort((a, b) => b.index - a.index);
 
   const showDiscoveryProducts = discoveryProductsSettings?.visibleOnPages?.cart === true;
 
