@@ -352,12 +352,12 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
       />
 
       {/* Mobile Order Summary */}
-      <MobileOrderSummary
+      {/* <MobileOrderSummary
         selectedItems={selectedItems}
         getSelectedCartItems={getSelectedCartItems}
         calculateTotal={calculateTotal}
         toggleAll={toggleAll}
-      />
+      /> */}
     </div>
   );
 }
@@ -473,16 +473,16 @@ function OrderSummary({
   );
 }
 
-// Mobile Order Summary Component
-function MobileOrderSummary({
-  selectedItems,
-  getSelectedCartItems,
-  calculateTotal,
-  toggleAll,
-}: MobileOrderSummaryProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+// // Mobile Order Summary Component
+// function MobileOrderSummary({
+//   selectedItems,
+//   getSelectedCartItems,
+//   calculateTotal,
+//   toggleAll,
+// }: MobileOrderSummaryProps) {
+//   const [isExpanded, setIsExpanded] = useState(false);
 
-  const total = calculateTotal();
+//   const total = calculateTotal();
 
-  return <div>...</div>;
-}
+//   return <div>...</div>;
+// }
