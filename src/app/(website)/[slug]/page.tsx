@@ -122,7 +122,7 @@ function DesktopProductDetails({ product, cart }: ProductDetailsType) {
   return (
     <div className="hidden md:block">
       <div className="px-9 pt-5 mx-auto max-w-[1040px]">
-        <div className="flex gap-5 items-start justify-start relative">
+        <div className="flex gap-5 items-start relative">
           <ImageGalleryWrapper>
             <ImageGallery images={images} productName={name} />
           </ImageGalleryWrapper>

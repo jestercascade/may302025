@@ -31,7 +31,7 @@ export function ProductInfoWrapper({ children }: { children: React.ReactNode }) 
   }, [updateHeight]);
 
   return (
-    <div ref={wrapperRef} className="sticky top-5 pt-5 min-w-[372px] z-10">
+    <div ref={wrapperRef} className="sticky top-5 pt-5 min-w-[372px] max-w-[372px] z-10">
       {children}
     </div>
   );
