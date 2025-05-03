@@ -17,13 +17,7 @@ const initialOptions = {
   intent: "capture",
 };
 
-export function PayPalButton({
-  cart,
-  showLabel,
-}: {
-  cart: Cart;
-  showLabel: boolean;
-}) {
+export function PayPalButton({ cart, showLabel }: { cart: Cart; showLabel: boolean }) {
   const router = useRouter();
   const [key, setKey] = useState(() => cart.length);
   const { showAlert, hideAlert } = useAlertStore();
@@ -34,9 +28,7 @@ export function PayPalButton({
 
   const cartItems = generateCartItems(cart);
 
-  const clearCartWithRetries = async (
-    variantIds: string[]
-  ): Promise<boolean> => {
+  const clearCartWithRetries = async (variantIds: string[]): Promise<boolean> => {
     // First attempt - no alert
     const initialResult = await ClearPurchasedItemsAction({ variantIds });
     if (initialResult.type !== ShowAlertType.ERROR) {
@@ -98,12 +90,9 @@ export function PayPalButton({
 
   const onApprove = async (data: { orderID: string }) => {
     try {
-      const response = await fetch(
-        `/api/paypal/capture-order/${data.orderID}`,
-        {
-          method: "POST",
-        }
-      );
+      const response = await fetch(`/api/paypal/capture-order/${data.orderID}`, {
+        method: "POST",
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -134,8 +123,7 @@ export function PayPalButton({
       return orderData;
     } catch (error) {
       showAlert({
-        message:
-          "Your payment couldn't be processed. Please try again or use a different payment method.",
+        message: "Your payment couldn't be processed. Please try again or use a different payment method.",
         type: ShowAlertType.ERROR,
       });
       console.error("Failed to capture order:", error);
@@ -158,8 +146,8 @@ export function PayPalButton({
           tagline: showLabel,
           label: showLabel ? "pay" : "paypal",
         }}
-        createOrder={createOrder}
-        onApprove={onApprove}
+        // createOrder={createOrder}
+        // onApprove={onApprove}
       />
     </PayPalScriptProvider>
   );
@@ -176,13 +164,9 @@ function generateCartItems(cart: Cart): CartItem[] {
   }
 
   function formatProductName(item: ProductCartItem): string {
-    const attributes = [
-      item.size && item.size,
-      item.color && item.color,
-    ].filter(Boolean);
+    const attributes = [item.size && item.size, item.color && item.color].filter(Boolean);
 
-    const attributeString =
-      attributes.length > 0 ? `[${attributes.join(", ")}] - ` : "";
+    const attributeString = attributes.length > 0 ? `[${attributes.join(", ")}] - ` : "";
 
     const fullName = `${attributeString}${item.name}`;
     return fullName.length > 127 ? `${fullName.slice(0, 124)}...` : fullName;
@@ -207,18 +191,13 @@ function generateCartItems(cart: Cart): CartItem[] {
     } else {
       const productDetails = item.products
         .map((product) => {
-          const details = [product.id, product.size, product.color].filter(
-            Boolean
-          );
+          const details = [product.id, product.size, product.color].filter(Boolean);
           return `[${details.join(", ")}]`;
         })
         .join(" + ");
 
       return {
-        name:
-          productDetails.length > 127
-            ? `${productDetails.slice(0, 124)}...`
-            : productDetails,
+        name: productDetails.length > 127 ? `${productDetails.slice(0, 124)}...` : productDetails,
         sku: generateSku(item.baseUpsellId),
         unit_amount: {
           currency_code: "USD",

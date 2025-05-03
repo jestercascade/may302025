@@ -11,6 +11,68 @@ import clsx from "clsx";
 import { Check, Gift } from "lucide-react";
 import { RemoveFromCartButton } from "./RemoveFromCartButton";
 
+// Type Definitions
+type SelectedOptionType = {
+  value: string;
+  optionDisplayOrder: number;
+  groupDisplayOrder: number;
+};
+
+type CartProductItemType = {
+  type: "product";
+  baseProductId: string;
+  name: string;
+  slug: string;
+  pricing: {
+    basePrice: number;
+    salePrice: number;
+    discountPercentage: number;
+  };
+  mainImage: string;
+  variantId: string;
+  selectedOptions: Record<string, SelectedOptionType>;
+  index: number;
+};
+
+type CartUpsellItemType = {
+  type: "upsell";
+  baseUpsellId: string;
+  variantId: string;
+  index: number;
+  mainImage: string;
+  pricing: {
+    basePrice: number;
+    salePrice: number;
+    discountPercentage: number;
+  };
+  products: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    mainImage: string;
+    basePrice: number;
+    selectedOptions: Record<string, SelectedOptionType>;
+  }>;
+};
+
+type CartItemType = CartProductItemType | CartUpsellItemType;
+
+// Props Interfaces for Sub-Components
+interface OrderSummaryProps {
+  selectedItems: Set<string>;
+  getSelectedCartItems: () => CartItemType[];
+  calculateTotal: () => number;
+  toggleAll: () => void;
+  cartItems: CartItemType[];
+}
+
+interface MobileOrderSummaryProps {
+  selectedItems: Set<string>;
+  getSelectedCartItems: () => CartItemType[];
+  calculateTotal: () => number;
+  toggleAll: () => void;
+}
+
 export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set(cartItems.map((item) => item.variantId)));
   const [deselectedItems, setDeselectedItems] = useState<Set<string>>(new Set());
@@ -79,7 +141,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
     return cartItems.filter((item) => selectedItems.has(item.variantId));
   };
 
-  const formatOptions = (options: Record<string, SelectedOptionType>, type = "product") => {
+  const formatOptions = (options: Record<string, SelectedOptionType>, type: "product" | "upsell" = "product") => {
     const entries = Object.entries(options || {});
     if (entries.length === 0) return null;
 
@@ -279,98 +341,18 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
           </div>
         </div>
       </div>
-      <div className="hidden md:flex flex-col gap-3 h-max min-w-[276px] max-w-[276px] lg:min-w-[300px] lg:max-w-[300px] sticky top-16 select-none">
-        <div className="flex flex-col gap-2">
-          <div className="flex gap-[6px] items-center">
-            <TbLock className="stroke-green -ml-[1px]" size={20} />
-            <span className="text-sm text-gray">Secure Checkout with SSL Encryption</span>
-          </div>
-          <div className="flex gap-[6px] items-center">
-            <PiShieldCheckBold className="fill-green" size={18} />
-            <span className="text-sm text-gray ml-[1px]">Safe and Trusted Payment Methods</span>
-          </div>
-          <div className="flex gap-[6px] items-center">
-            <TbTruck className="stroke-green" size={20} />
-            <span className="text-sm text-gray">Free Shipping for You</span>
-          </div>
-        </div>
-        <div className="mb-2 flex items-baseline gap-1">
-          {selectedItems.size > 0 ? (
-            <>
-              <span className="text-sm font-semibold">
-                Total ({selectedItems.size} {selectedItems.size === 1 ? "Item" : "Items"}):
-              </span>
-              <div className="flex items-baseline">
-                <span className="text-sm font-semibold">$</span>
-                <span className="text-xl font-bold">{Math.floor(Number(calculateTotal()))}</span>
-                <span className="text-sm font-semibold">{(Number(calculateTotal()) % 1).toFixed(2).substring(1)}</span>
-              </div>
-            </>
-          ) : (
-            <button
-              onClick={toggleAll}
-              className="text-sm text-blue px-3 w-max h-8 rounded-full cursor-pointer flex items-center justify-center border border-[#d9d8d6] shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,_#faf9f8_5%,_#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear-gradient(to_bottom,_#eae8e6_5%,_#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_5px_rgba(0,0,0,0.1)]"
-            >
-              Select all items
-            </button>
-          )}
-        </div>
-        <div className={clsx(selectedItems.size ? "flex items-center mb-2" : "hidden")}>
-          <div className="h-[20px] rounded-[3px] flex items-center justify-center">
-            <Image
-              src="/images/payment-methods/visa.svg"
-              alt="Visa"
-              width={34}
-              height={34}
-              priority={true}
-              draggable={false}
-            />
-          </div>
-          <div className="ml-[10px] h-[18px] w-[36px] rounded-[3px] flex items-center justify-center">
-            <Image
-              className="-ml-[4px]"
-              src="/images/payment-methods/mastercard.svg"
-              alt="Mastercard"
-              width={38}
-              height={38}
-              priority={true}
-              draggable={false}
-            />
-          </div>
-          <div className="ml-[5px] h-[20px] overflow-hidden rounded-[3px] flex items-center justify-center">
-            <Image
-              src="/images/payment-methods/american-express.png"
-              alt="American Express"
-              width={60}
-              height={20}
-              priority={true}
-              draggable={false}
-            />
-          </div>
-          <div className="ml-[10px] h-[20px] rounded-[3px] flex items-center justify-center">
-            <Image
-              src="/images/payment-methods/discover.svg"
-              alt="Discover"
-              width={64}
-              height={14}
-              priority={true}
-              draggable={false}
-            />
-          </div>
-          <div className="ml-[10px] h-[20px] rounded-[3px] flex items-center justify-center">
-            <Image
-              src="/images/payment-methods/diners-club-international.svg"
-              alt="Diners Club International"
-              width={68}
-              height={10}
-              priority={true}
-              draggable={false}
-            />
-          </div>
-        </div>
-        {/* {selectedItems.size > 0 && <PayPalButton showLabel={true} cart={getSelectedCartItems()} />} */}
-      </div>
-      <MobilePriceDetails
+
+      {/* Order Summary Component */}
+      <OrderSummary
+        selectedItems={selectedItems}
+        getSelectedCartItems={getSelectedCartItems}
+        calculateTotal={calculateTotal}
+        toggleAll={toggleAll}
+        cartItems={cartItems}
+      />
+
+      {/* Mobile Order Summary */}
+      <MobileOrderSummary
         selectedItems={selectedItems}
         getSelectedCartItems={getSelectedCartItems}
         calculateTotal={calculateTotal}
@@ -380,89 +362,127 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
   );
 }
 
-// -- UI Components --
-
-function MobilePriceDetails({
+function OrderSummary({
   selectedItems,
   getSelectedCartItems,
   calculateTotal,
   toggleAll,
-}: {
-  selectedItems: Set<string>;
-  getSelectedCartItems: () => CartItemType[];
-  calculateTotal: () => number;
-  toggleAll: () => void;
-}) {
+  cartItems,
+}: OrderSummaryProps) {
+  const totalPrice = calculateTotal();
+
   return (
-    <div className="md:hidden pt-[6px] p-2 pb-5 border-t border-[#e6e8ec] bg-white fixed z-10 bottom-0 left-0 right-0">
-      <div className="flex gap-4 items-center justify-end mx-auto w-full max-w-[536px]">
-        <div className="w-max flex items-center gap-1">
-          {selectedItems.size > 0 ? (
-            <div className="flex items-baseline">
-              <span className="text-sm font-semibold">$</span>
-              <span className="text-lg font-bold">{Math.floor(Number(calculateTotal()))}</span>
-              <span className="text-sm font-semibold">{(Number(calculateTotal()) % 1).toFixed(2).substring(1)}</span>
+    <div className="hidden md:flex flex-col gap-3 h-max min-w-[276px] max-w-[276px] lg:min-w-[344px] lg:max-w-[344px] sticky top-16 select-none bg-white rounded-lg p-5 border border-gray-200 shadow-sm">
+      <div className="text-lg font-semibold text-gray-800 mb-2">Order Summary</div>
+
+      {selectedItems.size > 0 ? (
+        <>
+          <div className="space-y-1">
+            <div className="text-sm text-gray-600">
+              You're getting ({selectedItems.size} {selectedItems.size === 1 ? "item" : "items"})
             </div>
-          ) : (
-            <button
-              onClick={toggleAll}
-              className="text-sm text-blue px-3 w-max h-8 rounded-full cursor-pointer flex items-center justify-center border border-[#d9d8d6] shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,_#faf9f8_5%,_#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear-gradient(to_bottom,_#eae8e6_5%,_#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_5px_rgba(0,0,0,0.1)]"
-            >
-              Select all items
-            </button>
-          )}
+            <div className="text-sm font-medium text-green-500">FREE shipping</div>
+          </div>
+
+          <div className="py-3 border-b border-gray-200">
+            <div className="flex justify-between items-center font-semibold">
+              <span className="text-gray-800">Total</span>
+              <div className="flex items-baseline">
+                <span className="text-sm">$</span>
+                <span className="text-xl">{Math.floor(totalPrice)}</span>
+                <span className="text-sm">{(totalPrice % 1).toFixed(2).substring(1)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="py-4 space-y-4">
+            <div className="grid grid-cols-5 gap-1 items-center">
+              <Image
+                src="/images/payment-methods/visa.svg"
+                alt="Visa"
+                width={34}
+                height={20}
+                className="object-contain"
+              />
+              <Image
+                src="/images/payment-methods/mastercard.svg"
+                alt="Mastercard"
+                width={34}
+                height={20}
+                className="object-contain"
+              />
+              <Image
+                src="/images/payment-methods/american-express.png"
+                alt="American Express"
+                width={34}
+                height={20}
+                className="object-contain"
+              />
+              <Image
+                src="/images/payment-methods/discover.svg"
+                alt="Discover"
+                width={34}
+                height={20}
+                className="object-contain"
+              />
+              <Image
+                src="/images/payment-methods/diners-club-international.svg"
+                alt="Diners Club"
+                width={34}
+                height={20}
+                className="object-contain"
+              />
+            </div>
+
+            <PayPalButton showLabel={true} cart={getSelectedCartItems()} />
+          </div>
+
+          <div className="pt-2 space-y-2 text-xs">
+            <div className="flex gap-2 items-center text-gray-600">
+              <TbLock size={16} className="text-green-500" />
+              <span>Secure checkout with SSL encryption</span>
+            </div>
+            <div className="flex gap-2 items-center text-gray-600">
+              <PiShieldCheckBold size={14} className="text-green-500" />
+              <span>Safe and trusted payment methods</span>
+            </div>
+            <div className="flex gap-2 items-center text-gray-600">
+              <TbTruck size={16} className="text-green-500" />
+              <span>Free shipping on all orders</span>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="flex flex-col items-center py-6 space-y-4">
+          <div className="bg-gray-100 p-3 rounded-full">
+            <Gift size={24} className="text-gray" />
+          </div>
+          <div className="text-center">
+            <h3 className="font-medium">Your cart is waiting</h3>
+            <p className="text-sm text-gray mt-1">Select items to complete your purchase</p>
+          </div>
+          <button
+            onClick={toggleAll}
+            className="w-full py-2.5 rounded-full text-blue cursor-pointer flex items-center justify-center border border-[#d9d8d6] shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,_#faf9f8_5%,_#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear-gradient(to_bottom,_#eae8e6_5%,_#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_5px_rgba(0,0,0,0.1)]"
+          >
+            Select all items
+          </button>
         </div>
-        {/* <div className="w-[200px] h-[35px]">
-          {selectedItems.size > 0 && <PayPalButton showLabel={false} cart={getSelectedCartItems()} />}
-        </div> */}
-      </div>
+      )}
     </div>
   );
 }
 
-// -- Type Definitions --
+// Mobile Order Summary Component
+function MobileOrderSummary({
+  selectedItems,
+  getSelectedCartItems,
+  calculateTotal,
+  toggleAll,
+}: MobileOrderSummaryProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
 
-type SelectedOptionType = {
-  value: string;
-  optionDisplayOrder: number;
-  groupDisplayOrder: number;
-};
+  const total = calculateTotal();
 
-type CartProductItemType = {
-  type: "product";
-  baseProductId: string;
-  name: string;
-  slug: string;
-  pricing: {
-    basePrice: number;
-    salePrice: number;
-    discountPercentage: number;
-  };
-  mainImage: string;
-  variantId: string;
-  selectedOptions: Record<string, SelectedOptionType>;
-  index: number;
-};
-
-type CartUpsellItemType = {
-  type: "upsell";
-  baseUpsellId: string;
-  variantId: string;
-  index: number;
-  mainImage: string;
-  pricing: {
-    basePrice: number;
-    salePrice: number;
-    discountPercentage: number;
-  };
-  products: Array<{
-    id: string;
-    name: string;
-    slug: string;
-    mainImage: string;
-    basePrice: number;
-    selectedOptions: Record<string, SelectedOptionType>;
-  }>;
-};
-
-type CartItemType = CartProductItemType | CartUpsellItemType;
+  return <div>...</div>;
+}
