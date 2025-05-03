@@ -98,7 +98,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
 
     const getClassNames = () => {
       if (type === "upsell") {
-        return "inline-flex text-xs px-1.5 py-0.5 rounded border border-[#fceddf] text-neutral-500 bg-rose-50/70";
+        return "inline-flex text-xs px-1.5 py-0.5 rounded border border-blue-200/70 text-gray bg-blue-50";
       }
       return "inline-flex text-xs px-1.5 py-0.5 rounded bg-[#F7F7F7] text-neutral-500";
     };
@@ -127,11 +127,11 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
               <div
                 onClick={toggleAll}
                 className={clsx(
-                  "w-5 h-5 cursor-pointer rounded-full flex items-center justify-center ease-in-out duration-200 transition",
+                  "w-[18px] h-[18px] cursor-pointer rounded-full flex items-center justify-center ease-in-out duration-200 transition",
                   selectedItems.size === cartItems.length ? "bg-black" : "border border-neutral-400"
                 )}
               >
-                {selectedItems.size === cartItems.length && <Check color="#ffffff" size={16} strokeWidth={2} />}
+                {selectedItems.size === cartItems.length && <Check color="#ffffff" size={12} strokeWidth={2} />}
               </div>
             </div>
             <span className="font-semibold">
@@ -151,56 +151,58 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                       <div
                         onClick={() => toggleItem(item.variantId)}
                         className={clsx(
-                          "w-5 h-5 cursor-pointer rounded-full flex items-center justify-center ease-in-out duration-200 transition",
+                          "w-[18px] h-[18px] cursor-pointer rounded-full flex items-center justify-center ease-in-out duration-200 transition",
                           isSelected ? "bg-black" : "border border-neutral-400"
                         )}
                       >
-                        {isSelected && <Check color="#ffffff" size={16} strokeWidth={2} />}
+                        {isSelected && <Check color="#ffffff" size={12} strokeWidth={2} />}
                       </div>
                     </div>
-                    <div>
-                      <div className="min-[580px]:hidden flex items-center justify-center min-w-[108px] max-w-[108px] min-h-[108px] max-h-[108px] overflow-hidden rounded-lg">
-                        <Image src={item.mainImage} alt={item.name} width={108} height={108} priority />
+                    <div className="flex gap-4 w-[calc(100%-32px)] p-5 pr-0 rounded-lg border border-gray-200/80">
+                      <div>
+                        <div className="min-[580px]:hidden flex items-center justify-center min-w-[108px] max-w-[108px] min-h-[108px] max-h-[108px] overflow-hidden rounded-lg">
+                          <Image src={item.mainImage} alt={item.name} width={108} height={108} priority />
+                        </div>
+                        <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
+                          <Image src={item.mainImage} alt={item.name} width={128} height={128} priority />
+                        </div>
                       </div>
-                      <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
-                        <Image src={item.mainImage} alt={item.name} width={128} height={128} priority />
-                      </div>
-                    </div>
-                    <div className="w-full pr-3 flex flex-col gap-1">
-                      <div className="min-w-full h-5 flex items-center justify-between gap-3">
-                        <Link
-                          href={`${item.slug}-${item.baseProductId}`}
-                          target="_blank"
-                          className="text-xs line-clamp-1 hover:underline"
-                        >
-                          {item.name}
-                        </Link>
-                        <RemoveFromCartButton type="product" variantId={item.variantId} />
-                      </div>
-                      {formatOptions(item.selectedOptions)}
-                      <div className="mt-1 w-max flex items-center justify-center">
-                        {Number(item.pricing.salePrice) ? (
-                          <div className="flex items-center gap-[6px]">
-                            <div className="flex items-baseline text-[rgb(168,100,0)]">
-                              <span className="text-[0.813rem] leading-3 font-semibold">$</span>
-                              <span className="text-lg font-bold">{Math.floor(Number(item.pricing.salePrice))}</span>
-                              <span className="text-[0.813rem] leading-3 font-semibold">
-                                {(Number(item.pricing.salePrice) % 1).toFixed(2).substring(1)}
+                      <div className="w-full pr-3 flex flex-col gap-1">
+                        <div className="min-w-full h-5 flex items-center justify-between gap-3">
+                          <Link
+                            href={`${item.slug}-${item.baseProductId}`}
+                            target="_blank"
+                            className="text-xs line-clamp-1 hover:underline"
+                          >
+                            {item.name}
+                          </Link>
+                          <RemoveFromCartButton type="product" variantId={item.variantId} />
+                        </div>
+                        {formatOptions(item.selectedOptions)}
+                        <div className="mt-1 w-max flex items-center justify-center">
+                          {Number(item.pricing.salePrice) ? (
+                            <div className="flex items-center gap-[6px]">
+                              <div className="flex items-baseline text-[rgb(168,100,0)]">
+                                <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                                <span className="text-lg font-bold">{Math.floor(Number(item.pricing.salePrice))}</span>
+                                <span className="text-[0.813rem] leading-3 font-semibold">
+                                  {(Number(item.pricing.salePrice) % 1).toFixed(2).substring(1)}
+                                </span>
+                              </div>
+                              <span className="text-[0.813rem] leading-3 text-gray line-through">
+                                ${formatThousands(Number(item.pricing.basePrice))}
                               </span>
                             </div>
-                            <span className="text-[0.813rem] leading-3 text-gray line-through">
-                              ${formatThousands(Number(item.pricing.basePrice))}
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="flex items-baseline">
-                            <span className="text-[0.813rem] leading-3 font-semibold">$</span>
-                            <span className="text-lg font-bold">{Math.floor(Number(item.pricing.basePrice))}</span>
-                            <span className="text-[0.813rem] leading-3 font-semibold">
-                              {(Number(item.pricing.basePrice) % 1).toFixed(2).substring(1)}
-                            </span>
-                          </div>
-                        )}
+                          ) : (
+                            <div className="flex items-baseline">
+                              <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                              <span className="text-lg font-bold">{Math.floor(Number(item.pricing.basePrice))}</span>
+                              <span className="text-[0.813rem] leading-3 font-semibold">
+                                {(Number(item.pricing.basePrice) % 1).toFixed(2).substring(1)}
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -212,14 +214,14 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                       <div
                         onClick={() => toggleItem(item.variantId)}
                         className={clsx(
-                          "w-5 h-5 cursor-pointer rounded-full flex items-center justify-center ease-in-out duration-200 transition",
+                          "w-[18px] h-[18px] cursor-pointer rounded-full flex items-center justify-center ease-in-out duration-200 transition",
                           isSelected ? "bg-black" : "border border-neutral-400"
                         )}
                       >
-                        {isSelected && <Check color="#ffffff" size={16} strokeWidth={2} />}
+                        {isSelected && <Check color="#ffffff" size={12} strokeWidth={2} />}
                       </div>
                     </div>
-                    <div className="relative w-[calc(100%-32px)] p-5 rounded-lg bg-[#fffbf6] border border-[#fceddf]">
+                    <div className="relative w-[calc(100%-32px)] p-5 rounded-lg bg-blue-50 border border-blue-200/50">
                       <div className="flex items-center justify-between mb-4">
                         <div className="min-w-full h-5 flex gap-5 items-center justify-center">
                           <div className="w-max flex items-center justify-center">
@@ -255,13 +257,13 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                         {item.products.map((product) => (
                           <div
                             key={product.id}
-                            className="bg-white bg-opacity-80 backdrop-blur-sm rounded-lg p-3 border border-[#fceddf] shadow-sm transition-all duration-200 hover:shadow-md hover:bg-opacity-100"
+                            className="bg-white bg-opacity-80 backdrop-blur-sm rounded-lg p-3 border border-blue-200/50 shadow-sm transition-all duration-200 hover:shadow-md hover:bg-opacity-100"
                           >
                             <div className="flex gap-4">
-                              <div className="min-[580px]:hidden flex items-center justify-center min-w-[80px] max-w-[80px] min-h-[80px] max-h-[80px] overflow-hidden rounded-lg bg-gradient-to-br from-amber-50 to-amber-100 border border-[#fceddf]">
+                              <div className="min-[580px]:hidden flex items-center justify-center min-w-[80px] max-w-[80px] min-h-[80px] max-h-[80px] overflow-hidden rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200/50">
                                 <Image src={product.mainImage} alt={product.name} width={80} height={80} priority />
                               </div>
-                              <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[120px] min-[580px]:max-w-[120px] min-[580px]:min-h-[120px] min-[580px]:max-h-[120px] overflow-hidden rounded-lg bg-gradient-to-br from-amber-50 to-amber-120 border border-[#fceddf]">
+                              <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[120px] min-[580px]:max-w-[120px] min-[580px]:min-h-[120px] min-[580px]:max-h-[120px] overflow-hidden rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200/50">
                                 <Image src={product.mainImage} alt={product.name} width={120} height={120} priority />
                               </div>
                               <div className="space-y-3">
