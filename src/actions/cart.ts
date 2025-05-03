@@ -214,3 +214,86 @@ export async function AddToCartAction(data: {
     };
   }
 }
+
+export async function RemoveFromCartAction({ variantId }: { variantId: string }) {
+  try {
+    const cookieStore = await cookies();
+    const deviceIdentifier = cookieStore.get("device_identifier")?.value;
+    if (!deviceIdentifier) return { type: ShowAlertType.ERROR, message: "Cart not found" };
+
+    const snapshot = await adminDb
+      .collection("carts")
+      .where("device_identifier", "==", deviceIdentifier)
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) return { type: ShowAlertType.ERROR, message: "Cart not found" };
+
+    const cartDoc = snapshot.docs[0];
+    const existingItems = cartDoc.data().items;
+    const filteredItems = existingItems
+      .filter((item: { variantId: string }) => item.variantId !== variantId)
+      .map((item: any, index: number) => ({ ...item, index: index + 1 }));
+
+    if (filteredItems.length === 0) {
+      await cartDoc.ref.delete();
+      const cookieStore = await cookies();
+      cookieStore.delete("device_identifier");
+    } else {
+      await cartDoc.ref.update({
+        items: filteredItems,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+    }
+
+    revalidatePath("/cart");
+    return { type: ShowAlertType.SUCCESS, message: "Item removed from cart" };
+  } catch (error) {
+    console.error("Remove item error:", error);
+    return {
+      type: ShowAlertType.ERROR,
+      message: "Please reload and try again",
+    };
+  }
+}
+
+export async function ClearPurchasedItemsAction({ variantIds }: { variantIds: string[] }) {
+  try {
+    const cookieStore = await cookies();
+    const deviceIdentifier = cookieStore.get("device_identifier")?.value;
+    if (!deviceIdentifier) return { type: ShowAlertType.ERROR, message: "Cart not found" };
+
+    const snapshot = await adminDb
+      .collection("carts")
+      .where("device_identifier", "==", deviceIdentifier)
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) return { type: ShowAlertType.ERROR, message: "Cart not found" };
+
+    const cartDoc = snapshot.docs[0];
+    const existingItems = cartDoc.data().items || [];
+    const remainingItems = existingItems
+      .filter((item: { variantId: string }) => !variantIds.includes(item.variantId))
+      .map((item: any, index: number) => ({ ...item, index: index + 1 }));
+
+    if (remainingItems.length === 0) {
+      await cartDoc.ref.delete();
+      cookieStore.delete("device_identifier");
+    } else {
+      await cartDoc.ref.update({
+        items: remainingItems,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+    }
+
+    revalidatePath("/cart");
+    return {
+      type: ShowAlertType.SUCCESS,
+      message: "Cart updated successfully",
+    };
+  } catch (error) {
+    console.error("Clear purchased error:", error);
+    return { type: ShowAlertType.ERROR, message: "Failed to update cart" };
+  }
+}

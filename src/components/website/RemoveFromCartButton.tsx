@@ -1,8 +1,8 @@
 "use client";
 
 import { useTransition } from "react";
-import { Trash, Trash2 } from "lucide-react";
-// import { RemoveFromCartAction } from "@/actions/cart";
+import { Trash2 } from "lucide-react";
+import { RemoveFromCartAction } from "@/actions/cart";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { DashSpinner } from "@/ui/Spinners/DashSpinner";
@@ -14,16 +14,13 @@ export function RemoveFromCartButton({ type, variantId }: { type: "product" | "u
   const showAlert = useAlertStore((state) => state.showAlert);
 
   const handleRemove = () => {
-    // startTransition(async () => {
-    //   const result = await RemoveFromCartAction({ variantId });
-    //   showAlert({
-    //     message: result.message,
-    //     type:
-    //       result.type === ShowAlertType.ERROR
-    //         ? ShowAlertType.ERROR
-    //         : ShowAlertType.NEUTRAL,
-    //   });
-    // });
+    startTransition(async () => {
+      const result = await RemoveFromCartAction({ variantId });
+      showAlert({
+        message: result.message,
+        type: result.type === ShowAlertType.ERROR ? ShowAlertType.ERROR : ShowAlertType.NEUTRAL,
+      });
+    });
   };
 
   return (
