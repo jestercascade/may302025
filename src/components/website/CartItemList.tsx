@@ -381,7 +381,7 @@ function OrderSummary({
             <div className="text-sm text-gray-600">
               You're getting ({selectedItems.size} {selectedItems.size === 1 ? "item" : "items"})
             </div>
-            <div className="text-sm font-medium text-green-500">FREE shipping</div>
+            <div className="text-sm font-medium text-green">FREE shipping</div>
           </div>
 
           <div className="py-3 border-b border-gray-200">
@@ -439,15 +439,15 @@ function OrderSummary({
 
           <div className="pt-2 space-y-2 text-xs">
             <div className="flex gap-2 items-center text-gray-600">
-              <TbLock size={16} className="text-green-500" />
+              <TbLock size={16} className="text-green" />
               <span>Secure checkout with SSL encryption</span>
             </div>
             <div className="flex gap-2 items-center text-gray-600">
-              <PiShieldCheckBold size={14} className="text-green-500" />
+              <PiShieldCheckBold size={14} className="text-green" />
               <span>Safe and trusted payment methods</span>
             </div>
             <div className="flex gap-2 items-center text-gray-600">
-              <TbTruck size={16} className="text-green-500" />
+              <TbTruck size={16} className="text-green" />
               <span>Free shipping on all orders</span>
             </div>
           </div>
