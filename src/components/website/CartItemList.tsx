@@ -216,9 +216,6 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                           <div className="w-max flex items-center justify-center">
                             {Number(item.pricing.salePrice) ? (
                               <div className="flex items-center gap-[6px]">
-                                <span className="text-[0.813rem] leading-3 text-gray line-through">
-                                  ${formatThousands(Number(item.pricing.basePrice))}
-                                </span>
                                 <div className="flex items-baseline text-[rgb(168,100,0)]">
                                   <span className="text-[0.813rem] leading-3 font-semibold">$</span>
                                   <span className="text-lg font-bold">
@@ -228,6 +225,9 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                                     {(Number(item.pricing.salePrice) % 1).toFixed(2).substring(1)}
                                   </span>
                                 </div>
+                                <span className="text-[0.813rem] leading-3 text-gray line-through">
+                                  ${formatThousands(Number(item.pricing.basePrice))}
+                                </span>
                               </div>
                             ) : (
                               <div className="flex items-baseline text-[rgb(168,100,0)]">
