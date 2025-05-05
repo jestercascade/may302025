@@ -2,7 +2,7 @@
 
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { useOptionsStore } from "@/zustand/website/optionsStore";
-import { useTransition, useState, useEffect } from "react";
+import { useTransition, useEffect, useState, useRef } from "react";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { AddToCartAction } from "@/actions/cart";
 import { UpsellReviewButton } from "../UpsellReviewOverlay";
@@ -36,39 +36,100 @@ type CartType = {
   updatedAt: string;
 };
 
+// This interface tracks what configurations have been added to the cart
+interface CartTrackingItem {
+  productId: string;
+  options: Record<string, string>;
+}
+
 export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithUpsellType; cart: CartType | null }) {
   const [isPending, startTransition] = useTransition();
-  const [localIsInCart, setLocalIsInCart] = useState(false);
   const { showAlert } = useAlertStore();
-  const { selectedOptions } = useOptionsStore();
+  const { selectedOptions, isInCart, setIsInCart } = useOptionsStore();
+  // Track cart items locally for overlay state management
+  const [cartTracking, setCartTracking] = useState<CartTrackingItem[]>([]);
   const pathname = usePathname();
   const { push } = useRouter();
   const hideQuickviewOverlay = useQuickviewStore((state) => state.hideOverlay);
   const hideUpsellReviewOverlay = useUpsellReviewStore((state) => state.hideOverlay);
+  const productIdRef = useRef(product.id);
 
-  // Check if product is in cart on initial render and when cart changes
+  // When the component mounts or when the cart updates, initialize our local cart tracking
   useEffect(() => {
-    setLocalIsInCart(checkIsProductInCart());
-  }, [cart, selectedOptions]);
+    if (cart?.items && product.options?.groups) {
+      const initialTracking: CartTrackingItem[] = [];
 
-  const handleInCartButtonClick = () => {
-    if (pathname === "/cart") {
-      hideUpsellReviewOverlay();
-      hideQuickviewOverlay();
+      cart.items.forEach((item) => {
+        if (item.type === "product") {
+          const options: Record<string, string> = {};
 
-      const scrollableParent = document.getElementById("scrollable-parent");
-      if (scrollableParent) {
-        scrollableParent.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        });
-      }
-    } else {
-      push("/cart");
+          // Convert the cart item options to our simplified format
+          for (const [key, opt] of Object.entries(item.selectedOptions)) {
+            options[key] = opt.value;
+          }
+
+          initialTracking.push({
+            productId: item.baseProductId,
+            options,
+          });
+        }
+      });
+
+      setCartTracking(initialTracking);
     }
+  }, [cart, product.id]);
+
+  // Reset in-cart state when product changes
+  useEffect(() => {
+    if (productIdRef.current !== product.id) {
+      setIsInCart(false);
+      productIdRef.current = product.id;
+    }
+  }, [product.id, setIsInCart]);
+
+  // When selected options change, check if current configuration is in cart
+  useEffect(() => {
+    if (product.options?.groups) {
+      const currentInCart = isCurrentSelectionInCart();
+      setIsInCart(currentInCart);
+    }
+  }, [selectedOptions, cartTracking]);
+
+  // Determine if the current selection is already in the cart
+  const isCurrentSelectionInCart = (): boolean => {
+    if (!product.options?.groups) return false;
+
+    // Build current selection options
+    const currentSelectedValues: Record<string, string> = {};
+    for (const [groupIdStr, optionId] of Object.entries(selectedOptions)) {
+      if (optionId === null || optionId === undefined) continue;
+
+      const groupId = Number(groupIdStr);
+      const group = product.options.groups.find((g) => g.id === groupId);
+
+      if (group) {
+        const option = group.values.find((v) => v.id === optionId);
+        if (option) {
+          currentSelectedValues[group.name.toLowerCase()] = option.value;
+        }
+      }
+    }
+
+    // Check if this configuration exists in our tracked cart
+    return cartTracking.some((item) => {
+      if (item.productId !== product.id) return false;
+
+      const itemKeys = Object.keys(item.options);
+      const currentKeys = Object.keys(currentSelectedValues);
+
+      if (itemKeys.length !== currentKeys.length) return false;
+
+      return currentKeys.every((key) => item.options[key] === currentSelectedValues[key]);
+    });
   };
 
-  const checkIsProductInCart = (): boolean => {
+  // Check if the product is in the server cart
+  const isProductInCart = (): boolean => {
     if (!cart?.items || !product.options?.groups) return false;
 
     const currentSelectedValues: Record<string, string> = {};
@@ -105,6 +166,23 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
     });
   };
 
+  const handleInCartButtonClick = () => {
+    if (pathname === "/cart") {
+      hideUpsellReviewOverlay();
+      hideQuickviewOverlay();
+
+      const scrollableParent = document.getElementById("scrollable-parent");
+      if (scrollableParent) {
+        scrollableParent.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }
+    } else {
+      push("/cart");
+    }
+  };
+
   const handleAddToCart = async () => {
     if (!product.options?.groups) {
       return showAlert({
@@ -135,6 +213,7 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
     startTransition(async () => {
       try {
         const readableSelectedOptions: Record<string, SelectedOptionType> = {};
+        const simpleSelectedOptions: Record<string, string> = {};
 
         for (const [groupIdStr, optionId] of Object.entries(selectedOptions)) {
           if (optionId === null || optionId === undefined) continue;
@@ -152,6 +231,9 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
                 optionDisplayOrder: optionIndex,
                 groupDisplayOrder: group.displayOrder,
               };
+
+              // Also store a simplified version
+              simpleSelectedOptions[groupNameLower] = option.value;
             }
           }
         }
@@ -162,17 +244,22 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
           selectedOptions: readableSelectedOptions,
         });
 
-        console.log("Successful");
-
-        // If the add to cart was successful, update our local in-cart state
-        if (result.type !== ShowAlertType.ERROR) {
-          setLocalIsInCart(true);
-        }
-
         showAlert({
           message: result.message,
           type: result.type === ShowAlertType.ERROR ? ShowAlertType.ERROR : ShowAlertType.SUCCESS,
         });
+
+        // On success, update our cart tracking
+        if (result.type === ShowAlertType.SUCCESS) {
+          setCartTracking((prev) => [
+            ...prev,
+            {
+              productId: product.id,
+              options: simpleSelectedOptions,
+            },
+          ]);
+          setIsInCart(true);
+        }
       } catch (error) {
         console.error("Add to cart error:", error);
         showAlert({
@@ -183,8 +270,7 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
     });
   };
 
-  // Use both our local state and the cart check to determine if product is in cart
-  const productAlreadyInCart = localIsInCart || checkIsProductInCart();
+  const productAlreadyInCart = isCurrentSelectionInCart();
 
   return (
     <>
