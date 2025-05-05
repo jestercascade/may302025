@@ -373,7 +373,7 @@ function OrderSummary({
 
   return (
     <div className="hidden md:flex flex-col gap-3 h-max min-w-[276px] max-w-[276px] lg:min-w-[344px] lg:max-w-[344px] sticky top-16 select-none bg-white rounded-lg p-5 border border-gray-200 shadow-sm">
-      <div className="text-lg font-semibold text-gray-800 mb-2">Order Summary</div>
+      <div className="text-lg font-semibold mb-2">Order Summary</div>
 
       {selectedItems.size > 0 ? (
         <>
@@ -386,7 +386,7 @@ function OrderSummary({
 
           <div className="py-3 border-b border-gray-200">
             <div className="flex justify-between items-center font-semibold">
-              <span className="text-gray-800">Total</span>
+              <span>Total</span>
               <div className="flex items-baseline">
                 <span className="text-sm">$</span>
                 <span className="text-xl">{Math.floor(totalPrice)}</span>
