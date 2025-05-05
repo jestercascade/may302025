@@ -175,15 +175,6 @@ async function checkDocumentsExist(
 
 // --- Type Definitions ---
 
-type CartProductItemType = {
-  index: number;
-  baseProductId: string;
-  variantId: string;
-  color: string;
-  size: string;
-  type: "product";
-};
-
 type CartUpsellItemType = {
   index: number;
   baseUpsellId: string;
@@ -194,12 +185,4 @@ type CartUpsellItemType = {
     color: string;
     size: string;
   }>;
-};
-
-type CartType = {
-  id: string;
-  device_identifier: any;
-  items: (CartProductItemType | CartUpsellItemType)[];
-  createdAt: string;
-  updatedAt: string;
 };

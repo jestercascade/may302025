@@ -16,11 +16,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function NewArrivals({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string }>;
-}) {
+export default async function NewArrivals({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
   const { page = "1" } = await searchParams;
   const currentPage = Number(page) || 1;
 
@@ -60,11 +56,7 @@ export default async function NewArrivals({
       <div className="max-w-5xl mx-auto px-5 pt-4">
         <div className="select-none w-full flex flex-wrap gap-2 md:gap-0">
           {products.map((product, index) => (
-            <ProductCard
-              key={product.id || index}
-              product={product}
-              cart={cart}
-            />
+            <ProductCard key={product.id || index} product={product} cart={cart} />
           ))}
         </div>
         <Pagination currentPage={currentPageAdjusted} totalPages={totalPages} />

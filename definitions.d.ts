@@ -287,30 +287,17 @@ type SubscriberType = {
 };
 
 type CartProductItemType = {
-  index: number;
-  baseProductId: string;
-  variantId: string;
-  color: string;
-  size: string;
   type: "product";
-};
-
-type CartUpsellItemType = {
-  index: number;
-  baseUpsellId: string;
+  baseProductId: string;
+  selectedOptions: Record<string, SelectedOptionType>;
   variantId: string;
-  type: "upsell";
-  products: Array<{
-    id: string;
-    color: string;
-    size: string;
-  }>;
+  index: number;
 };
 
 type CartType = {
   id: string;
   device_identifier: string;
-  items: Array<CartProductItemType | CartUpsellItemType>;
+  items: CartProductItemType[];
   createdAt: string;
   updatedAt: string;
 };

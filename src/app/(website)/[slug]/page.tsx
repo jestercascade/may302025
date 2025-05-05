@@ -79,6 +79,8 @@ export default async function ProductDetails({ params }: { params: Promise<{ slu
     }),
   ]);
 
+  console.log(cart);
+
   const product = fetchedProducts?.[0] as ProductWithUpsellType;
 
   if (!product) {
