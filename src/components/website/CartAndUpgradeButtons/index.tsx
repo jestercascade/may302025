@@ -2,7 +2,7 @@
 
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { useOptionsStore } from "@/zustand/website/optionsStore";
-import { useTransition } from "react";
+import { useTransition, useState, useEffect } from "react";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { AddToCartAction } from "@/actions/cart";
 import { UpsellReviewButton } from "../UpsellReviewOverlay";
@@ -38,12 +38,18 @@ type CartType = {
 
 export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithUpsellType; cart: CartType | null }) {
   const [isPending, startTransition] = useTransition();
+  const [localIsInCart, setLocalIsInCart] = useState(false);
   const { showAlert } = useAlertStore();
   const { selectedOptions } = useOptionsStore();
   const pathname = usePathname();
   const { push } = useRouter();
   const hideQuickviewOverlay = useQuickviewStore((state) => state.hideOverlay);
   const hideUpsellReviewOverlay = useUpsellReviewStore((state) => state.hideOverlay);
+
+  // Check if product is in cart on initial render and when cart changes
+  useEffect(() => {
+    setLocalIsInCart(checkIsProductInCart());
+  }, [cart, selectedOptions]);
 
   const handleInCartButtonClick = () => {
     if (pathname === "/cart") {
@@ -62,7 +68,7 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
     }
   };
 
-  const isProductInCart = (): boolean => {
+  const checkIsProductInCart = (): boolean => {
     if (!cart?.items || !product.options?.groups) return false;
 
     const currentSelectedValues: Record<string, string> = {};
@@ -156,6 +162,13 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
           selectedOptions: readableSelectedOptions,
         });
 
+        console.log("Successful");
+
+        // If the add to cart was successful, update our local in-cart state
+        if (result.type !== ShowAlertType.ERROR) {
+          setLocalIsInCart(true);
+        }
+
         showAlert({
           message: result.message,
           type: result.type === ShowAlertType.ERROR ? ShowAlertType.ERROR : ShowAlertType.SUCCESS,
@@ -170,7 +183,8 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
     });
   };
 
-  const productAlreadyInCart = isProductInCart();
+  // Use both our local state and the cart check to determine if product is in cart
+  const productAlreadyInCart = localIsInCart || checkIsProductInCart();
 
   return (
     <>

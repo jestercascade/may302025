@@ -4,6 +4,7 @@ import { SizeChartOverlay, UpsellReviewOverlay } from "@/components/website/Dyna
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 import { CartAndUpgradeButtons } from "../CartAndUpgradeButtons";
 import { ProductDetailsOptions } from "@/components/website/Options/ProductDetailsOptions";
+import { QuickviewOptions } from "@/components/website/Options/QuickviewOptions";
 import { useProductColorImageStore } from "@/zustand/website/productColorImageStore";
 import { useState, useMemo } from "react";
 import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
@@ -195,7 +196,11 @@ const MemoizedMobileProductDetails = memo(function MobileProductDetails({
                   </div>
                 )}
               </div>
-              <ProductDetailsOptions options={selectedProduct.options} isStickyBarInCartIndicator={false} />
+              <QuickviewOptions
+                productId={selectedProduct.id}
+                options={selectedProduct.options}
+                isStickyBarInCartIndicator={false}
+              />
             </div>
           </div>
           <div>
@@ -371,7 +376,11 @@ const MemoizedDesktopProductDetails = memo(function DesktopProductDetails({
                     </div>
                   )}
                 </div>
-                <ProductDetailsOptions options={selectedProduct.options} isStickyBarInCartIndicator={false} />
+                <QuickviewOptions
+                  productId={selectedProduct.id}
+                  options={selectedProduct.options}
+                  isStickyBarInCartIndicator={false}
+                />
               </div>
             </div>
             {selectedProduct.upsell &&
