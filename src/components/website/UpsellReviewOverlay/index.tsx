@@ -520,7 +520,8 @@ import styles from "./styles.module.css";
 import { usePathname, useRouter } from "next/navigation";
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 import { Spinner } from "@/ui/Spinners/Default";
-import { X, ChevronRight, Check, ChevronDown } from "lucide-react";
+import { X, Ruler, ChevronRight, Check, ChevronDown } from "lucide-react";
+import { useOverlayStore } from "@/zustand/website/overlayStore";
 
 // -- UpsellReviewButton Component --
 
@@ -634,6 +635,8 @@ function UpsellProductSummary({ product, selectedOptions, onSelectOptions }) {
 
 function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelected, onClose }) {
   const [localSelectedOptions, setLocalSelectedOptions] = useState(currentSelectedOptions || {});
+  const showOverlay = useOverlayStore((state) => state.showOverlay);
+  const productDetailsPage = useOverlayStore((state) => state.pages.productDetails);
 
   const requiredGroups = product.options.groups.filter((group) => group.values.some((opt) => opt.isActive));
   const isAllSelected = requiredGroups.every((group) => localSelectedOptions[group.id] !== undefined);
@@ -650,19 +653,40 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
       .map((col) => ({ label: col.label, value: row[col.label] }));
   };
 
+  // Constants for size labels and country codes
+  const sizeLabels = new Set(["XXXS", "XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "2XL", "3XL", "4XL", "5XL"]);
+  const countryCodes = new Set(["US", "UK", "EU", "FR", "IT", "JP", "AU", "CN"]);
+
+  const formatMeasurement = (label, value) => {
+    if (sizeLabels.has(value) || countryCodes.has(value)) return value;
+    if (value.includes("'") || value.includes('"') || value.includes("cm") || value.includes("in")) return value;
+    if (/^\d+(\/\d+)?$/.test(value)) return value;
+    if (label.toLowerCase() === "height" && value.includes("-")) return value + "cm";
+    return value + " in";
+  };
+
+  const handleSizeChartClick = () => {
+    // Using the overlay store pattern from the reference code
+    if (typeof showOverlay === "function" && productDetailsPage) {
+      showOverlay({
+        pageName: productDetailsPage.name,
+        overlayName: productDetailsPage.overlays.sizeChart.name,
+      });
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-40">
-      <div className="bg-white rounded-2xl shadow-lg pt-4 pb-5 max-w-md w-full max-h-[90vh] flex flex-col">
-        <div className="flex justify-between items-center mb-2 pl-5 pr-4">
+      <div className="bg-white relative rounded-2xl shadow-lg py-5 max-w-md w-full max-h-[90vh] flex flex-col">
+        <div className="flex justify-between items-center mb-4 px-5">
           <h2 className="text-lg font-semibold">{product.name}</h2>
-          <button
-            onClick={onClose}
-            className="w-9 h-9 rounded-full flex items-center justify-center transition-colors active:bg-lightgray lg:hover:bg-lightgray"
-          >
-            <X color="#6c6c6c" strokeWidth={1.5} />
-          </button>
         </div>
-
+        <button
+          onClick={onClose}
+          className="w-9 h-9 rounded-full absolute top-[6px] right-[6px] flex items-center justify-center ease-in-out transition duration-300 active:bg-lightgray lg:hover:bg-lightgray"
+        >
+          <X color="#6c6c6c" strokeWidth={1.5} />
+        </button>
         <div className="overflow-y-auto flex-1 pl-5 pr-3 pb-5 rounded-y-scrollbar">
           <div className="mb-4">
             <Image
@@ -674,7 +698,7 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
             />
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             {product.options.groups
               .filter((group) => group.values.some((opt) => opt.isActive))
               .map((group) => (
@@ -702,13 +726,32 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
                         </button>
                       ))}
                   </div>
-                  {group.sizeChart && localSelectedOptions[group.id] && (
-                    <div className="mt-2 bg-gray-100 rounded-lg p-2">
-                      {getMeasurements(group, localSelectedOptions[group.id]).map((m) => (
-                        <div key={m.label} className="text-xs">
-                          {m.label}: {m.value}
+
+                  {group.name.toLowerCase() === "size" && localSelectedOptions[group.id] !== undefined && (
+                    <div className="mt-3">
+                      <div className="bg-neutral-50 rounded-lg px-3 py-2.5 border border-neutral-100">
+                        <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+                          {getMeasurements(group, localSelectedOptions[group.id]).map((m) => {
+                            if (!m.value) return null;
+                            return (
+                              <div key={m.label} className="flex items-center text-xs text-black">
+                                <span className="mr-1">{m.label}:</span>
+                                <span className="font-semibold">{formatMeasurement(m.label, m.value)}</span>
+                              </div>
+                            );
+                          })}
                         </div>
-                      ))}
+
+                        {group.sizeChart && (
+                          <button
+                            onClick={handleSizeChartClick}
+                            className="mt-2 text-xs text-blue hover:text-blue-dimmed transition-colors flex items-center"
+                          >
+                            <Ruler size={12} className="mr-1.5" />
+                            View Measurements
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
