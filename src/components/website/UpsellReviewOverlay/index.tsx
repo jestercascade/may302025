@@ -545,12 +545,6 @@ export function UpsellReviewButton({ product }) {
 }
 
 // -- UpsellProductSummary Component --
-
-import { Check } from "lucide-react";
-import Image from "next/image";
-import { ChevronDown } from "lucide-react";
-import clsx from "clsx";
-
 function UpsellProductSummary({ product, selectedOptions, onSelectOptions }) {
   const hasActiveOptions = product.options.groups.some((group) => group.values.some((opt) => opt.isActive));
   const isOptionsSelected =
