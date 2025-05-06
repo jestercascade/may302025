@@ -585,7 +585,7 @@ function UpsellProductSummary({ product, selectedOptions, onSelectOptions }) {
       </div>
       <div className="bg-white bg-opacity-80 backdrop-blur-sm rounded-lg p-3 border border-[#e5e7eb] shadow-sm transition-all duration-200 hover:shadow-md hover:bg-opacity-100 flex-1">
         <div className="flex gap-4">
-          <div className="flex items-center justify-center min-w-20 max-w-20 aspect-square overflow-hidden rounded-lg bg-gradient-to-br from-[#f3f4f6] to-[#e5e7eb] border border-[#e5e7eb]">
+          <div className="flex items-center justify-center min-w-[120px] max-w-[120px] aspect-square overflow-hidden rounded-lg bg-gradient-to-br from-[#f3f4f6] to-[#e5e7eb] border border-[#e5e7eb]">
             <Image
               src={product.images.main}
               alt={product.name}
@@ -613,13 +613,13 @@ function UpsellProductSummary({ product, selectedOptions, onSelectOptions }) {
             {showButton && (
               <button
                 onClick={() => onSelectOptions(product.id)}
-                className={`text-xs inline-flex items-center gap-1.5 transition-colors w-max font-medium ${
+                className={`text-xs inline-flex items-center gap-1 transition-colors w-max font-medium ${
                   buttonVariant === "filled"
-                    ? "px-2 py-1 rounded-md bg-[#e5e7eb] text-[#374151] hover:bg-[#d1d5db]"
-                    : "text-[#2563eb] hover:text-[#1d4ed8] hover:underline"
+                    ? "px-2 py-1 rounded bg-lightgray hover:bg-lightgray-dimmed"
+                    : "text-blue hover:text-blue-dimmed hover:underline"
                 }`}
               >
-                {buttonVariant === "filled" && <ChevronDown size={14} className="text-[#2563eb]" />}
+                {buttonVariant === "filled" && <ChevronDown size={14} />}
                 {buttonLabel}
               </button>
             )}
@@ -652,11 +652,14 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-40">
-      <div className="bg-white rounded-2xl shadow-lg py-5 max-w-md w-full max-h-[90vh] flex flex-col">
-        <div className="flex justify-between items-center mb-4 px-5">
+      <div className="bg-white rounded-2xl shadow-lg pt-4 pb-5 max-w-md w-full max-h-[90vh] flex flex-col">
+        <div className="flex justify-between items-center mb-2 pl-5 pr-4">
           <h2 className="text-lg font-semibold">{product.name}</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <X size={24} />
+          <button
+            onClick={onClose}
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-colors active:bg-lightgray lg:hover:bg-lightgray"
+          >
+            <X color="#6c6c6c" strokeWidth={1.5} />
           </button>
         </div>
 
