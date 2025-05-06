@@ -572,7 +572,7 @@ function UpsellProductSummary({ product, selectedOptions, onSelectOptions }) {
   const buttonLabel = isOptionsSelected ? "Change Options" : "Select Options";
 
   return (
-    <div className="flex items-start gap-3">
+    <div className="flex items-center gap-3">
       <div className="flex items-center justify-center">
         <div
           className={clsx(
