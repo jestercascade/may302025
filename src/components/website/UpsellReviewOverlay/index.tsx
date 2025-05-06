@@ -676,8 +676,8 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-40">
-      <div className="bg-white relative rounded-2xl shadow-lg py-5 max-w-md w-full max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-start pt-16 z-40">
+      <div className="bg-white relative rounded-2xl shadow-lg py-5 max-w-md w-full h-[calc(90vh)] max-h-[544px] flex flex-col">
         <div className="flex justify-between items-center mb-4 px-5">
           <h2 className="text-lg font-semibold">{product.name}</h2>
         </div>
@@ -688,16 +688,9 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
           <X color="#6c6c6c" strokeWidth={1.5} />
         </button>
         <div className="overflow-y-auto flex-1 pl-5 pr-3 pb-5 rounded-y-scrollbar">
-          <div className="mb-4">
-            <Image
-              src={product.images.main}
-              alt={product.name}
-              width={200}
-              height={200}
-              className="w-full rounded-lg"
-            />
+          <div className="mb-4 w-[320px] h-[320px] rounded-lg overflow-hidden">
+            <Image src={product.images.main} alt={product.name} width={320} height={320} />
           </div>
-
           <div className="flex flex-col gap-4">
             {product.options.groups
               .filter((group) => group.values.some((opt) => opt.isActive))
@@ -758,7 +751,6 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
               ))}
           </div>
         </div>
-
         <div className="pt-3 px-5 border-t border-gray-200">
           <button
             disabled={!isAllSelected}
