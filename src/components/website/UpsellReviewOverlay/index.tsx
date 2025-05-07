@@ -883,9 +883,9 @@ function UpsellProductSummary({ product, selectedOptions, onSelectOptions }) {
             />
           </div>
           <div className="space-y-3">
-            <a target="_blank" className="text-xs line-clamp-1 hover:underline" href="#">
+            <button onClick={() => onSelectOptions(product.id)} className="text-xs line-clamp-1 hover:underline">
               {product.name}
-            </a>
+            </button>
             {optionsTags.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-1 max-w-xs">
                 {optionsTags.map((opt, i) => (
@@ -958,8 +958,8 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-start pt-16 z-40">
-      <div className="bg-white relative rounded-2xl shadow-lg py-5 max-w-md w-full h-[calc(90vh)] max-h-[560px] flex flex-col">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-start pt-16 z-40">
+      <div className="bg-white relative rounded-2xl shadow-lg py-5 max-w-md w-full h-[calc(90vh)] max-h-[564px] flex flex-col">
         <div className="flex justify-between items-center mb-4 px-5">
           <h2 className="text-lg font-semibold">{product.name}</h2>
         </div>
@@ -1056,7 +1056,7 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
               onOptionsSelected(localSelectedOptions);
               onClose();
             }}
-            className={`w-full py-2 rounded-lg font-semibold ${
+            className={`w-full py-2 rounded-lg font-semibold transition-colors ${
               isAllSelected ? "bg-blue text-white hover:bg-blue-dimmed" : "bg-gray/30 text-gray cursor-not-allowed"
             }`}
           >
