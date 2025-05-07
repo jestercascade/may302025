@@ -918,13 +918,17 @@ function UpsellProductSummary({ product, selectedOptions, onSelectOptions }) {
   );
 }
 
-function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelected, onClose }) {
+export function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelected, onClose }) {
   const [localSelectedOptions, setLocalSelectedOptions] = useState(currentSelectedOptions || {});
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const productDetailsPage = useOverlayStore((state) => state.pages.productDetails);
 
   const requiredGroups = product.options.groups.filter((group) => group.values.some((opt) => opt.isActive));
   const isAllSelected = requiredGroups.every((group) => localSelectedOptions[group.id] !== undefined);
+
+  // Check if there are options or gallery to render
+  const hasOptions = product.options.groups.some((group) => group.values.some((opt) => opt.isActive));
+  const hasGallery = Array.isArray(product.images.gallery) && product.images.gallery.length > 0;
 
   const getMeasurements = (group, selectedOptionId) => {
     if (!group.sizeChart?.inches) return [];
@@ -938,7 +942,6 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
       .map((col) => ({ label: col.label, value: row[col.label] }));
   };
 
-  // Constants for size labels and country codes
   const sizeLabels = new Set(["XXXS", "XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "2XL", "3XL", "4XL", "5XL"]);
   const countryCodes = new Set(["US", "UK", "EU", "FR", "IT", "JP", "AU", "CN"]);
 
@@ -957,6 +960,104 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
     });
   };
 
+  // Build sections dynamically
+  const sections = [];
+
+  // Main image section
+  sections.push(
+    <div key="main-image" className="w-[320px] h-[320px] rounded-lg overflow-hidden">
+      <Image
+        src={product.images.main}
+        alt={product.name}
+        width={320}
+        height={320}
+        className="w-full h-auto object-cover"
+      />
+    </div>
+  );
+
+  // Options section (if present)
+  if (hasOptions) {
+    sections.push(
+      <div key="options" className="flex flex-col gap-4">
+        {product.options.groups
+          .filter((group) => group.values.some((opt) => opt.isActive))
+          .map((group) => (
+            <div key={group.id}>
+              <h3 className="text-sm font-medium mb-2">{group.name}</h3>
+              <div className="flex flex-wrap gap-2">
+                {group.values
+                  .filter((option) => option.isActive)
+                  .map((option) => (
+                    <button
+                      key={option.id}
+                      onClick={() =>
+                        setLocalSelectedOptions({
+                          ...localSelectedOptions,
+                          [group.id]: option.id,
+                        })
+                      }
+                      className={`px-3 py-1.5 min-w-[3rem] rounded-full text-sm ${
+                        localSelectedOptions[group.id] === option.id
+                          ? "bg-black text-white"
+                          : "bg-gray-100 text-black hover:bg-gray-200"
+                      }`}
+                    >
+                      {option.value}
+                    </button>
+                  ))}
+              </div>
+              {group.name.toLowerCase() === "size" && localSelectedOptions[group.id] !== undefined && (
+                <div className="mt-3">
+                  <div className="bg-neutral-50 rounded-lg px-3 py-2.5 max-w-72 border border-neutral-100">
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+                      {getMeasurements(group, localSelectedOptions[group.id]).map((m) => {
+                        if (!m.value) return null;
+                        return (
+                          <div key={m.label} className="flex items-center text-xs text-black">
+                            <span className="mr-1">{m.label}:</span>
+                            <span className="font-semibold">{formatMeasurement(m.label, m.value)}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {group.sizeChart && (
+                      <button
+                        onClick={handleSizeChartClick}
+                        className="mt-2 text-xs text-blue hover:text-blue-dimmed transition-colors flex items-center"
+                      >
+                        <Ruler size={12} className="mr-1.5" />
+                        View Measurements
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+      </div>
+    );
+  }
+
+  // Gallery section (if present)
+  if (hasGallery) {
+    sections.push(
+      <div key="gallery" className="flex flex-col gap-3">
+        {product.images.gallery.map((image, index) => (
+          <div key={index} className="w-full rounded-lg overflow-hidden border border-gray-100">
+            <Image
+              src={image}
+              alt={`${product.name} - Image ${index + 1}`}
+              width={320}
+              height={320}
+              className="w-full h-auto"
+            />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-start pt-16 z-40">
       <div className="bg-white relative rounded-2xl shadow-lg py-5 max-w-md w-full h-[calc(90vh)] max-h-[564px] flex flex-col">
@@ -970,84 +1071,12 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
           <X color="#6c6c6c" strokeWidth={1.5} />
         </button>
         <div className="overflow-y-auto flex-1 pl-5 pr-3 pb-5 rounded-y-scrollbar">
-          <div className="mb-4 w-[320px] h-[320px] rounded-lg overflow-hidden">
-            <Image src={product.images.main} alt={product.name} width={320} height={320} />
-          </div>
-          <div className="h-px bg-gray-200 w-full mb-5"></div>
-          <div className="flex flex-col gap-4">
-            {product.options.groups
-              .filter((group) => group.values.some((opt) => opt.isActive))
-              .map((group) => (
-                <div key={group.id}>
-                  <h3 className="text-sm font-medium mb-2">{group.name}</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {group.values
-                      .filter((option) => option.isActive)
-                      .map((option) => (
-                        <button
-                          key={option.id}
-                          onClick={() =>
-                            setLocalSelectedOptions({
-                              ...localSelectedOptions,
-                              [group.id]: option.id,
-                            })
-                          }
-                          className={`px-3 py-1.5 min-w-[3rem] rounded-full text-sm ${
-                            localSelectedOptions[group.id] === option.id
-                              ? "bg-black text-white"
-                              : "bg-gray-100 text-black hover:bg-gray-200"
-                          }`}
-                        >
-                          {option.value}
-                        </button>
-                      ))}
-                  </div>
-
-                  {group.name.toLowerCase() === "size" && localSelectedOptions[group.id] !== undefined && (
-                    <div className="mt-3">
-                      <div className="bg-neutral-50 rounded-lg px-3 py-2.5 max-w-72 border border-neutral-100">
-                        <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
-                          {getMeasurements(group, localSelectedOptions[group.id]).map((m) => {
-                            if (!m.value) return null;
-                            return (
-                              <div key={m.label} className="flex items-center text-xs text-black">
-                                <span className="mr-1">{m.label}:</span>
-                                <span className="font-semibold">{formatMeasurement(m.label, m.value)}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-
-                        {group.sizeChart && (
-                          <button
-                            onClick={handleSizeChartClick}
-                            className="mt-2 text-xs text-blue hover:text-blue-dimmed transition-colors flex items-center"
-                          >
-                            <Ruler size={12} className="mr-1.5" />
-                            View Measurements
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-          </div>
-          <div className="h-px bg-gray-200 w-full my-5"></div>
-          <div className="flex flex-col gap-3">
-            {product.images.gallery &&
-              product.images.gallery.map((image, index) => (
-                <div key={index} className="w-full rounded-lg overflow-hidden border border-gray-100">
-                  <Image
-                    src={image}
-                    alt={`${product.name} - Image ${index + 1}`}
-                    width={320}
-                    height={320}
-                    className="w-full h-auto"
-                  />
-                </div>
-              ))}
-          </div>
+          {sections.map((section, index) => (
+            <div key={index}>
+              {index > 0 && <div className="h-px bg-gray-200 w-full my-5"></div>}
+              {section}
+            </div>
+          ))}
         </div>
         <div className="pt-3 px-5 border-t border-gray-200">
           <button
