@@ -759,9 +759,7 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
               onClose();
             }}
             className={`w-full py-2 rounded-lg font-semibold ${
-              isAllSelected
-                ? "bg-blue-500 text-white hover:bg-blue-600"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              isAllSelected ? "bg-blue text-white hover:bg-blue-dimmed" : "bg-gray/30 text-gray cursor-not-allowed"
             }`}
           >
             Done
