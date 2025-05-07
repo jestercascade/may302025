@@ -520,10 +520,8 @@ import styles from "./styles.module.css";
 import { usePathname, useRouter } from "next/navigation";
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 import { Spinner } from "@/ui/Spinners/Default";
-import { X, Ruler, ChevronRight, Check, ChevronDown } from "lucide-react";
+import { X, Ruler, Check, ChevronDown, CheckCircle } from "lucide-react";
 import { useOverlayStore } from "@/zustand/website/overlayStore";
-
-// -- UpsellReviewButton Component --
 
 export function UpsellReviewButton({ product }) {
   const showOverlay = useUpsellReviewStore((state) => state.showOverlay);
@@ -545,7 +543,6 @@ export function UpsellReviewButton({ product }) {
   );
 }
 
-// -- UpsellProductSummary Component --
 function UpsellProductSummary({ product, selectedOptions, onSelectOptions }) {
   const hasActiveOptions = product.options.groups.some((group) => group.values.some((opt) => opt.isActive));
   const isOptionsSelected =
@@ -631,8 +628,6 @@ function UpsellProductSummary({ product, selectedOptions, onSelectOptions }) {
   );
 }
 
-// -- OptionSelectionModal Component --
-
 function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelected, onClose }) {
   const [localSelectedOptions, setLocalSelectedOptions] = useState(currentSelectedOptions || {});
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -675,32 +670,184 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
     }
   };
 
+  // return (
+  //   <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-40">
+  //     <div className="bg-white dark:bg-gray-800 relative rounded-lg shadow-xl max-w-md w-full max-h-[85vh] flex flex-col overflow-hidden">
+  //       {/* Header - Facebook style with prominent title and close button */}
+  //       <div className="py-4 px-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+  //         <h2 className="text-xl font-bold">{product.name}</h2>
+  //         <button
+  //           onClick={onClose}
+  //           className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-600"
+  //         >
+  //           <X size={18} />
+  //         </button>
+  //       </div>
+
+  //       <div className="overflow-y-auto flex-1">
+  //         {/* Main product image - Facebook style focus on visuals */}
+  //         <div className="aspect-square w-full relative overflow-hidden">
+  //           <Image src={product.images.main} alt={product.name} layout="fill" objectFit="cover" className="w-full" />
+  //           {/* Optional Facebook-style image reactions/badges could go here */}
+  //         </div>
+
+  //         {/* Options Selection - Facebook style cards */}
+  //         <div className="p-4">
+  //           {product.options.groups
+  //             .filter((group) => group.values.some((opt) => opt.isActive))
+  //             .map((group) => (
+  //               <div key={group.id} className="mb-5">
+  //                 <h3 className="font-bold text-base mb-2 flex items-center">
+  //                   {group.name}
+  //                   {group.name.toLowerCase() === "size" && (
+  //                     <button
+  //                       onClick={handleSizeChartClick}
+  //                       className="ml-auto text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center"
+  //                     >
+  //                       <Ruler size={12} className="mr-1" />
+  //                       Size Guide
+  //                     </button>
+  //                   )}
+  //                 </h3>
+
+  //                 {/* Facebook-style option selector */}
+  //                 <div className="flex flex-wrap gap-2">
+  //                   {group.values
+  //                     .filter((option) => option.isActive)
+  //                     .map((option) => (
+  //                       <button
+  //                         key={option.id}
+  //                         onClick={() =>
+  //                           setLocalSelectedOptions({
+  //                             ...localSelectedOptions,
+  //                             [group.id]: option.id,
+  //                           })
+  //                         }
+  //                         className={`px-4 py-2 rounded-md text-sm font-medium transition ${
+  //                           localSelectedOptions[group.id] === option.id
+  //                             ? "bg-blue-600 text-white"
+  //                             : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600"
+  //                         }`}
+  //                       >
+  //                         {option.value}
+  //                       </button>
+  //                     ))}
+  //                 </div>
+
+  //                 {/* Size measurements - Facebook tooltip style */}
+  //                 {group.name.toLowerCase() === "size" && localSelectedOptions[group.id] !== undefined && (
+  //                   <div className="mt-3 bg-gray-50 dark:bg-gray-900 rounded-md p-3 border border-gray-200 dark:border-gray-700">
+  //                     <h4 className="text-sm font-medium mb-2 text-gray-600 dark:text-gray-400">Measurements</h4>
+  //                     <div className="grid grid-cols-2 gap-3">
+  //                       {getMeasurements(group, localSelectedOptions[group.id]).map((m) => {
+  //                         if (!m.value) return null;
+  //                         return (
+  //                           <div key={m.label} className="flex items-center text-sm">
+  //                             <span className="text-gray-500 dark:text-gray-400 mr-2">{m.label}:</span>
+  //                             <span className="font-medium">{formatMeasurement(m.label, m.value)}</span>
+  //                           </div>
+  //                         );
+  //                       })}
+  //                     </div>
+  //                   </div>
+  //                 )}
+  //               </div>
+  //             ))}
+  //         </div>
+
+  //         {/* Gallery - Facebook-style carousel/grid */}
+  //         {product.images.gallery && product.images.gallery.length > 0 && (
+  //           <div className="px-4 pb-4">
+  //             <h3 className="font-bold text-base mb-2">More Images</h3>
+  //             <div className="flex overflow-x-auto pb-2 -mx-1 hide-scrollbar">
+  //               {product.images.gallery.map((image, index) => (
+  //                 <div key={index} className="flex-shrink-0 w-32 h-32 mx-1">
+  //                   <div className="w-full h-full rounded-md overflow-hidden border border-gray-200 dark:border-gray-700">
+  //                     <Image
+  //                       src={image}
+  //                       alt={`${product.name} - Image ${index + 1}`}
+  //                       width={128}
+  //                       height={128}
+  //                       className="w-full h-full object-cover"
+  //                     />
+  //                   </div>
+  //                 </div>
+  //               ))}
+  //             </div>
+  //           </div>
+  //         )}
+  //       </div>
+
+  //       {/* Footer - Facebook style prominent action button */}
+  //       <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+  //         <button
+  //           disabled={!isAllSelected}
+  //           onClick={() => {
+  //             onOptionsSelected(localSelectedOptions);
+  //             onClose();
+  //           }}
+  //           className={`w-full py-2.5 rounded-lg font-bold text-sm ${
+  //             isAllSelected
+  //               ? "bg-blue-600 hover:bg-blue-700 text-white"
+  //               : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+  //           }`}
+  //         >
+  //           {isAllSelected ? "Add to Cart" : "Select Required Options"}
+  //         </button>
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
+
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-start pt-16 z-40">
-      <div className="bg-white relative rounded-2xl shadow-lg py-5 max-w-md w-full h-[calc(90vh)] max-h-[544px] flex flex-col">
-        <div className="flex justify-between items-center mb-4 px-5">
-          <h2 className="text-lg font-semibold">{product.name}</h2>
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex justify-center items-center z-40">
+      <div className="bg-white dark:bg-neutral-900 relative rounded-xl shadow-lg max-w-md w-full max-h-[85vh] flex flex-col overflow-hidden">
+        {/* Header - macOS style with centered title */}
+        <div className="py-3 px-4 border-b border-gray-200 dark:border-gray-700 flex justify-center relative">
+          <h2 className="text-base font-medium text-center">Select Options</h2>
+          <button
+            onClick={onClose}
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+          >
+            <X size={20} strokeWidth={1.5} />
+          </button>
         </div>
-        <button
-          onClick={onClose}
-          className="w-9 h-9 rounded-full absolute top-[6px] right-[6px] flex items-center justify-center ease-in-out transition duration-300 active:bg-lightgray lg:hover:bg-lightgray"
-        >
-          <X color="#6c6c6c" strokeWidth={1.5} />
-        </button>
-        <div className="overflow-y-auto flex-1 pl-5 pr-3 pb-5 rounded-y-scrollbar">
-          <div className="mb-4 w-[320px] h-[320px] rounded-lg overflow-hidden">
-            <Image src={product.images.main} alt={product.name} width={320} height={320} />
+
+        <div className="overflow-y-auto flex-1">
+          {/* Product Preview - Clean card layout */}
+          <div className="p-4 flex items-center space-x-3 border-b border-gray-200 dark:border-gray-700">
+            <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+              <Image
+                src={product.images.main}
+                alt={product.name}
+                width={64}
+                height={64}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div>
+              <h3 className="font-medium text-sm">{product.name}</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                {product.brand || "Complete your selection"}
+              </p>
+            </div>
           </div>
-          <div className="flex flex-col gap-4">
+
+          {/* Options Selection - iOS style lists */}
+          <div className="px-4">
             {product.options.groups
               .filter((group) => group.values.some((opt) => opt.isActive))
-              .map((group) => (
-                <div key={group.id}>
-                  <h3 className="text-sm font-medium mb-2">{group.name}</h3>
-                  <div className="flex flex-wrap gap-2">
+              .map((group, groupIndex, allGroups) => (
+                <div key={group.id} className={groupIndex < allGroups.length - 1 ? "mb-6" : ""}>
+                  <h3 className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-medium mt-4 mb-2">
+                    {group.name}
+                  </h3>
+
+                  {/* iOS-style selector */}
+                  <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
                     {group.values
                       .filter((option) => option.isActive)
-                      .map((option) => (
+                      .map((option, idx, arr) => (
                         <button
                           key={option.id}
                           onClick={() =>
@@ -709,27 +856,29 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
                               [group.id]: option.id,
                             })
                           }
-                          className={`px-3 py-1.5 min-w-[3rem] rounded-full text-sm ${
-                            localSelectedOptions[group.id] === option.id
-                              ? "bg-black text-white"
-                              : "bg-gray-100 text-black hover:bg-gray-200"
+                          className={`w-full text-left px-4 py-3 text-sm flex justify-between items-center ${
+                            idx < arr.length - 1 ? "border-b border-gray-200 dark:border-gray-700" : ""
                           }`}
                         >
-                          {option.value}
+                          <span>{option.value}</span>
+                          {localSelectedOptions[group.id] === option.id && (
+                            <CheckCircle size={18} className="text-blue-500" />
+                          )}
                         </button>
                       ))}
                   </div>
 
+                  {/* Size chart info - Sheet style */}
                   {group.name.toLowerCase() === "size" && localSelectedOptions[group.id] !== undefined && (
-                    <div className="mt-3">
-                      <div className="bg-neutral-50 rounded-lg px-3 py-2.5 border border-neutral-100">
-                        <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+                    <div className="mt-2">
+                      <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-100 dark:border-blue-800">
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                           {getMeasurements(group, localSelectedOptions[group.id]).map((m) => {
                             if (!m.value) return null;
                             return (
-                              <div key={m.label} className="flex items-center text-xs text-black">
-                                <span className="mr-1">{m.label}:</span>
-                                <span className="font-semibold">{formatMeasurement(m.label, m.value)}</span>
+                              <div key={m.label} className="flex items-center justify-between text-xs">
+                                <span className="text-gray-600 dark:text-gray-400">{m.label}</span>
+                                <span className="font-medium">{formatMeasurement(m.label, m.value)}</span>
                               </div>
                             );
                           })}
@@ -738,10 +887,10 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
                         {group.sizeChart && (
                           <button
                             onClick={handleSizeChartClick}
-                            className="mt-2 text-xs text-blue hover:text-blue-dimmed transition-colors flex items-center"
+                            className="mt-2 w-full text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors flex items-center justify-center py-1"
                           >
                             <Ruler size={12} className="mr-1.5" />
-                            View Measurements
+                            View Size Chart
                           </button>
                         )}
                       </div>
@@ -750,27 +899,172 @@ function OptionSelectionModal({ product, currentSelectedOptions, onOptionsSelect
                 </div>
               ))}
           </div>
+
+          {/* Gallery - macOS style grid */}
+          {product.images.gallery && product.images.gallery.length > 0 && (
+            <div className="px-4 mt-6 mb-6">
+              <h3 className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 font-medium mb-2">
+                Product Images
+              </h3>
+              <div className="grid grid-cols-2 gap-2">
+                {product.images.gallery.map((image, index) => (
+                  <div key={index} className="aspect-square rounded-md overflow-hidden shadow-sm">
+                    <Image
+                      src={image}
+                      alt={`${product.name} - Image ${index + 1}`}
+                      width={160}
+                      height={160}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-        <div className="pt-3 px-5 border-t border-gray-200">
+
+        {/* Footer - iOS style action button */}
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
           <button
             disabled={!isAllSelected}
             onClick={() => {
               onOptionsSelected(localSelectedOptions);
               onClose();
             }}
-            className={`w-full py-2 rounded-lg font-semibold ${
-              isAllSelected ? "bg-blue text-white hover:bg-blue-dimmed" : "bg-gray/30 text-gray cursor-not-allowed"
+            className={`w-full py-3 rounded-xl font-medium text-sm transition ${
+              isAllSelected
+                ? "bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700"
+                : "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed"
             }`}
           >
-            Done
+            {isAllSelected ? "Confirm Selection" : "Select All Options"}
           </button>
         </div>
       </div>
     </div>
   );
-}
 
-// -- UpsellReviewOverlay Component --
+  // return (
+  //   <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-start pt-16 z-40">
+  //     <div className="bg-white relative rounded-2xl shadow-lg py-5 max-w-md w-full h-[calc(90vh)] max-h-[544px] flex flex-col">
+  //       <div className="flex justify-between items-center mb-4 px-5">
+  //         <h2 className="text-lg font-semibold">{product.name}</h2>
+  //       </div>
+  //       <button
+  //         onClick={onClose}
+  //         className="w-9 h-9 rounded-full absolute top-[6px] right-[6px] flex items-center justify-center ease-in-out transition duration-300 active:bg-lightgray lg:hover:bg-lightgray"
+  //       >
+  //         <X color="#6c6c6c" strokeWidth={1.5} />
+  //       </button>
+  //       <div className="overflow-y-auto flex-1 pl-5 pr-3 pb-5 rounded-y-scrollbar">
+  //         {/* Main product image */}
+  //         <div className="mb-4 w-[320px] h-[320px] rounded-lg overflow-hidden">
+  //           <Image src={product.images.main} alt={product.name} width={320} height={320} />
+  //         </div>
+
+  //         {/* Separator after main image */}
+  //         <div className="h-px bg-gray-200 w-full mb-5"></div>
+
+  //         {/* Options section */}
+  //         <div className="flex flex-col gap-4">
+  //           {product.options.groups
+  //             .filter((group) => group.values.some((opt) => opt.isActive))
+  //             .map((group) => (
+  //               <div key={group.id}>
+  //                 <h3 className="text-sm font-medium mb-2">{group.name}</h3>
+  //                 <div className="flex flex-wrap gap-2">
+  //                   {group.values
+  //                     .filter((option) => option.isActive)
+  //                     .map((option) => (
+  //                       <button
+  //                         key={option.id}
+  //                         onClick={() =>
+  //                           setLocalSelectedOptions({
+  //                             ...localSelectedOptions,
+  //                             [group.id]: option.id,
+  //                           })
+  //                         }
+  //                         className={`px-3 py-1.5 min-w-[3rem] rounded-full text-sm ${
+  //                           localSelectedOptions[group.id] === option.id
+  //                             ? "bg-black text-white"
+  //                             : "bg-gray-100 text-black hover:bg-gray-200"
+  //                         }`}
+  //                       >
+  //                         {option.value}
+  //                       </button>
+  //                     ))}
+  //                 </div>
+
+  //                 {group.name.toLowerCase() === "size" && localSelectedOptions[group.id] !== undefined && (
+  //                   <div className="mt-3">
+  //                     <div className="bg-neutral-50 rounded-lg px-3 py-2.5 border border-neutral-100">
+  //                       <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+  //                         {getMeasurements(group, localSelectedOptions[group.id]).map((m) => {
+  //                           if (!m.value) return null;
+  //                           return (
+  //                             <div key={m.label} className="flex items-center text-xs text-black">
+  //                               <span className="mr-1">{m.label}:</span>
+  //                               <span className="font-semibold">{formatMeasurement(m.label, m.value)}</span>
+  //                             </div>
+  //                           );
+  //                         })}
+  //                       </div>
+
+  //                       {group.sizeChart && (
+  //                         <button
+  //                           onClick={handleSizeChartClick}
+  //                           className="mt-2 text-xs text-blue hover:text-blue-dimmed transition-colors flex items-center"
+  //                         >
+  //                           <Ruler size={12} className="mr-1.5" />
+  //                           View Measurements
+  //                         </button>
+  //                       )}
+  //                     </div>
+  //                   </div>
+  //                 )}
+  //               </div>
+  //             ))}
+  //         </div>
+
+  //         {/* Separator before product gallery */}
+  //         <div className="h-px bg-gray-200 w-full my-5"></div>
+
+  //         {/* Product Images Gallery */}
+  //         <div className="flex flex-col gap-3">
+  //           {product.images.gallery &&
+  //             product.images.gallery.map((image, index) => (
+  //               <div key={index} className="w-full rounded-lg overflow-hidden border border-gray-100">
+  //                 <Image
+  //                   src={image}
+  //                   alt={`${product.name} - Image ${index + 1}`}
+  //                   width={320}
+  //                   height={320}
+  //                   className="w-full h-auto"
+  //                 />
+  //               </div>
+  //             ))}
+  //         </div>
+  //       </div>
+
+  //       {/* Footer with button - already has a separator */}
+  //       <div className="pt-3 px-5 border-t border-gray-200">
+  //         <button
+  //           disabled={!isAllSelected}
+  //           onClick={() => {
+  //             onOptionsSelected(localSelectedOptions);
+  //             onClose();
+  //           }}
+  //           className={`w-full py-2 rounded-lg font-semibold ${
+  //             isAllSelected ? "bg-blue text-white hover:bg-blue-dimmed" : "bg-gray/30 text-gray cursor-not-allowed"
+  //           }`}
+  //         >
+  //           Done
+  //         </button>
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
+}
 
 export function UpsellReviewOverlay({ cart }) {
   const {
