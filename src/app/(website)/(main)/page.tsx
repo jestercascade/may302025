@@ -23,17 +23,16 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const [collections, categoriesData, pageHero, discoveryProductsSettings] =
-    await Promise.all([
-      getCollections({
-        fields: ["title", "slug", "products"],
-        visibility: "PUBLISHED",
-        publishedProductsOnly: true,
-      }),
-      getCategories({ visibility: "VISIBLE" }),
-      getPageHero(),
-      getDiscoveryProductsSettings(),
-    ]);
+  const [collections, categoriesData, pageHero, discoveryProductsSettings] = await Promise.all([
+    getCollections({
+      fields: ["title", "slug", "products"],
+      visibility: "PUBLISHED",
+      publishedProductsOnly: true,
+    }),
+    getCategories({ visibility: "VISIBLE" }),
+    getPageHero(),
+    getDiscoveryProductsSettings(),
+  ]);
 
   const featured = await enrichFeaturedCollections(collections || []);
   const combinedCollections = [
@@ -54,8 +53,7 @@ export default async function Home() {
 
   const heroContent = renderHero(pageHero);
   const isHeroRendered = heroContent !== null;
-  const isCategoriesRendered =
-    !!categoriesData?.showOnPublicSite && categoriesData.categories?.length > 0;
+  const isCategoriesRendered = !!categoriesData?.showOnPublicSite && categoriesData.categories?.length > 0;
   const hasCollectionContent = combinedCollections.some((c) => {
     if (c.collectionType === "FEATURED") return c.products.length >= 3;
     if (c.collectionType === "BANNER") return c.products.length > 0;
@@ -72,9 +70,7 @@ export default async function Home() {
       visibility: "PUBLISHED",
     });
 
-    const availableProducts = (publishedProducts ?? []).filter(
-      (p) => !excludedIds.has(p.id)
-    ).length;
+    const availableProducts = (publishedProducts ?? []).filter((p) => !excludedIds.has(p.id)).length;
 
     if (availableProducts < 3) {
       return <CatalogEmptyState />;
@@ -89,9 +85,7 @@ export default async function Home() {
     <>
       {heroContent}
       <div>
-        {isCategoriesRendered && (
-          <Categories categories={categoriesData.categories} />
-        )}
+        {isCategoriesRendered && <Categories categories={categoriesData.categories} />}
         <div className="mt-8 max-w-5xl mx-auto flex flex-col gap-8">
           {combinedCollections
             .map((collection) => renderCollection(collection, cart))
@@ -103,11 +97,7 @@ export default async function Home() {
             <div className="px-5">
               <ProductsProvider>
                 <Suspense fallback={null}>
-                  <ShuffledDiscoveryProducts
-                    page="HOME"
-                    excludeIds={Array.from(excludedIds)}
-                    cart={cart}
-                  />
+                  <ShuffledDiscoveryProducts page="HOME" excludeIds={Array.from(excludedIds)} cart={cart} />
                 </Suspense>
               </ProductsProvider>
             </div>
@@ -121,11 +111,7 @@ export default async function Home() {
 // -- UI Components --
 
 function renderHero(pageHero: any) {
-  if (
-    pageHero?.visibility !== "VISIBLE" ||
-    !pageHero.images?.desktop ||
-    !pageHero.images?.mobile
-  ) {
+  if (pageHero?.visibility !== "VISIBLE" || !pageHero.images?.desktop || !pageHero.images?.mobile) {
     return null;
   }
 
@@ -176,13 +162,9 @@ function renderCollection(collection: any, cart: any) {
 
 // -- Logic & Utilities --
 
-async function enrichFeaturedCollections(
-  collections: CollectionType[] | null
-): Promise<EnrichedCollectionType[]> {
+async function enrichFeaturedCollections(collections: CollectionType[] | null): Promise<EnrichedCollectionType[]> {
   const featuredCollections = (collections || []).filter(
-    (collection) =>
-      collection.collectionType === "FEATURED" &&
-      collection.visibility === "PUBLISHED"
+    (collection) => collection.collectionType === "FEATURED" && collection.visibility === "PUBLISHED"
   );
 
   // Create a map of product IDs and their indexes
@@ -199,40 +181,23 @@ async function enrichFeaturedCollections(
   // Fetch and enrich products
   const productsFromDb = await getProducts({
     ids: productIds,
-    fields: [
-      "name",
-      "slug",
-      "description",
-      "highlights",
-      "pricing",
-      "images",
-      "options",
-      "upsell",
-    ],
+    fields: ["name", "slug", "description", "highlights", "pricing", "images", "options", "upsell"],
     visibility: "PUBLISHED",
   });
 
   const productsWithIndexes = (productsFromDb || []).map((product) => ({
     ...product,
-    index:
-      productIdToIndexMap.find((item) => item.id === product.id)?.index ?? 0,
+    index: productIdToIndexMap.find((item) => item.id === product.id)?.index ?? 0,
   }));
 
   // Enrich collections with product details
   return featuredCollections.map((collection) => {
     const enrichedProducts = (collection.products || [])
       .map((product: any) => {
-        const productDetails = productsWithIndexes.find(
-          (p) => p.id === product.id
-        );
-        return productDetails
-          ? { ...productDetails, index: product.index }
-          : undefined;
+        const productDetails = productsWithIndexes.find((p) => p.id === product.id);
+        return productDetails ? { ...productDetails, index: product.index } : undefined;
       })
-      .filter(
-        (product: any): product is NonNullable<typeof product> =>
-          product !== undefined
-      )
+      .filter((product: any): product is NonNullable<typeof product> => product !== undefined)
       .sort((a: any, b: any) => (a.index ?? 0) - (b.index ?? 0));
 
     return {
@@ -244,80 +209,7 @@ async function enrichFeaturedCollections(
 
 // -- Type Definitions --
 
-type EnrichedProductType = {
-  index: number;
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  highlights: {
-    headline: string;
-    keyPoints: { index: number; text: string }[];
-  };
-  pricing: {
-    salePrice: number;
-    basePrice: number;
-    discountPercentage: number;
-  };
-  images: {
-    main: string;
-    gallery: string[];
-  };
-  options: {
-    colors: Array<{
-      name: string;
-      image: string;
-    }>;
-    sizes: {
-      inches: {
-        columns: { label: string; order: number }[];
-        rows: { [key: string]: string }[];
-      };
-      centimeters: {
-        columns: { label: string; order: number }[];
-        rows: { [key: string]: string }[];
-      };
-    };
-  };
-  upsell: {
-    id: string;
-    mainImage: string;
-    pricing: {
-      salePrice: number;
-      basePrice: number;
-      discountPercentage: number;
-    };
-    visibility: "DRAFT" | "PUBLISHED" | "HIDDEN";
-    createdAt: string;
-    updatedAt: string;
-    products: {
-      id: string;
-      name: string;
-      slug: string;
-      basePrice: number;
-      images: {
-        main: string;
-        gallery: string[];
-      };
-      options: {
-        colors: Array<{
-          name: string;
-          image: string;
-        }>;
-        sizes: {
-          inches: {
-            columns: Array<{ label: string; order: number }>;
-            rows: Array<{ [key: string]: string }>;
-          };
-          centimeters: {
-            columns: Array<{ label: string; order: number }>;
-            rows: Array<{ [key: string]: string }>;
-          };
-        };
-      };
-    }[];
-  };
-};
+type EnrichedProductType = ProductWithUpsellType & { index: number };
 
 type EnrichedCollectionType = {
   id: string;
