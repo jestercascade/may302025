@@ -2,7 +2,7 @@
 
 import { useUpsellReviewStore } from "@/zustand/website/upsellReviewStore";
 import { useAlertStore } from "@/zustand/shared/alertStore";
-import { useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { AddToCartAction } from "@/actions/cart";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { formatThousands } from "@/lib/utils/common";
@@ -137,6 +137,7 @@ export function UpsellReviewButton({ product }: { product: UpsellReviewProductTy
 }
 
 // UpsellReviewOverlay Component
+// UpsellReviewOverlay Component with fixed isInCart logic
 export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
   const {
     hideOverlay,
@@ -151,42 +152,58 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
   const showAlert = useAlertStore((state) => state.showAlert);
   const pathname = usePathname();
   const router = useRouter();
-  const [showCarousel, setShowCarousel] = useState(false);
-  const [selectedProductForCarousel, setSelectedProductForCarousel] = useState<UpsellProductType | null>(null);
   const [selectedProductForOptions, setSelectedProductForOptions] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const [isInCart, setIsInCart] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
-  const isUpsellInCart = (): boolean => {
+  // Fixed function to correctly check if the upsell is in cart
+  const isUpsellInCart = useCallback((): boolean => {
     if (!cart?.items || !selectedProduct?.upsell) return false;
     return cart.items.some((item) => item.type === "upsell" && item.baseUpsellId === selectedProduct.upsell.id);
-  };
+  }, [cart, selectedProduct]);
 
+  // Updated useEffect to properly reset state on overlay visibility change
   useEffect(() => {
     if (isVisible && selectedProduct) {
+      // Reset state when overlay becomes visible
       const autoReadyProducts = selectedProduct.upsell.products
         .filter((product) => product.options.groups.every((group) => group.values.every((option) => !option.isActive)))
         .map((product) => product.id);
+
       setReadyProducts(autoReadyProducts);
       setSelectedOptions({});
+
+      // Correctly set isInCart status by checking the cart directly
       setIsInCart(isUpsellInCart());
     }
-  }, [isVisible, selectedProduct, setReadyProducts, setSelectedOptions, cart]);
+  }, [isVisible, selectedProduct, setReadyProducts, setSelectedOptions, isUpsellInCart]);
 
-  const openCarousel = (product: UpsellProductType) => {
-    setSelectedProductForCarousel(product);
-    setShowCarousel(true);
-  };
-
-  const closeCarousel = () => {
-    setShowCarousel(false);
-    setSelectedProductForCarousel(null);
-  };
+  // Additionally watch cart changes to update isInCart status
+  useEffect(() => {
+    if (isVisible && selectedProduct) {
+      setIsInCart(isUpsellInCart());
+    }
+  }, [cart, isVisible, selectedProduct, isUpsellInCart]);
 
   const calculateSavings = (pricing: { basePrice: number; salePrice: number }): string => {
     return (Number(pricing.basePrice) - Number(pricing.salePrice)).toFixed(2);
   };
+
+  // Compute if all products are ready for adding to cart
+  const areAllProductsReady = useMemo(() => {
+    if (!selectedProduct) return false;
+
+    return selectedProduct.upsell.products.every((product) => {
+      // If product has no active options, it's automatically ready
+      const hasActiveOptions = product.options.groups.some((group) => group.values.some((option) => option.isActive));
+
+      if (!hasActiveOptions) return true;
+
+      // Product is ready if it's in the readyProducts array
+      return readyProducts.includes(product.id);
+    });
+  }, [selectedProduct, readyProducts]);
 
   const handleAddToCart = () => {
     setIsAddingToCart(true);
@@ -310,17 +327,19 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                       {readyProducts.length > 0 ? (
                         <>
                           <span className="min-[480px]:hidden font-semibold text-sm">
-                            Selections ({readyProducts.length})
+                            Selections ({readyProducts.length}/{selectedProduct.upsell.products.length})
                           </span>
                           <span className="hidden min-[480px]:block pl-[3px] font-semibold text-sm min-[520px]:text-base">
-                            Confirm selections ({readyProducts.length})
+                            Confirm selections ({readyProducts.length}/{selectedProduct.upsell.products.length})
                           </span>
                         </>
                       ) : (
                         <>
-                          <span className="min-[480px]:hidden font-semibold text-sm">Selections (0)</span>
+                          <span className="min-[480px]:hidden font-semibold text-sm">
+                            Selections (0/{selectedProduct.upsell.products.length})
+                          </span>
                           <span className="hidden min-[480px]:block font-semibold text-sm min-[520px]:text-base">
-                            Selections (0)
+                            Selections (0/{selectedProduct.upsell.products.length})
                           </span>
                         </>
                       )}
@@ -336,7 +355,7 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                           </button>
                           <button
                             onClick={handleInCartButtonClick}
-                            className="hidden animate-fade px-4 min-[365px]:flex items-center justify-center w-full h-11 rounded-full cursor-pointer border border-[#c5c3c0] text-blue text-sm font-semibold shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,_#faf9f8_5%,_#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear-gradient(to_bottom,_#eae8e6_5%,_#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
+                            className="hidden animate-fade px-4 min-[365px]:flex items-center justify-center w-full h-11 rounded-full cursor-pointer border border-[#c5c3c0] text-blue font-semibold shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,_#faf9f8_5%,_#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear-gradient(to_bottom,_#eae8e6_5%,_#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
                           >
                             In Cart - See Now
                           </button>
@@ -346,11 +365,11 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                           <button
                             className={clsx(
                               "min-[375px]:hidden text-sm flex items-center justify-center min-w-28 max-w-28 px-[10px] h-11 rounded-full border border-[#b27100] text-white font-semibold shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear-gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000] transition-opacity duration-200",
-                              readyProducts.length !== selectedProduct.upsell.products.length || isAddingToCart
+                              !areAllProductsReady || isAddingToCart
                                 ? "opacity-50 cursor-context-menu"
                                 : "cursor-pointer hover:bg-[#cc8100] hover:[background:linear-gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
                             )}
-                            disabled={readyProducts.length !== selectedProduct.upsell.products.length || isAddingToCart}
+                            disabled={!areAllProductsReady || isAddingToCart}
                             onClick={handleAddToCart}
                           >
                             {isAddingToCart ? <Spinner size={24} color="white" /> : "Get Upgrade"}
@@ -358,11 +377,11 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                           <button
                             className={clsx(
                               "hidden text-sm min-[375px]:flex items-center justify-center min-w-[160px] max-w-60 min-[425px]:min-w-[172px] px-[10px] min-[425px]:px-4 min-[480px]:px-5 h-11 rounded-full border border-[#b27100] text-white font-semibold shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear-gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000] transition-opacity duration-200",
-                              readyProducts.length !== selectedProduct.upsell.products.length || isAddingToCart
+                              !areAllProductsReady || isAddingToCart
                                 ? "opacity-50 cursor-context-menu"
                                 : "cursor-pointer hover:bg-[#cc8100] hover:[background:linear-gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
                             )}
-                            disabled={readyProducts.length !== selectedProduct.upsell.products.length || isAddingToCart}
+                            disabled={!areAllProductsReady || isAddingToCart}
                             onClick={handleAddToCart}
                           >
                             {isAddingToCart ? <Spinner size={24} color="white" /> : "Add Upgrade to Cart"}
@@ -373,7 +392,7 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                         className={clsx(
                           "animate-fade-right absolute right-0 bottom-12 min-[520px]:bottom-14 w-[248px] py-3 px-4 rounded-xl bg-[#373737] before:content-[''] before:w-[10px] before:h-[10px] before:bg-[#373737] before:rounded-br-[2px] before:rotate-45 before:origin-bottom-left before:absolute before:-bottom-0 before:right-12",
                           {
-                            hidden: readyProducts.length !== selectedProduct.upsell.products.length || isInCart,
+                            hidden: !areAllProductsReady || isInCart,
                           }
                         )}
                       >
@@ -429,14 +448,19 @@ type UpsellProductSummaryProps = {
   onSelectOptions: (productId: string) => void;
 };
 
+// UpsellProductSummary Component with improved option state tracking
 function UpsellProductSummary({ product, selectedOptions, onSelectOptions }: UpsellProductSummaryProps) {
+  // Check if this product has any options that need to be selected
   const hasActiveOptions = product.options.groups.some((group) => group.values.some((opt) => opt.isActive));
-  const isOptionsSelected =
-    hasActiveOptions &&
-    product.options.groups
+
+  // Check if all required options for this product have been selected
+  const isOptionsSelected = useMemo(() => {
+    if (!hasActiveOptions) return true;
+
+    return product.options.groups
       .filter((group) => group.values.some((opt) => opt.isActive))
       .every((group) => selectedOptions[group.id] !== undefined);
-  const isReady = !hasActiveOptions || isOptionsSelected;
+  }, [product, selectedOptions, hasActiveOptions]);
 
   const optionsTags = isOptionsSelected
     ? product.options.groups
@@ -461,10 +485,10 @@ function UpsellProductSummary({ product, selectedOptions, onSelectOptions }: Ups
         <div
           className={clsx(
             "w-5 h-5 rounded-full flex items-center justify-center",
-            isReady ? "bg-black" : "border border-gray-300"
+            isOptionsSelected ? "bg-black" : "border border-gray-300"
           )}
         >
-          {isReady && <Check color="#ffffff" size={16} strokeWidth={2} />}
+          {isOptionsSelected && <Check color="#ffffff" size={16} strokeWidth={2} />}
         </div>
       </div>
       <div className="bg-white bg-opacity-80 backdrop-blur-sm rounded-lg p-3 border border-[#e5e7eb] shadow-sm transition-all duration-200 hover:shadow-md hover:bg-opacity-100 flex-1">
@@ -697,7 +721,7 @@ export function OptionSelectionModal({
               onClose();
             }}
             className={`w-full py-2 rounded-lg font-semibold transition-colors ${
-              isAllSelected ? "bg-blue text-white hover:bg-blue-dimmed" : "bg-lightgray/30 text-gray cursor-not-allowed"
+              isAllSelected ? "bg-blue text-white hover:bg-blue-dimmed" : "bg-neutral-100 text-gray cursor-not-allowed"
             }`}
           >
             Done
