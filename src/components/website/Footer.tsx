@@ -47,7 +47,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="w-full pt-6 pb-24 mt-14 bg-lightgray">
+    <footer className="w-full pt-6 pb-24 mt-14 bg-neutral-100">
       <div className="md:hidden px-5 mx-auto">
         <div className="flex flex-col gap-8">
           <div>
@@ -68,49 +68,28 @@ export function Footer() {
           <div className="grid grid-cols-2">
             <div>
               <h3 className="font-semibold mb-4">Company</h3>
-              <Link
-                href="/about-us"
-                className="block w-max text-sm text-gray mb-2 hover:underline"
-              >
+              <Link href="/about-us" className="block w-max text-sm text-gray mb-2 hover:underline">
                 About us
               </Link>
-              <Link
-                href="/privacy-policy"
-                className="block w-max text-sm text-gray mb-2 hover:underline"
-              >
+              <Link href="/privacy-policy" className="block w-max text-sm text-gray mb-2 hover:underline">
                 Privacy policy
               </Link>
-              <Link
-                href="/terms-of-use"
-                className="block w-max text-sm text-gray mb-2 hover:underline"
-              >
+              <Link href="/terms-of-use" className="block w-max text-sm text-gray mb-2 hover:underline">
                 Terms of use
               </Link>
             </div>
             <div>
               <h3 className="font-semibold mb-4">Get Help</h3>
-              <Link
-                href="/contact-us"
-                className="block w-max text-sm text-gray mb-2 hover:underline"
-              >
+              <Link href="/contact-us" className="block w-max text-sm text-gray mb-2 hover:underline">
                 Contact us
               </Link>
-              <Link
-                href="#"
-                className="block w-max text-sm text-gray mb-2 hover:underline"
-              >
+              <Link href="#" className="block w-max text-sm text-gray mb-2 hover:underline">
                 Track order
               </Link>
-              <Link
-                href="/returns-and-refunds"
-                className="block w-max text-sm text-gray mb-2 hover:underline"
-              >
+              <Link href="/returns-and-refunds" className="block w-max text-sm text-gray mb-2 hover:underline">
                 Returns & refunds
               </Link>
-              <Link
-                href="/faq"
-                className="block w-max text-sm text-gray mb-2 hover:underline"
-              >
+              <Link href="/faq" className="block w-max text-sm text-gray mb-2 hover:underline">
                 FAQ
               </Link>
             </div>
@@ -121,49 +100,28 @@ export function Footer() {
         <div className="flex gap-10">
           <div className="w-full">
             <h3 className="font-semibold mb-4">Company</h3>
-            <Link
-              href="/about-us"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/about-us" className="block w-max text-sm text-gray mb-2 hover:underline">
               About us
             </Link>
-            <Link
-              href="/privacy-policy"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/privacy-policy" className="block w-max text-sm text-gray mb-2 hover:underline">
               Privacy policy
             </Link>
-            <Link
-              href="/terms-of-use"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/terms-of-use" className="block w-max text-sm text-gray mb-2 hover:underline">
               Terms of use
             </Link>
           </div>
           <div className="w-full">
             <h3 className="font-semibold mb-4">Get Help</h3>
-            <Link
-              href="/contact-us"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/contact-us" className="block w-max text-sm text-gray mb-2 hover:underline">
               Contact us
             </Link>
-            <Link
-              href="#"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="#" className="block w-max text-sm text-gray mb-2 hover:underline">
               Track order
             </Link>
-            <Link
-              href="/returns-and-refunds"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/returns-and-refunds" className="block w-max text-sm text-gray mb-2 hover:underline">
               Returns & refunds
             </Link>
-            <Link
-              href="/faq"
-              className="block w-max text-sm text-gray mb-2 hover:underline"
-            >
+            <Link href="/faq" className="block w-max text-sm text-gray mb-2 hover:underline">
               FAQ
             </Link>
           </div>
@@ -209,10 +167,7 @@ function NewsletterForm({
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
-    <form
-      onSubmit={onSubmit}
-      className={clsx("relative h-11 w-[270px]", isSubmitting && "opacity-45")}
-    >
+    <form onSubmit={onSubmit} className={clsx("relative h-11 w-[270px]", isSubmitting && "opacity-45")}>
       <button
         type="submit"
         disabled={isSubmitting}

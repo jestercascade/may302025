@@ -189,7 +189,7 @@ function DesktopNavbar({
 
 function Footer() {
   return (
-    <footer className="w-full pt-6 pb-24 mt-14 bg-lightgray">
+    <footer className="w-full pt-6 pb-24 mt-14 bg-neutral-100">
       <div className="md:hidden max-w-[486px] px-5 mx-auto">
         <div className="flex flex-col gap-8">
           <div>
