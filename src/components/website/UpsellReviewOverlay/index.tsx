@@ -61,44 +61,30 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
   const isUpsellInCart = useCallback((): boolean => {
     if (!cart?.items || !selectedProduct?.upsell) return false;
 
-    // First check if we have all the necessary product options selected
     const allProductsReady = selectedProduct.upsell.products.every((product) => {
-      // Check if this product requires options
       const requiresOptions = product.options.groups.some((group) => group.values.some((option) => option.isActive));
-
-      // If it doesn't require options, it's automatically ready
       if (!requiresOptions) return true;
-
-      // Otherwise check if it's in readyProducts
       return readyProducts.includes(product.id);
     });
 
-    // Only proceed with cart check if all products are ready
     if (!allProductsReady) return false;
 
-    // Now check if this specific upsell with these specific options is in the cart
     return cart.items.some((item) => {
       if (item.type !== "upsell" || item.baseUpsellId !== selectedProduct.upsell.id) {
         return false;
       }
 
-      // For a valid match, we need to compare the selected options of each product
       const upsellProducts = selectedProduct.upsell.products;
       const cartProducts = (item as CartUpsellItemType).products;
 
-      // If product count doesn't match, it's not the same upsell
       if (upsellProducts.length !== cartProducts.length) return false;
 
-      // Compare each product and its options
       for (const upsellProduct of upsellProducts) {
-        // Find matching product in cart
         const cartProduct = cartProducts.find((p) => p.id === upsellProduct.id);
         if (!cartProduct) return false;
 
-        // Check if options match
         const productSelectedOptions = selectedOptions[upsellProduct.id] || {};
 
-        // Convert selected options to the format used in the cart for comparison
         const upsellOptions: Record<string, SelectedOptionType> = {};
         for (const [groupIdStr, optionId] of Object.entries(productSelectedOptions)) {
           const groupId = Number(groupIdStr);
@@ -115,7 +101,6 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
           }
         }
 
-        // Check if options match by comparing keys and values
         const cartOptionKeys = Object.keys(cartProduct.selectedOptions);
         const upsellOptionKeys = Object.keys(upsellOptions);
 
@@ -131,15 +116,12 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
         }
       }
 
-      // If we got here, everything matches
       return true;
     });
   }, [cart, selectedProduct, readyProducts, selectedOptions]);
 
-  // FIX: Initialize state when visibility changes
   useEffect(() => {
     if (isVisible && selectedProduct) {
-      // Reset state when overlay becomes visible
       const autoReadyProducts = selectedProduct.upsell.products
         .filter((product) => product.options.groups.every((group) => group.values.every((option) => !option.isActive)))
         .map((product) => product.id);
@@ -149,10 +131,8 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
     }
   }, [isVisible, selectedProduct, setReadyProducts, setSelectedOptions]);
 
-  // FIX: Separate effect for updating isInCart
   useEffect(() => {
     if (isVisible && selectedProduct) {
-      // Note: We're not using the function directly in the dependency array
       const cartStatus = isUpsellInCart();
       setIsInCart(cartStatus);
     }
@@ -162,17 +142,14 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
     return (Number(pricing.basePrice) - Number(pricing.salePrice)).toFixed(2);
   };
 
-  // Compute if all products are ready for adding to cart
   const areAllProductsReady = useMemo(() => {
     if (!selectedProduct) return false;
 
     return selectedProduct.upsell.products.every((product) => {
-      // If product has no active options, it's automatically ready
       const hasActiveOptions = product.options.groups.some((group) => group.values.some((option) => option.isActive));
 
       if (!hasActiveOptions) return true;
 
-      // Product is ready if it's in the readyProducts array
       return readyProducts.includes(product.id);
     });
   }, [selectedProduct, readyProducts]);

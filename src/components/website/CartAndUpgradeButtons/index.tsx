@@ -13,6 +13,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Spinner } from "@/ui/Spinners/Default";
 import styles from "./styles.module.css";
 import clsx from "clsx";
+import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 
 type SelectedOptionType = {
   value: string;
@@ -45,16 +46,13 @@ interface CartTrackingItem {
 export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithUpsellType; cart: CartType | null }) {
   const [isPending, startTransition] = useTransition();
   const { showAlert } = useAlertStore();
-  const { selectedOptions, isInCart, setIsInCart } = useOptionsStore();
-  // Track cart items locally for overlay state management
+  const { selectedOptions, setIsInCart } = useOptionsStore();
   const [cartTracking, setCartTracking] = useState<CartTrackingItem[]>([]);
   const pathname = usePathname();
-  const { push } = useRouter();
+  const { push } = useNavigation();
   const hideQuickviewOverlay = useQuickviewStore((state) => state.hideOverlay);
   const hideUpsellReviewOverlay = useUpsellReviewStore((state) => state.hideOverlay);
-  const productIdRef = useRef(product.id);
 
-  // When the component mounts or when the cart updates, initialize our local cart tracking
   useEffect(() => {
     if (cart?.items && product.options?.groups) {
       const initialTracking: CartTrackingItem[] = [];
@@ -63,7 +61,6 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
         if (item.type === "product") {
           const options: Record<string, string> = {};
 
-          // Convert the cart item options to our simplified format
           for (const [key, opt] of Object.entries(item.selectedOptions)) {
             options[key] = opt.value;
           }
@@ -79,27 +76,9 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
     }
   }, [cart, product.id]);
 
-  // Reset in-cart state when product changes
-  useEffect(() => {
-    if (productIdRef.current !== product.id) {
-      setIsInCart(false);
-      productIdRef.current = product.id;
-    }
-  }, [product.id, setIsInCart]);
-
-  // When selected options change, check if current configuration is in cart
-  useEffect(() => {
-    if (product.options?.groups) {
-      const currentInCart = isCurrentSelectionInCart();
-      setIsInCart(currentInCart);
-    }
-  }, [selectedOptions, cartTracking]);
-
-  // Determine if the current selection is already in the cart
   const isCurrentSelectionInCart = (): boolean => {
     if (!product.options?.groups) return false;
 
-    // Build current selection options
     const currentSelectedValues: Record<string, string> = {};
     for (const [groupIdStr, optionId] of Object.entries(selectedOptions)) {
       if (optionId === null || optionId === undefined) continue;
@@ -115,7 +94,6 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
       }
     }
 
-    // Check if this configuration exists in our tracked cart
     return cartTracking.some((item) => {
       if (item.productId !== product.id) return false;
 
@@ -125,44 +103,6 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
       if (itemKeys.length !== currentKeys.length) return false;
 
       return currentKeys.every((key) => item.options[key] === currentSelectedValues[key]);
-    });
-  };
-
-  // Check if the product is in the server cart
-  const isProductInCart = (): boolean => {
-    if (!cart?.items || !product.options?.groups) return false;
-
-    const currentSelectedValues: Record<string, string> = {};
-
-    for (const [groupIdStr, optionId] of Object.entries(selectedOptions)) {
-      if (optionId === null || optionId === undefined) continue;
-
-      const groupId = Number(groupIdStr);
-      const group = product.options.groups.find((g) => g.id === groupId);
-
-      if (group) {
-        const option = group.values.find((v) => v.id === optionId);
-        if (option) {
-          currentSelectedValues[group.name.toLowerCase()] = option.value;
-        }
-      }
-    }
-
-    return cart.items.some((item) => {
-      if (item.type !== "product" || item.baseProductId !== product.id) {
-        return false;
-      }
-
-      const itemOptionsValues: Record<string, string> = {};
-      for (const [key, opt] of Object.entries(item.selectedOptions)) {
-        itemOptionsValues[key] = opt.value;
-      }
-
-      const currentKeys = Object.keys(currentSelectedValues);
-      const itemKeys = Object.keys(itemOptionsValues);
-      if (currentKeys.length !== itemKeys.length) return false;
-
-      return currentKeys.every((key) => currentSelectedValues[key] === itemOptionsValues[key]);
     });
   };
 
@@ -232,7 +172,6 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
                 groupDisplayOrder: group.displayOrder,
               };
 
-              // Also store a simplified version
               simpleSelectedOptions[groupNameLower] = option.value;
             }
           }
@@ -249,7 +188,6 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
           type: result.type === ShowAlertType.ERROR ? ShowAlertType.ERROR : ShowAlertType.SUCCESS,
         });
 
-        // On success, update our cart tracking
         if (result.type === ShowAlertType.SUCCESS) {
           setCartTracking((prev) => [
             ...prev,

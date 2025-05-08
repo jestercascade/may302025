@@ -233,10 +233,10 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
       {isDropdownVisible && (
         <div className="absolute top-full left-0 z-20 w-full mt-2">
           <div
-            className={`${styles.customScrollbar} p-4 rounded-md shadow-lg bg-white border border-gray-200 max-h-60 overflow-y-auto`}
+            className={`${styles.customScrollbar} flex flex-col gap-4 p-4 rounded-md shadow-lg bg-white border border-gray-200 max-h-60 overflow-y-auto`}
           >
             {sortedGroups.map((group) => (
-              <div key={group.id} className="mb-4 last:mb-0">
+              <div key={group.id}>
                 <h3 className="text-sm font-medium mb-2">{group.name}</h3>
                 <div className="flex flex-wrap gap-2">
                   {group.values
