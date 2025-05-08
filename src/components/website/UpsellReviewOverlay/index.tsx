@@ -14,6 +14,7 @@ import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 import { Spinner } from "@/ui/Spinners/Default";
 import { X, Ruler, Check, ChevronDown } from "lucide-react";
 import { useOverlayStore } from "@/zustand/website/overlayStore";
+import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 
 export function UpsellReviewButton({ product }: { product: UpsellReviewProductType }) {
   const showOverlay = useUpsellReviewStore((state) => state.showOverlay);
@@ -36,6 +37,16 @@ export function UpsellReviewButton({ product }: { product: UpsellReviewProductTy
 }
 
 export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
+  const [selectedProductForOptions, setSelectedProductForOptions] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
+  const [isInCart, setIsInCart] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+
+  const hideQuickviewOverlay = useQuickviewStore((state) => state.hideOverlay);
+  const showAlert = useAlertStore((state) => state.showAlert);
+  const pathname = usePathname();
+  const router = useRouter();
+  const { push } = useNavigation();
   const {
     hideOverlay,
     selectedOptions,
@@ -45,14 +56,6 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
     setSelectedOptions,
     setReadyProducts,
   } = useUpsellReviewStore();
-  const hideQuickviewOverlay = useQuickviewStore((state) => state.hideOverlay);
-  const showAlert = useAlertStore((state) => state.showAlert);
-  const pathname = usePathname();
-  const router = useRouter();
-  const [selectedProductForOptions, setSelectedProductForOptions] = useState<string | null>(null);
-  const [, startTransition] = useTransition();
-  const [isInCart, setIsInCart] = useState(false);
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   // Fixed function to correctly check if the upsell is in cart with proper validation
   const isUpsellInCart = useCallback((): boolean => {
@@ -226,7 +229,7 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
       hideQuickviewOverlay();
       document.getElementById("scrollable-parent")?.scrollTo({ top: 0, behavior: "smooth" });
     } else {
-      router.push("/cart");
+      push("/cart");
     }
   };
 

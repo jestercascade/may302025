@@ -2,15 +2,7 @@
 
 import { useNavigationLoadingIndicatorStore } from "@/zustand/shared/navigationLoadingIndicatorStore";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-  ReactNode,
-  useRef,
-} from "react";
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode, useRef } from "react";
 
 const NavigationContext = createContext<{
   triggerLoading: () => void;
@@ -70,15 +62,9 @@ function LoadingOverlay({ showOverlay }: { showOverlay: boolean }) {
 }
 
 export function NavigationProvider({ children }: { children: ReactNode }) {
-  const showOverlay = useNavigationLoadingIndicatorStore(
-    (state) => state.showOverlay
-  );
-  const hideOverlay = useNavigationLoadingIndicatorStore(
-    (state) => state.hideOverlay
-  );
-  const isOverlayVisible = useNavigationLoadingIndicatorStore(
-    (state) => state.isVisible
-  );
+  const showOverlay = useNavigationLoadingIndicatorStore((state) => state.showOverlay);
+  const hideOverlay = useNavigationLoadingIndicatorStore((state) => state.hideOverlay);
+  const isOverlayVisible = useNavigationLoadingIndicatorStore((state) => state.isVisible);
 
   const pathname = usePathname();
   const navigationStartTime = useRef<number | null>(null);
@@ -145,9 +131,7 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
   }, [handleNavigation]);
 
   return (
-    <NavigationContext.Provider
-      value={{ triggerLoading, showOverlay: isOverlayVisible }}
-    >
+    <NavigationContext.Provider value={{ triggerLoading, showOverlay: isOverlayVisible }}>
       <LoadingOverlay showOverlay={isOverlayVisible} />
       {children}
     </NavigationContext.Provider>
