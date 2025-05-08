@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 
 const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000; // 1 second between retries
+const RETRY_DELAY = 1000;
 
 const initialOptions = {
   clientId: appConfig.PAYPAL.CLIENT_ID || "",
@@ -21,6 +21,10 @@ export function PayPalButton({ cart, showLabel }: { cart: Cart; showLabel: boole
   const router = useRouter();
   const [key, setKey] = useState(() => cart.length);
   const { showAlert, hideAlert } = useAlertStore();
+
+  useEffect(() => {
+    console.log(cart);
+  }, []);
 
   useEffect(() => {
     setKey(cart.length);
@@ -146,8 +150,8 @@ export function PayPalButton({ cart, showLabel }: { cart: Cart; showLabel: boole
           tagline: showLabel,
           label: showLabel ? "pay" : "paypal",
         }}
-        // createOrder={createOrder}
-        // onApprove={onApprove}
+        createOrder={createOrder}
+        onApprove={onApprove}
       />
     </PayPalScriptProvider>
   );
@@ -164,12 +168,53 @@ function generateCartItems(cart: Cart): CartItem[] {
   }
 
   function formatProductName(item: ProductCartItem): string {
-    const attributes = [item.size && item.size, item.color && item.color].filter(Boolean);
+    // Get base product ID
+    const productId = item.baseProductId;
 
-    const attributeString = attributes.length > 0 ? `[${attributes.join(", ")}] - ` : "";
+    // Extract all selected options into an array
+    const optionValues: string[] = [];
 
-    const fullName = `${attributeString}${item.name}`;
-    return fullName.length > 127 ? `${fullName.slice(0, 124)}...` : fullName;
+    // Add base product ID as the first element
+    optionValues.push(productId);
+
+    // Add all option values in order of their groupDisplayOrder
+    if (item.selectedOptions) {
+      const sortedOptions = Object.values(item.selectedOptions)
+        .sort((a, b) => a.groupDisplayOrder - b.groupDisplayOrder)
+        .map((option) => option.value);
+
+      optionValues.push(...sortedOptions);
+    }
+
+    // Format as [ID, option1, option2, ...]
+    const formattedName = `[${optionValues.join(", ")}]`;
+
+    // For PayPal, name must be 127 characters or less
+    return formattedName.length > 127 ? `${formattedName.slice(0, 124)}...` : formattedName;
+  }
+
+  function formatUpsellName(item: UpsellCartItem): string {
+    // For each product in the upsell, create a bracket with product ID and options
+    const productDetails = item.products.map((product) => {
+      const optionValues: string[] = [product.id];
+
+      // Add option values if they exist
+      if (product.selectedOptions) {
+        const sortedOptions = Object.values(product.selectedOptions)
+          .sort((a, b) => a.groupDisplayOrder - b.groupDisplayOrder)
+          .map((option) => option.value);
+
+        optionValues.push(...sortedOptions);
+      }
+
+      return `[${optionValues.join(", ")}]`;
+    });
+
+    // Join all product details with " + "
+    const combinedName = productDetails.join(" + ");
+
+    // For PayPal, name must be 127 characters or less
+    return combinedName.length > 127 ? `${combinedName.slice(0, 124)}...` : combinedName;
   }
 
   function getPrice(pricing: { salePrice: number; basePrice: number }): number {
@@ -189,15 +234,8 @@ function generateCartItems(cart: Cart): CartItem[] {
         quantity: 1,
       };
     } else {
-      const productDetails = item.products
-        .map((product) => {
-          const details = [product.id, product.size, product.color].filter(Boolean);
-          return `[${details.join(", ")}]`;
-        })
-        .join(" + ");
-
       return {
-        name: productDetails.length > 127 ? `${productDetails.slice(0, 124)}...` : productDetails,
+        name: formatUpsellName(item),
         sku: generateSku(item.baseUpsellId),
         unit_amount: {
           currency_code: "USD",
@@ -221,6 +259,12 @@ type CartItem = {
   quantity: number;
 };
 
+type SelectedOptionType = {
+  value: string;
+  optionDisplayOrder: number;
+  groupDisplayOrder: number;
+};
+
 type ProductCartItem = {
   baseProductId: string;
   variantId: string;
@@ -230,8 +274,7 @@ type ProductCartItem = {
     basePrice: number;
     salePrice: number;
   };
-  size?: string;
-  color?: string;
+  selectedOptions: Record<string, SelectedOptionType>;
 };
 
 type UpsellCartItem = {
@@ -246,8 +289,7 @@ type UpsellCartItem = {
     id: string;
     name: string;
     basePrice: number;
-    size: string;
-    color: string;
+    selectedOptions: Record<string, SelectedOptionType>;
   }>;
 };
 
