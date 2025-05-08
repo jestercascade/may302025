@@ -87,15 +87,12 @@ export function QuickviewOverlay() {
         </div>
       )}
       <UpsellReviewOverlay cart={cart} />
-      {/* <SizeChartOverlay
+      <SizeChartOverlay
         productInfo={{
           id: selectedProduct.id,
-          name: selectedProduct.name,
-          pricing: selectedProduct.pricing,
-          images: selectedProduct.images,
           options: selectedProduct.options,
         }}
-      /> */}
+      />
     </>
   );
 }
