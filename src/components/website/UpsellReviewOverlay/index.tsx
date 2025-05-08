@@ -15,107 +15,6 @@ import { Spinner } from "@/ui/Spinners/Default";
 import { X, Ruler, Check, ChevronDown } from "lucide-react";
 import { useOverlayStore } from "@/zustand/website/overlayStore";
 
-// Type Definitions
-type VisibilityType = "DRAFT" | "PUBLISHED" | "HIDDEN";
-
-type SizeChartType = {
-  centimeters?: {
-    columns: Array<{ label: string; order: number }>;
-    rows: Array<{ [key: string]: string }>;
-  };
-  inches?: {
-    columns: Array<{ label: string; order: number }>;
-    rows: Array<{ [key: string]: string }>;
-  };
-};
-
-type OptionGroupType = {
-  id: number;
-  name: string;
-  displayOrder: number;
-  values: Array<{
-    id: number;
-    value: string;
-    isActive: boolean;
-  }>;
-  sizeChart?: SizeChartType;
-};
-
-type ProductOptionsType = {
-  groups: Array<OptionGroupType>;
-  config: {
-    chaining: {
-      enabled: boolean;
-      relationships: Array<{
-        parentGroupId: number;
-        childGroupId: number;
-        constraints: { [parentOptionId: string]: number[] };
-      }>;
-    };
-  };
-};
-
-type UpsellProductType = {
-  id: string;
-  name: string;
-  slug: string;
-  basePrice: number;
-  images: {
-    main: string;
-    gallery: string[];
-  };
-  options: ProductOptionsType;
-};
-
-type UpsellReviewProductType = {
-  id: string;
-  upsell: {
-    id: string;
-    mainImage: string;
-    pricing: {
-      basePrice: number;
-      salePrice: number;
-      discountPercentage: number;
-    };
-    visibility: VisibilityType;
-    createdAt: string;
-    updatedAt: string;
-    products: UpsellProductType[];
-  };
-};
-
-type SelectedOptionType = {
-  value: string;
-  optionDisplayOrder: number;
-  groupDisplayOrder: number;
-};
-
-type CartProductItemType = {
-  type: "product";
-  baseProductId: string;
-  selectedOptions: Record<string, SelectedOptionType>;
-  variantId: string;
-  index: number;
-};
-
-type CartUpsellItemType = {
-  type: "upsell";
-  baseUpsellId: string;
-  products: Array<{
-    id: string;
-    selectedOptions: Record<string, SelectedOptionType>;
-  }>;
-};
-
-type CartType = {
-  id: string;
-  device_identifier: string;
-  items: Array<CartProductItemType | CartUpsellItemType>;
-  createdAt: string;
-  updatedAt: string;
-};
-
-// UpsellReviewButton Component
 export function UpsellReviewButton({ product }: { product: UpsellReviewProductType }) {
   const showOverlay = useUpsellReviewStore((state) => state.showOverlay);
   const setSelectedProduct = useUpsellReviewStore((state) => state.setSelectedProduct);
@@ -136,409 +35,6 @@ export function UpsellReviewButton({ product }: { product: UpsellReviewProductTy
   );
 }
 
-// UpsellReviewOverlay Component
-// UpsellReviewOverlay Component with fixed isInCart logic
-// export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
-//   const {
-//     hideOverlay,
-//     selectedOptions,
-//     readyProducts,
-//     isVisible,
-//     selectedProduct,
-//     setSelectedOptions,
-//     setReadyProducts,
-//   } = useUpsellReviewStore();
-//   const hideQuickviewOverlay = useQuickviewStore((state) => state.hideOverlay);
-//   const showAlert = useAlertStore((state) => state.showAlert);
-//   const pathname = usePathname();
-//   const router = useRouter();
-//   const [selectedProductForOptions, setSelectedProductForOptions] = useState<string | null>(null);
-//   const [, startTransition] = useTransition();
-//   const [isInCart, setIsInCart] = useState(false);
-//   const [isAddingToCart, setIsAddingToCart] = useState(false);
-
-//   // Fixed function to correctly check if the upsell is in cart
-//   // const isUpsellInCart = useCallback((): boolean => {
-//   //   // THIS IS WRONG! It's wrong what's happening here...
-//   //   // Because we're supposed to only set isInCart to true when:
-//   //   // `all products are selected with their options selected`
-//   //   // then we can test if in the cart we can find an upsell with identical products with exact matching selected options
-
-//   //   // if (!cart?.items || !selectedProduct?.upsell) return false;
-//   //   // return cart.items.some((item) => item.type === "upsell" && item.baseUpsellId === selectedProduct.upsell.id);
-//   // }, [cart, selectedProduct]);
-
-//   // Fixed function to correctly check if the upsell is in cart with proper validation
-//   const isUpsellInCart = useCallback((): boolean => {
-//     if (!cart?.items || !selectedProduct?.upsell) return false;
-
-//     // First check if we have all the necessary product options selected
-//     const allProductsReady = selectedProduct.upsell.products.every((product) => {
-//       // Check if this product requires options
-//       const requiresOptions = product.options.groups.some((group) => group.values.some((option) => option.isActive));
-
-//       // If it doesn't require options, it's automatically ready
-//       if (!requiresOptions) return true;
-
-//       // Otherwise check if it's in readyProducts
-//       return readyProducts.includes(product.id);
-//     });
-
-//     // Only proceed with cart check if all products are ready
-//     if (!allProductsReady) return false;
-
-//     // Now check if this specific upsell with these specific options is in the cart
-//     return cart.items.some((item) => {
-//       if (item.type !== "upsell" || item.baseUpsellId !== selectedProduct.upsell.id) {
-//         return false;
-//       }
-
-//       // For a valid match, we need to compare the selected options of each product
-//       const upsellProducts = selectedProduct.upsell.products;
-//       const cartProducts = (item as CartUpsellItemType).products;
-
-//       // If product count doesn't match, it's not the same upsell
-//       if (upsellProducts.length !== cartProducts.length) return false;
-
-//       // Compare each product and its options
-//       for (const upsellProduct of upsellProducts) {
-//         // Find matching product in cart
-//         const cartProduct = cartProducts.find((p) => p.id === upsellProduct.id);
-//         if (!cartProduct) return false;
-
-//         // Check if options match
-//         const productSelectedOptions = selectedOptions[upsellProduct.id] || {};
-
-//         // Convert selected options to the format used in the cart for comparison
-//         const upsellOptions: Record<string, SelectedOptionType> = {};
-//         for (const [groupIdStr, optionId] of Object.entries(productSelectedOptions)) {
-//           const groupId = Number(groupIdStr);
-//           const group = upsellProduct.options.groups.find((g) => g.id === groupId);
-//           const optionIndex = group?.values.findIndex((v) => v.id === optionId);
-
-//           if (group && optionIndex !== undefined && optionIndex !== -1) {
-//             const option = group.values[optionIndex];
-//             upsellOptions[group.name.toLowerCase()] = {
-//               value: option.value,
-//               optionDisplayOrder: optionIndex,
-//               groupDisplayOrder: group.displayOrder,
-//             };
-//           }
-//         }
-
-//         // Check if options match by comparing keys and values
-//         const cartOptionKeys = Object.keys(cartProduct.selectedOptions);
-//         const upsellOptionKeys = Object.keys(upsellOptions);
-
-//         if (cartOptionKeys.length !== upsellOptionKeys.length) return false;
-
-//         for (const key of upsellOptionKeys) {
-//           if (
-//             !cartProduct.selectedOptions[key] ||
-//             cartProduct.selectedOptions[key].value !== upsellOptions[key].value
-//           ) {
-//             return false;
-//           }
-//         }
-//       }
-
-//       // If we got here, everything matches
-//       return true;
-//     });
-//   }, [cart, selectedProduct, readyProducts, selectedOptions]);
-
-//   /* Error: Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. React limits the number of nested updates to prevent infinite loops.
-//     at getRootForUpdatedFiber (https://refactored-space-winner-jpp9r565g4q37gx-3000.app.github.dev/_next/static/chunks/node_modules_next_dist_compiled_2ce9398a._.js:4701:171)
-//     at enqueueConcurrentRenderForLane (https://refactored-space-winner-jpp9r565g4q37gx-3000.app.github.dev/_next/static/chunks/node_modules_next_dist_compiled_2ce9398a._.js:4689:16)
-//     at forceStoreRerender (https://refactored-space-winner-jpp9r565g4q37gx-3000.app.github.dev/_next/static/chunks/node_modules_next_dist_compiled_2ce9398a._.js:5854:20)
-//     at https://refactored-space-winner-jpp9r565g4q37gx-3000.app.github.dev/_next/static/chunks/node_modules_next_dist_compiled_2ce9398a._.js:5840:45
-//     at https://refactored-space-winner-jpp9r565g4q37gx-3000.app.github.dev/_next/static/chunks/node_modules_c68fdf6a._.js:1758:43
-//     at Set.forEach (<anonymous>)
-//     at setState (https://refactored-space-winner-jpp9r565g4q37gx-3000.app.github.dev/_next/static/chunks/node_modules_c68fdf6a._.js:1758:23)
-//     at setReadyProducts (https://refactored-space-winner-jpp9r565g4q37gx-3000.app.github.dev/_next/static/chunks/src_a8fb8af6._.js:179:39)
-//     at UpsellReviewOverlay.useEffect (https://refactored-space-winner-jpp9r565g4q37gx-3000.app.github.dev/_next/static/chunks/src_a8fb8af6._.js:1036:17)
-//     at LoadableComponent (https://refactored-space-winner-jpp9r565g4q37gx-3000.app.github.dev/_next/static/chunks/node_modules_8337220b._.js:189:57)
-//     at ProductDetails (rsc://React/Server/file:///workspaces/24-april-2025/.next/server/chunks/ssr/%5Broot%20of%20the%20server%5D__0a82d820._.js?72:1978:264) */
-
-//   // Updated useEffect to properly reset state on overlay visibility change
-//   useEffect(() => {
-//     if (isVisible && selectedProduct) {
-//       // Reset state when overlay becomes visible
-//       const autoReadyProducts = selectedProduct.upsell.products
-//         .filter((product) => product.options.groups.every((group) => group.values.every((option) => !option.isActive)))
-//         .map((product) => product.id);
-
-//       setReadyProducts(autoReadyProducts);
-//       setSelectedOptions({});
-
-//       // Correctly set isInCart status by checking the cart directly
-//       setIsInCart(isUpsellInCart());
-//     }
-//   }, [isVisible, selectedProduct, setReadyProducts, setSelectedOptions, isUpsellInCart]);
-
-//   // Additionally watch cart changes to update isInCart status
-//   useEffect(() => {
-//     if (isVisible && selectedProduct) {
-//       setIsInCart(isUpsellInCart());
-//     }
-//   }, [cart, isVisible, selectedProduct, isUpsellInCart]);
-
-//   const calculateSavings = (pricing: { basePrice: number; salePrice: number }): string => {
-//     return (Number(pricing.basePrice) - Number(pricing.salePrice)).toFixed(2);
-//   };
-
-//   // Compute if all products are ready for adding to cart
-//   const areAllProductsReady = useMemo(() => {
-//     if (!selectedProduct) return false;
-
-//     return selectedProduct.upsell.products.every((product) => {
-//       // If product has no active options, it's automatically ready
-//       const hasActiveOptions = product.options.groups.some((group) => group.values.some((option) => option.isActive));
-
-//       if (!hasActiveOptions) return true;
-
-//       // Product is ready if it's in the readyProducts array
-//       return readyProducts.includes(product.id);
-//     });
-//   }, [selectedProduct, readyProducts]);
-
-//   const handleAddToCart = () => {
-//     setIsAddingToCart(true);
-//     startTransition(async () => {
-//       if (!selectedProduct) return;
-
-//       const productsToAdd = selectedProduct.upsell.products.map((product) => {
-//         const productSelectedOptions = selectedOptions[product.id] || {};
-//         const readableOptions: Record<string, SelectedOptionType> = {};
-//         for (const [groupIdStr, optionId] of Object.entries(productSelectedOptions)) {
-//           const groupId = Number(groupIdStr);
-//           const group = product.options.groups.find((g) => g.id === groupId);
-//           const optionIndex = group?.values.findIndex((v) => v.id === optionId);
-//           if (group && optionIndex !== undefined && optionIndex !== -1) {
-//             const option = group.values[optionIndex];
-//             readableOptions[group.name.toLowerCase()] = {
-//               value: option.value,
-//               optionDisplayOrder: optionIndex,
-//               groupDisplayOrder: group.displayOrder,
-//             };
-//           }
-//         }
-//         return {
-//           id: product.id,
-//           selectedOptions: readableOptions,
-//         };
-//       });
-
-//       const upsellToAdd: CartUpsellItemType = {
-//         type: "upsell",
-//         baseUpsellId: selectedProduct.upsell.id,
-//         products: productsToAdd,
-//       };
-
-//       const result = await AddToCartAction(upsellToAdd);
-//       showAlert({
-//         message: result.message,
-//         type: result.type === ShowAlertType.ERROR ? ShowAlertType.ERROR : ShowAlertType.NEUTRAL,
-//       });
-
-//       setIsAddingToCart(false);
-//       if (result.type !== ShowAlertType.ERROR) {
-//         setIsInCart(true);
-//       }
-//     });
-//   };
-
-//   const handleInCartButtonClick = () => {
-//     if (pathname === "/cart") {
-//       hideOverlay();
-//       hideQuickviewOverlay();
-//       document.getElementById("scrollable-parent")?.scrollTo({ top: 0, behavior: "smooth" });
-//     } else {
-//       router.push("/cart");
-//     }
-//   };
-
-//   return (
-//     <>
-//       {isVisible && selectedProduct && (
-//         <div className="custom-scrollbar flex justify-center py-20 w-full h-dvh overflow-x-hidden overflow-y-visible z-30 fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-40 backdrop-blur-sm">
-//           <div className="w-[calc(100%-36px)] max-w-[500px] max-h-[764px] relative overflow-hidden rounded-2xl shadow-[0px_0px_36px_0px_rgba(255,185,56,0.6)] bg-white">
-//             <div className="h-full pt-5 pb-[80px] flex flex-col relative">
-//               <div className="pb-3">
-//                 <div className="w-max mx-auto flex items-center justify-center">
-//                   {Number(selectedProduct.upsell.pricing.salePrice) ? (
-//                     <div className="flex items-center gap-[6px]">
-//                       <div className="flex items-baseline text-[rgb(168,100,0)]">
-//                         <span className="text-[0.813rem] leading-3 font-semibold">$</span>
-//                         <span className="text-xl font-bold">
-//                           {Math.floor(Number(selectedProduct.upsell.pricing.salePrice))}
-//                         </span>
-//                         <span className="text-[0.813rem] leading-3 font-semibold">
-//                           {(Number(selectedProduct.upsell.pricing.salePrice) % 1).toFixed(2).substring(1)}
-//                         </span>
-//                       </div>
-//                       <span className="text-[0.813rem] leading-3 text-gray line-through">
-//                         ${formatThousands(Number(selectedProduct.upsell.pricing.basePrice))}
-//                       </span>
-//                     </div>
-//                   ) : (
-//                     <div className="flex items-baseline text-[rgb(168,100,0)]">
-//                       <span className="text-[0.813rem] leading-3 font-semibold">$</span>
-//                       <span className="text-lg font-bold">
-//                         {Math.floor(Number(selectedProduct.upsell.pricing.basePrice))}
-//                       </span>
-//                       <span className="text-[0.813rem] leading-3 font-semibold">
-//                         {(Number(selectedProduct.upsell.pricing.basePrice) % 1).toFixed(2).substring(1)}
-//                       </span>
-//                       <span className="ml-1 text-[0.813rem] leading-3 font-semibold">today</span>
-//                     </div>
-//                   )}
-//                 </div>
-//               </div>
-//               <div className="px-5 pt-4 pb-24 flex flex-col gap-5 items-center custom-scrollbar overflow-x-hidden overflow-y-visible">
-//                 <div className="w-full flex flex-col gap-3">
-//                   {selectedProduct.upsell.products.map((product) => (
-//                     <UpsellProductSummary
-//                       key={product.id}
-//                       product={product}
-//                       selectedOptions={selectedOptions[product.id] || {}}
-//                       onSelectOptions={(productId) => setSelectedProductForOptions(productId)}
-//                     />
-//                   ))}
-//                 </div>
-//               </div>
-//               <div className="absolute left-0 right-0 bottom-0">
-//                 <div className="h-[80px] px-5 flex items-start shadow-[0_-12px_16px_2px_white]">
-//                   <div className="w-full h-11 flex justify-between items-center">
-//                     <div className="flex gap-3">
-//                       <div className="flex items-center">
-//                         <div
-//                           className={clsx(
-//                             "w-5 h-5 rounded-full flex items-center justify-center",
-//                             readyProducts.length > 0 ? "bg-black" : "border border-gray"
-//                           )}
-//                         >
-//                           {readyProducts.length > 0 && <Check color="#ffffff" size={16} strokeWidth={2} />}
-//                         </div>
-//                       </div>
-//                       {readyProducts.length > 0 ? (
-//                         <>
-//                           <span className="min-[480px]:hidden font-semibold text-sm">
-//                             Selections ({readyProducts.length}/{selectedProduct.upsell.products.length})
-//                           </span>
-//                           <span className="hidden min-[480px]:block pl-[3px] font-semibold text-sm min-[520px]:text-base">
-//                             Confirm selections ({readyProducts.length}/{selectedProduct.upsell.products.length})
-//                           </span>
-//                         </>
-//                       ) : (
-//                         <>
-//                           <span className="min-[480px]:hidden font-semibold text-sm">
-//                             Selections (0/{selectedProduct.upsell.products.length})
-//                           </span>
-//                           <span className="hidden min-[480px]:block font-semibold text-sm min-[520px]:text-base">
-//                             Selections (0/{selectedProduct.upsell.products.length})
-//                           </span>
-//                         </>
-//                       )}
-//                     </div>
-//                     <div className="relative">
-//                       {isInCart ? (
-//                         <>
-//                           <button
-//                             onClick={handleInCartButtonClick}
-//                             className="min-[365px]:hidden animate-fade px-3 flex items-center justify-center w-full h-11 rounded-full cursor-pointer border border-[#c5c3c0] text-blue text-sm font-semibold shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,_#faf9f8_5%,_#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear-gradient(to_bottom,_#eae8e6_5%,_#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
-//                           >
-//                             View in Cart
-//                           </button>
-//                           <button
-//                             onClick={handleInCartButtonClick}
-//                             className="hidden animate-fade px-4 min-[365px]:flex items-center justify-center w-full h-11 rounded-full cursor-pointer border border-[#c5c3c0] text-blue font-semibold shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,_#faf9f8_5%,_#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear-gradient(to_bottom,_#eae8e6_5%,_#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
-//                           >
-//                             In Cart - See Now
-//                           </button>
-//                         </>
-//                       ) : (
-//                         <>
-//                           <button
-//                             className={clsx(
-//                               "min-[375px]:hidden text-sm flex items-center justify-center min-w-28 max-w-28 px-[10px] h-11 rounded-full border border-[#b27100] text-white font-semibold shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear-gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000] transition-opacity duration-200",
-//                               !areAllProductsReady || isAddingToCart
-//                                 ? "opacity-50 cursor-context-menu"
-//                                 : "cursor-pointer hover:bg-[#cc8100] hover:[background:linear-gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
-//                             )}
-//                             disabled={!areAllProductsReady || isAddingToCart}
-//                             onClick={handleAddToCart}
-//                           >
-//                             {isAddingToCart ? <Spinner size={24} color="white" /> : "Get Upgrade"}
-//                           </button>
-//                           <button
-//                             className={clsx(
-//                               "hidden text-sm min-[375px]:flex items-center justify-center min-w-[160px] max-w-60 min-[425px]:min-w-[172px] px-[10px] min-[425px]:px-4 min-[480px]:px-5 h-11 rounded-full border border-[#b27100] text-white font-semibold shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear-gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000] transition-opacity duration-200",
-//                               !areAllProductsReady || isAddingToCart
-//                                 ? "opacity-50 cursor-context-menu"
-//                                 : "cursor-pointer hover:bg-[#cc8100] hover:[background:linear-gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
-//                             )}
-//                             disabled={!areAllProductsReady || isAddingToCart}
-//                             onClick={handleAddToCart}
-//                           >
-//                             {isAddingToCart ? <Spinner size={24} color="white" /> : "Add Upgrade to Cart"}
-//                           </button>
-//                         </>
-//                       )}
-//                       <div
-//                         className={clsx(
-//                           "animate-fade-right absolute right-0 bottom-12 min-[520px]:bottom-14 w-[248px] py-3 px-4 rounded-xl bg-[#373737] before:content-[''] before:w-[10px] before:h-[10px] before:bg-[#373737] before:rounded-br-[2px] before:rotate-45 before:origin-bottom-left before:absolute before:-bottom-0 before:right-12",
-//                           {
-//                             hidden: !areAllProductsReady || isInCart,
-//                           }
-//                         )}
-//                       >
-//                         <p className="text-white text-sm">
-//                           <span className="text-[#ffe6ba]">
-//                             {selectedProduct.upsell.pricing.salePrice
-//                               ? `Congrats! Saved $${calculateSavings(selectedProduct.upsell.pricing)} -`
-//                               : `Congrats! You're all set -`}
-//                           </span>{" "}
-//                           <b>grab it before it's gone!</b>
-//                         </p>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-//             <button
-//               type="button"
-//               onClick={hideOverlay}
-//               className="w-9 h-9 rounded-full absolute top-[6px] right-[6px] flex items-center justify-center ease-in-out transition duration-300 active:bg-lightgray lg:hover:bg-lightgray"
-//             >
-//               <X color="#6c6c6c" strokeWidth={1.5} />
-//             </button>
-//           </div>
-//         </div>
-//       )}
-//       {selectedProduct && selectedProductForOptions && (
-//         <OptionSelectionModal
-//           product={selectedProduct.upsell.products.find((p) => p.id === selectedProductForOptions)!}
-//           currentSelectedOptions={selectedOptions[selectedProductForOptions] || {}}
-//           onOptionsSelected={(newOptions) => {
-//             setSelectedOptions({
-//               ...selectedOptions,
-//               [selectedProductForOptions]: newOptions,
-//             });
-//             if (!readyProducts.includes(selectedProductForOptions)) {
-//               setReadyProducts([...readyProducts, selectedProductForOptions]);
-//             }
-//             setSelectedProductForOptions(null);
-//           }}
-//           onClose={() => setSelectedProductForOptions(null)}
-//         />
-//       )}
-//     </>
-//   );
-// }
-
-// UpsellReviewOverlay Component with fixed infinite loop issue
 export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
   const {
     hideOverlay,
@@ -914,14 +410,6 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
   );
 }
 
-// UpsellProductSummary Component
-type UpsellProductSummaryProps = {
-  product: UpsellProductType;
-  selectedOptions: Record<number, number>;
-  onSelectOptions: (productId: string) => void;
-};
-
-// UpsellProductSummary Component with improved option state tracking
 function UpsellProductSummary({ product, selectedOptions, onSelectOptions }: UpsellProductSummaryProps) {
   // Check if this product has any options that need to be selected
   const hasActiveOptions = product.options.groups.some((group) => group.values.some((opt) => opt.isActive));
@@ -1011,15 +499,7 @@ function UpsellProductSummary({ product, selectedOptions, onSelectOptions }: Ups
   );
 }
 
-// OptionSelectionModal Component
-type OptionSelectionModalProps = {
-  product: UpsellProductType;
-  currentSelectedOptions: Record<number, number>;
-  onOptionsSelected: (newOptions: Record<number, number>) => void;
-  onClose: () => void;
-};
-
-export function OptionSelectionModal({
+function OptionSelectionModal({
   product,
   currentSelectedOptions,
   onOptionsSelected,
@@ -1204,3 +684,115 @@ export function OptionSelectionModal({
     </div>
   );
 }
+
+type UpsellProductSummaryProps = {
+  product: UpsellProductType;
+  selectedOptions: Record<number, number>;
+  onSelectOptions: (productId: string) => void;
+};
+
+type OptionSelectionModalProps = {
+  product: UpsellProductType;
+  currentSelectedOptions: Record<number, number>;
+  onOptionsSelected: (newOptions: Record<number, number>) => void;
+  onClose: () => void;
+};
+
+type VisibilityType = "DRAFT" | "PUBLISHED" | "HIDDEN";
+
+type SizeChartType = {
+  centimeters?: {
+    columns: Array<{ label: string; order: number }>;
+    rows: Array<{ [key: string]: string }>;
+  };
+  inches?: {
+    columns: Array<{ label: string; order: number }>;
+    rows: Array<{ [key: string]: string }>;
+  };
+};
+
+type OptionGroupType = {
+  id: number;
+  name: string;
+  displayOrder: number;
+  values: Array<{
+    id: number;
+    value: string;
+    isActive: boolean;
+  }>;
+  sizeChart?: SizeChartType;
+};
+
+type ProductOptionsType = {
+  groups: Array<OptionGroupType>;
+  config: {
+    chaining: {
+      enabled: boolean;
+      relationships: Array<{
+        parentGroupId: number;
+        childGroupId: number;
+        constraints: { [parentOptionId: string]: number[] };
+      }>;
+    };
+  };
+};
+
+type UpsellProductType = {
+  id: string;
+  name: string;
+  slug: string;
+  basePrice: number;
+  images: {
+    main: string;
+    gallery: string[];
+  };
+  options: ProductOptionsType;
+};
+
+type UpsellReviewProductType = {
+  id: string;
+  upsell: {
+    id: string;
+    mainImage: string;
+    pricing: {
+      basePrice: number;
+      salePrice: number;
+      discountPercentage: number;
+    };
+    visibility: VisibilityType;
+    createdAt: string;
+    updatedAt: string;
+    products: UpsellProductType[];
+  };
+};
+
+type SelectedOptionType = {
+  value: string;
+  optionDisplayOrder: number;
+  groupDisplayOrder: number;
+};
+
+type CartProductItemType = {
+  type: "product";
+  baseProductId: string;
+  selectedOptions: Record<string, SelectedOptionType>;
+  variantId: string;
+  index: number;
+};
+
+type CartUpsellItemType = {
+  type: "upsell";
+  baseUpsellId: string;
+  products: Array<{
+    id: string;
+    selectedOptions: Record<string, SelectedOptionType>;
+  }>;
+};
+
+type CartType = {
+  id: string;
+  device_identifier: string;
+  items: Array<CartProductItemType | CartUpsellItemType>;
+  createdAt: string;
+  updatedAt: string;
+};
