@@ -612,7 +612,7 @@ export function OptionSelectionModal({
                       className={`px-3 py-1.5 min-w-[3rem] rounded-full text-sm ${
                         localSelectedOptions[group.id] === option.id
                           ? "bg-black text-white"
-                          : "bg-gray-100 text-black hover:bg-gray-200"
+                          : "bg-neutral-100 text-black hover:bg-neutral-200"
                       }`}
                     >
                       {option.value}
@@ -684,7 +684,7 @@ export function OptionSelectionModal({
         <div className="overflow-y-auto flex-1 pl-5 pr-3 pb-5 rounded-y-scrollbar">
           {sections.map((section, index) => (
             <div key={index}>
-              {index > 0 && <div className="h-px bg-gray-200 w-full my-5"></div>}
+              {index > 0 && <div className="h-px bg-lightgray w-full my-5"></div>}
               {section}
             </div>
           ))}
@@ -697,7 +697,7 @@ export function OptionSelectionModal({
               onClose();
             }}
             className={`w-full py-2 rounded-lg font-semibold transition-colors ${
-              isAllSelected ? "bg-blue text-white hover:bg-blue-dimmed" : "bg-gray/30 text-gray cursor-not-allowed"
+              isAllSelected ? "bg-blue text-white hover:bg-blue-dimmed" : "bg-lightgray/30 text-gray cursor-not-allowed"
             }`}
           >
             Done
