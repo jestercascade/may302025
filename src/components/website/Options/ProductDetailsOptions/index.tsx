@@ -28,6 +28,16 @@ type SizeChartType = {
 
 type ProductOptionsType = {
   groups: OptionGroupType[];
+  config?: {
+    chaining?: {
+      enabled: boolean;
+      relationships?: Array<{
+        parentGroupId: number;
+        childGroupId: number;
+        constraints: { [parentOptionId: string]: number[] };
+      }>;
+    };
+  };
 };
 
 type ProductDetailsOptionsProps = {
@@ -54,9 +64,7 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
 
   const MAX_DISPLAY_CHARS = 28;
 
-  const sortedGroups = [...options.groups]
-    .filter((group) => group.values.some((opt) => opt.isActive))
-    .sort((a, b) => a.displayOrder - b.displayOrder);
+  const sortedGroups = [...options.groups].sort((a, b) => a.displayOrder - b.displayOrder);
 
   const sizeGroup = sortedGroups.find((group) => group.name.toLowerCase() === "size");
   const isSizeSelected = sizeGroup && selectedOptions[sizeGroup.id] !== undefined;
@@ -82,6 +90,60 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
     if (label.toLowerCase() === "height" && value.includes("-")) return value + "cm";
     return value + " in";
   };
+
+  // Extract chaining configuration
+  const chaining = options.config?.chaining;
+  const isChainingEnabled = chaining?.enabled ?? false;
+  const relationships = isChainingEnabled ? chaining.relationships || [] : [];
+
+  // Pre-compute which parent options have at least one valid child option
+  const validParentOptions = new Map<number, Set<number>>();
+
+  // Also pre-compute which child options are valid with any parent
+  const validChildOptions = new Map<number, Set<number>>();
+
+  relationships.forEach((relationship) => {
+    const { parentGroupId, childGroupId, constraints } = relationship;
+
+    // Initialize sets if not exists
+    if (!validParentOptions.has(parentGroupId)) {
+      validParentOptions.set(parentGroupId, new Set<number>());
+    }
+    if (!validChildOptions.has(childGroupId)) {
+      validChildOptions.set(childGroupId, new Set<number>());
+    }
+
+    // Find the groups
+    const childGroup = sortedGroups.find((group) => group.id === childGroupId);
+    const parentGroup = sortedGroups.find((group) => group.id === parentGroupId);
+    if (!childGroup || !parentGroup) return;
+
+    // For each parent option, check if it has at least one active child option
+    Object.entries(constraints).forEach(([parentOptionIdStr, allowedChildIds]) => {
+      const parentOptionId = Number(parentOptionIdStr);
+
+      // Skip if parent option itself is inactive
+      const parentOption = parentGroup.values.find((opt) => opt.id === parentOptionId);
+      if (!parentOption?.isActive) return;
+
+      const hasValidChild = allowedChildIds.some((childId) => {
+        const childOption = childGroup.values.find((opt) => opt.id === childId);
+        return childOption && childOption.isActive;
+      });
+
+      if (hasValidChild) {
+        validParentOptions.get(parentGroupId)?.add(parentOptionId);
+
+        // Record which children are valid with any valid parent
+        allowedChildIds.forEach((childId) => {
+          const childOption = childGroup.values.find((opt) => opt.id === childId);
+          if (childOption?.isActive) {
+            validChildOptions.get(childGroupId)?.add(childId);
+          }
+        });
+      }
+    });
+  });
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -148,9 +210,39 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
   };
 
   const handleSelectOption = (groupId: number, optionId: number) => {
-    setSelectedOption(groupId, optionId);
+    // Create updated selection state
     const updated = { ...selectedOptions, [groupId]: optionId };
-    if (sortedGroups.every((g) => updated[g.id] !== undefined)) setDropdownVisible(false);
+
+    // Check if this is a parent selection that invalidates any existing child selections
+    if (isChainingEnabled) {
+      relationships.forEach((rel) => {
+        // If this is a parent group being selected
+        if (rel.parentGroupId === groupId) {
+          const childGroupId = rel.childGroupId;
+          const selectedChildId = selectedOptions[childGroupId];
+
+          // If a child is already selected, check if it's compatible with this parent
+          if (selectedChildId !== undefined) {
+            const allowedChildIds = rel.constraints[optionId] || [];
+
+            // If the selected child is not compatible with this parent, clear the child selection
+            if (!allowedChildIds.includes(selectedChildId)) {
+              delete updated[childGroupId]; // Remove incompatible child selection
+            }
+          }
+        }
+      });
+    }
+
+    // Apply all updated selections
+    Object.entries(updated).forEach(([gId, oId]) => {
+      setSelectedOption(Number(gId), oId);
+    });
+
+    // Close dropdown if all required options are selected
+    if (sortedGroups.every((g) => updated[g.id] !== undefined)) {
+      setDropdownVisible(false);
+    }
   };
 
   const handleSizeChartClick = () => {
@@ -158,6 +250,71 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
       pageName: productDetailsPage.name,
       overlayName: productDetailsPage.overlays.sizeChart.name,
     });
+  };
+
+  // Helper function to check if an option should be disabled based on constraints
+  const isOptionDisabled = (groupId: number, optionId: number) => {
+    // Base case: if option is explicitly marked as inactive
+    const group = sortedGroups.find((g) => g.id === groupId);
+    const option = group?.values.find((o) => o.id === optionId);
+    if (!option?.isActive) return true;
+
+    if (isChainingEnabled) {
+      // Case 1: This is a parent option
+      const isParent = relationships.some((rel) => rel.parentGroupId === groupId);
+      if (isParent) {
+        // If this parent has no valid children, disable it
+        if (!validParentOptions.get(groupId)?.has(optionId)) {
+          return true;
+        }
+
+        // Check if selecting this parent would invalidate current child selections
+        const childSelectionsInvalid = relationships.some((rel) => {
+          if (rel.parentGroupId !== groupId) return false;
+
+          const childGroupId = rel.childGroupId;
+          const selectedChildId = selectedOptions[childGroupId];
+
+          // If child is selected, check if it would be compatible with this parent
+          if (selectedChildId !== undefined) {
+            const allowedChildIds = rel.constraints[optionId] || [];
+            return !allowedChildIds.includes(selectedChildId);
+          }
+
+          return false;
+        });
+
+        // Disable parent if it would invalidate current child selections
+        if (childSelectionsInvalid) {
+          return true;
+        }
+      }
+
+      // Case 2: This is a child option - check if it's compatible with selected parent
+      const relationshipAsChild = relationships.find((rel) => rel.childGroupId === groupId);
+      if (relationshipAsChild) {
+        const { parentGroupId, constraints } = relationshipAsChild;
+        const selectedParentId = selectedOptions[parentGroupId];
+
+        // If parent is selected, check if this child is compatible
+        if (selectedParentId !== undefined) {
+          const allowedChildIds = constraints[selectedParentId] || [];
+          return !allowedChildIds.includes(optionId);
+        }
+
+        // If no parent is selected, check if this child is compatible with ANY valid parent
+        // Only enable child options that have at least one possible valid parent
+        const hasAnyValidParent = Object.entries(constraints).some(([parentIdStr, allowedChildIds]) => {
+          const parentId = Number(parentIdStr);
+          // Check if this parent is valid and allows this child
+          return validParentOptions.get(parentGroupId)?.has(parentId) && allowedChildIds.includes(optionId);
+        });
+
+        return !hasAnyValidParent;
+      }
+    }
+
+    return false;
   };
 
   if (sortedGroups.length === 0) return null;
@@ -239,23 +396,28 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
               <div key={group.id}>
                 <h3 className="text-sm font-medium mb-2">{group.name}</h3>
                 <div className="flex flex-wrap gap-2">
-                  {group.values
-                    .filter((option) => option.isActive)
-                    .map((option) => (
+                  {group.values.map((option) => {
+                    const isDisabled = isOptionDisabled(group.id, option.id);
+
+                    return (
                       <button
                         key={option.id}
-                        onClick={() => handleSelectOption(group.id, option.id)}
+                        onClick={() => !isDisabled && handleSelectOption(group.id, option.id)}
                         className={clsx(
                           "px-3 py-1.5 min-w-12 rounded-full text-sm",
                           "transition-all duration-150 ease-in-out",
                           selectedOptions[group.id] === option.id
                             ? "bg-black text-white"
+                            : isDisabled
+                            ? "border-2 border-dashed border-gray-300 text-gray-400 opacity-50 cursor-not-allowed"
                             : "bg-neutral-100 text-black hover:bg-neutral-200"
                         )}
+                        disabled={isDisabled}
                       >
                         {option.value}
                       </button>
-                    ))}
+                    );
+                  })}
                 </div>
                 {group.name.toLowerCase() === "size" && selectedOptions[group.id] !== undefined && selectedSizeRow && (
                   <div className="mt-3">
