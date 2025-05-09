@@ -57,7 +57,6 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
     setReadyProducts,
   } = useUpsellReviewStore();
 
-  // Fixed function to correctly check if the upsell is in cart with proper validation
   const isUpsellInCart = useCallback((): boolean => {
     if (!cart?.items || !selectedProduct?.upsell) return false;
 
@@ -391,10 +390,8 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
 }
 
 function UpsellProductSummary({ product, selectedOptions, onSelectOptions }: UpsellProductSummaryProps) {
-  // Check if this product has any options that need to be selected
   const hasActiveOptions = product.options.groups.some((group) => group.values.some((opt) => opt.isActive));
 
-  // Check if all required options for this product have been selected
   const isOptionsSelected = useMemo(() => {
     if (!hasActiveOptions) return true;
 
@@ -491,6 +488,128 @@ function OptionSelectionModal({
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const productDetailsPage = useOverlayStore((state) => state.pages.productDetails);
 
+  const chaining = product.options.config?.chaining;
+  const isChainingEnabled = chaining?.enabled ?? false;
+  const relationships = isChainingEnabled ? chaining.relationships || [] : [];
+
+  // Precompute valid parent and child options
+  const validParentOptions = new Map<number, Set<number>>();
+  const validChildOptions = new Map<number, Set<number>>();
+
+  relationships.forEach((relationship) => {
+    const { parentGroupId, childGroupId, constraints } = relationship;
+
+    if (!validParentOptions.has(parentGroupId)) {
+      validParentOptions.set(parentGroupId, new Set<number>());
+    }
+    if (!validChildOptions.has(childGroupId)) {
+      validChildOptions.set(childGroupId, new Set<number>());
+    }
+
+    const childGroup = product.options.groups.find((group) => group.id === childGroupId);
+    const parentGroup = product.options.groups.find((group) => group.id === parentGroupId);
+    if (!childGroup || !parentGroup) return;
+
+    Object.entries(constraints).forEach(([parentOptionIdStr, allowedChildIds]) => {
+      const parentOptionId = Number(parentOptionIdStr);
+
+      const parentOption = parentGroup.values.find((opt) => opt.id === parentOptionId);
+      if (!parentOption?.isActive) return;
+
+      const hasValidChild = allowedChildIds.some((childId) => {
+        const childOption = childGroup.values.find((opt) => opt.id === childId);
+        return childOption && childOption.isActive;
+      });
+
+      if (hasValidChild) {
+        validParentOptions.get(parentGroupId)?.add(parentOptionId);
+
+        allowedChildIds.forEach((childId) => {
+          const childOption = childGroup.values.find((opt) => opt.id === childId);
+          if (childOption?.isActive) {
+            validChildOptions.get(childGroupId)?.add(childId);
+          }
+        });
+      }
+    });
+  });
+
+  const isOptionDisabled = (groupId: number, optionId: number): boolean => {
+    const group = product.options.groups.find((g) => g.id === groupId);
+    const option = group?.values.find((o) => o.id === optionId);
+    if (!option?.isActive) return true;
+
+    if (isChainingEnabled) {
+      const isParent = relationships.some((rel) => rel.parentGroupId === groupId);
+      if (isParent) {
+        if (!validParentOptions.get(groupId)?.has(optionId)) {
+          return true;
+        }
+
+        const childSelectionsInvalid = relationships.some((rel) => {
+          if (rel.parentGroupId !== groupId) return false;
+
+          const childGroupId = rel.childGroupId;
+          const selectedChildId = localSelectedOptions[childGroupId];
+
+          if (selectedChildId !== undefined) {
+            const allowedChildIds = rel.constraints[optionId] || [];
+            return !allowedChildIds.includes(selectedChildId);
+          }
+
+          return false;
+        });
+
+        if (childSelectionsInvalid) {
+          return true;
+        }
+      }
+
+      const relationshipAsChild = relationships.find((rel) => rel.childGroupId === groupId);
+      if (relationshipAsChild) {
+        const { parentGroupId, constraints } = relationshipAsChild;
+        const selectedParentId = localSelectedOptions[parentGroupId];
+
+        if (selectedParentId !== undefined) {
+          const allowedChildIds = constraints[selectedParentId] || [];
+          return !allowedChildIds.includes(optionId);
+        } else {
+          const hasAnyValidParent = Object.entries(constraints).some(([parentIdStr, allowedChildIds]) => {
+            const parentId = Number(parentIdStr);
+            return validParentOptions.get(parentGroupId)?.has(parentId) && allowedChildIds.includes(optionId);
+          });
+          return !hasAnyValidParent;
+        }
+      }
+    }
+
+    return false;
+  };
+
+  const handleSelectOption = (groupId: number, optionId: number) => {
+    if (isOptionDisabled(groupId, optionId)) return;
+
+    const updated = { ...localSelectedOptions, [groupId]: optionId };
+
+    if (isChainingEnabled) {
+      relationships.forEach((rel) => {
+        if (rel.parentGroupId === groupId) {
+          const childGroupId = rel.childGroupId;
+          const selectedChildId = localSelectedOptions[childGroupId];
+
+          if (selectedChildId !== undefined) {
+            const allowedChildIds = rel.constraints[optionId] || [];
+            if (!allowedChildIds.includes(selectedChildId)) {
+              delete updated[childGroupId];
+            }
+          }
+        }
+      });
+    }
+
+    setLocalSelectedOptions(updated);
+  };
+
   const requiredGroups = product.options.groups.filter((group) => group.values.some((opt) => opt.isActive));
   const isAllSelected = requiredGroups.every((group) => localSelectedOptions[group.id] !== undefined);
 
@@ -557,24 +676,25 @@ function OptionSelectionModal({
               <div className="flex flex-wrap gap-2">
                 {group.values
                   .filter((option) => option.isActive)
-                  .map((option) => (
-                    <button
-                      key={option.id}
-                      onClick={() =>
-                        setLocalSelectedOptions({
-                          ...localSelectedOptions,
-                          [group.id]: option.id,
-                        })
-                      }
-                      className={`px-3 py-1.5 min-w-[3rem] rounded-full text-sm ${
-                        localSelectedOptions[group.id] === option.id
-                          ? "bg-black text-white"
-                          : "bg-neutral-100 text-black hover:bg-neutral-200"
-                      }`}
-                    >
-                      {option.value}
-                    </button>
-                  ))}
+                  .map((option) => {
+                    const disabled = isOptionDisabled(group.id, option.id);
+                    return (
+                      <button
+                        key={option.id}
+                        onClick={() => handleSelectOption(group.id, option.id)}
+                        disabled={disabled}
+                        className={`px-3 py-1.5 min-w-[3rem] rounded-full text-sm ${
+                          localSelectedOptions[group.id] === option.id
+                            ? "bg-black text-white"
+                            : disabled
+                            ? "bg-neutral-100 text-gray-400 cursor-not-allowed"
+                            : "bg-neutral-100 text-black hover:bg-neutral-200"
+                        }`}
+                      >
+                        {option.value}
+                      </button>
+                    );
+                  })}
               </div>
               {group.name.toLowerCase() === "size" && localSelectedOptions[group.id] !== undefined && (
                 <div className="mt-3">
