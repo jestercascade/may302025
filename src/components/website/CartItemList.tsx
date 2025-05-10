@@ -57,20 +57,12 @@ type CartUpsellItemType = {
 
 type CartItemType = CartProductItemType | CartUpsellItemType;
 
-// Props Interfaces for Sub-Components
 interface OrderSummaryProps {
   selectedItems: Set<string>;
   getSelectedCartItems: () => CartItemType[];
   calculateTotal: () => number;
   toggleAll: () => void;
   cartItems: CartItemType[];
-}
-
-interface MobileOrderSummaryProps {
-  selectedItems: Set<string>;
-  getSelectedCartItems: () => CartItemType[];
-  calculateTotal: () => number;
-  toggleAll: () => void;
 }
 
 export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
@@ -433,8 +425,9 @@ function OrderSummary({
                 className="object-contain"
               />
             </div>
-
-            <PayPalButton showLabel={true} cart={getSelectedCartItems()} />
+            <div className="h-[45px]">
+              <PayPalButton showLabel={true} cart={getSelectedCartItems()} />
+            </div>
           </div>
 
           <div className="pt-2 space-y-2 text-xs">
