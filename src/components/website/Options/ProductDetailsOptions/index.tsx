@@ -389,8 +389,7 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
                         key={option.id}
                         onClick={() => !isDisabled && handleSelectOption(group.id, option.id)}
                         className={clsx(
-                          "px-3 py-1.5 min-w-12 rounded-full text-sm",
-                          "transition-all duration-150 ease-in-out",
+                          "px-3 py-1.5 min-w-12 rounded-full text-sm transition-all duration-150 ease-in-out",
                           selectedOptions[group.id] === option.id
                             ? "bg-black text-white"
                             : isDisabled
