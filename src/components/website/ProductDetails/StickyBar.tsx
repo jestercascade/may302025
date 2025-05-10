@@ -16,69 +16,94 @@ import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 export function StickyBar({
   productInfo,
   optionsComponent,
-  hasColor,
-  hasSize,
   cart,
 }: {
-  optionsComponent: ReactElement;
-  hasColor: boolean;
-  hasSize: boolean;
-  cart: CartType | null;
   productInfo: ProductInfoType;
+  optionsComponent: ReactElement;
+  cart: CartType | null;
 }) {
   const { push } = useNavigation();
   const [isPending, startTransition] = useTransition();
   const [isInCart, setIsInCart] = useState(false);
-  const selectedColor = useOptionsStore((state) => state.selectedColor);
-  const selectedSize = useOptionsStore((state) => state.selectedSize);
+  const selectedOptions = useOptionsStore((state) => state.selectedOptions);
   const showAlert = useAlertStore((state) => state.showAlert);
-  const shouldShowStickyBar = useScrollStore(
-    (state) => state.shouldShowStickyBar
-  );
+  const shouldShowStickyBar = useScrollStore((state) => state.shouldShowStickyBar);
 
+  // Compute required option groups (those with at least one active value)
+  const requiredGroups = productInfo.options.groups.filter((group) => group.values.some((value) => value.isActive));
+
+  // Compute current selected option values for cart comparison
+  const currentSelectedValues: Record<string, string> = {};
+  requiredGroups.forEach((group) => {
+    const selectedOptionId = selectedOptions[group.id];
+    if (selectedOptionId !== undefined) {
+      const option = group.values.find((opt) => opt.id === selectedOptionId);
+      if (option) {
+        currentSelectedValues[group.name.toLowerCase()] = option.value;
+      }
+    }
+  });
+
+  // Check if the current selection is in the cart
   useEffect(() => {
-    setIsInCart(
+    const isInCart =
       cart?.items.some((item) => {
-        if (item.type === "product") {
+        if (item.type !== "product" || item.baseProductId !== productInfo.id) return false;
+        const cartOptionKeys = Object.keys(item.selectedOptions);
+        if (requiredGroups.length === 0) {
+          // Simple product: no options required
+          return cartOptionKeys.length === 0;
+        } else {
+          // Product with options: check if selected options match
+          const requiredKeys = requiredGroups.map((group) => group.name.toLowerCase());
+          if (cartOptionKeys.length !== requiredKeys.length) return false;
           return (
-            item.baseProductId === productInfo.id &&
-            item.color === selectedColor &&
-            item.size === selectedSize
+            requiredKeys.every((key) => cartOptionKeys.includes(key)) &&
+            requiredKeys.every((key) => item.selectedOptions[key].value === currentSelectedValues[key])
           );
         }
-        return false;
-      }) ?? false
-    );
-  }, [cart, productInfo.id, selectedColor, selectedSize]);
+      }) ?? false;
+    setIsInCart(isInCart);
+  }, [cart, productInfo.id, selectedOptions, requiredGroups]);
 
   const handleAddToCart = async () => {
-    if (hasColor && !selectedColor) {
+    // Check if all required options are selected
+    const allOptionsSelected = requiredGroups.every((group) => selectedOptions[group.id] !== undefined);
+    if (requiredGroups.length > 0 && !allOptionsSelected) {
+      const firstMissingGroup = requiredGroups.find((group) => selectedOptions[group.id] === undefined);
+      const message = firstMissingGroup ? `Select a ${firstMissingGroup.name.toLowerCase()}` : "Select all options";
       return showAlert({
-        message: "Select a color",
-        type: ShowAlertType.NEUTRAL,
-      });
-    }
-    if (hasSize && !selectedSize) {
-      return showAlert({
-        message: "Select a size",
+        message,
         type: ShowAlertType.NEUTRAL,
       });
     }
 
     startTransition(async () => {
+      const selectedOptionsForCart: Record<string, SelectedOptionType> = {};
+      requiredGroups.forEach((group) => {
+        const selectedOptionId = selectedOptions[group.id];
+        if (selectedOptionId !== undefined) {
+          const optionIndex = group.values.findIndex((opt) => opt.id === selectedOptionId);
+          if (optionIndex !== -1) {
+            const option = group.values[optionIndex];
+            selectedOptionsForCart[group.name.toLowerCase()] = {
+              value: option.value,
+              optionDisplayOrder: optionIndex,
+              groupDisplayOrder: group.displayOrder,
+            };
+          }
+        }
+      });
+
       const result = await AddToCartAction({
         type: "product",
         baseProductId: productInfo.id,
-        color: selectedColor,
-        size: selectedSize,
+        selectedOptions: selectedOptionsForCart,
       });
 
       showAlert({
         message: result.message,
-        type:
-          result.type === ShowAlertType.ERROR
-            ? ShowAlertType.ERROR
-            : ShowAlertType.NEUTRAL,
+        type: result.type === ShowAlertType.ERROR ? ShowAlertType.ERROR : ShowAlertType.NEUTRAL,
       });
 
       if (result.type === ShowAlertType.SUCCESS) {
@@ -88,13 +113,6 @@ export function StickyBar({
   };
 
   const { pricing, upsell, images, name } = productInfo;
-
-  const isSimpleProductInCart =
-    !hasColor &&
-    !hasSize &&
-    cart?.items.some(
-      (item) => item.type === "product" && item.baseProductId === productInfo.id
-    );
 
   return (
     <div
@@ -107,30 +125,15 @@ export function StickyBar({
       <div className="w-full max-w-[1066px] h-16 mx-auto flex gap-5 items-center justify-between">
         <div className="h-full flex gap-5">
           <div className="h-full aspect-square relative rounded-md flex items-center justify-center overflow-hidden">
-            <Image
-              src={images.main}
-              alt={name}
-              width={64}
-              height={64}
-              priority={true}
-            />
+            <Image src={images.main} alt={name} width={64} height={64} priority={true} />
           </div>
           <div className="h-full flex gap-5 items-center">
             <div className="w-max flex items-center justify-center">
               {Number(pricing.salePrice) ? (
                 <div className="flex items-center gap-[6px]">
-                  <div
-                    className={clsx(
-                      "flex items-baseline",
-                      !upsell && "text-[rgb(168,100,0)]"
-                    )}
-                  >
-                    <span className="text-[0.813rem] leading-3 font-semibold">
-                      $
-                    </span>
-                    <span className="text-lg font-bold">
-                      {Math.floor(Number(pricing.salePrice))}
-                    </span>
+                  <div className={clsx("flex items-baseline", !upsell && "text-[rgb(168,100,0)]")}>
+                    <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                    <span className="text-lg font-bold">{Math.floor(Number(pricing.salePrice))}</span>
                     <span className="text-[0.813rem] leading-3 font-semibold">
                       {(Number(pricing.salePrice) % 1).toFixed(2).substring(1)}
                     </span>
@@ -141,12 +144,8 @@ export function StickyBar({
                 </div>
               ) : (
                 <div className="flex items-baseline">
-                  <span className="text-[0.813rem] leading-3 font-semibold">
-                    $
-                  </span>
-                  <span className="text-lg font-bold">
-                    {Math.floor(Number(pricing.basePrice))}
-                  </span>
+                  <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                  <span className="text-lg font-bold">{Math.floor(Number(pricing.basePrice))}</span>
                   <span className="text-[0.813rem] leading-3 font-semibold">
                     {(Number(pricing.basePrice) % 1).toFixed(2).substring(1)}
                   </span>
@@ -170,11 +169,7 @@ export function StickyBar({
                     isPending && "!cursor-context-menu opacity-50"
                   )}
                 >
-                  {isPending ? (
-                    <Spinner size={28} color="white" />
-                  ) : (
-                    "Add to Cart"
-                  )}
+                  {isPending ? <Spinner size={28} color="white" /> : "Add to Cart"}
                 </button>
               ) : (
                 <button
@@ -185,16 +180,12 @@ export function StickyBar({
                     isPending && "cursor-context-menu opacity-50"
                   )}
                 >
-                  {isPending ? (
-                    <Spinner size={28} color="gray" />
-                  ) : (
-                    "Add to Cart"
-                  )}
+                  {isPending ? <Spinner size={28} color="gray" /> : "Add to Cart"}
                 </button>
               )}
             </>
           )}
-          {(isInCart || isSimpleProductInCart) && !hasColor && !hasSize && (
+          {isInCart && (
             <button
               onClick={() => push("/cart")}
               className="flex items-center justify-center w-max px-9 rounded-full cursor-pointer border border-[#c5c3c0] text-blue font-semibold h-[44px] shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,_#faf9f8_5%,_#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear-gradient(to_bottom,_#eae8e6_5%,_#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)] min-[896px]:h-12"
@@ -230,55 +221,34 @@ export function StickyBar({
                             {Number(upsell.pricing.salePrice) ? (
                               <div className="flex items-center gap-[6px]">
                                 <div className="flex items-baseline text-[rgb(168,100,0)]">
-                                  <span className="text-[0.813rem] leading-3 font-semibold">
-                                    $
-                                  </span>
+                                  <span className="text-[0.813rem] leading-3 font-semibold">$</span>
                                   <span className="text-lg font-bold">
-                                    {Math.floor(
-                                      Number(upsell.pricing.salePrice)
-                                    )}
+                                    {Math.floor(Number(upsell.pricing.salePrice))}
                                   </span>
                                   <span className="text-[0.813rem] leading-3 font-semibold">
-                                    {(Number(upsell.pricing.salePrice) % 1)
-                                      .toFixed(2)
-                                      .substring(1)}
+                                    {(Number(upsell.pricing.salePrice) % 1).toFixed(2).substring(1)}
                                   </span>
                                 </div>
                                 <span className="text-[0.813rem] leading-3 text-gray line-through">
-                                  $
-                                  {formatThousands(
-                                    Number(upsell.pricing.basePrice)
-                                  )}
+                                  ${formatThousands(Number(upsell.pricing.basePrice))}
                                 </span>
                               </div>
                             ) : (
                               <div className="flex items-baseline text-[rgb(168,100,0)]">
-                                <span className="text-[0.813rem] leading-3 font-semibold">
-                                  $
-                                </span>
+                                <span className="text-[0.813rem] leading-3 font-semibold">$</span>
                                 <span className="text-lg font-bold">
                                   {Math.floor(Number(upsell.pricing.basePrice))}
                                 </span>
                                 <span className="text-[0.813rem] leading-3 font-semibold">
-                                  {(Number(upsell.pricing.basePrice) % 1)
-                                    .toFixed(2)
-                                    .substring(1)}
+                                  {(Number(upsell.pricing.basePrice) % 1).toFixed(2).substring(1)}
                                 </span>
-                                <span className="ml-1 text-[0.813rem] leading-3 font-semibold">
-                                  today
-                                </span>
+                                <span className="ml-1 text-[0.813rem] leading-3 font-semibold">today</span>
                               </div>
                             )}
                           </div>
                         </div>
                         <div className="mt-3 h-[210px] aspect-square mx-auto overflow-hidden">
-                          <Image
-                            src={upsell.mainImage}
-                            alt="Upgrade order"
-                            width={240}
-                            height={240}
-                            priority
-                          />
+                          <Image src={upsell.mainImage} alt="Upgrade order" width={240} height={240} priority />
                         </div>
                         <div className="w-[184px] mx-auto mt-5 text-xs leading-6 [word-spacing:1px]">
                           <ul className="*:flex *:justify-between">
@@ -289,31 +259,24 @@ export function StickyBar({
                                   <span
                                     className={`${
                                       upsell.pricing.salePrice > 0 &&
-                                      upsell.pricing.salePrice <
-                                        upsell.pricing.basePrice
+                                      upsell.pricing.salePrice < upsell.pricing.basePrice
                                         ? "line-through text-gray"
                                         : "text-gray"
                                     }`}
                                   >
-                                    $
-                                    {formatThousands(Number(product.basePrice))}
+                                    ${formatThousands(Number(product.basePrice))}
                                   </span>
                                 </p>
                               </li>
                             ))}
-                            {upsell.pricing.salePrice > 0 &&
-                              upsell.pricing.salePrice <
-                                upsell.pricing.basePrice && (
-                                <li className="mt-2 flex items-center rounded font-semibold">
-                                  <p className="mx-auto">
-                                    You Save $
-                                    {formatThousands(
-                                      Number(upsell.pricing.basePrice) -
-                                        Number(upsell.pricing.salePrice)
-                                    )}
-                                  </p>
-                                </li>
-                              )}
+                            {upsell.pricing.salePrice > 0 && upsell.pricing.salePrice < upsell.pricing.basePrice && (
+                              <li className="mt-2 flex items-center rounded font-semibold">
+                                <p className="mx-auto">
+                                  You Save $
+                                  {formatThousands(Number(upsell.pricing.basePrice) - Number(upsell.pricing.salePrice))}
+                                </p>
+                              </li>
+                            )}
                           </ul>
                         </div>
                       </div>
@@ -329,7 +292,63 @@ export function StickyBar({
   );
 }
 
-// -- Type Definitions --
+// Type Definitions
+type SelectedOptionType = {
+  value: string;
+  optionDisplayOrder: number;
+  groupDisplayOrder: number;
+};
+
+type CartProductItemType = {
+  type: "product";
+  baseProductId: string;
+  selectedOptions: Record<string, SelectedOptionType>;
+  variantId: string;
+  index: number;
+};
+
+type CartType = {
+  id: string;
+  device_identifier: string;
+  items: CartProductItemType[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+type OptionGroupType = {
+  id: number;
+  name: string;
+  displayOrder: number;
+  values: Array<{
+    id: number;
+    value: string;
+    isActive: boolean;
+  }>;
+  sizeChart?: {
+    centimeters?: {
+      columns: { label: string; order: number }[];
+      rows: { [key: string]: string }[];
+    };
+    inches?: {
+      columns: { label: string; order: number }[];
+      rows: { [key: string]: string }[];
+    };
+  };
+};
+
+type ProductOptionsType = {
+  groups: OptionGroupType[];
+  config?: {
+    chaining?: {
+      enabled: boolean;
+      relationships?: Array<{
+        parentGroupId: number;
+        childGroupId: number;
+        constraints: { [parentOptionId: string]: number[] };
+      }>;
+    };
+  };
+};
 
 type ProductInfoType = {
   id: string;
@@ -343,58 +362,6 @@ type ProductInfoType = {
     main: string;
     gallery: string[];
   };
-  options: {
-    colors: Array<{
-      name: string;
-      image: string;
-    }>;
-    sizes: {
-      inches: {
-        columns: { label: string; order: number }[];
-        rows: { [key: string]: string }[];
-      };
-      centimeters: {
-        columns: { label: string; order: number }[];
-        rows: { [key: string]: string }[];
-      };
-    };
-  };
-  upsell: {
-    id: string;
-    mainImage: string;
-    pricing: {
-      basePrice: number;
-      salePrice: number;
-      discountPercentage: number;
-    };
-    visibility: "DRAFT" | "PUBLISHED" | "HIDDEN";
-    createdAt: string;
-    updatedAt: string;
-    products: Array<{
-      id: string;
-      name: string;
-      slug: string;
-      basePrice: number;
-      images: {
-        main: string;
-        gallery: string[];
-      };
-      options: {
-        colors: Array<{
-          name: string;
-          image: string;
-        }>;
-        sizes: {
-          inches: {
-            columns: Array<{ label: string; order: number }>;
-            rows: Array<{ [key: string]: string }>;
-          };
-          centimeters: {
-            columns: Array<{ label: string; order: number }>;
-            rows: Array<{ [key: string]: string }>;
-          };
-        };
-      };
-    }>;
-  };
+  options: ProductOptionsType;
+  upsell: ProductWithUpsellType["upsell"];
 };

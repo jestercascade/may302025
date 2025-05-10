@@ -87,11 +87,11 @@ export function ProductDetailsWrapper({
         />
       </nav>
       {children}
-      {/* <StickyBar
+      <StickyBar
         productInfo={productInfo}
-        optionsComponent={<ProductDetailsOptions productInfo={productInfo} isStickyBarInCartIndicator={true} />}
+        optionsComponent={<ProductDetailsOptions options={productInfo.options} isStickyBarInCartIndicator={false} />}
         cart={cart}
-      /> */}
+      />
       <Footer />
     </div>
   );
