@@ -127,7 +127,7 @@ export function StickyBar({
           <div className="h-full aspect-square relative rounded-md flex items-center justify-center overflow-hidden">
             <Image src={images.main} alt={name} width={64} height={64} priority={true} />
           </div>
-          <div className="h-full flex gap-5 items-center">
+          <div className="w-[360px] h-full flex gap-5 items-center">
             <div className="w-max flex items-center justify-center">
               {Number(pricing.salePrice) ? (
                 <div className="flex items-center gap-[6px]">

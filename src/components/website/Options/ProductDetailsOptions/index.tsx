@@ -44,6 +44,7 @@ type ProductDetailsOptionsProps = {
   options: ProductOptionsType;
   isStickyBarInCartIndicator?: boolean;
   onSizeChartClick?: () => void;
+  hideDetailedSelections?: boolean;
 };
 
 const sizeLabels = new Set(["XXXS", "XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "2XL", "3XL", "4XL", "5XL"]);
@@ -52,6 +53,7 @@ const countryCodes = new Set(["US", "UK", "EU", "FR", "IT", "JP", "AU", "CN"]);
 export const ProductDetailsOptions = memo(function ProductDetailsOptions({
   options,
   isStickyBarInCartIndicator = false,
+  hideDetailedSelections = false,
 }: ProductDetailsOptionsProps) {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
   const { selectedOptions, setSelectedOption } = useOptionsStore();
@@ -331,20 +333,22 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
                 <span className="text-base font-medium">{display}</span>
                 {remaining > 0 && <span className="text-sm text-gray-500 ml-2">+{remaining}</span>}
               </div>
-              <div className="flex flex-wrap gap-1 mt-1 w-full">
-                {selections.map((s) => (
-                  <span
-                    key={s.name}
-                    className={clsx(
-                      "inline-flex text-xs px-1.5 py-0.5 rounded",
-                      highlightedOptions[s.id] ? "bg-amber-100 text-amber-800" : "bg-neutral-100 text-gray-600"
-                    )}
-                    style={highlightedOptions[s.id] ? { animation: "highlightPulse 800ms ease-out" } : {}}
-                  >
-                    {s.name}: {s.value}
-                  </span>
-                ))}
-              </div>
+              {!hideDetailedSelections && (
+                <div className="flex flex-wrap gap-1 mt-1 w-full">
+                  {selections.map((s) => (
+                    <span
+                      key={s.name}
+                      className={clsx(
+                        "inline-flex text-xs px-1.5 py-0.5 rounded",
+                        highlightedOptions[s.id] ? "bg-amber-100 text-amber-800" : "bg-neutral-100 text-gray-600"
+                      )}
+                      style={highlightedOptions[s.id] ? { animation: "highlightPulse 800ms ease-out" } : {}}
+                    >
+                      {s.name}: {s.value}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           ) : (
             <span className="text-base">Select Options</span>

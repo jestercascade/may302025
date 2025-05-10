@@ -89,7 +89,13 @@ export function ProductDetailsWrapper({
       {children}
       <StickyBar
         productInfo={productInfo}
-        optionsComponent={<ProductDetailsOptions options={productInfo.options} isStickyBarInCartIndicator={false} />}
+        optionsComponent={
+          <ProductDetailsOptions
+            hideDetailedSelections={true}
+            options={productInfo.options}
+            isStickyBarInCartIndicator={false}
+          />
+        }
         cart={cart}
       />
       <Footer />
