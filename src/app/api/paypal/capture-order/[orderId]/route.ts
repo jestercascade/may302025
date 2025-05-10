@@ -8,17 +8,107 @@ import { getProducts } from "@/actions/get/products";
 import { revalidatePath } from "next/cache";
 import { appConfig } from "@/config";
 
-export async function POST(
-  _request: NextRequest,
-  { params }: { params: Promise<{ orderId: string }> }
-) {
+// ===== Type Definitions =====
+type ProductOption = {
+  value: string;
+  optionDisplayOrder: number;
+  groupDisplayOrder: number;
+};
+
+type SelectedOptions = {
+  [key: string]: ProductOption;
+};
+
+type SelectedOptionType = {
+  value: string;
+  optionDisplayOrder: number;
+  groupDisplayOrder: number;
+};
+
+type ImagesType = {
+  main: string;
+  gallery?: string[];
+};
+
+interface BaseCartItem {
+  variantId: string;
+  index: number;
+}
+
+interface ProductItem extends BaseCartItem {
+  type: "product";
+  baseProductId: string;
+  selectedOptions: SelectedOptions;
+}
+
+interface UpsellProduct {
+  id: string;
+  selectedOptions: SelectedOptions;
+}
+
+interface UpsellItem extends BaseCartItem {
+  type: "upsell";
+  baseUpsellId: string;
+  products: UpsellProduct[];
+}
+
+type CartItem = ProductItem | UpsellItem;
+
+type CartProductItemType = {
+  baseProductId: string;
+  variantId: string;
+  name: string;
+  type: "product";
+  index: number;
+  selectedOptions: Record<string, SelectedOptionType>;
+};
+
+type CartUpsellItemType = {
+  baseUpsellId: string;
+  variantId: string;
+  type: "upsell";
+  index: number;
+  products: Array<{
+    id: string;
+    selectedOptions: Record<string, SelectedOptionType>;
+  }>;
+};
+
+type ProductType = {
+  id: string;
+  name: string;
+  slug: string;
+  pricing: {
+    basePrice: number;
+    salePrice: number;
+  };
+  images: ImagesType;
+  options?: any;
+};
+
+type UpsellType = {
+  id: string;
+  mainImage: string;
+  pricing: {
+    basePrice: number;
+    salePrice: number;
+  };
+  products: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    index: number;
+    basePrice: number;
+    images: ImagesType;
+    options?: any;
+  }>;
+};
+
+export async function POST(_request: NextRequest, { params }: { params: Promise<{ orderId: string }> }) {
   const orderId = (await params).orderId;
 
   if (!orderId) {
-    return NextResponse.json(
-      { error: "Order ID is required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Order ID is required" }, { status: 400 });
   }
 
   try {
@@ -53,8 +143,7 @@ export async function POST(
       },
       amount: {
         value: orderData.purchase_units[0].payments.captures[0].amount.value,
-        currency:
-          orderData.purchase_units[0].payments.captures[0].amount.currency_code,
+        currency: orderData.purchase_units[0].payments.captures[0].amount.currency_code,
       },
       shipping: {
         name: orderData.purchase_units[0].shipping.name.full_name,
@@ -88,7 +177,6 @@ export async function POST(
       },
     };
 
-    // Updated to use adminDb
     const ordersRef = adminDb.collection("orders");
     await ordersRef.doc(orderData.id).set(newOrder);
 
@@ -101,90 +189,60 @@ export async function POST(
     });
   } catch (error) {
     console.error("Error capturing and saving order:", error);
-    return NextResponse.json(
-      { error: "An error occurred while capturing and saving the order." },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "An error occurred while capturing and saving the order." }, { status: 500 });
   }
 }
-
-// -- Logic & Utilities --
 
 async function getCartItems() {
   const cookieStore = await cookies();
   const deviceIdentifier = cookieStore.get("device_identifier")?.value ?? "";
 
   const cart = await getCart(deviceIdentifier);
+  const items: CartItem[] = cart?.items || [];
 
-  const items = cart?.items || [];
-  const productItems = items.filter(
-    (item): item is CartProductItemType => item.type === "product"
-  );
-  const upsellItems = items.filter(
-    (item): item is CartUpsellItemType => item.type === "upsell"
-  );
+  const productItems = items.filter((item): item is ProductItem => item.type === "product");
+  const upsellItems = items.filter((item): item is UpsellItem => item.type === "upsell");
 
-  const productIds = productItems
-    .map((product) => product.baseProductId)
-    .filter(Boolean);
+  const productIds = productItems.map((product) => product.baseProductId).filter(Boolean);
 
-  const [baseProducts, cartUpsells] = await Promise.all([
-    getBaseProducts(productIds),
-    getCartUpsells(upsellItems),
-  ]);
+  const [baseProducts, cartUpsells] = await Promise.all([getBaseProducts(productIds), getCartUpsells(upsellItems)]);
 
-  const cartProducts = mapCartProductsToBaseProducts(
-    productItems,
-    baseProducts
-  );
+  const cartProducts = mapCartProductsToBaseProducts(productItems as unknown as CartProductItemType[], baseProducts);
 
-  const sortedCartItems = [...cartProducts, ...cartUpsells].sort(
-    (a, b) => b.index - a.index
-  );
+  const sortedCartItems = [...cartProducts, ...cartUpsells].sort((a, b) => b.index - a.index);
 
   return sortedCartItems;
 }
 
-// Properly typed helper functions
-const getBaseProducts = async (productIds: string[]) =>
-  getProducts({
+const getBaseProducts = async (productIds: string[]) => {
+  const products = await getProducts({
     ids: productIds,
     fields: ["name", "slug", "pricing", "images", "options"],
     visibility: "PUBLISHED",
-  }) as Promise<ProductType[]>;
+  });
+  return (products as ProductType[]) || [];
+};
 
-const mapCartProductsToBaseProducts = (
-  cartProducts: CartProductItemType[],
-  baseProducts: ProductType[]
-) =>
+const mapCartProductsToBaseProducts = (cartProducts: CartProductItemType[], baseProducts: ProductType[]) =>
   cartProducts
     .map((cartProduct) => {
-      const baseProduct = baseProducts.find(
-        (product) => product.id === cartProduct.baseProductId
-      );
+      const baseProduct = baseProducts.find((product) => product.id === cartProduct.baseProductId);
 
       if (!baseProduct) return null;
-
-      const colorImage = baseProduct.options?.colors.find(
-        (colorOption) => colorOption.name === cartProduct.color
-      )?.image;
 
       return {
         baseProductId: baseProduct.id,
         name: baseProduct.name,
         slug: baseProduct.slug,
         pricing: baseProduct.pricing,
-        mainImage: colorImage || baseProduct.images.main,
+        mainImage: baseProduct.images.main,
         variantId: cartProduct.variantId,
-        size: cartProduct.size,
-        color: cartProduct.color,
+        selectedOptions: cartProduct.selectedOptions,
         index: cartProduct.index || 0,
         type: cartProduct.type,
       };
     })
-    .filter(
-      (product): product is NonNullable<typeof product> => product !== null
-    );
+    .filter((product): product is NonNullable<typeof product> => product !== null);
 
 const getCartUpsells = async (upsellItems: CartUpsellItemType[]) => {
   const upsellPromises = upsellItems.map(async (upsell) => {
@@ -198,30 +256,21 @@ const getCartUpsells = async (upsellItems: CartUpsellItemType[]) => {
 
     const detailedProducts = upsell.products
       .map((selectedProduct) => {
-        const baseProduct = upsellData.products.find(
-          (product) => product.id === selectedProduct.id
-        );
+        const baseProduct = upsellData.products.find((product) => product.id === selectedProduct.id);
 
         if (!baseProduct) return null;
-
-        const colorImage = baseProduct.options?.colors.find(
-          (colorOption) => colorOption.name === selectedProduct.color
-        )?.image;
 
         return {
           index: baseProduct.index,
           id: baseProduct.id,
           slug: baseProduct.slug,
           name: baseProduct.name,
-          mainImage: colorImage || baseProduct.images.main,
+          mainImage: baseProduct.images.main,
           basePrice: baseProduct.basePrice,
-          size: selectedProduct.size,
-          color: selectedProduct.color,
+          selectedOptions: selectedProduct.selectedOptions,
         };
       })
-      .filter(
-        (product): product is NonNullable<typeof product> => product !== null
-      );
+      .filter((product): product is NonNullable<typeof product> => product !== null);
 
     if (detailedProducts.length === 0) {
       return null;
@@ -239,17 +288,10 @@ const getCartUpsells = async (upsellItems: CartUpsellItemType[]) => {
   });
 
   const results = await Promise.all(upsellPromises);
-  return results.filter(
-    (result): result is NonNullable<typeof result> => result !== null
-  );
+  return results.filter((result): result is NonNullable<typeof result> => result !== null);
 };
 
-const getUpsell = async ({
-  id,
-}: {
-  id: string;
-}): Promise<Partial<UpsellType> | null> => {
-  // Updated to use adminDb
+const getUpsell = async ({ id }: { id: string }): Promise<Partial<UpsellType> | null> => {
   const snapshot = await adminDb.collection("upsells").doc(id).get();
 
   if (!snapshot.exists) {
@@ -259,9 +301,7 @@ const getUpsell = async ({
   const data = snapshot.data();
   if (!data) return null;
 
-  const productIds = data.products
-    ? data.products.map((p: { id: string }) => p.id)
-    : [];
+  const productIds = data.products ? data.products.map((p: { id: string }) => p.id) : [];
 
   const products =
     productIds.length > 0
@@ -288,9 +328,7 @@ const getUpsell = async ({
     })
     .filter((product: any) => product !== null);
 
-  const sortedProducts = updatedProducts.sort(
-    (a: any, b: any) => a.index - b.index
-  );
+  const sortedProducts = updatedProducts.sort((a: any, b: any) => a.index - b.index);
 
   const upsell: Partial<UpsellType> = {
     id: snapshot.id,

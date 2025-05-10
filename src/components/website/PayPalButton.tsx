@@ -23,10 +23,6 @@ export function PayPalButton({ cart, showLabel }: { cart: Cart; showLabel: boole
   const { showAlert, hideAlert } = useAlertStore();
 
   useEffect(() => {
-    console.log(cart);
-  }, []);
-
-  useEffect(() => {
     setKey(cart.length);
   }, [cart]);
 
