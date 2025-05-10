@@ -668,62 +668,58 @@ function OptionSelectionModal({
   if (hasOptions) {
     sections.push(
       <div key="options" className="flex flex-col gap-4">
-        {product.options.groups
-          .filter((group) => group.values.some((opt) => opt.isActive))
-          .map((group) => (
-            <div key={group.id}>
-              <h3 className="text-sm font-medium mb-2">{group.name}</h3>
-              <div className="flex flex-wrap gap-2">
-                {group.values
-                  .filter((option) => option.isActive)
-                  .map((option) => {
-                    const disabled = isOptionDisabled(group.id, option.id);
-                    return (
-                      <button
-                        key={option.id}
-                        onClick={() => handleSelectOption(group.id, option.id)}
-                        disabled={disabled}
-                        className={`px-3 py-1.5 min-w-[3rem] rounded-full text-sm transition-all duration-150 ease-in-out ${
-                          localSelectedOptions[group.id] === option.id
-                            ? "bg-black text-white"
-                            : disabled
-                            ? "border-2 border-dashed border-gray-300 text-gray-400 opacity-50 cursor-not-allowed"
-                            : "bg-neutral-100 text-black hover:bg-neutral-200"
-                        }`}
-                      >
-                        {option.value}
-                      </button>
-                    );
-                  })}
-              </div>
-              {group.name.toLowerCase() === "size" && localSelectedOptions[group.id] !== undefined && (
-                <div className="mt-3">
-                  <div className="bg-neutral-50 rounded-lg px-3 py-2.5 max-w-72 border border-neutral-100">
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
-                      {getMeasurements(group, localSelectedOptions[group.id]).map((m) => {
-                        if (!m.value) return null;
-                        return (
-                          <div key={m.label} className="flex items-center text-xs text-black">
-                            <span className="mr-1">{m.label}:</span>
-                            <span className="font-semibold">{formatMeasurement(m.label, m.value)}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    {group.sizeChart && (
-                      <button
-                        onClick={handleSizeChartClick}
-                        className="mt-2 text-xs text-blue hover:text-blue-dimmed transition-colors flex items-center"
-                      >
-                        <Ruler size={12} className="mr-1.5" />
-                        View Measurements
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
+        {product.options.groups.map((group) => (
+          <div key={group.id}>
+            <h3 className="text-sm font-medium mb-2">{group.name}</h3>
+            <div className="flex flex-wrap gap-2">
+              {group.values.map((option) => {
+                const disabled = isOptionDisabled(group.id, option.id);
+                return (
+                  <button
+                    key={option.id}
+                    onClick={() => handleSelectOption(group.id, option.id)}
+                    disabled={disabled}
+                    className={`px-3 py-1.5 min-w-[3rem] rounded-full text-sm transition-all duration-150 ease-in-out ${
+                      localSelectedOptions[group.id] === option.id
+                        ? "bg-black text-white"
+                        : disabled
+                        ? "border-2 border-dashed border-gray-300 text-gray-400 opacity-50 cursor-not-allowed"
+                        : "bg-neutral-100 text-black hover:bg-neutral-200"
+                    }`}
+                  >
+                    {option.value}
+                  </button>
+                );
+              })}
             </div>
-          ))}
+            {group.name.toLowerCase() === "size" && localSelectedOptions[group.id] !== undefined && (
+              <div className="mt-3">
+                <div className="bg-neutral-50 rounded-lg px-3 py-2.5 max-w-72 border border-neutral-100">
+                  <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+                    {getMeasurements(group, localSelectedOptions[group.id]).map((m) => {
+                      if (!m.value) return null;
+                      return (
+                        <div key={m.label} className="flex items-center text-xs text-black">
+                          <span className="mr-1">{m.label}:</span>
+                          <span className="font-semibold">{formatMeasurement(m.label, m.value)}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {group.sizeChart && (
+                    <button
+                      onClick={handleSizeChartClick}
+                      className="mt-2 text-xs text-blue hover:text-blue-dimmed transition-colors flex items-center"
+                    >
+                      <Ruler size={12} className="mr-1.5" />
+                      View Measurements
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     );
   }
