@@ -15,9 +15,7 @@ export default function ShowAlert() {
   const type = useAlertStore((state) => state.type);
   const isVisible = useAlertStore((state) => state.isVisible);
   const hideAlert = useAlertStore((state) => state.hideAlert);
-  const preventBodyOverflowChange = useBodyOverflowStore(
-    (state) => state.preventBodyOverflowChange
-  );
+  const preventBodyOverflowChange = useBodyOverflowStore((state) => state.preventBodyOverflowChange);
 
   const overlayRef = useRef(null);
   const pathname = usePathname();
@@ -30,14 +28,11 @@ export default function ShowAlert() {
 
   useEffect(() => {
     const body = document.body;
-    const productDetailsWrapper = document.getElementById(
-      "product-details-wrapper"
-    );
+    const productDetailsWrapper = document.getElementById("product-details-wrapper");
 
     if (isVisible) {
       body.style.overflow = "hidden";
-      if (productDetailsWrapper)
-        productDetailsWrapper.style.overflow = "hidden";
+      if (productDetailsWrapper) productDetailsWrapper.style.overflow = "hidden";
     } else {
       if (!preventBodyOverflowChange) {
         body.style.overflow = "";
@@ -85,18 +80,13 @@ export default function ShowAlert() {
     >
       <div
         id="message-container"
-        className={clsx(
-          "absolute bottom-0 left-0 right-0 pt-3 pb-8 px-8 rounded-tl-3xl rounded-tr-3xl",
-          {
-            "bg-[#008500]": typeUpper === SUCCESS,
-            "bg-[#ed2828]": typeUpper === ERROR,
-            "bg-black": typeUpper === NEUTRAL,
-          }
-        )}
+        className={clsx("absolute bottom-0 left-0 right-0 pt-3 pb-8 px-8 rounded-tl-3xl rounded-tr-3xl", {
+          "bg-[#008500]": typeUpper === SUCCESS,
+          "bg-[#ed2828]": typeUpper === ERROR,
+          "bg-black": typeUpper === NEUTRAL,
+        })}
       >
-        <div className="mx-auto text-white text-center font-medium max-w-[400px]">
-          {message}
-        </div>
+        <div className="mx-auto text-white text-center font-medium max-w-[400px] md:max-w-[460px]">{message}</div>
       </div>
     </div>
   );

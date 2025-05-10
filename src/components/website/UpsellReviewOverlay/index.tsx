@@ -683,11 +683,11 @@ function OptionSelectionModal({
                         key={option.id}
                         onClick={() => handleSelectOption(group.id, option.id)}
                         disabled={disabled}
-                        className={`px-3 py-1.5 min-w-[3rem] rounded-full text-sm ${
+                        className={`px-3 py-1.5 min-w-[3rem] rounded-full text-sm transition-all duration-150 ease-in-out ${
                           localSelectedOptions[group.id] === option.id
                             ? "bg-black text-white"
                             : disabled
-                            ? "bg-neutral-100 text-gray-400 cursor-not-allowed"
+                            ? "border-2 border-dashed border-gray-300 text-gray-400 opacity-50 cursor-not-allowed"
                             : "bg-neutral-100 text-black hover:bg-neutral-200"
                         }`}
                       >
