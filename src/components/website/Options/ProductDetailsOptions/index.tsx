@@ -6,6 +6,7 @@ import { ChevronDown, Ruler } from "lucide-react";
 import clsx from "clsx";
 import styles from "./styles.module.css";
 import { useOverlayStore } from "@/zustand/website/overlayStore";
+import { useScrollStore } from "@/zustand/website/scrollStore";
 
 type OptionType = {
   id: number;
@@ -60,6 +61,7 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [highlightedOptions, setHighlightedOptions] = useState<Record<number, boolean>>({});
   const previousSelections = useRef<Record<number, number | null>>({});
+  const shouldShowStickyBar = useScrollStore((state) => state.shouldShowStickyBar);
 
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const productDetailsPage = useOverlayStore((state) => state.pages.productDetails);
@@ -137,6 +139,12 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
       }
     });
   });
+
+  useEffect(() => {
+    if (!shouldShowStickyBar) {
+      setDropdownVisible(false);
+    }
+  }, [shouldShowStickyBar]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -365,7 +373,7 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
       </button>
 
       {isDropdownVisible && (
-        <div className="absolute top-full left-0 z-20 w-full mt-2">
+        <div className="absolute top-full left-0 z-20 w-80 mt-2">
           <div
             className={`${styles.customScrollbar} flex flex-col gap-4 p-4 rounded-md shadow-lg bg-white border border-gray-200 max-h-60 overflow-y-auto`}
           >
