@@ -35,9 +35,7 @@ const BATCH_SIZE = 10;
  *   includeProductDetails: true
  * });
  */
-export async function getCollections(
-  options: GetCollectionsOptionsType = {}
-): Promise<CollectionType[] | null> {
+export async function getCollections(options: GetCollectionsOptionsType = {}): Promise<CollectionType[] | null> {
   const {
     ids = [],
     fields = [],
@@ -45,12 +43,29 @@ export async function getCollections(
     excludeProducts = false,
     publishedProductsOnly = false,
     includeProductDetails = false,
+    allowedCampaignStatuses,
   } = options;
 
   let collections: CollectionType[] = [];
   let allProductIds = new Set<string>();
 
-  // ─── 1️⃣ Load collections & collect product IDs ──────────────────────────────
+  const computeCampaignStatus = (startDate: string, endDate: string): CampaignStatusType => {
+    const currentDate = new Date();
+    const campaignStartDate = new Date(startDate);
+    const campaignEndDate = new Date(endDate);
+
+    campaignStartDate.setUTCHours(0, 0, 0, 0);
+    campaignEndDate.setUTCHours(0, 0, 0, 0);
+
+    if (currentDate.getTime() > campaignEndDate.getTime()) {
+      return "Ended";
+    } else if (currentDate.getTime() < campaignStartDate.getTime()) {
+      return "Upcoming";
+    } else {
+      return "Active";
+    }
+  };
+
   if (ids.length > 0) {
     const batches: string[][] = [];
     for (let i = 0; i < ids.length; i += BATCH_SIZE) {
@@ -59,9 +74,7 @@ export async function getCollections(
 
     const snapshots = await Promise.all(
       batches.map((batch) => {
-        const refs = batch.map((id) =>
-          adminDb.collection("collections").doc(id)
-        );
+        const refs = batch.map((id) => adminDb.collection("collections").doc(id));
         return adminDb.getAll(...refs);
       })
     );
@@ -70,12 +83,18 @@ export async function getCollections(
       for (const doc of snapArr) {
         if (!doc.exists) continue;
         const data = doc.data() || {};
-        const col = filterCollectionFields(data, fields, doc.id);
 
+        if (allowedCampaignStatuses && data.campaignDuration) {
+          const status = computeCampaignStatus(data.campaignDuration.startDate, data.campaignDuration.endDate);
+          if (!allowedCampaignStatuses.includes(status)) {
+            continue;
+          }
+        }
+
+        const col = filterCollectionFields(data, fields, doc.id);
         (data.products || []).forEach((p: any) => {
           if (p?.id) allProductIds.add(p.id);
         });
-
         collections.push(col);
       }
     }
@@ -89,59 +108,46 @@ export async function getCollections(
 
     for (const doc of snap.docs) {
       const data = doc.data() || {};
-      const col = filterCollectionFields(data, fields, doc.id);
 
+      if (allowedCampaignStatuses && data.campaignDuration) {
+        const status = computeCampaignStatus(data.campaignDuration.startDate, data.campaignDuration.endDate);
+        if (!allowedCampaignStatuses.includes(status)) {
+          continue;
+        }
+      }
+
+      const col = filterCollectionFields(data, fields, doc.id);
       (data.products || []).forEach((p: any) => {
         if (p?.id) allProductIds.add(p.id);
       });
-
       collections.push(col);
     }
   }
 
-  // ─── 1.5 Check product existence and filter non-existing ────────────────────
-  const existingProductIds = await checkProductExistence(
-    Array.from(allProductIds)
-  );
+  const existingProductIds = await checkProductExistence(Array.from(allProductIds));
 
   if (!excludeProducts) {
     collections = collections.map((col) => ({
       ...col,
-      products: (col.products || []).filter((p) =>
-        existingProductIds.has(p.id)
-      ),
+      products: (col.products || []).filter((p) => existingProductIds.has(p.id)),
     }));
   }
 
-  allProductIds = existingProductIds; // Update with filtered IDs
+  allProductIds = existingProductIds;
 
-  // ─── 2️⃣ Optionally filter & embed products ─────────────────────────────────
-  if (
-    !excludeProducts &&
-    (publishedProductsOnly || includeProductDetails) &&
-    allProductIds.size > 0
-  ) {
-    // a) determine published IDs if needed
+  if (!excludeProducts && (publishedProductsOnly || includeProductDetails) && allProductIds.size > 0) {
     let publishedIds: Set<string> | null = null;
     if (publishedProductsOnly) {
       publishedIds = await getPublishedProductIds(Array.from(allProductIds));
     }
 
-    // b) decide which IDs to fetch details for
-    const idsToFetch = publishedProductsOnly
-      ? Array.from(publishedIds!)
-      : Array.from(allProductIds);
+    const idsToFetch = publishedProductsOnly ? Array.from(publishedIds!) : Array.from(allProductIds);
 
-    // c) fetch full product details if requested
     let productsMap = new Map<string, ProductType | ProductWithUpsellType>();
     if (includeProductDetails) {
-      productsMap = await fetchProductsInBatches(
-        idsToFetch,
-        publishedProductsOnly
-      );
+      productsMap = await fetchProductsInBatches(idsToFetch, publishedProductsOnly);
     }
 
-    // d) one pass over collections
     collections = collections.map((col) => {
       let refs = col.products || [];
 
@@ -163,7 +169,6 @@ export async function getCollections(
     });
   }
 
-  // ─── 3️⃣ If products were excluded, zero out the array ───────────────────────
   if (excludeProducts) {
     collections = collections.map((col) => ({
       ...col,
@@ -171,16 +176,10 @@ export async function getCollections(
     }));
   }
 
-  // ─── 4️⃣ Sort by updatedAt desc & return ────────────────────────────────────
-  return collections.sort(
-    (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-  );
+  return collections.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 }
 
-/** Helper: Check if products exist in the database */
-async function checkProductExistence(
-  productIds: string[]
-): Promise<Set<string>> {
+async function checkProductExistence(productIds: string[]): Promise<Set<string>> {
   const existingIds = new Set<string>();
   if (productIds.length === 0) return existingIds;
 
@@ -200,10 +199,7 @@ async function checkProductExistence(
   return existingIds;
 }
 
-/** Helper: which of these IDs are published? */
-async function getPublishedProductIds(
-  productIds: string[]
-): Promise<Set<string>> {
+async function getPublishedProductIds(productIds: string[]): Promise<Set<string>> {
   const published = new Set<string>();
   if (productIds.length === 0) return published;
 
@@ -225,11 +221,7 @@ async function getPublishedProductIds(
   return published;
 }
 
-function filterCollectionFields(
-  data: FirebaseFirestore.DocumentData,
-  fields: string[],
-  id: string
-): CollectionType {
+function filterCollectionFields(data: FirebaseFirestore.DocumentData, fields: string[], id: string): CollectionType {
   const out: Partial<CollectionType> = { id };
 
   if (fields.length > 0) {
@@ -302,11 +294,7 @@ async function fetchProductsInBatches(
   if (upsellIds.size) {
     const upsellsMap = await fetchUpsellsInBatches(Array.from(upsellIds));
     for (const [pid, prod] of map.entries()) {
-      if (
-        "upsell" in prod &&
-        typeof prod.upsell === "string" &&
-        upsellsMap.has(prod.upsell)
-      ) {
+      if ("upsell" in prod && typeof prod.upsell === "string" && upsellsMap.has(prod.upsell)) {
         map.set(pid, {
           ...prod,
           upsell: upsellsMap.get(prod.upsell)!,
@@ -318,9 +306,7 @@ async function fetchProductsInBatches(
   return map;
 }
 
-async function fetchUpsellsInBatches(
-  upsellIds: string[]
-): Promise<Map<string, UpsellType>> {
+async function fetchUpsellsInBatches(upsellIds: string[]): Promise<Map<string, UpsellType>> {
   const upsellsMap = new Map<string, UpsellType>();
   if (!upsellIds.length) return upsellsMap;
 
@@ -334,14 +320,7 @@ async function fetchUpsellsInBatches(
       adminDb
         .collection("upsells")
         .where("__name__", "in", batch)
-        .select(
-          "mainImage",
-          "visibility",
-          "createdAt",
-          "updatedAt",
-          "pricing",
-          "products"
-        )
+        .select("mainImage", "visibility", "createdAt", "updatedAt", "pricing", "products")
         .get()
     )
   );
@@ -417,10 +396,10 @@ type GetCollectionsOptionsType = {
   ids?: string[];
   fields?: string[];
   visibility?: VisibilityType;
-  /** drop the products array entirely */
   excludeProducts?: boolean;
-  /** only include refs for products with visibility === "PUBLISHED" */
   publishedProductsOnly?: boolean;
-  /** fetch & embed full product details (images, pricing, upsells) */
   includeProductDetails?: boolean;
+  allowedCampaignStatuses?: CampaignStatusType[];
 };
+
+type CampaignStatusType = "Upcoming" | "Active" | "Ended";

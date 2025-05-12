@@ -28,6 +28,7 @@ export default async function Home() {
       fields: ["title", "slug", "products"],
       visibility: "PUBLISHED",
       publishedProductsOnly: true,
+      allowedCampaignStatuses: ["Active"],
     }),
     getCategories({ visibility: "VISIBLE" }),
     getPageHero(),
