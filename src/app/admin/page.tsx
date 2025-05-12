@@ -418,25 +418,26 @@ const CartStatusBreakdown = ({
 
   const calculateCartValue = (cart: CartType) => {
     let totalValue = 0;
-
     cart.items.forEach((item) => {
       if (item.type === "product") {
         const product = products?.find((p) => p.id === item.baseProductId);
         if (product) {
-          const price = parseFloat(String(product.pricing.basePrice));
+          const price = product.pricing.salePrice
+            ? parseFloat(String(product.pricing.salePrice))
+            : parseFloat(String(product.pricing.basePrice));
           totalValue += price;
         }
       } else if (item.type === "upsell") {
         // @ts-ignore
         const upsell = upsells?.find((u) => u.id === item.baseUpsellId);
-
         if (upsell) {
-          const price = parseFloat(String(upsell.pricing.basePrice));
+          const price = upsell.pricing.salePrice
+            ? parseFloat(String(upsell.pricing.salePrice))
+            : parseFloat(String(upsell.pricing.basePrice));
           totalValue += price;
         }
       }
     });
-
     return totalValue;
   };
 
