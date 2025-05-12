@@ -522,9 +522,7 @@ const ImageGallery = memo(function ({
 
   return (
     <div className="select-none flex w-full">
-      <div
-        className={`${styles.customScrollbar} apply-scrollbar min-w-[62px] max-w-[62px] max-h-[380px] overflow-x-hidden overflow-y-visible flex flex-col gap-2 mr-2`}
-      >
+      <div className="thin-black-scrollbar min-w-[62px] max-w-[62px] max-h-[380px] overflow-x-hidden overflow-y-visible flex flex-col gap-2 mr-2">
         {productImages.map((image, index) => (
           <ThumbnailImage
             key={image}
