@@ -17,36 +17,28 @@ class StoreGrowthMetrics {
   private getLocalDateForComparison(utcDate: string): string {
     const date = new Date(utcDate);
     const localDate = new Date(date.toLocaleString());
-    return `${localDate.getFullYear()}-${(localDate.getMonth() + 1)
+    return `${localDate.getFullYear()}-${(localDate.getMonth() + 1).toString().padStart(2, "0")}-${localDate
+      .getDate()
       .toString()
-      .padStart(2, "0")}-${localDate.getDate().toString().padStart(2, "0")}`;
+      .padStart(2, "0")}`;
   }
 
   private filterOrdersByDate(date: string): OrderType[] {
-    return this.orders.filter((order) =>
-      this.getLocalDateForComparison(order.timestamp).startsWith(date)
-    );
+    return this.orders.filter((order) => this.getLocalDateForComparison(order.timestamp).startsWith(date));
   }
 
   private filterOrdersByMonth(date: string): OrderType[] {
     return this.orders.filter((order) =>
-      this.getLocalDateForComparison(order.timestamp).startsWith(
-        date.substring(0, 7)
-      )
+      this.getLocalDateForComparison(order.timestamp).startsWith(date.substring(0, 7))
     );
   }
 
   private calculateRevenue(orders: OrderType[]): number {
-    return orders.reduce(
-      (acc, order) => acc + parseFloat(order.amount.value),
-      0
-    );
+    return orders.reduce((acc, order) => acc + parseFloat(order.amount.value), 0);
   }
 
   private calculateAOV(orders: OrderType[]): number {
-    return orders.length > 0
-      ? this.calculateRevenue(orders) / orders.length
-      : 0;
+    return orders.length > 0 ? this.calculateRevenue(orders) / orders.length : 0;
   }
 
   getMetrics() {
@@ -59,9 +51,7 @@ class StoreGrowthMetrics {
     }
 
     const today = this.getLocalDateForComparison(new Date().toISOString());
-    const thisMonth = `${new Date().getFullYear()}-${(new Date().getMonth() + 1)
-      .toString()
-      .padStart(2, "0")}`;
+    const thisMonth = `${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, "0")}`;
 
     const todayOrders = this.filterOrdersByDate(today);
     const thisMonthOrders = this.filterOrdersByMonth(thisMonth);
@@ -101,12 +91,8 @@ class StoreGrowthMetrics {
 export default async function Overview() {
   const [orders, products, upsells, carts] = await Promise.all([
     getOrders() as Promise<PaymentTransaction[]>,
-    getProducts({ fields: ["visibility", "pricing"] }) as Promise<
-      ProductType[] | null
-    >,
-    getUpsells({ fields: ["visibility", "pricing", "products"] }) as Promise<
-      UpsellType[] | null
-    >,
+    getProducts({ fields: ["visibility", "pricing"] }) as Promise<ProductType[] | null>,
+    getUpsells({ fields: ["visibility", "pricing", "products"] }) as Promise<UpsellType[] | null>,
     getCarts(),
   ]);
 
@@ -125,12 +111,6 @@ export default async function Overview() {
         </div>
       </div>
       <div>
-        <h2 className="font-semibold text-xl mb-6">Revenue by Category</h2>
-        <div className="w-full p-5 relative shadow rounded-xl bg-white">
-          <RevenueByCategory orders={orders} />
-        </div>
-      </div>
-      <div>
         <h2 className="font-semibold text-xl mb-6">Product Status</h2>
         <div className="w-full p-5 relative shadow rounded-xl bg-white">
           <ProductStatus products={products} />
@@ -139,11 +119,7 @@ export default async function Overview() {
       <div>
         <h2 className="font-semibold text-xl mb-6">Cart Status Breakdown</h2>
         <div className="w-full p-5 relative shadow rounded-xl bg-white">
-          <CartStatusBreakdown
-            carts={carts}
-            products={products}
-            upsells={upsells}
-          />
+          <CartStatusBreakdown carts={carts} products={products} upsells={upsells} />
         </div>
       </div>
       <div>
@@ -185,29 +161,13 @@ const StoreGrowth = ({ orders }: { orders: OrderType[] | null }) => {
           <tbody>
             <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4 font-semibold">Revenue</td>
-              <td
-                className={clsx(
-                  "p-4",
-                  metrics.revenue.today !== 0 && "text-green-700 font-semibold"
-                )}
-              >
-                {metrics.revenue.today
-                  ? storeGrowthMetrics.formatRevenue(metrics.revenue.today)
-                  : "—"}
+              <td className={clsx("p-4", metrics.revenue.today !== 0 && "text-green-700 font-semibold")}>
+                {metrics.revenue.today ? storeGrowthMetrics.formatRevenue(metrics.revenue.today) : "—"}
               </td>
-              <td
-                className={clsx(
-                  "p-4 font-semibold",
-                  metrics.revenue.today !== 0 && "text-green-700"
-                )}
-              >
-                {metrics.revenue.thisMonth
-                  ? storeGrowthMetrics.formatRevenue(metrics.revenue.thisMonth)
-                  : "—"}
+              <td className={clsx("p-4 font-semibold", metrics.revenue.today !== 0 && "text-green-700")}>
+                {metrics.revenue.thisMonth ? storeGrowthMetrics.formatRevenue(metrics.revenue.thisMonth) : "—"}
               </td>
-              <td className="p-4 font-semibold">
-                {storeGrowthMetrics.formatRevenue(metrics.revenue.allTime)}
-              </td>
+              <td className="p-4 font-semibold">{storeGrowthMetrics.formatRevenue(metrics.revenue.allTime)}</td>
             </tr>
             <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4 font-semibold">Orders</td>
@@ -217,20 +177,12 @@ const StoreGrowth = ({ orders }: { orders: OrderType[] | null }) => {
             </tr>
             <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4 font-semibold">AOV</td>
+              <td className="p-4">{metrics.aov.today ? storeGrowthMetrics.formatRevenue(metrics.aov.today) : "—"}</td>
               <td className="p-4">
-                {metrics.aov.today
-                  ? storeGrowthMetrics.formatRevenue(metrics.aov.today)
-                  : "—"}
+                {metrics.aov.thisMonth ? storeGrowthMetrics.formatRevenue(metrics.aov.thisMonth) : "—"}
               </td>
               <td className="p-4">
-                {metrics.aov.thisMonth
-                  ? storeGrowthMetrics.formatRevenue(metrics.aov.thisMonth)
-                  : "—"}
-              </td>
-              <td className="p-4">
-                {metrics.aov.allTime
-                  ? storeGrowthMetrics.formatRevenue(metrics.aov.allTime)
-                  : "—"}
+                {metrics.aov.allTime ? storeGrowthMetrics.formatRevenue(metrics.aov.allTime) : "—"}
               </td>
             </tr>
           </tbody>
@@ -240,17 +192,10 @@ const StoreGrowth = ({ orders }: { orders: OrderType[] | null }) => {
   );
 };
 
-const BestsellingProducts = ({
-  orders,
-}: {
-  orders: PaymentTransaction[] | null;
-}) => {
+const BestsellingProducts = ({ orders }: { orders: PaymentTransaction[] | null }) => {
   const TOP_PRODUCTS_COUNT = 5;
 
-  const calculateBestSellingProducts = (
-    orders: PaymentTransaction[],
-    dateFilter: string | null
-  ) => {
+  const calculateBestSellingProducts = (orders: PaymentTransaction[], dateFilter: string | null) => {
     const products: Record<
       string,
       {
@@ -285,9 +230,7 @@ const BestsellingProducts = ({
                 id: baseProductId,
               };
             }
-            products[baseProductId].revenue += parseFloat(
-              String(product.basePrice)
-            );
+            products[baseProductId].revenue += parseFloat(String(product.basePrice));
             products[baseProductId].quantity += 1;
           });
         } else {
@@ -302,9 +245,7 @@ const BestsellingProducts = ({
               id: baseProductId,
             };
           }
-          products[baseProductId].revenue += parseFloat(
-            String(item.pricing.basePrice)
-          );
+          products[baseProductId].revenue += parseFloat(String(item.pricing.basePrice));
           products[baseProductId].quantity += 1;
         }
       });
@@ -321,15 +262,10 @@ const BestsellingProducts = ({
   };
 
   const today = new Date().toISOString().split("T")[0];
-  const thisMonth = `${new Date().getFullYear()}-${(new Date().getMonth() + 1)
-    .toString()
-    .padStart(2, "0")}`;
+  const thisMonth = `${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, "0")}`;
 
   const bestSellingToday = calculateBestSellingProducts(orders || [], today);
-  const bestSellingThisMonth = calculateBestSellingProducts(
-    orders || [],
-    thisMonth
-  );
+  const bestSellingThisMonth = calculateBestSellingProducts(orders || [], thisMonth);
 
   const allProducts = Object.entries(bestSellingThisMonth)
     .map(([baseProductId, monthData]) => ({
@@ -344,11 +280,7 @@ const BestsellingProducts = ({
     .slice(0, TOP_PRODUCTS_COUNT);
 
   if (!orders || orders.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500">
-        No sales data available yet
-      </div>
-    );
+    return <div className="text-center py-8 text-gray-500">No sales data available yet</div>;
   }
 
   return (
@@ -357,274 +289,52 @@ const BestsellingProducts = ({
         <table className="w-full min-w-[738px] text-sm">
           <thead>
             <tr className="border-b">
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-36 md:w-1/4">
-                PRODUCT
-              </th>
+              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-36 md:w-1/4">PRODUCT</th>
               <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-36 md:w-1/4">
                 <div className="relative">
                   <span>REVENUE</span>
-                  <span className="absolute left-0 top-full font-normal bg-neutral-100">
-                    today
-                  </span>
+                  <span className="absolute left-0 top-full font-normal bg-neutral-100">today</span>
                 </div>
               </th>
               <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-36 md:w-1/4">
                 <div className="relative">
                   <span>REVENUE</span>
-                  <span className="absolute left-0 top-full font-normal bg-neutral-100">
-                    this month
-                  </span>
+                  <span className="absolute left-0 top-full font-normal bg-neutral-100">this month</span>
                 </div>
               </th>
               <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-36 md:w-1/4">
                 <div className="relative">
                   <span>UNITS SOLD</span>
-                  <span className="absolute left-0 top-full font-normal bg-neutral-100">
-                    this month
-                  </span>
+                  <span className="absolute left-0 top-full font-normal bg-neutral-100">this month</span>
                 </div>
               </th>
             </tr>
           </thead>
           <tbody>
-            {allProducts.map(
-              ({
-                id,
-                name,
-                slug,
-                todayRevenue,
-                monthRevenue,
-                monthQuantity,
-              }) => (
-                <tr
-                  key={id}
-                  className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors"
-                >
-                  <td className="p-4">
-                    <div className="w-full max-w-[112px]">
-                      <Link
-                        href={`/admin/products/${slug}-${id}`}
-                        target="_blank"
-                        className="underline line-clamp-1 min-w-[152px]"
-                      >
-                        {name}
-                      </Link>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    {todayRevenue > 0 ? formatRevenue(todayRevenue) : "—"}
-                  </td>
-                  <td className="p-4 font-semibold text-green-700">
-                    {formatRevenue(monthRevenue)}
-                  </td>
-                  <td className="p-4">{monthQuantity}</td>
-                </tr>
-              )
-            )}
+            {allProducts.map(({ id, name, slug, todayRevenue, monthRevenue, monthQuantity }) => (
+              <tr key={id} className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
+                <td className="p-4">
+                  <div className="w-full max-w-[112px]">
+                    <Link
+                      href={`/admin/products/${slug}-${id}`}
+                      target="_blank"
+                      className="underline line-clamp-1 min-w-[152px]"
+                    >
+                      {name}
+                    </Link>
+                  </div>
+                </td>
+                <td className="p-4">{todayRevenue > 0 ? formatRevenue(todayRevenue) : "—"}</td>
+                <td className="p-4 font-semibold text-green-700">{formatRevenue(monthRevenue)}</td>
+                <td className="p-4">{monthQuantity}</td>
+              </tr>
+            ))}
             {allProducts.length === 0 && (
               <tr>
                 <td colSpan={4} className="text-center py-4 text-gray-500">
                   No sales yet for this period
                 </td>
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-};
-
-const RevenueByCategory = async ({
-  orders,
-}: {
-  orders: PaymentTransaction[] | null;
-}) => {
-  const categoriesData = (await getCategories()) || { categories: [] };
-  const products =
-    (await getProducts({ fields: ["id", "slug", "category"] })) || [];
-
-  const productCategories = products.reduce((acc, product) => {
-    if ("slug" in product && "category" in product) {
-      acc[product.slug] = product.category.toLowerCase();
-    }
-    return acc;
-  }, {} as Record<string, string>);
-
-  const calculateRevenueByCategory = (
-    orders: PaymentTransaction[],
-    dateFilter: string | null
-  ): Record<string, { revenue: number; category: string }> => {
-    const categoryRevenue: Record<
-      string,
-      { revenue: number; category: string }
-    > = {};
-
-    categoriesData.categories.forEach((category) => {
-      const normalizedName = category.name.toLowerCase();
-      categoryRevenue[normalizedName] = {
-        revenue: 0,
-        category: category.name,
-      };
-    });
-
-    const isDateMatch = (timestamp: string, filter: string | null) => {
-      if (!filter) return true;
-      const orderDate = new Date(timestamp).toISOString().split("T")[0];
-      return orderDate.startsWith(filter);
-    };
-
-    orders?.forEach((order) => {
-      if (dateFilter && !isDateMatch(order.timestamp, dateFilter)) return;
-
-      const orderTotal = parseFloat(order.amount.value);
-      const itemCount = order.items.reduce((count, orderItem) => {
-        if (orderItem.type === "upsell") {
-          return count + orderItem.products.length;
-        }
-        return count + 1;
-      }, 0);
-      const revenuePerItem = orderTotal / itemCount;
-
-      order.items.forEach((item) => {
-        if (item.type === "upsell") {
-          item.products.forEach((product) => {
-            const category = (
-              productCategories[product.slug] || "uncategorized"
-            ).toLowerCase();
-            if (!categoryRevenue[category]) {
-              categoryRevenue[category] = {
-                revenue: 0,
-                category: category.charAt(0).toUpperCase() + category.slice(1),
-              };
-            }
-            categoryRevenue[category].revenue += revenuePerItem;
-          });
-        } else {
-          const category = (
-            productCategories[item.slug] || "uncategorized"
-          ).toLowerCase();
-          if (!categoryRevenue[category]) {
-            categoryRevenue[category] = {
-              revenue: 0,
-              category: category.charAt(0).toUpperCase() + category.slice(1),
-            };
-          }
-          categoryRevenue[category].revenue += revenuePerItem;
-        }
-      });
-    });
-
-    return categoryRevenue;
-  };
-
-  const formatRevenue = (amount: number): string => {
-    return `$${amount.toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
-  };
-
-  const formatPercentage = (amount: number, total: number): string => {
-    return total === 0
-      ? "—"
-      : amount === 0
-      ? "0"
-      : `${((amount / total) * 100).toFixed(1)}%`;
-  };
-
-  const thisMonth = `${new Date().getFullYear()}-${(new Date().getMonth() + 1)
-    .toString()
-    .padStart(2, "0")}`;
-
-  const monthlyRevenue = calculateRevenueByCategory(orders || [], thisMonth);
-  const allTimeRevenue = calculateRevenueByCategory(orders || [], null);
-
-  const totalMonthlyRevenue = Object.values(monthlyRevenue).reduce(
-    (acc, { revenue }) => acc + revenue,
-    0
-  );
-
-  const sortedCategories = Object.entries(allTimeRevenue)
-    .sort(([nameA], [nameB]) => {
-      const monthlyRevenueA = monthlyRevenue[nameA]?.revenue || 0;
-      const monthlyRevenueB = monthlyRevenue[nameB]?.revenue || 0;
-      return monthlyRevenueB - monthlyRevenueA;
-    })
-    .map(([name, data]) => ({
-      name,
-      category: data.category,
-      monthRevenue: monthlyRevenue[name]?.revenue || 0,
-      allTimeRevenue: data.revenue,
-    }));
-
-  if (!orders || orders.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500">No orders available</div>
-    );
-  }
-
-  return (
-    <div className="rounded-lg bg-white border overflow-hidden">
-      <div className="overflow-auto custom-x-scrollbar">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b">
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-36 md:w-1/4">
-                CATEGORY
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-40 md:w-1/4">
-                <div className="relative">
-                  <span>REVENUE</span>
-                  <span className="absolute left-0 top-full font-normal bg-neutral-100">
-                    this month
-                  </span>
-                </div>
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-40 md:w-1/4">
-                ALL-TIME REVENUE
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-40 md:w-1/4">
-                <div className="relative">
-                  <span>CONTRIBUTION</span>
-                  <span className="absolute left-0 top-full font-normal bg-neutral-100">
-                    this month
-                  </span>
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedCategories.map(
-              ({ name, category, monthRevenue, allTimeRevenue }) => (
-                <tr
-                  key={name}
-                  className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors"
-                >
-                  <td className="p-4 font-semibold">{category}</td>
-                  <td
-                    className={`p-4 ${
-                      monthRevenue > 0 ? "text-green-700 font-semibold" : ""
-                    }`}
-                  >
-                    {monthRevenue > 0 ? formatRevenue(monthRevenue) : "—"}
-                  </td>
-                  <td className="p-4">
-                    {allTimeRevenue > 0 ? formatRevenue(allTimeRevenue) : "—"}
-                  </td>
-                  <td
-                    className={`p-4 ${
-                      monthlyRevenue[name]?.revenue > 0 &&
-                      formatPercentage(monthRevenue, totalMonthlyRevenue) !==
-                        "0"
-                        ? "text-green-700 font-semibold"
-                        : ""
-                    }`}
-                  >
-                    {formatPercentage(monthRevenue, totalMonthlyRevenue)}
-                  </td>
-                </tr>
-              )
             )}
           </tbody>
         </table>
@@ -653,17 +363,13 @@ const ProductStatus = ({ products }: { products: ProductType[] | null }) => {
               <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-[100px]">
                 Product Count
               </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">
-                Summary
-              </th>
+              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">Summary</th>
             </tr>
           </thead>
           <tbody>
             <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4">
-                <span className="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">
-                  Active
-                </span>
+                <span className="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">Active</span>
               </td>
               <td className="p-4 font-semibold">{activeProducts.length}</td>
               <td className="p-4">Currently available for sale.</td>
@@ -721,7 +427,9 @@ const CartStatusBreakdown = ({
           totalValue += price;
         }
       } else if (item.type === "upsell") {
+        // @ts-ignore
         const upsell = upsells?.find((u) => u.id === item.baseUpsellId);
+
         if (upsell) {
           const price = parseFloat(String(upsell.pricing.basePrice));
           totalValue += price;
@@ -766,9 +474,7 @@ const CartStatusBreakdown = ({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b">
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36">
-                Status
-              </th>
+              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36">Status</th>
               <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36">
                 Cart Count
               </th>
@@ -783,9 +489,7 @@ const CartStatusBreakdown = ({
           <tbody>
             <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4">
-                <span className="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">
-                  Active
-                </span>
+                <span className="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">Active</span>
               </td>
               <td
                 className={clsx("p-4", {
@@ -794,12 +498,7 @@ const CartStatusBreakdown = ({
               >
                 {statusBreakdown.Active.count}
               </td>
-              <td
-                className={clsx(
-                  "p-4",
-                  statusBreakdown.Active.value && "font-semibold"
-                )}
-              >
+              <td className={clsx("p-4", statusBreakdown.Active.value && "font-semibold")}>
                 {statusBreakdown.Active.value
                   ? `$${statusBreakdown.Active.value.toLocaleString("en-US", {
                       minimumFractionDigits: 2,
@@ -810,9 +509,7 @@ const CartStatusBreakdown = ({
             </tr>
             <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4">
-                <span className="inline-block bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs">
-                  Idle
-                </span>
+                <span className="inline-block bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs">Idle</span>
               </td>
               <td
                 className={clsx("p-4", {
@@ -821,12 +518,7 @@ const CartStatusBreakdown = ({
               >
                 {statusBreakdown.Idle.count}
               </td>
-              <td
-                className={clsx(
-                  "p-4",
-                  statusBreakdown.Idle.value && "font-semibold"
-                )}
-              >
+              <td className={clsx("p-4", statusBreakdown.Idle.value && "font-semibold")}>
                 {statusBreakdown.Idle.value
                   ? `$${statusBreakdown.Idle.value.toLocaleString("en-US", {
                       minimumFractionDigits: 2,
@@ -837,9 +529,7 @@ const CartStatusBreakdown = ({
             </tr>
             <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4">
-                <span className="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
-                  Abandoned
-                </span>
+                <span className="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">Abandoned</span>
               </td>
               <td
                 className={clsx("p-4", {
@@ -848,28 +538,18 @@ const CartStatusBreakdown = ({
               >
                 {statusBreakdown.Abandoned.count}
               </td>
-              <td
-                className={clsx(
-                  "p-4",
-                  statusBreakdown.Abandoned.value && "font-semibold"
-                )}
-              >
+              <td className={clsx("p-4", statusBreakdown.Abandoned.value && "font-semibold")}>
                 {statusBreakdown.Abandoned.value
-                  ? `$${statusBreakdown.Abandoned.value.toLocaleString(
-                      "en-US",
-                      {
-                        minimumFractionDigits: 2,
-                      }
-                    )}`
+                  ? `$${statusBreakdown.Abandoned.value.toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                    })}`
                   : 0}
               </td>
               <td className="p-4">Carts abandoned for 7-30 days.</td>
             </tr>
             <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4">
-                <span className="inline-block bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs">
-                  Dead
-                </span>
+                <span className="inline-block bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs">Dead</span>
               </td>
               <td
                 className={clsx("p-4", {
@@ -878,12 +558,7 @@ const CartStatusBreakdown = ({
               >
                 {statusBreakdown.Dead.count}
               </td>
-              <td
-                className={clsx(
-                  "p-4",
-                  statusBreakdown.Dead.value && "text-red-700"
-                )}
-              >
+              <td className={clsx("p-4", statusBreakdown.Dead.value && "text-red-700")}>
                 {statusBreakdown.Dead.value
                   ? `$${statusBreakdown.Dead.value.toLocaleString("en-US", {
                       minimumFractionDigits: 2,
@@ -901,8 +576,7 @@ const CartStatusBreakdown = ({
 
 const UpsellPerformance = ({ upsells }: { upsells: UpsellType[] | null }) => {
   // Calculate active upsells (PUBLISHED only)
-  const activeUpsells =
-    upsells?.filter((u) => u.visibility === "PUBLISHED").length || 0;
+  const activeUpsells = upsells?.filter((u) => u.visibility === "PUBLISHED").length || 0;
 
   // Calculate total potential revenue and actual revenue with discounts
   const metrics = upsells?.reduce(
@@ -910,8 +584,7 @@ const UpsellPerformance = ({ upsells }: { upsells: UpsellType[] | null }) => {
       if (upsell.visibility !== "PUBLISHED") return acc;
 
       const baseRevenue = upsell.pricing.basePrice;
-      const actualRevenue =
-        upsell.pricing.salePrice || upsell.pricing.basePrice;
+      const actualRevenue = upsell.pricing.salePrice || upsell.pricing.basePrice;
 
       return {
         totalRevenue: acc.totalRevenue + baseRevenue,
@@ -930,15 +603,9 @@ const UpsellPerformance = ({ upsells }: { upsells: UpsellType[] | null }) => {
         <table className="w-full min-w-[738px] text-sm">
           <thead>
             <tr className="border-b">
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-36">
-                Metric
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-36">
-                Value
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">
-                Description
-              </th>
+              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-36">Metric</th>
+              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-36">Value</th>
+              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">Description</th>
             </tr>
           </thead>
           <tbody>
@@ -946,45 +613,31 @@ const UpsellPerformance = ({ upsells }: { upsells: UpsellType[] | null }) => {
               <td className="p-4 font-semibold">Active Upsells</td>
               <td className="p-4 font-semibold">{activeUpsells}</td>
               <td className="p-4">
-                Test combinations to find the most profitable upsells with the
-                least discount impact.
+                Test combinations to find the most profitable upsells with the least discount impact.
               </td>
             </tr>
             <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4 font-semibold">Revenue from Upsells</td>
               <td className="p-4 font-semibold">
-                {metrics.totalRevenue !== 0
-                  ? `$${metrics.totalRevenue.toLocaleString()}`
-                  : "0"}
+                {metrics.totalRevenue !== 0 ? `$${metrics.totalRevenue.toLocaleString()}` : "0"}
               </td>
-              <td className="p-4">
-                Compare upsell revenue to single-item sales to evaluate the
-                value of upsells.
-              </td>
+              <td className="p-4">Compare upsell revenue to single-item sales to evaluate the value of upsells.</td>
             </tr>
             <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4 font-semibold">Revenue Lost via Discounts</td>
               <td className="p-4 font-semibold">
-                {metrics.discountLoss !== 0
-                  ? `$${metrics.discountLoss.toLocaleString()}`
-                  : "0"}
+                {metrics.discountLoss !== 0 ? `$${metrics.discountLoss.toLocaleString()}` : "0"}
               </td>
               <td className="p-4">
-                Refine discount strategies to minimize revenue loss while
-                maintaining customer value.
+                Refine discount strategies to minimize revenue loss while maintaining customer value.
               </td>
             </tr>
             <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
               <td className="p-4 font-semibold">Avg. Customer Savings</td>
               <td className="p-4 font-semibold">
-                {avgSavings !== 0
-                  ? `$${Math.round(avgSavings).toLocaleString()}`
-                  : "0"}
+                {avgSavings !== 0 ? `$${Math.round(avgSavings).toLocaleString()}` : "0"}
               </td>
-              <td className="p-4">
-                Make sure upsells are sustainably boosting profits, not just
-                moving stock.
-              </td>
+              <td className="p-4">Make sure upsells are sustainably boosting profits, not just moving stock.</td>
             </tr>
           </tbody>
         </table>
