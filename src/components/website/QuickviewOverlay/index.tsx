@@ -125,7 +125,7 @@ const MemoizedMobileProductDetails = memo(function MobileProductDetails({
               <div
                 key={index}
                 className={clsx(
-                  "h-full bg-lightgray",
+                  "h-full bg-neutral-50",
                   imagesCount === 1 ? "mx-auto max-w-[446px] w-full h-auto aspect-auto" : "aspect-square"
                 )}
               >
@@ -291,7 +291,7 @@ const MemoizedMobileProductDetails = memo(function MobileProductDetails({
         </div>
         <div className="h-[72px] pt-[6px] pb-5 px-5 border-t border-[#e6e8ec] bg-white fixed z-10 bottom-0 left-0 right-0">
           <div className="max-w-[486px] mx-auto flex gap-[6px] justify-center">
-            {/* <CartAndUpgradeButtons product={selectedProduct} cart={cart} /> */}
+            <CartAndUpgradeButtons product={selectedProduct} cart={cart} />
           </div>
         </div>
       </div>
