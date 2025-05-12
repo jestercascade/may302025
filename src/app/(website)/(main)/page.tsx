@@ -111,21 +111,53 @@ export default async function Home() {
 
 // -- UI Components --
 
+// function renderHero(pageHero: any) {
+//   if (pageHero?.visibility !== "VISIBLE" || !pageHero.images?.desktop || !pageHero.images?.mobile) {
+//     return null;
+//   }
+
+//   return (
+//     <Link href={pageHero.destinationUrl} target="_blank" className="w-full">
+//       <div className="block md:hidden">
+//         <Image
+//           src={pageHero.images.mobile}
+//           alt={pageHero.title}
+//           sizes="100vw"
+//           style={{ width: "100%", height: "auto" }}
+//           width={2000}
+//           height={2000}
+//           priority
+//         />
+//       </div>
+//       <div className="hidden md:block">
+//         <Image
+//           src={pageHero.images.desktop}
+//           alt={pageHero.title}
+//           sizes="100vw"
+//           style={{ width: "100%", height: "auto" }}
+//           width={1440}
+//           height={360}
+//           priority
+//         />
+//       </div>
+//     </Link>
+//   );
+// }
+
 function renderHero(pageHero: any) {
   if (pageHero?.visibility !== "VISIBLE" || !pageHero.images?.desktop || !pageHero.images?.mobile) {
     return null;
   }
 
   return (
-    <Link href={pageHero.destinationUrl} target="_blank" className="w-full">
+    <Link href={pageHero.destinationUrl}>
       <div className="block md:hidden">
         <Image
           src={pageHero.images.mobile}
           alt={pageHero.title}
-          sizes="100vw"
-          style={{ width: "100%", height: "auto" }}
-          width={2000}
-          height={2000}
+          layout="responsive"
+          width={720}
+          height={405}
           priority
         />
       </div>
@@ -133,8 +165,7 @@ function renderHero(pageHero: any) {
         <Image
           src={pageHero.images.desktop}
           alt={pageHero.title}
-          sizes="100vw"
-          style={{ width: "100%", height: "auto" }}
+          layout="responsive"
           width={1440}
           height={360}
           priority
