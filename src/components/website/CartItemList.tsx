@@ -481,10 +481,10 @@ function MobileOrderSummary({
   const totalPrice = calculateTotal();
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-md z-50">
-      <div className="max-w-[499px] mx-auto p-4 pb-8 space-y-3">
+      <div className="max-w-[499px] mx-auto px-4 pt-3 pb-8 space-y-2">
         {selectedItems.size > 0 ? (
           <>
-            <div className="flex justify-between items-center text-sm">
+            <div className="w-[calc(100%-40px)] mx-auto flex justify-between items-center text-sm">
               <div className="flex items-center gap-2">
                 <span className="font-medium">Order Summary</span>
                 <span className="text-gray-600">
