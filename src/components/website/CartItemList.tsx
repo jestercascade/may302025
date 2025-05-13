@@ -308,14 +308,14 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                             className="bg-white bg-opacity-80 backdrop-blur-sm rounded-lg p-3 border border-blue-200/50 shadow-sm transition-all duration-200 hover:shadow-md hover:bg-opacity-100"
                           >
                             <div className="flex flex-col gap-4">
-                              <div className="w-full h-[160px]">
+                              <div className="aspect-square h-[160px] min-[580px]:h-[128px]">
                                 <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
                                   <Image src={product.mainImage} alt={product.name} width={160} height={160} priority />
                                 </div>
+                                <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
+                                  <Image src={product.mainImage} alt={product.name} width={128} height={128} priority />
+                                </div>
                               </div>
-                              {/* <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[120px] min-[580px]:max-w-[120px] min-[580px]:min-h-[120px] min-[580px]:max-h-[120px] overflow-hidden rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200/50">
-                                <Image src={product.mainImage} alt={product.name} width={120} height={120} priority />
-                              </div> */}
                               <div className="space-y-3">
                                 <Link
                                   href={`${product.slug}-${product.id}`}
