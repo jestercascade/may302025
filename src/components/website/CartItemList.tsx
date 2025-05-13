@@ -305,13 +305,15 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                             key={product.id}
                             className="bg-white bg-opacity-80 backdrop-blur-sm rounded-lg p-3 border border-blue-200/50 shadow-sm transition-all duration-200 hover:shadow-md hover:bg-opacity-100"
                           >
-                            <div className="flex gap-4">
-                              <div className="min-[580px]:hidden flex items-center justify-center min-w-[80px] max-w-[80px] min-h-[80px] max-h-[80px] overflow-hidden rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200/50">
-                                <Image src={product.mainImage} alt={product.name} width={80} height={80} priority />
+                            <div className="flex flex-col gap-4">
+                              <div className="w-full h-[160px]">
+                                <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200/50">
+                                  <Image src={product.mainImage} alt={product.name} width={160} height={160} priority />
+                                </div>
                               </div>
-                              <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[120px] min-[580px]:max-w-[120px] min-[580px]:min-h-[120px] min-[580px]:max-h-[120px] overflow-hidden rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200/50">
+                              {/* <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[120px] min-[580px]:max-w-[120px] min-[580px]:min-h-[120px] min-[580px]:max-h-[120px] overflow-hidden rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200/50">
                                 <Image src={product.mainImage} alt={product.name} width={120} height={120} priority />
-                              </div>
+                              </div> */}
                               <div className="space-y-3">
                                 <Link
                                   href={`${product.slug}-${product.id}`}
