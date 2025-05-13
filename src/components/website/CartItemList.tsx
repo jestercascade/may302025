@@ -487,7 +487,7 @@ function MobileOrderSummary({
             <div className="w-[calc(100%-40px)] mx-auto flex justify-between items-center text-sm">
               <div className="flex items-center gap-2">
                 <span className="font-medium">Order Summary</span>
-                <span className="text-gray-600">
+                <span className="text-gray">
                   ({selectedItems.size} {selectedItems.size === 1 ? "item" : "items"})
                 </span>
               </div>
