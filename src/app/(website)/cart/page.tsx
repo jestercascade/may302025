@@ -274,7 +274,7 @@ function EmptyCartState() {
 
 function Footer() {
   return (
-    <footer className="w-full pt-6 pb-36 min-[580px]:pb-24 mt-14 bg-neutral-100">
+    <footer className="w-full pt-6 pb-36 min-[580px]:pb-36 mt-14 bg-neutral-100">
       <div className="md:hidden max-w-[486px] px-5 mx-auto">
         <div className="grid grid-cols-2">
           <div>
