@@ -307,7 +307,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                             key={product.id}
                             className="bg-white bg-opacity-80 backdrop-blur-sm rounded-lg p-3 border border-blue-200/50 shadow-sm transition-all duration-200 hover:shadow-md hover:bg-opacity-100"
                           >
-                            <div className="flex flex-col gap-4">
+                            <div className="flex flex-col min-[580px]:flex-row gap-4">
                               <div className="aspect-square h-[160px] min-[580px]:h-[128px]">
                                 <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
                                   <Image src={product.mainImage} alt={product.name} width={160} height={160} priority />
@@ -508,11 +508,11 @@ function MobileOrderSummary({
             </div>
             <div className="text-center">
               <h3 className="font-medium text-sm">Your cart is waiting</h3>
-              <p className="text-xs text-gray-600 mt-1">Select items to complete your purchase</p>
+              <p className="text-xs text-gray mt-1">Select items to complete your purchase</p>
             </div>
             <button
               onClick={toggleAll}
-              className="w-full py-2 rounded-full text-blue-600 cursor-pointer flex items-center justify-center border border-[#d9d8d6] shadow-[inset_0px_1px_0px_0px_#ffffff] bg-gradient-to-b from-[#faf9f8] to-[#eae8e6] hover:from-[#eae8e6] hover:to-[#faf9f8] active:shadow-[inset_0_3px_5px_rgba(0,0,0,0.1)] text-sm"
+              className="w-full max-w-72 py-2 rounded-full text-blue cursor-pointer flex items-center justify-center border border-[#d9d8d6] shadow-[inset_0px_1px_0px_0px_#ffffff] bg-gradient-to-b from-[#faf9f8] to-[#eae8e6] hover:from-[#eae8e6] hover:to-[#faf9f8] active:shadow-[inset_0_3px_5px_rgba(0,0,0,0.1)] text-sm"
             >
               Select all items
             </button>
