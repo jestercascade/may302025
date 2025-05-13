@@ -65,6 +65,8 @@ interface OrderSummaryProps {
   cartItems: CartItemType[];
 }
 
+interface MobileOrderSummaryProps extends OrderSummaryProps {}
+
 export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set(cartItems.map((item) => item.variantId)));
   const [deselectedItems, setDeselectedItems] = useState<Set<string>>(new Set());
@@ -339,7 +341,6 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
         </div>
       </div>
 
-      {/* Order Summary Component */}
       <OrderSummary
         selectedItems={selectedItems}
         getSelectedCartItems={getSelectedCartItems}
@@ -347,14 +348,13 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
         toggleAll={toggleAll}
         cartItems={cartItems}
       />
-
-      {/* Mobile Order Summary */}
-      {/* <MobileOrderSummary
+      <MobileOrderSummary
         selectedItems={selectedItems}
         getSelectedCartItems={getSelectedCartItems}
         calculateTotal={calculateTotal}
         toggleAll={toggleAll}
-      /> */}
+        cartItems={cartItems}
+      />
     </div>
   );
 }
@@ -471,16 +471,52 @@ function OrderSummary({
   );
 }
 
-// // Mobile Order Summary Component
-// function MobileOrderSummary({
-//   selectedItems,
-//   getSelectedCartItems,
-//   calculateTotal,
-//   toggleAll,
-// }: MobileOrderSummaryProps) {
-//   const [isExpanded, setIsExpanded] = useState(false);
-
-//   const total = calculateTotal();
-
-//   return <div>...</div>;
-// }
+function MobileOrderSummary({
+  selectedItems,
+  getSelectedCartItems,
+  calculateTotal,
+  toggleAll,
+  cartItems,
+}: MobileOrderSummaryProps) {
+  const totalPrice = calculateTotal();
+  return (
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-md z-50">
+      <div className="max-w-screen-xl mx-auto w-full p-4 pb-8 space-y-3">
+        {selectedItems.size > 0 ? (
+          <>
+            <div className="flex justify-between items-center text-sm">
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Order Summary</span>
+                <span className="text-gray-600">
+                  ({selectedItems.size} {selectedItems.size === 1 ? "item" : "items"})
+                </span>
+              </div>
+              <div className="flex items-baseline font-semibold">
+                <span className="text-sm">$</span>
+                <span className="text-lg">{Math.floor(totalPrice)}</span>
+                <span className="text-sm">{(totalPrice % 1).toFixed(2).substring(1)}</span>
+              </div>
+            </div>
+            <PayPalButton showLabel={true} cart={getSelectedCartItems()} />
+          </>
+        ) : (
+          <div className="flex flex-col items-center space-y-3">
+            <div className="bg-gray-100 p-3 rounded-full">
+              <Gift size={24} className="text-gray-500" />
+            </div>
+            <div className="text-center">
+              <h3 className="font-medium text-sm">Your cart is waiting</h3>
+              <p className="text-xs text-gray-600 mt-1">Select items to complete your purchase</p>
+            </div>
+            <button
+              onClick={toggleAll}
+              className="w-full py-2 rounded-full text-blue-600 cursor-pointer flex items-center justify-center border border-[#d9d8d6] shadow-[inset_0px_1px_0px_0px_#ffffff] bg-gradient-to-b from-[#faf9f8] to-[#eae8e6] hover:from-[#eae8e6] hover:to-[#faf9f8] active:shadow-[inset_0_3px_5px_rgba(0,0,0,0.1)] text-sm"
+            >
+              Select all items
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
