@@ -201,14 +201,17 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                         {isSelected && <Check color="#ffffff" size={12} strokeWidth={2} />}
                       </div>
                     </div>
-                    <div className="flex gap-4 w-[calc(100%-32px)] p-5 pr-0 rounded-lg border border-gray-200/80">
-                      <div>
-                        <div className="min-[580px]:hidden flex items-center justify-center min-w-[108px] max-w-[108px] min-h-[108px] max-h-[108px] overflow-hidden rounded-lg">
-                          <Image src={item.mainImage} alt={item.name} width={108} height={108} priority />
+                    <div className="relative flex flex-col gap-4 w-[calc(100%-32px)] p-5 rounded-lg border border-gray-200/80">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center absolute right-3 top-3">
+                        <RemoveFromCartButton type="product" variantId={item.variantId} />
+                      </div>
+                      <div className="w-full h-[160px]">
+                        <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
+                          <Image src={item.mainImage} alt={item.name} width={160} height={160} priority />
                         </div>
-                        <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
+                        {/* <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
                           <Image src={item.mainImage} alt={item.name} width={128} height={128} priority />
-                        </div>
+                        </div> */}
                       </div>
                       <div className="w-full pr-3 flex flex-col gap-1">
                         <div className="min-w-full h-5 flex items-center justify-between gap-3">
@@ -219,7 +222,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                           >
                             {item.name}
                           </Link>
-                          <RemoveFromCartButton type="product" variantId={item.variantId} />
+                          {/* <RemoveFromCartButton type="product" variantId={item.variantId} /> */}
                         </div>
                         {formatOptions(item.selectedOptions)}
                         <div className="mt-1 w-max flex items-center justify-center">
