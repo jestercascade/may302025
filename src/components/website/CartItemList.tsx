@@ -203,24 +203,24 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                         {isSelected && <Check color="#ffffff" size={12} strokeWidth={2} />}
                       </div>
                     </div>
-                    <div className="relative flex flex-col gap-4 w-[calc(100%-32px)] p-5 rounded-lg border border-gray-200/80">
+                    <div className="relative flex flex-col min-[580px]:flex-row gap-4 w-[calc(100%-32px)] p-5 rounded-lg border border-gray-200/80">
                       <div className="w-8 h-8 rounded-full flex items-center justify-center absolute right-3 top-3">
                         <RemoveFromCartButton type="product" variantId={item.variantId} />
                       </div>
-                      <div className="w-full h-[160px]">
+                      <div className="aspect-square h-[160px] min-[580px]:h-[128px]">
                         <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
                           <Image src={item.mainImage} alt={item.name} width={160} height={160} priority />
                         </div>
-                        {/* <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
+                        <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
                           <Image src={item.mainImage} alt={item.name} width={128} height={128} priority />
-                        </div> */}
+                        </div>
                       </div>
-                      <div className="w-full pr-3 flex flex-col gap-1">
+                      <div className="w-full flex flex-col gap-1">
                         <div className="min-w-full h-5 flex items-center justify-between gap-3">
                           <Link
                             href={`${item.slug}-${item.baseProductId}`}
                             target="_blank"
-                            className="text-xs line-clamp-1 hover:underline"
+                            className="text-xs line-clamp-1 min-[580px]:w-[calc(100%-28px)] hover:underline"
                           >
                             {item.name}
                           </Link>
@@ -309,7 +309,7 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                           >
                             <div className="flex flex-col gap-4">
                               <div className="w-full h-[160px]">
-                                <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200/50">
+                                <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
                                   <Image src={product.mainImage} alt={product.name} width={160} height={160} priority />
                                 </div>
                               </div>
@@ -481,7 +481,7 @@ function MobileOrderSummary({
   const totalPrice = calculateTotal();
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-md z-50">
-      <div className="max-w-screen-xl mx-auto w-full p-4 pb-8 space-y-3">
+      <div className="max-w-[499px] mx-auto p-4 pb-8 space-y-3">
         {selectedItems.size > 0 ? (
           <>
             <div className="flex justify-between items-center text-sm">
@@ -497,7 +497,9 @@ function MobileOrderSummary({
                 <span className="text-sm">{(totalPrice % 1).toFixed(2).substring(1)}</span>
               </div>
             </div>
-            <PayPalButton showLabel={true} cart={getSelectedCartItems()} />
+            <div className="h-[45px] max-w-[499px]">
+              <PayPalButton showLabel={true} cart={getSelectedCartItems()} />
+            </div>
           </>
         ) : (
           <div className="flex flex-col items-center space-y-3">
