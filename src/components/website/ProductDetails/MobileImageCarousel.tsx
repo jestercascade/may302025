@@ -42,14 +42,14 @@ export function MobileImageCarousel({ images, productName }: ImageCarouselType) 
   if (productImages.length === 1) {
     return (
       <div className="relative select-none">
-        <div className="w-full flex items-center justify-center overflow-hidden">
-          <div className="relative w-full">
+        <div className="w-full aspect-square bg-neutral-100 flex items-center justify-center overflow-hidden">
+          <div className="relative flex items-center justify-center h-full w-full">
             <Image
               src={productImages[0]}
               alt={`${productName} - 1`}
               width={768}
-              height={0}
-              style={{ width: "100%", height: "auto" }}
+              height={768}
+              className="max-h-full max-w-full object-contain"
               priority={true}
             />
           </div>
@@ -64,16 +64,15 @@ export function MobileImageCarousel({ images, productName }: ImageCarouselType) 
         <div className="flex">
           {productImages.map((image, index) => (
             <div className="flex-[0_0_100%] min-w-0" key={index}>
-              <div className="w-full flex items-center justify-center overflow-hidden bg-lightgray">
-                <div className="relative w-full">
+              <div className="w-full aspect-square bg-neutral-100 flex items-center justify-center overflow-hidden">
+                <div className="relative flex items-center justify-center h-full w-full">
                   <Image
                     src={image}
                     alt={`${productName} - ${index + 1}`}
                     width={768}
-                    height={0}
-                    style={{ width: "100%", height: "auto" }}
+                    height={768}
+                    className="max-h-full max-w-full object-contain"
                     priority={index === 0}
-                    className="block"
                   />
                 </div>
               </div>

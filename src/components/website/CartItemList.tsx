@@ -221,7 +221,6 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
                           >
                             {item.name}
                           </Link>
-                          {/* <RemoveFromCartButton type="product" variantId={item.variantId} /> */}
                         </div>
                         {formatOptions(item.selectedOptions)}
                         <div className="mt-1 w-max flex items-center justify-center">

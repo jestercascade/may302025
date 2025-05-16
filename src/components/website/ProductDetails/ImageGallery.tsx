@@ -36,17 +36,18 @@ export function ImageGallery({ images, productName }: ProductImagesType) {
           />
         ))}
       </div>
-      <div className="w-full relative rounded-[20px] overflow-hidden bg-neutral-100 [box-shadow:0px_1.6px_3.6px_rgb(0,_0,_0,_0.4),_0px_0px_2.9px_rgb(0,_0,_0,_0.1)]">
-        <Image
-          src={displayedImage}
-          alt={productName}
-          width={506}
-          height={675}
-          sizes="(max-width: 506px) 100vw, 506px"
-          priority
-          style={{ width: "100%", height: "auto" }}
-          className="block transition-opacity duration-200"
-        />
+      <div>
+        <div className="aspect-square relative rounded-[20px] overflow-hidden flex items-center justify-center [box-shadow:0px_1.6px_3.6px_rgb(0,_0,_0,_0.4),_0px_0px_2.9px_rgb(0,_0,_0,_0.1)]">
+          <Image
+            src={displayedImage}
+            alt={productName}
+            width={506}
+            height={506}
+            priority
+            sizes="(max-width: 506px) 100vw, 506px"
+            className="max-h-full max-w-full object-contain transition-opacity duration-200"
+          />
+        </div>
       </div>
     </div>
   );

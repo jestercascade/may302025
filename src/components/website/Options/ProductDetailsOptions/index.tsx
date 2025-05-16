@@ -66,7 +66,7 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const productDetailsPage = useOverlayStore((state) => state.pages.productDetails);
 
-  const MAX_DISPLAY_CHARS = 28;
+  const MAX_DISPLAY_CHARS = 24;
 
   const sortedGroups = [...options.groups].sort((a, b) => a.displayOrder - b.displayOrder);
 
@@ -324,7 +324,6 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
       )}
     >
       <style jsx>{highlightKeyframes}</style>
-
       <button
         onClick={() => setDropdownVisible((prev) => !prev)}
         className={clsx(
@@ -371,9 +370,8 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
           )}
         />
       </button>
-
       {isDropdownVisible && (
-        <div className="absolute top-full left-0 z-20 w-80 mt-2">
+        <div className="absolute bottom-full md:top-full md:bottom-auto left-0 z-20 w-80 mb-2 md:mb-0 md:mt-2">
           <div
             className={`${styles.customScrollbar} flex flex-col gap-4 p-4 rounded-md shadow-lg bg-white border border-gray-200 max-h-60 overflow-y-auto`}
           >

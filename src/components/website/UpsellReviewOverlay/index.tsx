@@ -429,20 +429,38 @@ function UpsellProductSummary({ product, selectedOptions, onSelectOptions }: Ups
         </div>
       </div>
       <div className="bg-white bg-opacity-80 backdrop-blur-sm rounded-lg p-3 border border-[#e5e7eb] shadow-sm transition-all duration-200 hover:shadow-md hover:bg-opacity-100 flex-1">
-        <div className="flex gap-4">
-          <div className="flex items-center justify-center min-w-[120px] max-w-[120px] aspect-square overflow-hidden rounded-lg bg-gradient-to-br from-[#f3f4f6] to-[#e5e7eb] border border-[#e5e7eb]">
+        <div className="flex flex-col min-[580px]:flex-row gap-4">
+          {/* Mobile image (visible below 580px) */}
+          <div className="min-[580px]:hidden aspect-square h-[160px]">
+            <div className="flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg bg-gradient-to-br from-[#f3f4f6] to-[#e5e7eb] border border-[#e5e7eb]">
+              <Image
+                src={product.images.main}
+                alt={product.name}
+                width={160}
+                height={160}
+                className="w-full h-full object-cover"
+                priority
+              />
+            </div>
+          </div>
+
+          {/* Desktop image (visible above 580px) */}
+          <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg bg-gradient-to-br from-[#f3f4f6] to-[#e5e7eb] border border-[#e5e7eb]">
             <Image
               src={product.images.main}
               alt={product.name}
-              width={80}
-              height={80}
+              width={128}
+              height={128}
               className="w-full h-full object-cover"
+              priority
             />
           </div>
-          <div className="space-y-3">
+
+          <div className="space-y-3 w-full">
             <button onClick={() => onSelectOptions(product.id)} className="text-xs line-clamp-1 hover:underline">
               {product.name}
             </button>
+
             {optionsTags.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-1 max-w-xs">
                 {optionsTags.map((opt, i) => (
@@ -455,6 +473,7 @@ function UpsellProductSummary({ product, selectedOptions, onSelectOptions }: Ups
                 ))}
               </div>
             )}
+
             {showButton && (
               <button
                 onClick={() => onSelectOptions(product.id)}
