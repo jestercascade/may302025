@@ -8,9 +8,7 @@ import { useRouter } from "next/navigation";
 import clsx from "clsx";
 
 export function MobileNavbarButton() {
-  const showMobileNavbarOverlay = useMobileNavbarStore(
-    (state) => state.showMobileNavbarOverlay
-  );
+  const showMobileNavbarOverlay = useMobileNavbarStore((state) => state.showMobileNavbarOverlay);
 
   return (
     <button
@@ -24,17 +22,9 @@ export function MobileNavbarButton() {
   );
 }
 
-export function MobileNavbarOverlay({
-  categoriesData,
-}: {
-  categoriesData: StoreCategoriesType | null;
-}) {
-  const hideMobileNavbarOverlay = useMobileNavbarStore(
-    (state) => state.hideMobileNavbarOverlay
-  );
-  const isMobileNavbarOverlayVisible = useMobileNavbarStore(
-    (state) => state.isMobileNavbarOverlayVisible
-  );
+export function MobileNavbarOverlay() {
+  const hideMobileNavbarOverlay = useMobileNavbarStore((state) => state.hideMobileNavbarOverlay);
+  const isMobileNavbarOverlayVisible = useMobileNavbarStore((state) => state.isMobileNavbarOverlayVisible);
   const router = useRouter();
   const overlayRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -49,9 +39,7 @@ export function MobileNavbarOverlay({
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 768px)");
 
-    const handleMediaQueryChange = (
-      e: MediaQueryListEvent | MediaQueryList
-    ) => {
+    const handleMediaQueryChange = (e: MediaQueryListEvent | MediaQueryList) => {
       if (e.matches && isMobileNavbarOverlayVisible) {
         hideMobileNavbarOverlay();
       }
@@ -100,25 +88,9 @@ export function MobileNavbarOverlay({
             : "hidden"
         )}
       >
-        <div
-          ref={menuRef}
-          className="absolute right-0 bottom-0 top-0 h-full w-3/4 max-w-80 pl-8 pt-10 bg-white"
-        >
+        <div ref={menuRef} className="absolute right-0 bottom-0 top-0 h-full w-3/4 max-w-80 pl-8 pt-10 bg-white">
           <div className="flex flex-col gap-2.5 *:w-max *:text-lg *:font-medium">
-            <button onClick={() => handleNavigation("/new-arrivals")}>
-              New Arrivals
-            </button>
-            {categoriesData?.showOnPublicSite &&
-              categoriesData.categories.map((category) => (
-                <button
-                  key={category.index}
-                  onClick={() =>
-                    handleNavigation(`/category/${category.name.toLowerCase()}`)
-                  }
-                >
-                  {category.name}
-                </button>
-              ))}
+            <button onClick={() => handleNavigation("/new-arrivals")}>New Arrivals</button>
             <button onClick={() => handleNavigation("#")}>Track Order</button>
           </div>
           <button
@@ -135,8 +107,3 @@ export function MobileNavbarOverlay({
     </>
   );
 }
-
-type StoreCategoriesType = {
-  showOnPublicSite: boolean;
-  categories: CategoryType[];
-};

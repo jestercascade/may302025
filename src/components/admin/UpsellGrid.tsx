@@ -9,17 +9,24 @@ import { useState } from "react";
 import { NewUpsellEmptyGridButton } from "./NewUpsellOverlay";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 
+type UpsellGridType = {
+  id: string;
+  mainImage: string;
+  pricing: {
+    basePrice: number;
+    salePrice: number;
+    discountPercentage: number;
+  };
+  visibility: VisibilityType;
+};
+
 const PUBLISHED = "PUBLISHED";
 const DRAFT = "DRAFT";
 const HIDDEN = "HIDDEN";
 const INACTIVE = "INACTIVE";
 const ALL = "ALL";
 
-export default function UpsellGrid({
-  upsells,
-}: {
-  upsells: UpsellType[] | null;
-}) {
+export default function UpsellGrid({ upsells }: { upsells: UpsellGridType[] | null }) {
   const [filter, setFilter] = useState<string>(ALL);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageJumpValue, setPageJumpValue] = useState("1");
@@ -29,14 +36,10 @@ export default function UpsellGrid({
 
   const getFilteredUpsells = (filter: string) => {
     if (filter === PUBLISHED) {
-      return (upsells ?? []).filter(
-        (upsell) => upsell.visibility.toUpperCase() === PUBLISHED
-      );
+      return (upsells ?? []).filter((upsell) => upsell.visibility.toUpperCase() === PUBLISHED);
     } else if (filter === INACTIVE) {
       return (upsells ?? []).filter(
-        (upsell) =>
-          upsell.visibility.toUpperCase() === HIDDEN ||
-          upsell.visibility.toUpperCase() === DRAFT
+        (upsell) => upsell.visibility.toUpperCase() === HIDDEN || upsell.visibility.toUpperCase() === DRAFT
       );
     }
     return upsells ?? [];
@@ -49,9 +52,7 @@ export default function UpsellGrid({
 
     if (newFilteredUpsells.length === 0) {
       showAlert({
-        message: `${capitalizeFirstLetter(
-          newFilter.toLowerCase()
-        )} filter has no upsells`,
+        message: `${capitalizeFirstLetter(newFilter.toLowerCase())} filter has no upsells`,
       });
     } else {
       setFilter(newFilter);
@@ -61,11 +62,7 @@ export default function UpsellGrid({
     }
   };
 
-  const pagination = (
-    data: UpsellType[],
-    currentPage: number,
-    rowsPerPage: number
-  ) => {
+  const pagination = (data: UpsellGridType[], currentPage: number, rowsPerPage: number) => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     const paginatedArray = data.slice(startIndex, endIndex);
@@ -78,11 +75,7 @@ export default function UpsellGrid({
   };
 
   const rowsPerPage = 16;
-  const { paginatedArray: gridData, totalPages } = pagination(
-    filteredUpsells,
-    currentPage,
-    rowsPerPage
-  );
+  const { paginatedArray: gridData, totalPages } = pagination(filteredUpsells, currentPage, rowsPerPage);
 
   const handlePrevious = () => {
     setCurrentPage((prevPage) => {
@@ -150,33 +143,22 @@ export default function UpsellGrid({
                 <button
                   onClick={() => handleFilterChange(PUBLISHED)}
                   className={`px-3 h-9 hover:bg-[#e4e4e4] rounded-full ${
-                    filter === PUBLISHED
-                      ? "text-blue"
-                      : "text-gray hover:text-black"
+                    filter === PUBLISHED ? "text-blue" : "text-gray hover:text-black"
                   }`}
                 >
-                  Published (
-                  {
-                    (upsells ?? []).filter(
-                      (upsell) => upsell.visibility.toUpperCase() === PUBLISHED
-                    ).length
-                  }
-                  )
+                  Published ({(upsells ?? []).filter((upsell) => upsell.visibility.toUpperCase() === PUBLISHED).length})
                 </button>
                 <button
                   onClick={() => handleFilterChange(INACTIVE)}
                   className={`px-3 pr-[14px] h-9 hover:bg-[#e4e4e4] rounded-full ${
-                    filter === INACTIVE
-                      ? "text-blue"
-                      : "text-gray hover:text-black"
+                    filter === INACTIVE ? "text-blue" : "text-gray hover:text-black"
                   }`}
                 >
                   Inactive (
                   {
                     (upsells ?? []).filter(
                       (upsell) =>
-                        upsell.visibility.toUpperCase() === HIDDEN ||
-                        upsell.visibility.toUpperCase() === DRAFT
+                        upsell.visibility.toUpperCase() === HIDDEN || upsell.visibility.toUpperCase() === DRAFT
                     ).length
                   }
                   )
@@ -192,13 +174,7 @@ export default function UpsellGrid({
                 >
                   <div className="relative">
                     <div className="w-full aspect-square overflow-hidden flex items-center justify-center shadow-[2px_2px_4px_#9E9E9E] bg-white">
-                      <Image
-                        src={mainImage}
-                        alt="Upsell"
-                        width={250}
-                        height={250}
-                        priority
-                      />
+                      <Image src={mainImage} alt="Upsell" width={250} height={250} priority />
                     </div>
                     <div className="w-full h-full absolute top-0 bottom-0 left-0 right-0 ease-in-out duration-300 transition group-hover:bg-black/20"></div>
                   </div>
@@ -206,16 +182,10 @@ export default function UpsellGrid({
                     {Number(pricing.salePrice) ? (
                       <div className="flex items-center gap-[6px]">
                         <div className="flex items-baseline">
+                          <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                          <span className="text-lg font-bold">{Math.floor(Number(pricing.salePrice))}</span>
                           <span className="text-[0.813rem] leading-3 font-semibold">
-                            $
-                          </span>
-                          <span className="text-lg font-bold">
-                            {Math.floor(Number(pricing.salePrice))}
-                          </span>
-                          <span className="text-[0.813rem] leading-3 font-semibold">
-                            {(Number(pricing.salePrice) % 1)
-                              .toFixed(2)
-                              .substring(1)}
+                            {(Number(pricing.salePrice) % 1).toFixed(2).substring(1)}
                           </span>
                         </div>
                         <span className="text-[0.813rem] leading-3 text-gray line-through">
@@ -224,16 +194,10 @@ export default function UpsellGrid({
                       </div>
                     ) : (
                       <div className="flex items-baseline">
+                        <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                        <span className="text-lg font-bold">{Math.floor(Number(pricing.basePrice))}</span>
                         <span className="text-[0.813rem] leading-3 font-semibold">
-                          $
-                        </span>
-                        <span className="text-lg font-bold">
-                          {Math.floor(Number(pricing.basePrice))}
-                        </span>
-                        <span className="text-[0.813rem] leading-3 font-semibold">
-                          {(Number(pricing.basePrice) % 1)
-                            .toFixed(2)
-                            .substring(1)}
+                          {(Number(pricing.basePrice) % 1).toFixed(2).substring(1)}
                         </span>
                       </div>
                     )}
@@ -262,9 +226,7 @@ export default function UpsellGrid({
                       }
                     )}
                   />
-                  <div className="flex items-center justify-center px-1 cursor-context-menu">
-                    of
-                  </div>
+                  <div className="flex items-center justify-center px-1 cursor-context-menu">of</div>
                   <button
                     onClick={jumpToLastPage}
                     className="w-9 h-9 flex items-center justify-center border rounded-full ease-in-out duration-300 transition bg-white active:bg-lightgray-dimmed lg:hover:bg-lightgray-dimmed"
@@ -286,9 +248,7 @@ export default function UpsellGrid({
         <div className="w-full flex justify-center">
           <div className="text-center">
             <h2 className="font-semibold text-lg mb-2">No upsells yet</h2>
-            <p className="text-sm mb-4">
-              Click the button below to create your first one
-            </p>
+            <p className="text-sm mb-4">Click the button below to create your first one</p>
             <NewUpsellEmptyGridButton />
           </div>
         </div>

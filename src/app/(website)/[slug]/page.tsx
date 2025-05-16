@@ -6,7 +6,6 @@ import styles from "./styles.module.css";
 import { getCart } from "@/actions/get/carts";
 import { formatThousands } from "@/lib/utils/common";
 import { getProducts } from "@/actions/get/products";
-import { getCategories } from "@/actions/get/categories";
 import { BackButton } from "@/components/website/BackButton";
 import { ImageGallery } from "@/components/website/ProductDetails/ImageGallery";
 import { ProductDetailsWrapper } from "@/components/website/ProductDetailsWrapper";
@@ -69,9 +68,8 @@ export default async function ProductDetails({ params }: { params: Promise<{ slu
 
   const productId = getProductIdFromSlug(slug);
 
-  const [cart, categoriesData, fetchedProducts] = await Promise.all([
+  const [cart, fetchedProducts] = await Promise.all([
     getCart(deviceIdentifier),
-    getCategories({ visibility: "VISIBLE" }),
     getProducts({
       ids: [productId],
       fields: ["name", "pricing", "images", "options", "highlights", "upsell", "description"],
@@ -89,7 +87,6 @@ export default async function ProductDetails({ params }: { params: Promise<{ slu
     <>
       <ProductDetailsWrapper
         cart={cart}
-        categoriesData={categoriesData}
         productInfo={{
           id: product.id,
           name: product.name,
@@ -158,7 +155,7 @@ function DesktopProductDetails({ product, cart }: ProductDetailsType) {
 }
 
 function MobileProductDetails({ product, cart }: ProductDetailsType) {
-  const { name, pricing, images, highlights, upsell, description, options, id } = product;
+  const { name, pricing, images, highlights, upsell, description, options } = product;
 
   return (
     <div className="md:hidden">

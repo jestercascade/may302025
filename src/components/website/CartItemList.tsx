@@ -62,10 +62,7 @@ interface OrderSummaryProps {
   getSelectedCartItems: () => CartItemType[];
   calculateTotal: () => number;
   toggleAll: () => void;
-  cartItems: CartItemType[];
 }
-
-interface MobileOrderSummaryProps extends OrderSummaryProps {}
 
 export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set(cartItems.map((item) => item.variantId)));
@@ -346,30 +343,22 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
         getSelectedCartItems={getSelectedCartItems}
         calculateTotal={calculateTotal}
         toggleAll={toggleAll}
-        cartItems={cartItems}
       />
       <MobileOrderSummary
         selectedItems={selectedItems}
         getSelectedCartItems={getSelectedCartItems}
         calculateTotal={calculateTotal}
         toggleAll={toggleAll}
-        cartItems={cartItems}
       />
     </div>
   );
 }
 
-function OrderSummary({
-  selectedItems,
-  getSelectedCartItems,
-  calculateTotal,
-  toggleAll,
-  cartItems,
-}: OrderSummaryProps) {
+function OrderSummary({ selectedItems, getSelectedCartItems, calculateTotal, toggleAll }: OrderSummaryProps) {
   const totalPrice = calculateTotal();
 
   return (
-    <div className="hidden md:flex flex-col gap-3 h-max min-w-[276px] max-w-[276px] lg:min-w-[344px] lg:max-w-[344px] sticky top-16 select-none bg-white rounded-lg p-5 border border-gray-200 shadow-sm">
+    <div className="hidden lg:flex flex-col gap-3 h-max min-w-[344px] max-w-[344px] sticky top-16 select-none bg-white rounded-lg p-5 border border-gray-200 shadow-sm">
       <div className="text-lg font-semibold mb-2">Order Summary</div>
 
       {selectedItems.size > 0 ? (
@@ -471,16 +460,10 @@ function OrderSummary({
   );
 }
 
-function MobileOrderSummary({
-  selectedItems,
-  getSelectedCartItems,
-  calculateTotal,
-  toggleAll,
-  cartItems,
-}: MobileOrderSummaryProps) {
+function MobileOrderSummary({ selectedItems, getSelectedCartItems, calculateTotal, toggleAll }: OrderSummaryProps) {
   const totalPrice = calculateTotal();
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-md z-50">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-md z-50">
       <div className="max-w-[499px] mx-auto px-4 pt-3 pb-8 space-y-2">
         {selectedItems.size > 0 ? (
           <>

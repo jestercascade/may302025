@@ -10,7 +10,6 @@ import { getNewsletterSubscribers } from "@/actions/get/newsletter-subscribers";
 import { SendNewsletterEmailAction } from "@/actions/newsletters";
 import { EmailLogo } from "@/components/shared/emails/EmailLogo";
 import { EmailFooter } from "@/components/shared/emails/EmailFooter";
-import styles from "./styles.module.css";
 import juice from "juice";
 import clsx from "clsx";
 import { useAlertStore } from "@/zustand/shared/alertStore";
@@ -19,12 +18,8 @@ import { ShowAlertType } from "@/lib/sharedTypes";
 export function SendNewsletterButton({ id }: { id: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const pageName = useOverlayStore((state) => state.pages.newsletter.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.newsletter.overlays.sendNewsletter.name
-  );
-  const setSelectedNewsletterId = useSelectedNewsletterStore(
-    (state) => state.setSelectedNewsletterId
-  );
+  const overlayName = useOverlayStore((state) => state.pages.newsletter.overlays.sendNewsletter.name);
+  const setSelectedNewsletterId = useSelectedNewsletterStore((state) => state.setSelectedNewsletterId);
 
   const handleClick = () => {
     showOverlay({ pageName, overlayName });
@@ -32,10 +27,7 @@ export function SendNewsletterButton({ id }: { id: string }) {
   };
 
   return (
-    <button
-      onClick={handleClick}
-      className="h-9 w-9 rounded-full flex items-center justify-center"
-    >
+    <button onClick={handleClick} className="h-9 w-9 rounded-full flex items-center justify-center">
       <Send size={18} strokeWidth={1.75} className="mt-0.5" />
     </button>
   );
@@ -46,26 +38,16 @@ export function SendNewsletterOverlay() {
   const [loadingContent, setLoadingContent] = useState(true);
   const [newsletter, setNewsletter] = useState<NewsletterType | null>(null);
   const [subscribers, setSubscribers] = useState<SubscriberType[] | null>(null);
-  const [selectedSubscribers, setSelectedSubscribers] = useState<Set<string>>(
-    new Set()
-  );
+  const [selectedSubscribers, setSelectedSubscribers] = useState<Set<string>>(new Set());
   const [isExpanded, setIsExpanded] = useState(false);
 
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.newsletter.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.newsletter.overlays.sendNewsletter.name
-  );
-  const isOverlayVisible = useOverlayStore(
-    (state) => state.pages.newsletter.overlays.sendNewsletter.isVisible
-  );
-  const selectedNewsletterId = useSelectedNewsletterStore(
-    (state) => state.selectedNewsletterId
-  );
-  const setSelectedNewsletterId = useSelectedNewsletterStore(
-    (state) => state.setSelectedNewsletterId
-  );
+  const overlayName = useOverlayStore((state) => state.pages.newsletter.overlays.sendNewsletter.name);
+  const isOverlayVisible = useOverlayStore((state) => state.pages.newsletter.overlays.sendNewsletter.isVisible);
+  const selectedNewsletterId = useSelectedNewsletterStore((state) => state.selectedNewsletterId);
+  const setSelectedNewsletterId = useSelectedNewsletterStore((state) => state.setSelectedNewsletterId);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,9 +66,7 @@ export function SendNewsletterOverlay() {
 
         // Select all subscribers by default
         if (fetchedSubscribers) {
-          setSelectedSubscribers(
-            new Set(fetchedSubscribers.map((s) => s.email))
-          );
+          setSelectedSubscribers(new Set(fetchedSubscribers.map((s) => s.email)));
         }
 
         setLoadingContent(false);
@@ -132,10 +112,7 @@ export function SendNewsletterOverlay() {
     };
   }, [isOverlayVisible]);
 
-  const isAllSelected =
-    subscribers &&
-    subscribers.length > 0 &&
-    selectedSubscribers.size === subscribers.length;
+  const isAllSelected = subscribers && subscribers.length > 0 && selectedSubscribers.size === subscribers.length;
 
   const onHideOverlay = () => {
     setLoadingSave(false);
@@ -318,14 +295,10 @@ export function SendNewsletterOverlay() {
                 <div className="w-full h-full pt-2 flex flex-col items-center gap-5">
                   <div className="flex-1 w-[calc(100%-40px)] border rounded-md overflow-auto custom-scrollbar bg-neutral-50">
                     <div className="h-12 px-4 border-b flex items-center justify-center">
-                      <span className="truncate font-medium">
-                        {newsletter?.emailSubject}
-                      </span>
+                      <span className="truncate font-medium">{newsletter?.emailSubject}</span>
                     </div>
                     <div className="w-full h-[calc(100%-48px)]">
-                      <div
-                        className={`w-full h-full px-5 overflow-y-auto overflow-x-hidden ${styles.customScrollbar}`}
-                      >
+                      <div className="w-full h-full px-5 overflow-y-auto overflow-x-hidden rounded-y-scrollbar">
                         <EmailLogo contentType="react" />
                         {newsletter ? (
                           <div
@@ -336,15 +309,10 @@ export function SendNewsletterOverlay() {
                           />
                         ) : (
                           <div className="flex items-center justify-center h-full">
-                            <span className="text-gray-500">
-                              No content available
-                            </span>
+                            <span className="text-gray-500">No content available</span>
                           </div>
                         )}
-                        <EmailFooter
-                          includeUnsubscribeLink={true}
-                          contentType="react"
-                        />
+                        <EmailFooter includeUnsubscribeLink={true} contentType="react" />
                       </div>
                     </div>
                   </div>
@@ -367,10 +335,8 @@ export function SendNewsletterOverlay() {
                         className={clsx(
                           "relative h-9 w-max px-4 text-sm font-medium rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
                           {
-                            "bg-opacity-50":
-                              loadingSave || selectedSubscribers.size === 0,
-                            "hover:bg-neutral-600 active:bg-neutral-800":
-                              !loadingSave && selectedSubscribers.size > 0,
+                            "bg-opacity-50": loadingSave || selectedSubscribers.size === 0,
+                            "hover:bg-neutral-600 active:bg-neutral-800": !loadingSave && selectedSubscribers.size > 0,
                           }
                         )}
                       >
@@ -381,11 +347,7 @@ export function SendNewsletterOverlay() {
                           </div>
                         ) : (
                           <div className="flex items-center gap-2">
-                            <Send
-                              size={18}
-                              strokeWidth={1.75}
-                              className="mt-0.5 -ml-0.5"
-                            />
+                            <Send size={18} strokeWidth={1.75} className="mt-0.5 -ml-0.5" />
                             <span className="text-white">Send</span>
                           </div>
                         )}
@@ -398,35 +360,25 @@ export function SendNewsletterOverlay() {
                             subscribers.map((subscriber, index) => (
                               <div
                                 key={index}
-                                onClick={() =>
-                                  toggleSubscriber(subscriber.email)
-                                }
+                                onClick={() => toggleSubscriber(subscriber.email)}
                                 className="flex items-center gap-2.5 w-max cursor-pointer"
                               >
                                 <div
                                   className={clsx(
                                     "rounded-md min-w-[18px] h-[18px] flex items-center justify-center",
-                                    selectedSubscribers.has(subscriber.email)
-                                      ? "bg-amber"
-                                      : "border border-neutral-300"
+                                    selectedSubscribers.has(subscriber.email) ? "bg-amber" : "border border-neutral-300"
                                   )}
                                 >
-                                  {selectedSubscribers.has(
-                                    subscriber.email
-                                  ) && (
+                                  {selectedSubscribers.has(subscriber.email) && (
                                     <Check size={16} className="text-white" />
                                   )}
                                 </div>
-                                <span className="text-sm font-medium truncate w-full">
-                                  {subscriber.email}
-                                </span>
+                                <span className="text-sm font-medium truncate w-full">{subscriber.email}</span>
                               </div>
                             ))
                           ) : (
                             <div className="flex items-center justify-center h-full">
-                              <span className="text-gray-500">
-                                No subscribers found
-                              </span>
+                              <span className="text-gray-500">No subscribers found</span>
                             </div>
                           )}
                         </div>
@@ -452,14 +404,8 @@ export function SendNewsletterOverlay() {
                       type="button"
                       className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                     >
-                      <ArrowLeft
-                        size={20}
-                        strokeWidth={2}
-                        className="-ml-1 stroke-blue"
-                      />
-                      <span className="font-semibold text-sm text-blue">
-                        Newsletter
-                      </span>
+                      <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
+                      <span className="font-semibold text-sm text-blue">Newsletter</span>
                     </button>
                     <button
                       disabled={loadingSave || selectedSubscribers.size === 0}
@@ -467,10 +413,8 @@ export function SendNewsletterOverlay() {
                       className={clsx(
                         "relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
                         {
-                          "bg-opacity-50":
-                            loadingSave || selectedSubscribers.size === 0,
-                          "hover:bg-neutral-600 active:bg-neutral-800":
-                            !loadingSave && selectedSubscribers.size > 0,
+                          "bg-opacity-50": loadingSave || selectedSubscribers.size === 0,
+                          "hover:bg-neutral-600 active:bg-neutral-800": !loadingSave && selectedSubscribers.size > 0,
                         }
                       )}
                     >
@@ -480,9 +424,7 @@ export function SendNewsletterOverlay() {
                           <span className="text-white">Sending</span>
                         </div>
                       ) : (
-                        <span className="text-white">
-                          Send ({selectedSubscribers.size})
-                        </span>
+                        <span className="text-white">Send ({selectedSubscribers.size})</span>
                       )}
                     </button>
                   </div>
@@ -507,9 +449,7 @@ export function SendNewsletterOverlay() {
                               subscribers.map((subscriber, index) => (
                                 <div
                                   key={index}
-                                  onClick={() =>
-                                    toggleSubscriber(subscriber.email)
-                                  }
+                                  onClick={() => toggleSubscriber(subscriber.email)}
                                   className="flex items-center gap-2.5 w-max cursor-pointer"
                                 >
                                   <div
@@ -520,22 +460,16 @@ export function SendNewsletterOverlay() {
                                         : "border border-neutral-300"
                                     )}
                                   >
-                                    {selectedSubscribers.has(
-                                      subscriber.email
-                                    ) && (
+                                    {selectedSubscribers.has(subscriber.email) && (
                                       <Check size={16} className="text-white" />
                                     )}
                                   </div>
-                                  <span className="text-sm font-medium truncate w-full">
-                                    {subscriber.email}
-                                  </span>
+                                  <span className="text-sm font-medium truncate w-full">{subscriber.email}</span>
                                 </div>
                               ))
                             ) : (
                               <div className="flex items-center justify-center h-full">
-                                <span className="text-gray-500">
-                                  No subscribers found
-                                </span>
+                                <span className="text-gray-500">No subscribers found</span>
                               </div>
                             )}
                           </div>
@@ -543,13 +477,9 @@ export function SendNewsletterOverlay() {
                       </div>
                       <div className="bg-neutral-50">
                         <div className="h-12 px-4 border-b flex items-center justify-center">
-                          <span className="truncate font-medium">
-                            {newsletter?.emailSubject}
-                          </span>
+                          <span className="truncate font-medium">{newsletter?.emailSubject}</span>
                         </div>
-                        <div
-                          className={`w-full h-[calc(100%-48px)] px-5 overflow-y-auto ${styles.customScrollbar}`}
-                        >
+                        <div className="w-full h-[calc(100%-48px)] px-5 overflow-y-auto rounded-y-scrollbar">
                           <EmailLogo contentType="react" />
                           {newsletter ? (
                             <div
@@ -560,15 +490,10 @@ export function SendNewsletterOverlay() {
                             />
                           ) : (
                             <div className="flex items-center justify-center h-full">
-                              <span className="text-gray-500">
-                                No content available
-                              </span>
+                              <span className="text-gray-500">No content available</span>
                             </div>
                           )}
-                          <EmailFooter
-                            includeUnsubscribeLink={true}
-                            contentType="react"
-                          />
+                          <EmailFooter includeUnsubscribeLink={true} contentType="react" />
                         </div>
                       </div>
                     </div>

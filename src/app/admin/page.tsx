@@ -1,5 +1,4 @@
 import { getCarts } from "@/actions/get/carts";
-import { getCategories } from "@/actions/get/categories";
 import { getOrders } from "@/actions/get/orders";
 import { getProducts } from "@/actions/get/products";
 import { getUpsells } from "@/actions/get/upsells";
@@ -428,7 +427,6 @@ const CartStatusBreakdown = ({
           totalValue += price;
         }
       } else if (item.type === "upsell") {
-        // @ts-ignore
         const upsell = upsells?.find((u) => u.id === item.baseUpsellId);
         if (upsell) {
           const price = upsell.pricing.salePrice
@@ -735,4 +733,47 @@ type PaymentTransaction = {
       lastSent: string | null;
     };
   };
+};
+
+type SelectedOptionType = {
+  value: string;
+  optionDisplayOrder: number;
+  groupDisplayOrder: number;
+};
+
+type CartProductItemType = {
+  type: "product";
+  baseProductId: string;
+  selectedOptions: Record<string, SelectedOptionType>;
+  variantId: string;
+  index: number;
+};
+
+type CartUpsellItemType = {
+  type: "upsell";
+  baseUpsellId: string;
+  variantId: string;
+  index: number;
+  products: Array<{
+    index: number;
+    id: string;
+    slug: string;
+    name: string;
+    basePrice: number;
+    images: {
+      main: string;
+      gallery: string[];
+    };
+    options: ProductOptionsType;
+  }>;
+};
+
+type CartItemType = CartProductItemType | CartUpsellItemType;
+
+type CartType = {
+  id: string;
+  device_identifier: string;
+  items: CartItemType[];
+  createdAt: string;
+  updatedAt: string;
 };

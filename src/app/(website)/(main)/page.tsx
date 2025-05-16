@@ -1,9 +1,7 @@
 import { Banner } from "@/components/website/Banner";
-import { Categories } from "@/components/website/Categories";
 import ShuffledDiscoveryProducts from "@/components/website/ShuffledDiscoveryProducts";
 import { FeaturedProducts } from "@/components/website/FeaturedProducts";
 import { getCollections } from "@/actions/get/collections";
-import { getCategories } from "@/actions/get/categories";
 import { getPageHero } from "@/actions/get/pageHero";
 import { getProducts } from "@/actions/get/products";
 import { getCart } from "@/actions/get/carts";
@@ -23,14 +21,13 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const [collections, categoriesData, pageHero, discoveryProductsSettings] = await Promise.all([
+  const [collections, pageHero, discoveryProductsSettings] = await Promise.all([
     getCollections({
       fields: ["title", "slug", "products"],
       visibility: "PUBLISHED",
       publishedProductsOnly: true,
       allowedCampaignStatuses: ["Active"],
     }),
-    getCategories({ visibility: "VISIBLE" }),
     getPageHero(),
     getDiscoveryProductsSettings(),
   ]);
@@ -54,14 +51,13 @@ export default async function Home() {
 
   const heroContent = renderHero(pageHero);
   const isHeroRendered = heroContent !== null;
-  const isCategoriesRendered = !!categoriesData?.showOnPublicSite && categoriesData.categories?.length > 0;
   const hasCollectionContent = combinedCollections.some((c) => {
     if (c.collectionType === "FEATURED") return c.products.length >= 3;
     if (c.collectionType === "BANNER") return c.products.length > 0;
     return false;
   });
 
-  if (!isHeroRendered && !isCategoriesRendered && !hasCollectionContent) {
+  if (!isHeroRendered && !hasCollectionContent) {
     if (discoveryProductsSettings?.visibleOnPages?.home !== true) {
       return <CatalogEmptyState />;
     }
@@ -85,25 +81,22 @@ export default async function Home() {
   return (
     <>
       {heroContent}
-      <div>
-        {isCategoriesRendered && <Categories categories={categoriesData.categories} />}
-        <div className="mt-8 max-w-5xl mx-auto flex flex-col gap-8">
-          {combinedCollections
-            .map((collection) => renderCollection(collection, cart))
-            .filter(Boolean)
-            .map((content, index) => (
-              <div key={index}>{content}</div>
-            ))}
-          {discoveryProductsSettings?.visibleOnPages?.home === true && (
-            <div className="px-5">
-              <ProductsProvider>
-                <Suspense fallback={null}>
-                  <ShuffledDiscoveryProducts page="HOME" excludeIds={Array.from(excludedIds)} cart={cart} />
-                </Suspense>
-              </ProductsProvider>
-            </div>
-          )}
-        </div>
+      <div className="mt-8 max-w-5xl mx-auto flex flex-col gap-8">
+        {combinedCollections
+          .map((collection) => renderCollection(collection, cart))
+          .filter(Boolean)
+          .map((content, index) => (
+            <div key={index}>{content}</div>
+          ))}
+        {discoveryProductsSettings?.visibleOnPages?.home === true && (
+          <div className="px-5">
+            <ProductsProvider>
+              <Suspense fallback={null}>
+                <ShuffledDiscoveryProducts page="HOME" excludeIds={Array.from(excludedIds)} cart={cart} />
+              </Suspense>
+            </ProductsProvider>
+          </div>
+        )}
       </div>
     </>
   );

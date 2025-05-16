@@ -22,9 +22,7 @@ export function NewsletterUnsubscribeButton({ email }: { email: string }) {
 
       showAlert({
         message: response.message,
-        type: response.success
-          ? ShowAlertType.SUCCESS
-          : ShowAlertType.NEUTRAL,
+        type: response.success ? ShowAlertType.SUCCESS : ShowAlertType.NEUTRAL,
       });
 
       if (response.success) {
@@ -45,9 +43,7 @@ export function NewsletterUnsubscribeButton({ email }: { email: string }) {
       <div className="max-w-lg mx-auto text-center py-16">
         <div>
           <h1 className="text-2xl font-semibold mb-3">You're unsubscribed</h1>
-          <p className="text-sm text-gray">
-            You’re welcome to subscribe again for updates and exclusive offers
-          </p>
+          <p className="text-sm text-gray">You’re welcome to subscribe again for updates and exclusive offers</p>
         </div>
         <Link
           href="/"
@@ -67,9 +63,7 @@ export function NewsletterUnsubscribeButton({ email }: { email: string }) {
             <Mail size={32} color="#dadada" strokeWidth={1.25} />
           </div>
           <div className="space-y-3">
-            <h1 className="text-2xl font-semibold text-center">
-              Unsubscribe from our newsletter
-            </h1>
+            <h1 className="text-2xl font-semibold text-center">Unsubscribe from our newsletter</h1>
             <p className="text-sm text-center text-gray">{email}</p>
           </div>
         </div>

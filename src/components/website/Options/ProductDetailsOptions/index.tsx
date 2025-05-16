@@ -189,7 +189,7 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
     if (selections.length === 0) return { display: "Select Options", remaining: 0 };
 
     let displayText = "";
-    let separator = ", ";
+    const separator = ", ";
     let index = 0;
     let remaining = selections.length;
 

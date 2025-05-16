@@ -1,20 +1,20 @@
 "use client";
 
-import { useUpsellReviewStore } from "@/zustand/website/upsellReviewStore";
-import { useAlertStore } from "@/zustand/shared/alertStore";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
-import { AddToCartAction } from "@/actions/cart";
-import { ShowAlertType } from "@/lib/sharedTypes";
+import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
+import { useUpsellReviewStore } from "@/zustand/website/upsellReviewStore";
+import { useQuickviewStore } from "@/zustand/website/quickviewStore";
+import { useOverlayStore } from "@/zustand/website/overlayStore";
+import { useAlertStore } from "@/zustand/shared/alertStore";
+import { X, Ruler, Check, ChevronDown } from "lucide-react";
 import { formatThousands } from "@/lib/utils/common";
+import { ShowAlertType } from "@/lib/sharedTypes";
+import { AddToCartAction } from "@/actions/cart";
+import { Spinner } from "@/ui/Spinners/Default";
+import { usePathname } from "next/navigation";
+import styles from "./styles.module.css";
 import Image from "next/image";
 import clsx from "clsx";
-import styles from "./styles.module.css";
-import { usePathname, useRouter } from "next/navigation";
-import { useQuickviewStore } from "@/zustand/website/quickviewStore";
-import { Spinner } from "@/ui/Spinners/Default";
-import { X, Ruler, Check, ChevronDown } from "lucide-react";
-import { useOverlayStore } from "@/zustand/website/overlayStore";
-import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 
 export function UpsellReviewButton({ product }: { product: UpsellReviewProductType }) {
   const showOverlay = useUpsellReviewStore((state) => state.showOverlay);
@@ -45,7 +45,6 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
   const hideQuickviewOverlay = useQuickviewStore((state) => state.hideOverlay);
   const showAlert = useAlertStore((state) => state.showAlert);
   const pathname = usePathname();
-  const router = useRouter();
   const { push } = useNavigation();
   const {
     hideOverlay,
@@ -135,7 +134,7 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
       const cartStatus = isUpsellInCart();
       setIsInCart(cartStatus);
     }
-  }, [isVisible, selectedProduct, cart, readyProducts, selectedOptions]);
+  }, [isVisible, selectedProduct, isUpsellInCart]);
 
   const calculateSavings = (pricing: { basePrice: number; salePrice: number }): string => {
     return (Number(pricing.basePrice) - Number(pricing.salePrice)).toFixed(2);
@@ -189,7 +188,7 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
       const result = await AddToCartAction(upsellToAdd);
       showAlert({
         message: result.message,
-        type: result.type === ShowAlertType.ERROR ? ShowAlertType.ERROR : ShowAlertType.NEUTRAL,
+        type: result.type === ShowAlertType.ERROR ? ShowAlertType.ERROR : ShowAlertType.SUCCESS,
       });
 
       setIsAddingToCart(false);

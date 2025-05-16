@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  capitalizeFirstLetter,
-  formatDate,
-  isGifImage,
-  isValidRemoteImage,
-} from "@/lib/utils/common";
+import { capitalizeFirstLetter, formatDate, isGifImage, isValidRemoteImage } from "@/lib/utils/common";
 import { useState, useEffect, useRef } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
@@ -20,15 +15,11 @@ import Overlay from "@/ui/Overlay";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { ShowAlertType } from "@/lib/sharedTypes";
 
-export function NewCollectionMenuButton({
-  closeMenu,
-}: NewCollectionMenuButtonType) {
+export function NewCollectionMenuButton({ closeMenu }: NewCollectionMenuButtonType) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const setNavbarMenu = useNavbarMenuStore((state) => state.setNavbarMenu);
   const pageName = useOverlayStore((state) => state.pages.storefront.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.storefront.overlays.newCollection.name
-  );
+  const overlayName = useOverlayStore((state) => state.pages.storefront.overlays.newCollection.name);
 
   const openOverlay = () => {
     setNavbarMenu(false);
@@ -53,9 +44,7 @@ export function NewCollectionEmptyTableButton() {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const setNavbarMenu = useNavbarMenuStore((state) => state.setNavbarMenu);
   const pageName = useOverlayStore((state) => state.pages.storefront.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.storefront.overlays.newCollection.name
-  );
+  const overlayName = useOverlayStore((state) => state.pages.storefront.overlays.newCollection.name);
 
   const openOverlay = () => {
     setNavbarMenu(false);
@@ -79,12 +68,10 @@ export function NewCollectionOverlay() {
 
   const today = new Date();
 
-  const [isCategoryDropdownOpen, setIsCollectionTypeDropdownOpen] =
-    useState(false);
+  const [isCollectionDropdownOpen, setIsCollectionTypeDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [selectedCollectionType, setSelectedCollectionType] =
-    useState(FEATURED);
+  const [selectedCollectionType, setSelectedCollectionType] = useState(FEATURED);
   const [title, setTitle] = useState<string>("");
   const [slug, setSlug] = useState<string>("");
   const [bannerDesktopImage, setBannerDesktopImage] = useState<string>("");
@@ -98,12 +85,8 @@ export function NewCollectionOverlay() {
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.storefront.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.storefront.overlays.newCollection.name
-  );
-  const isOverlayVisible = useOverlayStore(
-    (state) => state.pages.storefront.overlays.newCollection.isVisible
-  );
+  const overlayName = useOverlayStore((state) => state.pages.storefront.overlays.newCollection.name);
+  const isOverlayVisible = useOverlayStore((state) => state.pages.storefront.overlays.newCollection.isVisible);
 
   useEffect(() => {
     if (isOverlayVisible) {
@@ -145,10 +128,7 @@ export function NewCollectionOverlay() {
   };
 
   const isValidDateRange =
-    launchDate &&
-    endDate &&
-    launchDate.toISOString().split("T")[0] <
-      endDate.toISOString().split("T")[0];
+    launchDate && endDate && launchDate.toISOString().split("T")[0] < endDate.toISOString().split("T")[0];
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -195,9 +175,7 @@ export function NewCollectionOverlay() {
           };
         }
 
-        const result = await CreateCollectionAction(
-          requestData as RequestDataType
-        );
+        const result = await CreateCollectionAction(requestData as RequestDataType);
 
         showAlert({
           message: result.message,
@@ -264,14 +242,8 @@ export function NewCollectionOverlay() {
                   type="button"
                   className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                 >
-                  <ArrowLeft
-                    size={20}
-                    strokeWidth={2}
-                    className="-ml-1 stroke-blue"
-                  />
-                  <span className="font-semibold text-sm text-blue">
-                    New collection
-                  </span>
+                  <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
+                  <span className="font-semibold text-sm text-blue">New collection</span>
                 </button>
                 <button
                   onClick={handleSave}
@@ -299,29 +271,17 @@ export function NewCollectionOverlay() {
                   <h2 className="text-xs text-gray">Type</h2>
                   <div ref={collectionTypeRef} className="w-full h-9 relative">
                     <button
-                      onClick={() =>
-                        setIsCollectionTypeDropdownOpen(
-                          (prevState) => !prevState
-                        )
-                      }
+                      onClick={() => setIsCollectionTypeDropdownOpen((prevState) => !prevState)}
                       type="button"
                       className="h-9 w-full px-3 rounded-md flex items-center justify-between transition duration-300 ease-in-out bg-lightgray active:bg-lightgray-dimmed"
                     >
-                      <span>
-                        {capitalizeFirstLetter(
-                          selectedCollectionType.toLowerCase()
-                        )}
-                      </span>
-                      <ChevronDown
-                        className="-mr-[4px] stroke-gray"
-                        size={20}
-                        strokeWidth={2}
-                      />
+                      <span>{capitalizeFirstLetter(selectedCollectionType.toLowerCase())}</span>
+                      <ChevronDown className="-mr-[4px] stroke-gray" size={20} strokeWidth={2} />
                     </button>
                     <div
                       className={clsx("w-full absolute top-10 z-10", {
-                        hidden: !isCategoryDropdownOpen,
-                        block: isCategoryDropdownOpen,
+                        hidden: !isCollectionDropdownOpen,
+                        block: isCollectionDropdownOpen,
                       })}
                     >
                       <div className="overflow-hidden h-full w-full py-[6px] flex flex-col gap-0 rounded-md shadow-dropdown bg-white">
@@ -345,16 +305,11 @@ export function NewCollectionOverlay() {
                   <h2 className="text-xs text-gray">Campaign duration</h2>
                   <div className="flex flex-col min-[478px]:flex-row items-start gap-3 mt-4">
                     <div
-                      className={clsx(
-                        "w-[180px] flex gap-2 items-center border rounded-md overflow-hidden pl-3",
-                        {
-                          "border-red": !isValidDateRange,
-                        }
-                      )}
+                      className={clsx("w-[180px] flex gap-2 items-center border rounded-md overflow-hidden pl-3", {
+                        "border-red": !isValidDateRange,
+                      })}
                     >
-                      <span className="w-max text-nowrap text-xs text-gray">
-                        Launch
-                      </span>
+                      <span className="w-max text-nowrap text-xs text-gray">Launch</span>
                       <DatePicker
                         selected={launchDate}
                         onChange={(date) => setLaunchDate(date)}
@@ -363,16 +318,11 @@ export function NewCollectionOverlay() {
                       />
                     </div>
                     <div
-                      className={clsx(
-                        "w-[180px] flex gap-2 items-center border rounded-md overflow-hidden pl-3",
-                        {
-                          "border-red": !isValidDateRange,
-                        }
-                      )}
+                      className={clsx("w-[180px] flex gap-2 items-center border rounded-md overflow-hidden pl-3", {
+                        "border-red": !isValidDateRange,
+                      })}
                     >
-                      <span className="w-max text-nowrap text-xs text-gray">
-                        End date
-                      </span>
+                      <span className="w-max text-nowrap text-xs text-gray">End date</span>
                       <DatePicker
                         selected={endDate}
                         onChange={(date) => setEndDate(date)}
@@ -419,13 +369,10 @@ export function NewCollectionOverlay() {
                     <h2 className="text-xs text-gray">Images</h2>
                     <div className="p-5 rounded-md border flex flex-col gap-5">
                       <div className="flex flex-col gap-2">
-                        <h2 className="text-xs text-gray">
-                          Desktop (1440x360 px)
-                        </h2>
+                        <h2 className="text-xs text-gray">Desktop (1440x360 px)</h2>
                         <div className="w-full border rounded-md overflow-hidden">
                           <div className="w-full min-h-[104px] flex items-center justify-center overflow-hidden">
-                            {bannerDesktopImage &&
-                            isValidRemoteImage(bannerDesktopImage) ? (
+                            {bannerDesktopImage && isValidRemoteImage(bannerDesktopImage) ? (
                               isGifImage(bannerDesktopImage) ? (
                                 <Image
                                   src={bannerDesktopImage}
@@ -436,20 +383,10 @@ export function NewCollectionOverlay() {
                                   unoptimized={true}
                                 />
                               ) : (
-                                <Image
-                                  src={bannerDesktopImage}
-                                  alt={title}
-                                  width={725}
-                                  height={86}
-                                  priority={true}
-                                />
+                                <Image src={bannerDesktopImage} alt={title} width={725} height={86} priority={true} />
                               )
                             ) : (
-                              <ImageIcon
-                                color="#e5e5e5"
-                                size={52}
-                                strokeWidth={0.75}
-                              />
+                              <ImageIcon color="#e5e5e5" size={52} strokeWidth={0.75} />
                             )}
                           </div>
                           <div className="w-full h-9 border-t overflow-hidden">
@@ -458,22 +395,17 @@ export function NewCollectionOverlay() {
                               name="bannerDesktopImage"
                               placeholder="Paste image URL"
                               value={bannerDesktopImage}
-                              onChange={(e) =>
-                                setBannerDesktopImage(e.target.value)
-                              }
+                              onChange={(e) => setBannerDesktopImage(e.target.value)}
                               className="h-full w-full px-3 text-sm text-gray"
                             />
                           </div>
                         </div>
                       </div>
                       <div className="flex flex-col gap-2">
-                        <h2 className="text-xs text-gray">
-                          Mobile (1080x1080 px)
-                        </h2>
+                        <h2 className="text-xs text-gray">Mobile (1080x1080 px)</h2>
                         <div className="w-full max-w-[416px] border rounded-md overflow-hidden">
                           <div className="w-full aspect-square flex items-center justify-center overflow-hidden">
-                            {bannerMobileImage &&
-                            isValidRemoteImage(bannerMobileImage) ? (
+                            {bannerMobileImage && isValidRemoteImage(bannerMobileImage) ? (
                               isGifImage(bannerMobileImage) ? (
                                 <Image
                                   src={bannerMobileImage}
@@ -484,20 +416,10 @@ export function NewCollectionOverlay() {
                                   unoptimized={true}
                                 />
                               ) : (
-                                <Image
-                                  src={bannerMobileImage}
-                                  alt={title}
-                                  width={725}
-                                  height={86}
-                                  priority={true}
-                                />
+                                <Image src={bannerMobileImage} alt={title} width={725} height={86} priority={true} />
                               )
                             ) : (
-                              <ImageIcon
-                                color="#e5e5e5"
-                                size={52}
-                                strokeWidth={0.75}
-                              />
+                              <ImageIcon color="#e5e5e5" size={52} strokeWidth={0.75} />
                             )}
                           </div>
                           <div className="w-full h-9 border-t overflow-hidden">
@@ -506,9 +428,7 @@ export function NewCollectionOverlay() {
                               name="bannerMobileImage"
                               placeholder="Paste image URL"
                               value={bannerMobileImage}
-                              onChange={(e) =>
-                                setBannerMobileImage(e.target.value)
-                              }
+                              onChange={(e) => setBannerMobileImage(e.target.value)}
                               className="h-full w-full px-3 text-sm text-gray"
                             />
                           </div>

@@ -32,20 +32,20 @@ export function StickyBar({
   // Compute required option groups (those with at least one active value)
   const requiredGroups = productInfo.options.groups.filter((group) => group.values.some((value) => value.isActive));
 
-  // Compute current selected option values for cart comparison
-  const currentSelectedValues: Record<string, string> = {};
-  requiredGroups.forEach((group) => {
-    const selectedOptionId = selectedOptions[group.id];
-    if (selectedOptionId !== undefined) {
-      const option = group.values.find((opt) => opt.id === selectedOptionId);
-      if (option) {
-        currentSelectedValues[group.name.toLowerCase()] = option.value;
-      }
-    }
-  });
-
   // Check if the current selection is in the cart
   useEffect(() => {
+    // Compute current selected option values for cart comparison
+    const currentSelectedValues: Record<string, string> = {};
+    requiredGroups.forEach((group) => {
+      const selectedOptionId = selectedOptions[group.id];
+      if (selectedOptionId !== undefined) {
+        const option = group.values.find((opt) => opt.id === selectedOptionId);
+        if (option) {
+          currentSelectedValues[group.name.toLowerCase()] = option.value;
+        }
+      }
+    });
+
     const isInCart =
       cart?.items.some((item) => {
         if (item.type !== "product" || item.baseProductId !== productInfo.id) return false;
@@ -53,15 +53,14 @@ export function StickyBar({
         if (requiredGroups.length === 0) {
           // Simple product: no options required
           return cartOptionKeys.length === 0;
-        } else {
-          // Product with options: check if selected options match
-          const requiredKeys = requiredGroups.map((group) => group.name.toLowerCase());
-          if (cartOptionKeys.length !== requiredKeys.length) return false;
-          return (
-            requiredKeys.every((key) => cartOptionKeys.includes(key)) &&
-            requiredKeys.every((key) => item.selectedOptions[key].value === currentSelectedValues[key])
-          );
         }
+        // Product with options: check if selected options match
+        const requiredKeys = requiredGroups.map((group) => group.name.toLowerCase());
+        if (cartOptionKeys.length !== requiredKeys.length) return false;
+        return (
+          requiredKeys.every((key) => cartOptionKeys.includes(key)) &&
+          requiredKeys.every((key) => item.selectedOptions[key].value === currentSelectedValues[key])
+        );
       }) ?? false;
     setIsInCart(isInCart);
   }, [cart, productInfo.id, selectedOptions, requiredGroups]);
@@ -206,7 +205,7 @@ export function StickyBar({
               {shouldShowStickyBar && (
                 <div
                   className={clsx(
-                    "peer-hover:block hidden py-[18px] px-6 rounded-xl shadow-dropdown bg-white before:content-[''] before:w-[14px] before:h-[14px] before:bg-white before:rounded-tl-[2px] before:rotate-45 before:origin-top-left before:absolute before:-top-[10px] before:border-l before:border-t before:border-[#d9d9d9] before:right-20 min-[840px]:before:right-24 absolute top-[58px]",
+                    "peer-hover:block hidden py-[18px] px-6 rounded-xl shadow-t-dropdown bg-white before:content-[''] before:w-[14px] before:h-[14px] before:bg-white before:rounded-tl-[2px] before:rotate-45 before:origin-top-left before:absolute before:-top-[10px] before:border-l before:border-t before:border-[#d9d9d9] before:right-20 min-[840px]:before:right-24 absolute top-[58px]",
                     !isInCart ? "-right-2" : "left-1/2 -translate-x-1/2"
                   )}
                 >

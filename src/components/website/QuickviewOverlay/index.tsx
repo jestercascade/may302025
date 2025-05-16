@@ -3,7 +3,6 @@
 import { SizeChartOverlay, UpsellReviewOverlay } from "@/components/website/DynamicOverlays";
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 import { CartAndUpgradeButtons } from "../CartAndUpgradeButtons";
-import { ProductDetailsOptions } from "@/components/website/Options/ProductDetailsOptions";
 import { QuickviewOptions } from "@/components/website/Options/QuickviewOptions";
 import { useProductColorImageStore } from "@/zustand/website/productColorImageStore";
 import { useState, useMemo } from "react";
@@ -52,7 +51,7 @@ export function QuickviewButton({
 
 export function QuickviewOverlay() {
   const hideOverlay = useQuickviewStore((state) => state.hideOverlay);
-  const isVisible = useQuickviewStore((state) => state.isVisible);
+  const isOverlayVisible = useQuickviewStore((state) => state.isVisible);
   const cart = useQuickviewStore((state) => state.cart);
   const selectedProduct = useQuickviewStore((state) => state.selectedProduct);
 
@@ -60,11 +59,18 @@ export function QuickviewOverlay() {
   const initialRender = useRef(true);
 
   useEffect(() => {
-    document.body.style.overflow = isVisible ? "hidden" : "visible";
-    return () => {
+    if (isOverlayVisible) {
+      document.body.style.overflow = "hidden";
+    } else {
       document.body.style.overflow = "visible";
+    }
+
+    return () => {
+      if (!isOverlayVisible) {
+        document.body.style.overflow = "visible";
+      }
     };
-  }, [isVisible]);
+  }, [isOverlayVisible]);
 
   useEffect(() => {
     if (initialRender.current) {
@@ -74,13 +80,13 @@ export function QuickviewOverlay() {
     }
   }, [pathname, hideOverlay]);
 
-  if (!isVisible || !selectedProduct) {
+  if (!isOverlayVisible || !selectedProduct) {
     return null;
   }
 
   return (
     <>
-      {isVisible && selectedProduct && (
+      {isOverlayVisible && selectedProduct && (
         <div className="flex justify-center w-full h-dvh z-20 fixed top-0 bottom-0 left-0 right-0 bg-black bg-opacity-40 backdrop-blur-sm">
           <MemoizedMobileProductDetails selectedProduct={selectedProduct} cart={cart} hideOverlay={hideOverlay} />
           <MemoizedDesktopProductDetails selectedProduct={selectedProduct} cart={cart} hideOverlay={hideOverlay} />

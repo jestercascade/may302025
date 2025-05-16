@@ -6,29 +6,18 @@ import clsx from "clsx";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useState, useEffect, KeyboardEvent, ChangeEvent, useRef } from "react";
 
-export function Pagination({
-  currentPage,
-  totalPages,
-}: {
-  currentPage: number;
-  totalPages: number;
-}) {
+export function Pagination({ currentPage, totalPages }: { currentPage: number; totalPages: number }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isNavigating, setIsNavigating] = useState(false);
-  const [navigatingDirection, setNavigatingDirection] = useState<
-    "prev" | "next" | "input" | "last" | null
-  >(null);
+  const [navigatingDirection, setNavigatingDirection] = useState<"prev" | "next" | "input" | "last" | null>(null);
   const [inputValue, setInputValue] = useState(currentPage.toString());
   const [inputError, setInputError] = useState(false);
   const lastPageRequested = useRef<number | null>(null);
 
   useEffect(() => {
-    if (
-      lastPageRequested.current === currentPage ||
-      lastPageRequested.current === null
-    ) {
+    if (lastPageRequested.current === currentPage || lastPageRequested.current === null) {
       setIsNavigating(false);
       setNavigatingDirection(null);
     }
@@ -38,10 +27,7 @@ export function Pagination({
     lastPageRequested.current = null;
   }, [currentPage]);
 
-  const handleNavigation = (
-    direction: "prev" | "next" | "input" | "last",
-    page?: number
-  ) => {
+  const handleNavigation = (direction: "prev" | "next" | "input" | "last", page?: number) => {
     let targetPage: number;
 
     if (direction === "prev") {
@@ -107,8 +93,7 @@ export function Pagination({
               className={clsx(
                 "w-9 h-9 flex items-center justify-center rounded-full ease-in-out duration-300 transition",
                 {
-                  "active:bg-lightgray-dimmed lg:hover:bg-lightgray-dimmed":
-                    currentPage !== 1 && !isNavigating,
+                  "active:bg-lightgray-dimmed lg:hover:bg-lightgray-dimmed": currentPage !== 1 && !isNavigating,
                 }
               )}
             >
@@ -152,18 +137,12 @@ export function Pagination({
               className={clsx(
                 "min-w-[36px] max-w-[36px] h-9 px-1 flex items-center justify-center border rounded-full bg-white",
                 {
-                  "cursor-context-menu":
-                    currentPage === totalPages || isNavigating,
-                  "hover:bg-lightgray cursor-pointer":
-                    currentPage !== totalPages && !isNavigating,
+                  "cursor-context-menu": currentPage === totalPages || isNavigating,
+                  "hover:bg-lightgray cursor-pointer": currentPage !== totalPages && !isNavigating,
                 }
               )}
             >
-              {isNavigating && navigatingDirection === "last" ? (
-                <Spinner />
-              ) : (
-                totalPages
-              )}
+              {isNavigating && navigatingDirection === "last" ? <Spinner /> : totalPages}
             </button>
 
             <button

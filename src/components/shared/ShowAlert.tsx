@@ -5,6 +5,7 @@ import { useRef, useEffect } from "react";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { usePathname } from "next/navigation";
 import { useBodyOverflowStore } from "@/zustand/shared/bodyOverflowStore";
+import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 
 const SUCCESS = "SUCCESS";
 const ERROR = "ERROR";
@@ -16,10 +17,9 @@ export default function ShowAlert() {
   const isVisible = useAlertStore((state) => state.isVisible);
   const hideAlert = useAlertStore((state) => state.hideAlert);
   const preventBodyOverflowChange = useBodyOverflowStore((state) => state.preventBodyOverflowChange);
-
+  const isQuickviewOverlayVisible = useQuickviewStore((state) => state.isVisible);
   const overlayRef = useRef(null);
   const pathname = usePathname();
-
   const typeUpper = type?.toUpperCase();
 
   useEffect(() => {
@@ -30,7 +30,9 @@ export default function ShowAlert() {
     const body = document.body;
     const productDetailsWrapper = document.getElementById("product-details-wrapper");
 
-    if (isVisible) {
+    const shouldLockScroll = isVisible || isQuickviewOverlayVisible;
+
+    if (shouldLockScroll) {
       body.style.overflow = "hidden";
       if (productDetailsWrapper) productDetailsWrapper.style.overflow = "hidden";
     } else {
@@ -41,12 +43,14 @@ export default function ShowAlert() {
     }
 
     return () => {
-      if (!preventBodyOverflowChange) {
+      const stillShouldLock = isQuickviewOverlayVisible;
+
+      if (!stillShouldLock && !preventBodyOverflowChange) {
         body.style.overflow = "";
         if (productDetailsWrapper) productDetailsWrapper.style.overflow = "";
       }
     };
-  }, [isVisible, preventBodyOverflowChange]);
+  }, [isVisible, isQuickviewOverlayVisible, preventBodyOverflowChange]);
 
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
@@ -57,7 +61,6 @@ export default function ShowAlert() {
     };
 
     document.addEventListener("mousedown", handleClick);
-
     return () => {
       document.removeEventListener("mousedown", handleClick);
     };

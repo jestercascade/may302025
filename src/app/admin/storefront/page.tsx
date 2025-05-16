@@ -1,11 +1,6 @@
-import { getCategories } from "@/actions/get/categories";
 import { getCollections } from "@/actions/get/collections";
 import { getDiscoveryProductsSettings } from "@/actions/get/discoveryProducts";
 import { getPageHero } from "@/actions/get/pageHero";
-import {
-  CategoriesButton,
-  CategoriesOverlay,
-} from "@/components/admin/Storefront/CategoriesOverlay";
 import CollectionTable from "@/components/admin/Storefront/CollectionTable";
 import {
   DiscoveryProductsButton,
@@ -15,8 +10,7 @@ import { NewCollectionOverlay } from "@/components/admin/Storefront/NewCollectio
 import { PageHeroButton, PageHeroOverlay } from "@/components/admin/Storefront/PageHeroOverlay";
 
 export default async function Storefront() {
-  const [categoriesData, pageHero, discoveryProductsSettings, collections] = await Promise.all([
-    getCategories(),
+  const [pageHero, discoveryProductsSettings, collections] = await Promise.all([
     getPageHero(),
     getDiscoveryProductsSettings(),
     getCollections({
@@ -31,7 +25,6 @@ export default async function Storefront() {
           <h2 className="font-semibold text-lg mb-5">Elements</h2>
           <div className="w-full flex flex-wrap gap-2">
             <PageHeroButton visibility={pageHero.visibility} />
-            <CategoriesButton showOnPublicSite={categoriesData?.showOnPublicSite} />
             <DiscoveryProductsButton />
           </div>
         </div>
@@ -39,7 +32,6 @@ export default async function Storefront() {
       </div>
       <NewCollectionOverlay />
       <PageHeroOverlay pageHero={pageHero} />
-      <CategoriesOverlay categoriesData={categoriesData} />
       <DiscoveryProductsOverlay discoveryProductsSettings={discoveryProductsSettings} />
     </>
   );

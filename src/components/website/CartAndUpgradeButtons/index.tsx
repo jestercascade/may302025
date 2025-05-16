@@ -2,14 +2,14 @@
 
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { useOptionsStore } from "@/zustand/website/optionsStore";
-import { useTransition, useEffect, useState, useRef } from "react";
+import { useTransition, useEffect, useState } from "react";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { AddToCartAction } from "@/actions/cart";
 import { UpsellReviewButton } from "../UpsellReviewOverlay";
 import { useUpsellReviewStore } from "@/zustand/website/upsellReviewStore";
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
 import { capitalizeFirstLetter } from "@/lib/utils/common";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Spinner } from "@/ui/Spinners/Default";
 import styles from "./styles.module.css";
 import clsx from "clsx";
@@ -74,7 +74,7 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
 
       setCartTracking(initialTracking);
     }
-  }, [cart, product.id]);
+  }, [cart, product.id, product.options?.groups]);
 
   const isCurrentSelectionInCart = (): boolean => {
     if (!product.options?.groups) return false;

@@ -1,12 +1,11 @@
 import type { MetadataRoute } from "next";
 import { getProducts } from "@/actions/get/products";
 import { getCollections } from "@/actions/get/collections";
-import { getCategories } from "@/actions/get/categories";
 
 const BASE_URL = "https://cherlygood.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [products, collections, categories] = await Promise.all([
+  const [products, collections] = await Promise.all([
     getProducts({
       fields: ["slug", "id", "updatedAt"],
       visibility: "PUBLISHED",
@@ -15,7 +14,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       fields: ["slug", "id", "updatedAt"],
       visibility: "PUBLISHED",
     }),
-    getCategories({ visibility: "VISIBLE" }),
   ]);
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -75,37 +73,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Category pages (e.g., /category/dresses)
-  const categoryPages: MetadataRoute.Sitemap = categories?.categories
-    ? categories.categories.map((category: CategoryType) => {
-        const lastModifiedDate = new Date(category.updatedAt);
-        if (isNaN(lastModifiedDate.getTime())) {
-          console.warn(
-            `Invalid updatedAt value for category ${category.name}: ${category.updatedAt}. Using current date as fallback.`
-          );
-          return {
-            url: `${BASE_URL}/category/${category.name.toLowerCase()}`,
-            lastModified: new Date().toISOString(),
-            changeFrequency: "weekly",
-            priority: 0.7,
-          };
-        }
-        return {
-          url: `${BASE_URL}/category/${category.name.toLowerCase()}`,
-          lastModified: lastModifiedDate.toISOString(),
-          changeFrequency: "weekly",
-          priority: 0.7,
-        };
-      })
-    : [];
-
   // Collection pages (e.g., /collections/black-friday-sale-52029)
   const collectionPages: MetadataRoute.Sitemap = collections
     ? collections.map((collection: CollectionType) => ({
         url: `${BASE_URL}/collections/${collection.slug}-${collection.id}`,
-        lastModified: new Date(
-          collection.updatedAt || new Date()
-        ).toISOString(),
+        lastModified: new Date(collection.updatedAt || new Date()).toISOString(),
         changeFrequency: "weekly",
         priority: 0.6,
       }))
@@ -122,10 +94,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     : [];
 
   // Combine all routes into a single sitemap
-  return [
-    ...staticPages,
-    ...categoryPages,
-    ...collectionPages,
-    ...productPages,
-  ];
+  return [...staticPages, ...collectionPages, ...productPages];
 }

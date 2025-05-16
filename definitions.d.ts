@@ -49,15 +49,6 @@ type ProductOptionsType = {
   };
 };
 
-type CategoryType = {
-  index: number;
-  name: string;
-  image: string;
-  visibility: "VISIBLE" | "HIDDEN";
-  createdAt: string;
-  updatedAt: string;
-};
-
 type CollectionProductType = {
   index: number;
   id: string;
@@ -112,7 +103,6 @@ type ProductType = {
   id: string;
   name: string;
   slug: string;
-  category: string;
   description: string;
   highlights: {
     headline: string;
@@ -168,7 +158,6 @@ type ProductWithUpsellType = {
   id: string;
   name: string;
   slug: string;
-  category: string;
   description: string;
   highlights: {
     headline: string;

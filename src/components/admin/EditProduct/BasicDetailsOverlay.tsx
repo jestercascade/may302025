@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  FormEvent,
-  useState,
-  useEffect,
-  ChangeEvent,
-  useCallback,
-} from "react";
+import { FormEvent, useState, useEffect, ChangeEvent, useCallback } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
 import { ArrowLeft, X, Pencil } from "lucide-react";
@@ -15,14 +9,11 @@ import { UpdateProductAction } from "@/actions/products";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import clsx from "clsx";
-import styles from "./styles.module.css";
 
 export function BasicDetailsButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.editProduct.overlays.basicDetails.name
-  );
+  const overlayName = useOverlayStore((state) => state.pages.editProduct.overlays.basicDetails.name);
 
   return (
     <button
@@ -39,23 +30,15 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState(data.name);
   const [slug, setSlug] = useState(data.slug);
-  const [basePrice, setBasePrice] = useState(
-    data.pricing.basePrice.toString() || ""
-  );
+  const [basePrice, setBasePrice] = useState(data.pricing.basePrice.toString() || "");
   const [salePrice, setSalePrice] = useState(data.pricing.salePrice || 0);
-  const [discountPercentage, setDiscountPercentage] = useState(
-    data.pricing.discountPercentage || 0
-  );
+  const [discountPercentage, setDiscountPercentage] = useState(data.pricing.discountPercentage || 0);
 
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editProduct.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.editProduct.overlays.basicDetails.name
-  );
-  const isOverlayVisible = useOverlayStore(
-    (state) => state.pages.editProduct.overlays.basicDetails.isVisible
-  );
+  const overlayName = useOverlayStore((state) => state.pages.editProduct.overlays.basicDetails.name);
+  const isOverlayVisible = useOverlayStore((state) => state.pages.editProduct.overlays.basicDetails.isVisible);
 
   useEffect(() => {
     if (isOverlayVisible) {
@@ -73,13 +56,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
 
   const calculateSalePrice = useCallback(
     (discount: number) => {
-      if (
-        basePrice === "" ||
-        basePrice === "0" ||
-        isNaN(discount) ||
-        discount <= 0 ||
-        discount >= 100
-      ) {
+      if (basePrice === "" || basePrice === "0" || isNaN(discount) || discount <= 0 || discount >= 100) {
         setSalePrice(0);
       } else {
         const rawSalePrice = Number(basePrice) * (1 - discount / 100);
@@ -155,9 +132,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
     setBasePrice(value);
   };
 
-  const handleDiscountPercentageChange = (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleDiscountPercentageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     if (/^\d*$/.test(value)) {
       if (value === "") {
@@ -196,14 +171,8 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                   type="button"
                   className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                 >
-                  <ArrowLeft
-                    size={20}
-                    strokeWidth={2}
-                    className="-ml-1 stroke-blue"
-                  />
-                  <span className="font-semibold text-sm text-blue">
-                    Basic details
-                  </span>
+                  <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
+                  <span className="font-semibold text-sm text-blue">Basic details</span>
                 </button>
                 <button
                   onClick={handleSave}
@@ -280,29 +249,20 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                     <div className="flex flex-col gap-2">
                       <h2 className="text-xs text-gray">Sale price</h2>
                       <div className="w-full h-9 px-3 flex items-center rounded-md cursor-context-menu border bg-neutral-100">
-                        {salePrice > 0 &&
-                        discountPercentage > 0 &&
-                        discountPercentage < 100
+                        {salePrice > 0 && discountPercentage > 0 && discountPercentage < 100
                           ? `${salePrice.toFixed(2)}`
                           : "--"}
                       </div>
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label
-                        htmlFor="discountPercentage"
-                        className="text-xs text-gray"
-                      >
+                      <label htmlFor="discountPercentage" className="text-xs text-gray">
                         Discount percentage
                       </label>
                       <div className="w-full h-9 relative">
                         <input
                           type="text"
                           id="discountPercentage"
-                          value={
-                            discountPercentage === 0
-                              ? ""
-                              : discountPercentage.toString()
-                          }
+                          value={discountPercentage === 0 ? "" : discountPercentage.toString()}
                           placeholder="--"
                           onChange={handleDiscountPercentageChange}
                           className="w-full h-9 px-3 rounded-md placeholder:text-black transition duration-300 ease-in-out border focus:border-neutral-400"

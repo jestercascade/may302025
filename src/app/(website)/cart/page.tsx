@@ -118,7 +118,7 @@ export default async function Cart() {
             </Link>
           </div>
         </nav>
-        <div className="min-h-[calc(100vh-385px)] w-full max-w-[580px] md:max-w-5xl mx-auto flex flex-col gap-10">
+        <div className="min-h-[calc(100vh-385px)] w-full max-w-[580px] lg:max-w-5xl mx-auto flex flex-col gap-10">
           <div className="w-full px-5 mx-auto">
             {sortedCartItems.length === 0 && <EmptyCartState />}
             {sortedCartItems.length > 0 && <CartItemList cartItems={sortedCartItems} />}
@@ -274,8 +274,8 @@ function EmptyCartState() {
 
 function Footer() {
   return (
-    <footer className="w-full pt-6 pb-36 min-[580px]:pb-36 mt-14 bg-neutral-100">
-      <div className="md:hidden max-w-[486px] px-5 mx-auto">
+    <footer className="w-full pt-6 pb-36 lg:pb-24 mt-14 bg-neutral-100">
+      <div className="lg:hidden max-w-[580px] px-5 mx-auto">
         <div className="grid grid-cols-2">
           <div>
             <h3 className="font-semibold mb-4">Company</h3>
@@ -306,7 +306,7 @@ function Footer() {
           </div>
         </div>
       </div>
-      <div className="hidden md:block w-full max-w-[1040px] px-9 mx-auto">
+      <div className="hidden lg:block w-full max-w-5xl px-5 mx-auto">
         <div className="flex gap-10">
           <div className="w-full">
             <h3 className="font-semibold mb-4">Company</h3>

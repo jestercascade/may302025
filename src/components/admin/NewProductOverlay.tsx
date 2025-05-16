@@ -18,9 +18,7 @@ export function NewProductMenuButton({ closeMenu }: { closeMenu: () => void }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const setNavbarMenu = useNavbarMenuStore((state) => state.setNavbarMenu);
   const pageName = useOverlayStore((state) => state.pages.products.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.products.overlays.newProduct.name
-  );
+  const overlayName = useOverlayStore((state) => state.pages.products.overlays.newProduct.name);
 
   const openOverlay = () => {
     setNavbarMenu(false);
@@ -43,9 +41,7 @@ export function NewProductEmptyGridButton() {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const setNavbarMenu = useNavbarMenuStore((state) => state.setNavbarMenu);
   const pageName = useOverlayStore((state) => state.pages.products.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.products.overlays.newProduct.name
-  );
+  const overlayName = useOverlayStore((state) => state.pages.products.overlays.newProduct.name);
 
   const openOverlay = () => {
     setNavbarMenu(false);
@@ -75,15 +71,9 @@ export function NewProductOverlay() {
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.products.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.products.overlays.newProduct.name
-  );
-  const isOverlayVisible = useOverlayStore(
-    (state) => state.pages.products.overlays.newProduct.isVisible
-  );
-  const setPreventBodyOverflowChange = useBodyOverflowStore(
-    (state) => state.setPreventBodyOverflowChange
-  );
+  const overlayName = useOverlayStore((state) => state.pages.products.overlays.newProduct.name);
+  const isOverlayVisible = useOverlayStore((state) => state.pages.products.overlays.newProduct.isVisible);
+  const setPreventBodyOverflowChange = useBodyOverflowStore((state) => state.setPreventBodyOverflowChange);
 
   useEffect(() => {
     if (isOverlayVisible) {
@@ -148,8 +138,7 @@ export function NewProductOverlay() {
     }
     if (!isValidRemoteImage(formData.mainImage)) {
       showAlert({
-        message:
-          "Invalid main image URL. Try an image from Pinterest or your Firebase Storage.",
+        message: "Invalid main image URL. Try an image from Pinterest or your Firebase Storage.",
         type: ShowAlertType.ERROR,
       });
       setPreventBodyOverflowChange(true);
@@ -213,14 +202,8 @@ export function NewProductOverlay() {
                   type="button"
                   className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                 >
-                  <ArrowLeft
-                    size={20}
-                    strokeWidth={2}
-                    className="-ml-1 stroke-blue"
-                  />
-                  <span className="font-semibold text-sm text-blue">
-                    New product
-                  </span>
+                  <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
+                  <span className="font-semibold text-sm text-blue">New product</span>
                 </button>
                 <button
                   onClick={handleSave}
@@ -299,16 +282,15 @@ export function NewProductOverlay() {
                   <div>
                     <div className="w-full max-w-[383px] border rounded-md overflow-hidden">
                       <div className="w-full aspect-square flex items-center justify-center overflow-hidden">
-                        {formData.mainImage &&
-                          isValidRemoteImage(formData.mainImage) && (
-                            <Image
-                              src={formData.mainImage}
-                              alt={formData.name || "mainImage"}
-                              width={383}
-                              height={383}
-                              priority
-                            />
-                          )}
+                        {formData.mainImage && isValidRemoteImage(formData.mainImage) && (
+                          <Image
+                            src={formData.mainImage}
+                            alt={formData.name || "mainImage"}
+                            width={383}
+                            height={383}
+                            priority
+                          />
+                        )}
                       </div>
                       <div className="w-full h-9 border-t overflow-hidden">
                         <input
@@ -353,9 +335,3 @@ export function NewProductOverlay() {
     </>
   );
 }
-
-// -- Type Definitions --
-
-type NewProductMenuButtonType = {
-  closeMenu: () => void;
-};

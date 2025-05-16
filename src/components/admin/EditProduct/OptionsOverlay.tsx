@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
 import Overlay from "@/ui/Overlay";
 import { useBodyOverflowStore } from "@/zustand/shared/bodyOverflowStore";
@@ -25,7 +25,6 @@ import {
 import { UpdateProductAction } from "@/actions/products";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { ShowAlertType } from "@/lib/sharedTypes";
-import SizesTable from "./SizesTable";
 
 // **Interfaces**
 interface Option {
@@ -179,6 +178,63 @@ export function OptionsOverlay({
     setColumnsCount(tableData[activeTab].columns.length);
   }, [tableData, activeTab]);
 
+  // **Admin State**
+  const [newOptionValues, setNewOptionValues] = useState<{
+    [key: number]: string;
+  }>({});
+  const [editingName, setEditingName] = useState<number | null>(null);
+  const [editNameValue, setEditNameValue] = useState<string>("");
+  const [newGroupName, setNewGroupName] = useState<string>("");
+  const [collapsedGroups, setCollapsedGroups] = useState<{
+    [key: number]: boolean;
+  }>({});
+
+  // Wrap findGroup in useCallback to maintain referential equality
+  const findGroup = useCallback(
+    (groupId: number): OptionGroup | undefined => optionGroups.find((group) => group.id === groupId),
+    [optionGroups]
+  );
+
+  // Wrap setParentChildRelationship in useCallback to maintain referential equality
+  const setParentChildRelationship = useCallback(
+    (parentId: number | null, childId: number | null) => {
+      if (parentId === null || childId === null || parentId === childId) return;
+      if (!findGroup(parentId) || !findGroup(childId)) return;
+      const newMatrix: AvailabilityMatrix = {};
+      const parentGroup = findGroup(parentId);
+      if (parentGroup) parentGroup.options.forEach((option) => (newMatrix[option.id] = []));
+      setChainingConfig({
+        enabled: true,
+        parentGroupId: parentId,
+        childGroupId: childId,
+      });
+      setAvailabilityMatrix(newMatrix);
+    },
+    [findGroup]
+  );
+
+  useEffect(() => {
+    if (chainingConfig.enabled && optionGroups.length >= 2) {
+      let parentId = chainingConfig.parentGroupId;
+      let childId = chainingConfig.childGroupId;
+      if (parentId === null || !findGroup(parentId)) parentId = optionGroups[0].id;
+      if (childId === null || !findGroup(childId) || childId === parentId) {
+        const otherGroup = optionGroups.find((g) => g.id !== parentId);
+        childId = otherGroup ? otherGroup.id : optionGroups[1] ? optionGroups[1].id : null;
+      }
+      if (parentId !== chainingConfig.parentGroupId || childId !== chainingConfig.childGroupId) {
+        if (parentId !== null && childId !== null) setParentChildRelationship(parentId, childId);
+      }
+    }
+  }, [
+    chainingConfig.enabled,
+    chainingConfig.parentGroupId,
+    chainingConfig.childGroupId,
+    optionGroups,
+    findGroup,
+    setParentChildRelationship,
+  ]);
+
   // **Ensure Size Chart Group ID Consistency**
   useEffect(() => {
     if (sizeChartEnabled) {
@@ -197,64 +253,6 @@ export function OptionsOverlay({
       setSizeChartGroupId(null);
     }
   }, [optionGroups, sizeChartEnabled, showAlert]);
-
-  // **Admin State**
-  const [newOptionValues, setNewOptionValues] = useState<{
-    [key: number]: string;
-  }>({});
-  const [editingName, setEditingName] = useState<number | null>(null);
-  const [editNameValue, setEditNameValue] = useState<string>("");
-  const [newGroupName, setNewGroupName] = useState<string>("");
-  const [collapsedGroups, setCollapsedGroups] = useState<{
-    [key: number]: boolean;
-  }>({});
-
-  // **Public-Facing State**
-  const [selectedOptions, setSelectedOptions] = useState<{
-    [key: number]: number;
-  }>({});
-
-  // **Track Disabled Parent Options**
-  const [disabledParentOptions, setDisabledParentOptions] = useState<number[]>([]);
-
-  // **Helper Functions**
-  const findGroup = (groupId: number): OptionGroup | undefined => optionGroups.find((group) => group.id === groupId);
-
-  useEffect(() => {
-    if (!chainingConfig.enabled || chainingConfig.parentGroupId === null || chainingConfig.childGroupId === null) {
-      setDisabledParentOptions([]);
-      return;
-    }
-    const childGroup = findGroup(chainingConfig.childGroupId);
-    const parentGroup = findGroup(chainingConfig.parentGroupId);
-    if (!childGroup || !parentGroup) return;
-    const activeChildOptionIds = childGroup.options.filter((option) => option.isActive).map((option) => option.id);
-    const newDisabledParentOptions = parentGroup.options
-      .filter((parentOption) => {
-        const availableChildOptions = availabilityMatrix[parentOption.id] || [];
-        const hasActiveChildOption = availableChildOptions.some((childOptionId) =>
-          activeChildOptionIds.includes(childOptionId)
-        );
-        return parentOption.isActive && !hasActiveChildOption;
-      })
-      .map((option) => option.id);
-    setDisabledParentOptions(newDisabledParentOptions);
-  }, [optionGroups, availabilityMatrix, chainingConfig]);
-
-  useEffect(() => {
-    if (chainingConfig.enabled && optionGroups.length >= 2) {
-      let parentId = chainingConfig.parentGroupId;
-      let childId = chainingConfig.childGroupId;
-      if (parentId === null || !findGroup(parentId)) parentId = optionGroups[0].id;
-      if (childId === null || !findGroup(childId) || childId === parentId) {
-        const otherGroup = optionGroups.find((g) => g.id !== parentId);
-        childId = otherGroup ? otherGroup.id : optionGroups[1] ? optionGroups[1].id : null;
-      }
-      if (parentId !== chainingConfig.parentGroupId || childId !== chainingConfig.childGroupId) {
-        if (parentId !== null && childId !== null) setParentChildRelationship(parentId, childId);
-      }
-    }
-  }, [chainingConfig.enabled, optionGroups]);
 
   // **Admin Functions**
   const addOptionGroup = () => {
@@ -286,9 +284,6 @@ export function OptionsOverlay({
       delete newState[groupId];
       return newState;
     });
-    const newSelections = { ...selectedOptions };
-    delete newSelections[groupId];
-    setSelectedOptions(newSelections);
   };
 
   const addOption = (groupId: number) => {
@@ -329,14 +324,6 @@ export function OptionsOverlay({
         return group;
       })
     );
-    if (selectedOptions[groupId] === optionId) {
-      const newSelections = { ...selectedOptions };
-      delete newSelections[groupId];
-      if (chainingConfig.enabled && chainingConfig.childGroupId !== null && chainingConfig.parentGroupId === groupId) {
-        delete newSelections[chainingConfig.childGroupId];
-      }
-      setSelectedOptions(newSelections);
-    }
   };
 
   const deleteOption = (groupId: number, optionId: number) => {
@@ -354,14 +341,6 @@ export function OptionsOverlay({
       const newMatrix = { ...availabilityMatrix };
       delete newMatrix[optionId];
       setAvailabilityMatrix(newMatrix);
-    }
-    if (selectedOptions[groupId] === optionId) {
-      const newSelections = { ...selectedOptions };
-      delete newSelections[groupId];
-      if (chainingConfig.enabled && chainingConfig.childGroupId !== null && chainingConfig.parentGroupId === groupId) {
-        delete newSelections[chainingConfig.childGroupId];
-      }
-      setSelectedOptions(newSelections);
     }
   };
 
@@ -388,22 +367,6 @@ export function OptionsOverlay({
 
   const toggleChaining = () => {
     setChainingConfig({ ...chainingConfig, enabled: !chainingConfig.enabled });
-    if (!chainingConfig.enabled) setSelectedOptions({});
-  };
-
-  const setParentChildRelationship = (parentId: number | null, childId: number | null) => {
-    if (parentId === null || childId === null || parentId === childId) return;
-    if (!findGroup(parentId) || !findGroup(childId)) return;
-    const newMatrix: AvailabilityMatrix = {};
-    const parentGroup = findGroup(parentId);
-    if (parentGroup) parentGroup.options.forEach((option) => (newMatrix[option.id] = []));
-    setChainingConfig({
-      enabled: true,
-      parentGroupId: parentId,
-      childGroupId: childId,
-    });
-    setAvailabilityMatrix(newMatrix);
-    setSelectedOptions({});
   };
 
   const swapParentChild = () => {
@@ -418,7 +381,6 @@ export function OptionsOverlay({
       childGroupId: chainingConfig.parentGroupId,
     });
     setAvailabilityMatrix(newMatrix);
-    setSelectedOptions({});
   };
 
   const moveGroupUp = (index: number) => {
@@ -525,6 +487,7 @@ export function OptionsOverlay({
         [activeTab]: {
           columns: prevData[activeTab].columns.slice(0, -1),
           rows: prevData[activeTab].rows.map((row) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { [lastColumn]: _omitted, ...rest } = row;
             return rest;
           }),
@@ -1059,7 +1022,7 @@ export function OptionsOverlay({
                           {/* Size Chart Section for "Size" Group */}
                           {group.name.toLowerCase() === "size" && (
                             <div className="mb-4 pt-4 border-t">
-                              <div className="w-[calc(100%-32px)] mx-auto flex items-center justify-between bg-neutral-50 p-4 rounded-md">
+                              <div className="w paz-[calc(100%-32px)] mx-auto flex items-center justify-between bg-neutral-50 p-4 rounded-md">
                                 <div className="flex items-center">
                                   <Table size={20} className="text-gray mr-3" />
                                   <span className="font-medium text-gray">Size Chart</span>
@@ -1231,5 +1194,94 @@ export function OptionsOverlay({
         </Overlay>
       )}
     </>
+  );
+}
+
+function SizesTable({
+  data,
+  columns,
+  onUpdate,
+  onColumnUpdate,
+}: {
+  data: TableRowType[];
+  columns: string[];
+  onUpdate: (updatedData: TableRowType[]) => void;
+  onColumnUpdate: (updatedColumns: { label: string; order: number }[]) => void;
+}) {
+  const handleCellChange = useCallback(
+    (rowIndex: number, column: string, value: string) => {
+      const updatedData = data.map((row, index) => {
+        if (index === rowIndex) {
+          return { ...row, [column]: value };
+        }
+        return row;
+      });
+      onUpdate(updatedData);
+    },
+    [data, onUpdate]
+  );
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, rowIndex: number, column: string) => {
+    const { value } = e.target;
+    handleCellChange(rowIndex, column, value);
+  };
+
+  const handleColumnChange = (index: number, newValue: string) => {
+    const updatedColumns = columns.map((col, i) => ({
+      label: i === index ? newValue : col,
+      order: i + 1,
+    }));
+    onColumnUpdate(updatedColumns);
+  };
+
+  return (
+    <div className="w-max max-w-full relative border overflow-y-hidden custom-x-scrollbar rounded-md bg-white">
+      <table className="table-fixed w-max text-left">
+        <thead className="font-semibold text-sm">
+          <tr>
+            {columns.map((column, index) => (
+              <th
+                key={index}
+                className={`w-28 max-w-28 h-10 text-sm border-b border-l first:border-l-0 ${
+                  index === 0 ? "bg-lightgray" : ""
+                }`}
+              >
+                <input
+                  value={column}
+                  type="text"
+                  className={`focus:border focus:border-black w-full h-full text-center font-semibold ${
+                    index === 0 ? "bg-lightgray" : ""
+                  }`}
+                  onChange={(e) => handleColumnChange(index, e.target.value)}
+                />
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row, rowIndex) => (
+            <tr key={rowIndex} className="py-0">
+              {columns.map((column, colIndex) => (
+                <td
+                  key={colIndex}
+                  className={`w-28 max-w-28 h-10 text-sm overflow-hidden border-l first:border-l-0 ${
+                    rowIndex === data.length - 1 ? "" : "border-b"
+                  } ${colIndex === 0 ? "bg-lightgray" : ""}`}
+                >
+                  <input
+                    value={row[column]}
+                    type="text"
+                    className={`focus:border focus:border-black w-full h-full text-center ${
+                      colIndex === 0 ? "bg-lightgray" : ""
+                    }`}
+                    onChange={(e) => handleInputChange(e, rowIndex, column)}
+                  />
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

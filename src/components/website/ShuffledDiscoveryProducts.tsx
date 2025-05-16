@@ -20,9 +20,7 @@ export default function ShuffledDiscoveryProducts({
 }) {
   const products = useProducts();
   const { isLoading } = useProductsState();
-  const [shuffledProducts, setShuffledProducts] = useState<
-    ProductWithUpsellType[]
-  >([]);
+  const [shuffledProducts, setShuffledProducts] = useState<ProductWithUpsellType[]>([]);
   const [isShuffling, setIsShuffling] = useState(true);
   const pathname = usePathname();
   const initialRenderRef = useRef(true);
@@ -31,35 +29,26 @@ export default function ShuffledDiscoveryProducts({
   useEffect(() => {
     if (!products) return;
 
-    // Initial render or pathname actually changed (not just during navigation events)
-    const shouldShuffle =
-      initialRenderRef.current || previousPathnameRef.current !== pathname;
+    const shouldShuffle = initialRenderRef.current || previousPathnameRef.current !== pathname;
 
     if (shouldShuffle) {
-      // console.log("🔀 Shuffling products for path:", pathname);
       setIsShuffling(true);
 
-      // Shuffling logic
       const filtered = products.filter((product) =>
-        page === "HOME" || page === "CART"
-          ? !excludeIds.includes(product.id)
-          : true
+        page === "HOME" || page === "CART" ? !excludeIds.includes(product.id) : true
       );
 
-      // Fisher-Yates shuffle
       const shuffled = [...filtered];
       for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
 
-      // Slight delay to avoid double render appearance
       setTimeout(() => {
         setShuffledProducts(shuffled.slice(0, itemsCount));
         setIsShuffling(false);
       }, 50);
 
-      // Update refs
       initialRenderRef.current = false;
       previousPathnameRef.current = pathname;
     }

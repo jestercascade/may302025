@@ -28,7 +28,7 @@ import {
   List,
 } from "lucide-react";
 import clsx from "clsx";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 
 export const EDITOR_LEVELS = {
   BASIC: "BASIC",
@@ -47,10 +47,7 @@ export const TOOLBAR_FEATURES = {
 } as const;
 
 const LEVEL_CONFIGURATIONS = {
-  [EDITOR_LEVELS.BASIC]: [
-    TOOLBAR_FEATURES.TEXT_FORMAT,
-    TOOLBAR_FEATURES.HISTORY,
-  ],
+  [EDITOR_LEVELS.BASIC]: [TOOLBAR_FEATURES.TEXT_FORMAT, TOOLBAR_FEATURES.HISTORY],
   [EDITOR_LEVELS.STANDARD]: [
     TOOLBAR_FEATURES.TEXT_FORMAT,
     TOOLBAR_FEATURES.HEADINGS,
@@ -280,15 +277,13 @@ export default function TipTapEditor({
         {
           icon: Heading1,
           label: "Heading 1",
-          action: () =>
-            editor?.chain().focus().toggleHeading({ level: 1 }).run(),
+          action: () => editor?.chain().focus().toggleHeading({ level: 1 }).run(),
           isActive: () => editor?.isActive("heading", { level: 1 }) ?? false,
         },
         {
           icon: Heading2,
           label: "Heading 2",
-          action: () =>
-            editor?.chain().focus().toggleHeading({ level: 2 }).run(),
+          action: () => editor?.chain().focus().toggleHeading({ level: 2 }).run(),
           isActive: () => editor?.isActive("heading", { level: 2 }) ?? false,
         },
       ]);
@@ -376,10 +371,7 @@ export default function TipTapEditor({
               // Get the selected text
               const selectedText = editor?.state.selection.empty
                 ? ""
-                : editor?.view.state.doc.textBetween(
-                    editor.state.selection.from,
-                    editor.state.selection.to
-                  );
+                : editor?.view.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to);
 
               if (!selectedText) {
                 window.alert("Please select some text first");
@@ -394,9 +386,7 @@ export default function TipTapEditor({
               if (normalizedUrl) {
                 editor?.chain().focus().setLink({ href: normalizedUrl }).run();
               } else {
-                window.alert(
-                  "Please enter a valid URL (e.g., https://example.com)"
-                );
+                window.alert("Please enter a valid URL (e.g., https://example.com)");
               }
             }
           },
@@ -452,12 +442,7 @@ interface ToolbarButtonProps {
   isActive?: () => boolean;
 }
 
-function ToolbarButton({
-  icon: Icon,
-  label,
-  action,
-  isActive,
-}: ToolbarButtonProps) {
+function ToolbarButton({ icon: Icon, label, action, isActive }: ToolbarButtonProps) {
   return (
     <button
       onClick={action}
@@ -473,11 +458,7 @@ function ToolbarButton({
 }
 
 function ToolbarGroup({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex items-center gap-0.5 px-1 border-r border-gray-200 last:border-0">
-      {children}
-    </div>
-  );
+  return <div className="flex items-center gap-0.5 px-1 border-r border-gray-200 last:border-0">{children}</div>;
 }
 
 function normalizeUrl(url: string): string | null {
@@ -487,8 +468,7 @@ function normalizeUrl(url: string): string | null {
     if (!url) return null;
 
     // Check if it's just a domain-like string (e.g., "google.com")
-    const domainRegex =
-      /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/;
+    const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/;
     if (domainRegex.test(url)) {
       url = `https://${url}`;
     }
