@@ -765,7 +765,7 @@ function OptionSelectionModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-start pt-16 z-40">
-      <div className="bg-white relative rounded-2xl shadow-lg py-5 max-w-md w-full h-[calc(90vh)] max-h-[564px] flex flex-col">
+      <div className="bg-white relative rounded-2xl shadow-lg py-5 max-w-md w-[calc(100%-36px)] h-[calc(90vh)] max-h-[564px] flex flex-col">
         <div className="flex justify-between items-center mb-4 px-5">
           <h2 className="text-lg font-semibold">{product.name}</h2>
         </div>
