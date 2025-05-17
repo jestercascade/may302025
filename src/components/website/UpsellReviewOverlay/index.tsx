@@ -273,7 +273,10 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                       </div>
                       {readyProducts.length > 0 ? (
                         <>
-                          <span className="min-[480px]:hidden font-semibold text-sm">
+                          <span className="block min-[425px]:hidden font-semibold text-sm">
+                            Selected ({readyProducts.length}/{selectedProduct.upsell.products.length})
+                          </span>
+                          <span className="hidden min-[425px]:block min-[480px]:hidden font-semibold text-sm">
                             Selections ({readyProducts.length}/{selectedProduct.upsell.products.length})
                           </span>
                           <span className="hidden min-[480px]:block pl-[3px] font-semibold text-sm min-[520px]:text-base">
@@ -296,13 +299,13 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
                         <>
                           <button
                             onClick={handleInCartButtonClick}
-                            className="min-[365px]:hidden animate-fade px-3 flex items-center justify-center w-full h-11 rounded-full cursor-pointer border border-[#c5c3c0] text-blue text-sm font-semibold shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,_#faf9f8_5%,_#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear-gradient(to_bottom,_#eae8e6_5%,_#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
+                            className="min-[425px]:hidden animate-fade px-3 flex items-center justify-center w-full h-11 rounded-full cursor-pointer border border-[#c5c3c0] text-blue text-sm font-semibold shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,_#faf9f8_5%,_#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear-gradient(to_bottom,_#eae8e6_5%,_#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
                           >
                             View in Cart
                           </button>
                           <button
                             onClick={handleInCartButtonClick}
-                            className="hidden animate-fade px-4 min-[365px]:flex items-center justify-center w-full h-11 rounded-full cursor-pointer border border-[#c5c3c0] text-blue font-semibold shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,_#faf9f8_5%,_#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear-gradient(to_bottom,_#eae8e6_5%,_#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
+                            className="hidden animate-fade px-4 min-[425px]:flex items-center justify-center w-full h-11 rounded-full cursor-pointer border border-[#c5c3c0] text-blue font-semibold shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,_#faf9f8_5%,_#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear-gradient(to_bottom,_#eae8e6_5%,_#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
                           >
                             In Cart - See Now
                           </button>
