@@ -13,7 +13,6 @@ export async function POST(request: NextRequest) {
 
     const totalAmount = calculateTotalAmount(cart);
     const accessToken = await generateAccessToken();
-    console.log("accessToken:", accessToken);
     const url = `${appConfig.PAYPAL.API_BASE}/v2/checkout/orders`;
 
     const payload = {

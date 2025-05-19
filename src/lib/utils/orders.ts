@@ -4,10 +4,6 @@ const PAYPAL_CLIENT_ID = appConfig.PAYPAL.CLIENT_ID;
 const PAYPAL_CLIENT_SECRET = appConfig.PAYPAL.CLIENT_SECRET;
 
 export async function generateAccessToken() {
-  console.log("PayPal CLIENT_ID:", PAYPAL_CLIENT_ID);
-  console.log("PayPal CLIENT_SECRET:", PAYPAL_CLIENT_SECRET);
-  console.log("PayPal API_BASE:", appConfig.PAYPAL.API_BASE);
-
   if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
     throw new Error("Missing PayPal credentials");
   }
