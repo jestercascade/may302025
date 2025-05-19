@@ -13,6 +13,7 @@ export async function POST(request: NextRequest) {
 
     const totalAmount = calculateTotalAmount(cart);
     const accessToken = await generateAccessToken();
+    console.log("accessToken:", accessToken);
     const url = `${appConfig.PAYPAL.API_BASE}/v2/checkout/orders`;
 
     const payload = {
@@ -53,10 +54,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     console.error("Failed to create PayPal order:", error);
-    return NextResponse.json(
-      { error: "Failed to create PayPal order" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create PayPal order" }, { status: 500 });
   }
 }
 
