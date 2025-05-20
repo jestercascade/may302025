@@ -110,14 +110,30 @@ function renderHero(pageHero: any) {
   }
 
   return (
-    <Link href={pageHero.destinationUrl}>
-      <div className="block md:hidden">
-        <Image src={pageHero.images.mobile} alt={pageHero.title} width={425} height={566} priority />
-      </div>
-      <div className="hidden md:block">
-        <Image src={pageHero.images.desktop} alt={pageHero.title} width={1024} height={256} priority />
-      </div>
-    </Link>
+    <div className="w-full">
+      <Link href={pageHero.destinationUrl} className="block w-full">
+        <div className="block md:hidden w-full">
+          <Image
+            src={pageHero.images.mobile}
+            alt={pageHero.title}
+            width={425}
+            height={566}
+            className="w-full h-auto"
+            priority
+          />
+        </div>
+        <div className="hidden md:block w-full">
+          <Image
+            src={pageHero.images.desktop}
+            alt={pageHero.title}
+            width={1024}
+            height={256}
+            className="w-full h-auto"
+            priority
+          />
+        </div>
+      </Link>
+    </div>
   );
 }
 
