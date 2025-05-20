@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { appConfig } from "@/config";
 import { generateAccessToken } from "@/lib/utils/orders";
 import { NextResponse } from "next/server";
@@ -13,7 +14,9 @@ export async function POST(request: NextRequest) {
 
     const totalAmount = calculateTotalAmount(cart);
     const accessToken = await generateAccessToken();
-    const url = `${appConfig.PAYPAL.API_BASE}/v2/checkout/orders`;
+    const searchUrl = `${appConfig.PAYPAL.API_BASE}/v2/checkout/orders`;
+
+    const invoiceId = generateUniqueInvoiceId(); // Generate unique invoice_id
 
     const payload = {
       intent: "CAPTURE",
@@ -30,11 +33,12 @@ export async function POST(request: NextRequest) {
             },
           },
           items: cart,
+          invoice_id: invoiceId, // Include invoice_id
         },
       ],
     };
 
-    const response = await fetch(url, {
+    const response = await fetch(searchUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -50,7 +54,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await response.json();
-    return NextResponse.json(data);
+    return NextResponse.json({ ...data, invoiceId }); // Return invoiceId for reference
   } catch (error) {
     console.error("Failed to create PayPal order:", error);
     return NextResponse.json({ error: "Failed to create PayPal order" }, { status: 500 });
@@ -65,6 +69,10 @@ function calculateTotalAmount(cart: CartItemType[]): string {
   }, 0);
 
   return total.toFixed(2);
+}
+
+function generateUniqueInvoiceId(): string {
+  return `INV-${uuidv4()}`; // Generate a unique invoice_id
 }
 
 // -- Type Definitions --

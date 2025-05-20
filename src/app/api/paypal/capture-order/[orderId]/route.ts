@@ -113,9 +113,9 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
 
   try {
     const accessToken = await generateAccessToken();
-    const url = `${appConfig.PAYPAL.API_BASE}/v2/checkout/orders/${orderId}/capture`;
+    const searchUrl = `${appConfig.PAYPAL.API_BASE}/v2/checkout/orders/${orderId}/capture`;
 
-    const response = await fetch(url, {
+    const response = await fetch(searchUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -130,6 +130,8 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
 
     const orderData = await response.json();
     const cartItems = await getCartItems();
+
+    const invoiceId = orderData.purchase_units[0].payments.captures[0].invoice_id;
 
     const newOrder = {
       status: orderData.status,
@@ -158,6 +160,7 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
       transactionId: orderData.purchase_units[0].payments.captures[0].id,
       timestamp: orderData.purchase_units[0].payments.captures[0].create_time,
       items: cartItems,
+      invoiceId: invoiceId, // Store invoice_id
       emails: {
         confirmed: {
           sentCount: 0,
