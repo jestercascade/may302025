@@ -294,7 +294,7 @@ function Footer() {
             <Link href="/contact-us" className="block w-max text-sm text-gray mb-2 hover:underline">
               Contact us
             </Link>
-            <Link href="/track-order" className="block w-max text-sm text-gray mb-2 hover:underline">
+            <Link href="/track" className="block w-max text-sm text-gray mb-2 hover:underline">
               Track order
             </Link>
             <Link href="/returns-and-refunds" className="block w-max text-sm text-gray mb-2 hover:underline">
@@ -325,7 +325,7 @@ function Footer() {
             <Link href="/contact-us" className="block w-max text-sm text-gray mb-2 hover:underline">
               Contact us
             </Link>
-            <Link href="/track-order" className="block w-max text-sm text-gray mb-2 hover:underline">
+            <Link href="/track" className="block w-max text-sm text-gray mb-2 hover:underline">
               Track order
             </Link>
             <Link href="/returns-and-refunds" className="block w-max text-sm text-gray mb-2 hover:underline">

@@ -42,7 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     {
-      url: `${BASE_URL}/track-order`,
+      url: `${BASE_URL}/track`,
       lastModified: new Date().toISOString(),
       changeFrequency: "monthly",
       priority: 0.7,

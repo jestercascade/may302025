@@ -60,7 +60,7 @@ export function ProductDetailsWrapper({
                 New Arrivals
               </Link>
               <Link
-                href="/track-order"
+                href="/track"
                 className="active:bg-lightgray lg:hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out"
               >
                 Track Order
@@ -139,7 +139,7 @@ function Footer() {
               <Link href="/contact-us" className="block w-max text-sm text-gray mb-2 hover:underline">
                 Contact us
               </Link>
-              <Link href="/track-order" className="block w-max text-sm text-gray mb-2 hover:underline">
+              <Link href="/track" className="block w-max text-sm text-gray mb-2 hover:underline">
                 Track order
               </Link>
               <Link href="/returns-and-refunds" className="block w-max text-sm text-gray mb-2 hover:underline">
@@ -171,7 +171,7 @@ function Footer() {
             <Link href="/contact-us" className="block w-max text-sm text-gray mb-2 hover:underline">
               Contact us
             </Link>
-            <Link href="/track-order" className="block w-max text-sm text-gray mb-2 hover:underline">
+            <Link href="/track" className="block w-max text-sm text-gray mb-2 hover:underline">
               Track order
             </Link>
             <Link href="/returns-and-refunds" className="block w-max text-sm text-gray mb-2 hover:underline">

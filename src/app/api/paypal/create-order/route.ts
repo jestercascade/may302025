@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const accessToken = await generateAccessToken();
     const searchUrl = `${appConfig.PAYPAL.API_BASE}/v2/checkout/orders`;
 
-    const invoiceId = generateUniqueInvoiceId(); // Generate unique invoice_id
+    const invoiceId = generateInvoiceId(); // Generate unique invoice_id
 
     const payload = {
       intent: "CAPTURE",
@@ -71,8 +71,9 @@ function calculateTotalAmount(cart: CartItemType[]): string {
   return total.toFixed(2);
 }
 
-function generateUniqueInvoiceId(): string {
-  return `INV-${uuidv4()}`; // Generate a unique invoice_id
+function generateInvoiceId(): string {
+  const code = uuidv4().slice(0, 8).toUpperCase();
+  return `${code} — enter at cherlygood.com/track`;
 }
 
 // -- Type Definitions --
