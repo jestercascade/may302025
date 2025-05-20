@@ -26,7 +26,7 @@ export const ProductCard = memo(function ProductCard({
           src={product.images.main}
           alt={product.name}
           width={308}
-          height={410}
+          height={308}
           priority={true}
         />
       </Link>
