@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 import { useUpsellReviewStore } from "@/zustand/website/upsellReviewStore";
 import { useQuickviewStore } from "@/zustand/website/quickviewStore";
@@ -55,6 +55,16 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
     setSelectedOptions,
     setReadyProducts,
   } = useUpsellReviewStore();
+
+  const initialRender = useRef(true);
+
+  useEffect(() => {
+    if (initialRender.current) {
+      initialRender.current = false;
+    } else {
+      hideOverlay();
+    }
+  }, [pathname, hideOverlay]);
 
   const isUpsellInCart = useCallback((): boolean => {
     if (!cart?.items || !selectedProduct?.upsell) return false;

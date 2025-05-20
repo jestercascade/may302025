@@ -1,6 +1,5 @@
 import ShuffledDiscoveryProducts from "@/components/website/ShuffledDiscoveryProducts";
 import { UpsellReviewOverlay } from "@/components/website/UpsellReviewOverlay";
-import { ResetUpsellReview } from "@/components/website/ResetUpsellReview";
 import { CartItemList } from "@/components/website/CartItemList";
 import { ProductsProvider } from "@/contexts/ProductsContext";
 import { getProducts } from "@/actions/get/products";
@@ -36,8 +35,6 @@ export default async function Cart() {
 
   const cartProducts = mapCartProductsToBaseProducts(productItems, baseProducts);
 
-  // Use a type assertion to tell TypeScript that cartUpsells is safe
-  // This is because we've confirmed that getCartUpsells function always returns complete objects with name and slug
   const typedCartUpsells = cartUpsells as unknown as Array<{
     type: "upsell";
     baseUpsellId: string;
@@ -128,7 +125,6 @@ export default async function Cart() {
         <Footer />
       </div>
       <UpsellReviewOverlay cart={cart} />
-      <ResetUpsellReview />
     </>
   );
 }
