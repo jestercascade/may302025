@@ -126,7 +126,7 @@ export default function Navbar({ itemsInCart }: { itemsInCart: number }) {
               New Arrivals
             </Link>
             <Link
-              href="#"
+              href="/track-order"
               className="active:bg-lightgray lg:hover:bg-lightgray h-10 text-sm font-semibold px-2 rounded-full flex items-center transition duration-300 ease-in-out"
             >
               Track Order
