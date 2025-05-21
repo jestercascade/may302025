@@ -78,7 +78,7 @@ export default {
         gray: customColors.gray,
         amber: { DEFAULT: "#A86400" },
       },
-      borderColor: { DEFAULT: "#dcdfe4" },
+      borderColor: { DEFAULT: "#dfe2e6" },
       boxShadow: {
         DEFAULT: "0px 1.8px 4px rgba(0,0,0,0.2), 0px 0px 3px rgba(0,0,0,0.1)",
         "thick-bottom": "#21212140 0px 3px 2px 0px, #E5E5E5 0px 0px 1px 1px",

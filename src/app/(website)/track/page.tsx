@@ -27,7 +27,7 @@ export default function TrackOrder() {
                   <input
                     type="text"
                     placeholder="Enter order number"
-                    className="block w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    className="block w-full pl-10 pr-4 py-3 bg-white border rounded-lg focus:border-[#c8cdd4] transition-all duration-200"
                   />
                 </div>
                 <div>
