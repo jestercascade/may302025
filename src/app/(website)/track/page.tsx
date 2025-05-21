@@ -112,13 +112,24 @@ function Footer() {
               Track Order
             </Link>
           </nav>
-          <div className="w-full max-w-md mb-8 flex justify-center">
-            <div className="relative h-11 w-[300px]">
-              <button className="peer w-[104px] h-[40px] absolute left-[194px] top-1/2 -translate-y-1/2 rounded font-semibold text-white">
+          {/* <div className="w-full max-w-md mb-8 flex justify-center">
+            <div className="relative h-11 w-[290px]">
+              <button className="peer w-[104px] h-[40px] absolute left-[184px] top-1/2 -translate-y-1/2 rounded font-semibold text-white">
                 Subscribe
               </button>
               <div className="peer-hover:bg-[#cc8100] peer-hover:[background:linear-gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] peer-active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)] w-full h-full p-[2px] rounded-lg shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear-gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000]">
-                <input className="w-[190px] h-[40px] px-3 rounded-md" type="text" placeholder="Enter your email" />
+                <input className="w-[180px] h-[40px] px-3 rounded-md" type="text" placeholder="Enter your email" />
+              </div>
+            </div>
+          </div> */}
+          <div className="w-full max-w-md mb-8 flex flex-col items-center">
+            <p className="text-sm mb-3">Get the latest releases and special offers</p>
+            <div className="relative h-11 w-[290px]">
+              <button className="peer w-[104px] h-[40px] absolute left-[184px] top-1/2 -translate-y-1/2 rounded font-semibold text-white">
+                Subscribe
+              </button>
+              <div className="peer-hover:bg-[#cc8100] peer-hover:[background:linear-gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] peer-active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)] w-full h-full p-[2px] rounded-lg shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear-gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000]">
+                <input className="w-[180px] h-[40px] px-3 rounded-md" type="text" placeholder="Enter your email" />
               </div>
             </div>
           </div>
