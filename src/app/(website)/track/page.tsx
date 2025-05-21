@@ -89,7 +89,6 @@ function Footer() {
     <footer className="w-full py-8 border-t bg-neutral-50">
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex flex-col items-center mb-8">
-          {/* Navigation Links */}
           <nav className="flex flex-wrap justify-center mb-10">
             <Link href="/about" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
               About Us
@@ -113,15 +112,11 @@ function Footer() {
               Track Order
             </Link>
           </nav>
-
-          {/* Newsletter Subscription Container */}
-          <div className="w-full max-w-md mb-10 rounded-xl px-6 py-6 bg-blue-500/5 border border-blue-200/35">
+          <div className="w-full max-w-[432px] mb-10 rounded-xl p-6 bg-blue-400/5 border border-blue-100/65">
             <div className="text-center mb-4">
               <h3 className="font-semibold text-base mb-1.5">Get the latest releases and special offers</h3>
               <p className="text-black/90 text-xs">Be the first to know about new products and exclusive deals</p>
             </div>
-
-            {/* Original Email Input Design */}
             <div className="w-full max-w-md flex justify-center">
               <div className="relative h-11 w-[290px]">
                 <button className="peer w-[104px] h-[40px] absolute left-[184px] top-1/2 -translate-y-1/2 rounded font-semibold text-white">
@@ -132,13 +127,9 @@ function Footer() {
                 </div>
               </div>
             </div>
-
-            {/* Privacy Notice */}
-            <div className="mt-1.5 text-xs text-gray/75 text-center">You can unsubscribe at any time</div>
+            <div className="mt-1.5 text-xs text-gray/85 text-center">You can unsubscribe at any time</div>
           </div>
         </div>
-
-        {/* Copyright */}
         <div className="flex justify-center text-xs text-gray">
           <p>© {new Date().getFullYear()} Cherlygood. All rights reserved.</p>
         </div>
