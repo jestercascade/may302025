@@ -86,53 +86,43 @@ export default function TrackOrder() {
 
 function Footer() {
   return (
-    <footer className="w-full py-8 bg-white border-t border-gray-100">
+    <footer className="w-full py-8 bg-white border-t">
       <div className="max-w-6xl mx-auto px-6">
-        {/* Main footer content - extremely minimal */}
         <div className="flex flex-col items-center mb-8">
           <nav className="flex flex-wrap justify-center mb-6">
-            <Link href="/about-us" className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+            <Link href="/about" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
               About Us
             </Link>
-            <Link href="/contact-us" className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+            <Link href="/contact" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
               Contact
             </Link>
-            <Link href="/faq" className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+            <Link href="/faq" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
               FAQs
             </Link>
-            <Link
-              href="/privacy-policy"
-              className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
-            >
+            <Link href="/privacy" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
               Privacy
             </Link>
-            <Link
-              href="/terms-of-use"
-              className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
-            >
+            <Link href="/terms" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
               Terms
             </Link>
-            <Link href="/returns" className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+            <Link href="/returns" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
               Returns
             </Link>
-            <Link href="/track" className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+            <Link href="/track" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
               Track Order
             </Link>
           </nav>
-
           <div className="w-full max-w-md mb-8 flex justify-center">
-            <div className="relative h-11 w-[340px]">
-              <button className="peer w-[104px] h-[40px] absolute left-[234px] top-1/2 -translate-y-1/2 rounded font-semibold text-white">
+            <div className="relative h-11 w-[300px]">
+              <button className="peer w-[104px] h-[40px] absolute left-[194px] top-1/2 -translate-y-1/2 rounded font-semibold text-white">
                 Subscribe
               </button>
               <div className="peer-hover:bg-[#cc8100] peer-hover:[background:linear-gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] peer-active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)] w-full h-full p-[2px] rounded-lg shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear-gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000]">
-                <input className="w-[230px] h-[40px] px-3 rounded-md" type="text" placeholder="Enter your email" />
+                <input className="w-[190px] h-[40px] px-3 rounded-md" type="text" placeholder="Enter your email" />
               </div>
             </div>
           </div>
         </div>
-
-        {/* Bottom minimal footer */}
         <div className="flex justify-center text-xs text-gray-500">
           <p>© {new Date().getFullYear()} Cherlygood. All rights reserved.</p>
         </div>
