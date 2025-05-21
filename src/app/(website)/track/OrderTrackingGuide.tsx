@@ -20,7 +20,7 @@ export default function OrderTrackingGuide() {
   };
 
   return (
-    <div className="w-full mt-8">
+    <div>
       <button
         onClick={toggleGuide}
         className="flex items-center justify-center gap-1.5 mx-auto text-gray rounded-lg px-3 py-2 transition-all duration-200 text-sm font-medium"
@@ -198,13 +198,7 @@ export default function OrderTrackingGuide() {
               </div>
             </div>
             <div className="mt-6 text-center">
-              <p className="text-gray text-xs">Need additional help? Contact our support team:</p>
-              <div className="flex justify-center mt-1.5">
-                <div className="flex items-center">
-                  <Mail className="h-3 w-3 text-gray mr-1.5" />
-                  <span className="text-gray-600 text-xs">cherlygood@gmail.com</span>
-                </div>
-              </div>
+              <p className="text-gray text-xs">Need additional help? Contact support@cherlygood.com</p>
             </div>
           </div>
         </div>

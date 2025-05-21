@@ -8,14 +8,14 @@ export default function TrackOrder() {
     <>
       <NavbarWrapper />
       <main className="bg-neutral-50 pt-[61px] md:pt-[57px] min-h-[calc(100vh-57px)]">
-        <div className="max-w-3xl mx-auto pt-16 pb-24 px-6">
-          <div className="text-center mb-16">
+        <div className="max-w-3xl mx-auto pt-16 pb-24 px-6 space-y-12">
+          <div className="text-center">
             <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4">Track Your Order</h1>
-            <p className="text-gray max-w-lg mx-auto text-base md:text-lg">
-              Enter your order number to check the current status and estimated delivery date.
+            <p className="text-gray max-w-md mx-auto">
+              Enter your invoice ID to check the current status and estimated delivery date.
             </p>
           </div>
-          <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200/80 overflow-hidden mb-14">
+          <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200/80 overflow-hidden">
             <div className="p-6 md:p-8">
               <div className="flex flex-col md:flex-row gap-3">
                 <div className="flex-grow relative">
@@ -24,7 +24,7 @@ export default function TrackOrder() {
                   </div>
                   <input
                     type="text"
-                    placeholder="Enter order number"
+                    placeholder="Enter invoice ID"
                     className="block w-full pl-10 pr-4 py-3 bg-white border rounded-lg focus:border-[#c8cdd4] transition-all duration-200"
                   />
                 </div>
@@ -36,12 +36,8 @@ export default function TrackOrder() {
               </div>
             </div>
           </div>
-
-          {/* Interactive Order Tracking Guide - collapsed by default */}
           <OrderTrackingGuide />
-
-          {/* FAQ section - more Apple-like with cleaner accordions */}
-          <div className="max-w-2xl mx-auto mt-16">
+          <div className="max-w-2xl mx-auto">
             <h2 className="text-xl font-semibold mb-8 text-center">Frequently Asked Questions</h2>
 
             <div className="space-y-3">
@@ -50,7 +46,7 @@ export default function TrackOrder() {
                 <div className="p-4 text-gray-600 text-sm leading-relaxed">
                   <p>
                     Once your order ships, you'll receive a shipping confirmation email with your tracking number. You
-                    can also find your tracking information by entering your order number on this page.
+                    can also find your tracking information by entering your invoice ID on this page.
                   </p>
                 </div>
               </div>
