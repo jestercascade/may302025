@@ -127,7 +127,7 @@ function Footer() {
                 </div>
               </div>
             </div>
-            <div className="mt-1.5 text-xs text-gray/90 text-center">You can unsubscribe any time</div>
+            <div className="mt-2 text-xs text-gray/90 text-center">You can unsubscribe any time</div>
           </div>
         </div>
         <div className="flex justify-center text-xs text-gray">
