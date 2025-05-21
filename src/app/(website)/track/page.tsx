@@ -112,10 +112,10 @@ function Footer() {
               Track Order
             </Link>
           </nav>
-          <div className="w-full max-w-[432px] mb-10 rounded-xl p-6 bg-blue-600/5 border border-blue-100/65">
+          <div className="w-full max-w-md mb-10 rounded-xl p-6 bg-blue-600/5 border border-blue-100/65">
             <div className="text-center mb-4">
-              <h3 className="font-semibold text-base mb-1.5">Get the latest releases and special offers</h3>
-              <p className="text-black/95 text-xs">Be the first to know about new products and exclusive deals</p>
+              <h3 className="font-semibold text-lg mb-1.5">Get the latest releases and special offers</h3>
+              <p className="text-black text-sm">Be first in line for the good stuff</p>
             </div>
             <div className="w-full max-w-md flex justify-center">
               <div className="relative h-11 w-[290px]">
@@ -127,7 +127,7 @@ function Footer() {
                 </div>
               </div>
             </div>
-            <div className="mt-1.5 text-xs text-gray/85 text-center">You can unsubscribe at any time</div>
+            <div className="mt-1.5 text-xs text-gray/90 text-center">You can unsubscribe any time</div>
           </div>
         </div>
         <div className="flex justify-center text-xs text-gray">
