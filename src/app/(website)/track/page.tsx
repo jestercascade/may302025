@@ -16,7 +16,7 @@ export default function TrackOrder() {
             </p>
           </div>
           <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200/80 overflow-hidden">
-            <div className="p-6 md:p-8">
+            <div className="p-8">
               <div className="flex flex-col md:flex-row gap-3">
                 <div className="flex-grow relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -25,11 +25,11 @@ export default function TrackOrder() {
                   <input
                     type="text"
                     placeholder="Enter invoice ID"
-                    className="block w-full pl-10 pr-4 py-3 bg-white border rounded-lg focus:border-[#c8cdd4] transition-all duration-200"
+                    className="block w-full pl-10 pr-4 py-2 bg-white border rounded-lg focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all duration-200"
                   />
                 </div>
                 <div>
-                  <button className="w-full md:w-auto px-8 py-3 rounded-lg font-medium text-white transition-all duration-200 bg-blue-500 hover:bg-blue-600">
+                  <button className="w-full md:w-auto px-6 py-2 rounded-lg font-medium text-white transition-all duration-200 bg-blue-500 hover:bg-blue-600">
                     Track
                   </button>
                 </div>
@@ -39,7 +39,6 @@ export default function TrackOrder() {
           <OrderTrackingGuide />
           <div className="max-w-2xl mx-auto">
             <h2 className="text-xl font-semibold mb-8 text-center">Frequently Asked Questions</h2>
-
             <div className="space-y-3">
               <div className="bg-white rounded-xl border border-gray-200/70 overflow-hidden">
                 <h3 className="font-medium p-4 border-b border-gray-200/70">Where's my order?</h3>
@@ -50,7 +49,6 @@ export default function TrackOrder() {
                   </p>
                 </div>
               </div>
-
               <div className="bg-white rounded-xl border border-gray-200/70 overflow-hidden">
                 <h3 className="font-medium p-4 border-b border-gray-200/70">How long will my order take to arrive?</h3>
                 <div className="p-4 text-gray-600 text-sm leading-relaxed">
@@ -60,7 +58,6 @@ export default function TrackOrder() {
                   </p>
                 </div>
               </div>
-
               <div className="bg-white rounded-xl border border-gray-200/70 overflow-hidden">
                 <h3 className="font-medium p-4 border-b border-gray-200/70">
                   What if my package is damaged or missing items?
