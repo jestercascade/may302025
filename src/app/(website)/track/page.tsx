@@ -86,7 +86,7 @@ export default function TrackOrder() {
 
 function Footer() {
   return (
-    <footer className="w-full py-8 bg-neutral-100">
+    <footer className="w-full py-8 border-t bg-neutral-50">
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex flex-col items-center mb-8">
           {/* Navigation Links */}
@@ -115,7 +115,7 @@ function Footer() {
           </nav>
 
           {/* Newsletter Subscription Container */}
-          <div className="w-full max-w-md mb-10 rounded-xl px-6 py-6 bg-blue-500/5 border border-blue-200/30">
+          <div className="w-full max-w-md mb-10 rounded-xl px-6 py-6 bg-blue-500/10 border border-blue-200/35">
             <div className="text-center mb-4">
               <h3 className="font-semibold text-base mb-1.5">Get the latest releases and special offers</h3>
               <p className="text-black/90 text-xs">Be the first to know about new products and exclusive deals</p>
