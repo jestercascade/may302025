@@ -7,7 +7,6 @@ export default function TrackOrder() {
     <>
       <NavbarWrapper />
       <main className="bg-neutral-50 pt-[61px] md:pt-[57px] min-h-[calc(100vh-57px)]">
-        {/* Header section with more whitespace and refined typography */}
         <div className="max-w-3xl mx-auto pt-16 pb-24 px-6">
           <div className="text-center mb-16">
             <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4">Track Your Order</h1>
@@ -15,8 +14,6 @@ export default function TrackOrder() {
               Enter your order number to check the current status and estimated delivery date.
             </p>
           </div>
-
-          {/* Track order form - cleaner with more subtle shadows */}
           <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200/80 overflow-hidden mb-14">
             <div className="p-6 md:p-8">
               <div className="flex flex-col md:flex-row gap-3">
