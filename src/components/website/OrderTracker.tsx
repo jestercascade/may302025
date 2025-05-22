@@ -27,7 +27,116 @@ export default function OrderTracker() {
     try {
       const result = await getOrders({ invoiceIds: [invoiceId.trim()] });
       console.log("Order data:", result);
-
+/*
+      [
+        {
+          id: "5K294251J2280863J",
+          timestamp: "2025-05-20T13:51:38Z",
+          status: "COMPLETED",
+          payer: {
+            email: "khanofemperia@gmail.com",
+            payerId: "E983X3LW4EEHL",
+            name: {
+              firstName: "Tshepo",
+              lastName: "Tau",
+            },
+          },
+          amount: {
+            value: "0.03",
+            currency: "USD",
+          },
+          shipping: {
+            name: "Tshepo Tau",
+            address: {
+              line1: "40 Progress Rd",
+              city: "Roodepoort",
+              state: "GP",
+              postalCode: "1724",
+              country: "ZA",
+            },
+          },
+          transactionId: "2JK31976WK584191G",
+          items: [
+            {
+              baseProductId: "28355",
+              name: "Quilted Waterproof Mattress Protective Cover - Super Soft And Comfortable Mattress Cover",
+              slug: "quilted-waterproof-mattress-protective-cover-super-soft-and-comfortable-mattress-cover",
+              pricing: {
+                basePrice: 0.01,
+                salePrice: 0,
+                discountPercentage: 0,
+              },
+              mainImage:
+                "https://img.kwcdn.com/product/fancy/03652b4d-c662-4753-ab4d-7f5693ed9de5.jpg?imageView2/2/w/800/q/70/format/webp",
+              variantId: "47656",
+              selectedOptions: {},
+              index: 3,
+              type: "product",
+            },
+            {
+              baseProductId: "58329",
+              name: "1pc, Ceiling Mop, Dust Removal Mop, Flexible Rotating Floor Mop, Wall Mop",
+              slug: "1pc-ceiling-mop-dust-removal-mop-flexible-rotating-floor-mop-wall-mop",
+              pricing: {
+                basePrice: 0.01,
+                salePrice: 0,
+                discountPercentage: 0,
+              },
+              mainImage:
+                "https://img.kwcdn.com/product/fancy/fafbe80b-46a3-4c2d-9c15-0ccbd90a45a2.jpg?imageView2/2/w/800/q/70/format/webp",
+              variantId: "49746",
+              selectedOptions: {},
+              index: 2,
+              type: "product",
+            },
+            {
+              baseProductId: "21887",
+              name: "Water Bottle Sport Frosted Tour Outdoor Leak Proof Seal Child School Water Bottles for Children Kids Girl Drinkware BPA Free",
+              slug: "water-bottle-sport-frosted-tour-outdoor-leak-proof-seal-child-school-water-bottles-for-children-kids-girl-drinkware-bpa-free",
+              pricing: {
+                basePrice: 0.01,
+                salePrice: 0,
+                discountPercentage: 0,
+              },
+              mainImage: "https://ae01.alicdn.com/kf/H37d8d657dc984a74b585a53f8c813872d.jpg",
+              variantId: "27054",
+              selectedOptions: {
+                capacity: {
+                  value: "0.65L",
+                  optionDisplayOrder: 2,
+                  groupDisplayOrder: 0,
+                },
+                color: {
+                  value: "Glow Pink",
+                  optionDisplayOrder: 3,
+                  groupDisplayOrder: 1,
+                },
+              },
+              index: 1,
+              type: "product",
+            },
+          ],
+          invoiceId: "21769B81 — enter at cherlygood.com/track",
+          emails: {
+            confirmed: {
+              sentCount: 0,
+              maxAllowed: 2,
+              lastSent: null,
+            },
+            shipped: {
+              sentCount: 0,
+              maxAllowed: 2,
+              lastSent: null,
+            },
+            delivered: {
+              sentCount: 0,
+              maxAllowed: 2,
+              lastSent: null,
+            },
+          },
+        },
+      ];
+*/
       if (!result) {
         showAlert({
           message: "We couldn't find any matching order",
