@@ -160,7 +160,7 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
       transactionId: orderData.purchase_units[0].payments.captures[0].id,
       timestamp: orderData.purchase_units[0].payments.captures[0].create_time,
       items: cartItems,
-      invoiceId: invoiceId, // Store invoice_id
+      invoiceId: invoiceId,
       emails: {
         confirmed: {
           sentCount: 0,
