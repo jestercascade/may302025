@@ -293,6 +293,7 @@ type CartType = {
 
 type OrderType = {
   id: string;
+  timestamp: string;
   status: string;
   payer: {
     email: string;
@@ -317,7 +318,57 @@ type OrderType = {
     };
   };
   transactionId: string;
-  timestamp: string;
+  items: Array<{
+    baseProductId: string;
+    name: string;
+    slug: string;
+    pricing: {
+      basePrice: number;
+      salePrice: number;
+      discountPercentage: number;
+    };
+    mainImage: string;
+    variantId: string;
+    selectedOptions: Record<
+      string,
+      {
+        value: string;
+        optionDisplayOrder: number;
+        groupDisplayOrder: number;
+      }
+    >;
+    index: number;
+    type: "product";
+  }>;
+  invoiceId: string;
+  emails: {
+    confirmed: {
+      sentCount: number;
+      maxAllowed: number;
+      lastSent: string | null;
+    };
+    shipped: {
+      sentCount: number;
+      maxAllowed: number;
+      lastSent: string | null;
+    };
+    delivered: {
+      sentCount: number;
+      maxAllowed: number;
+      lastSent: string | null;
+    };
+  };
+  tracking: {
+    currentStatus: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "COMPLETED";
+    statusHistory: Array<{
+      status: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "COMPLETED";
+      timestamp: string;
+      message?: string;
+    }>;
+    trackingNumber?: string;
+    estimatedDeliveryDate?: string;
+    lastUpdated: string;
+  };
 };
 
 type ConfigType = {

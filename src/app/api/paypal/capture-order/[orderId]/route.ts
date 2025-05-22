@@ -178,6 +178,19 @@ export async function POST(_request: NextRequest, { params }: { params: Promise<
           lastSent: null,
         },
       },
+      tracking: {
+        currentStatus: "PENDING",
+        statusHistory: [
+          {
+            status: "PENDING",
+            timestamp: orderData.purchase_units[0].payments.captures[0].create_time,
+            message: "Order placed and payment confirmed",
+          },
+        ],
+        trackingNumber: null,
+        estimatedDeliveryDate: null,
+        lastUpdated: orderData.purchase_units[0].payments.captures[0].create_time,
+      },
     };
 
     const ordersRef = adminDb.collection("orders");
