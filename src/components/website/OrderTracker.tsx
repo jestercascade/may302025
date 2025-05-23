@@ -9,13 +9,23 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatThousands } from "@/lib/utils/common";
 
+// Type Definitions
 type SelectedOptionType = {
   value: string;
   optionDisplayOrder: number;
   groupDisplayOrder: number;
 };
 
-type OrderItemType = {
+type UpsellProductType = {
+  id: string;
+  name: string;
+  slug: string;
+  mainImage: string;
+  selectedOptions: Record<string, SelectedOptionType>;
+};
+
+type OrderProductItemType = {
+  type: "product";
   mainImage: string;
   name: string;
   slug?: string;
@@ -26,6 +36,17 @@ type OrderItemType = {
     salePrice?: number | string;
   };
 };
+
+type OrderUpsellItemType = {
+  type: "upsell";
+  pricing: {
+    basePrice: number | string;
+    salePrice?: number | string;
+  };
+  products: UpsellProductType[];
+};
+
+type OrderItemType = OrderProductItemType | OrderUpsellItemType;
 
 type OrderType = {
   invoiceId: string;
