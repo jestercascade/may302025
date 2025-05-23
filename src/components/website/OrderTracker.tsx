@@ -151,10 +151,8 @@ export default function OrderTracker() {
           </div>
         </form>
       </div>
-
       {orderData && (
         <div className="p-6 border-t border-gray-200/70">
-          {/* Order Header */}
           <div className="bg-blue-50/50 px-6 py-5 rounded-xl">
             <div className="flex items-start justify-between">
               <div className="flex-1">
@@ -193,25 +191,24 @@ export default function OrderTracker() {
               </div>
             </div>
           </div>
-
-          {/* Progress Tracker */}
           <div className="py-6">
-            <div className="relative max-w-2xl mx-auto">
-              <div className="absolute top-[9px] left-[10px] right-[10px] h-0.5 bg-lightgray-dimmed rounded-full"></div>
+            <div className="relative max-w-2xl mx-auto px-[10px]">
+              <div className="absolute top-[9px] left-[10px] right-[10px] h-0.5 bg-gray-300 rounded-full"></div>
               <div
-                className="absolute top-3 left-[10px] h-0.5 bg-blue-500 rounded-full transition-all duration-700"
+                className="absolute top-[9px] left-0 h-0.5 bg-blue-500 rounded-full transition-all duration-700"
                 style={{
-                  width: `calc(${
-                    (statusOptions.indexOf(orderData.tracking.currentStatus.toLowerCase()) /
-                      (statusOptions.length - 1)) *
+                  width: `${
+                    ((statusOptions.indexOf(orderData.tracking.currentStatus.toLowerCase()) + 1) /
+                      statusOptions.length) *
                     100
-                  }% * (100% - 20px) / 100%)`,
+                  }%`,
                 }}
               ></div>
               <div className="relative flex justify-between">
                 {statusOptions.map((status, index) => {
                   const isCompleted = statusOptions.indexOf(orderData.tracking.currentStatus.toLowerCase()) >= index;
                   const isActive = status === orderData.tracking.currentStatus.toLowerCase();
+
                   return (
                     <div key={status} className="flex flex-col items-center">
                       <div
@@ -220,7 +217,7 @@ export default function OrderTracker() {
                             ? "bg-blue-500 ring-4 ring-blue-100 shadow-sm"
                             : isCompleted
                             ? "bg-blue-500"
-                            : "bg-lightgray-dimmed"
+                            : "bg-gray-300"
                         }`}
                       >
                         {isCompleted && <Check color="#ffffff" size={14} />}
@@ -236,8 +233,6 @@ export default function OrderTracker() {
               </div>
             </div>
           </div>
-
-          {/* Status Message */}
           <div className="text-center mb-8">
             <div
               className={`inline-flex items-center px-4 py-3 rounded-xl text-sm ${
@@ -266,8 +261,6 @@ export default function OrderTracker() {
               )}
             </div>
           </div>
-
-          {/* Timeline */}
           <div className="mb-8">
             <h3 className="text-base font-medium text-gray-900 mb-4">Order Timeline</h3>
             <div className="space-y-4">
@@ -293,12 +286,10 @@ export default function OrderTracker() {
             </div>
           </div>
 
-          {/* Order Items */}
           <div className="space-y-4">
             <h3 className="text-base font-medium mb-4">Items Ordered</h3>
             {orderData.items.map((item, index) => {
               if (item.type === "product") {
-                // Render product items with CartItemList design
                 const basePrice = Number(item.pricing.basePrice);
                 const salePrice = item.pricing.salePrice ? Number(item.pricing.salePrice) : null;
                 const itemName = item.name || "Product";
@@ -357,7 +348,6 @@ export default function OrderTracker() {
                   </div>
                 );
               } else if (item.type === "upsell") {
-                // Render upsell items with CartItemList design
                 return (
                   <div key={index} className="flex gap-3">
                     <div className="relative w-full p-5 rounded-lg bg-blue-50 border border-blue-200/50">
