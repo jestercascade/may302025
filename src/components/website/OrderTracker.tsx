@@ -3,15 +3,12 @@
 import { getOrders } from "@/actions/get/orders";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { useAlertStore } from "@/zustand/shared/alertStore";
-import { Search, CheckCircle, Truck, Package, AlertCircle, MapPin, Info } from "lucide-react";
+import { Search, CheckCircle, Truck, Package, MapPin, Check } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { formatThousands } from "@/lib/utils/common";
 
-// 134949E5
-
-// Type Definitions (assumed based on usage)
 type SelectedOptionType = {
   value: string;
   optionDisplayOrder: number;
@@ -156,335 +153,301 @@ export default function OrderTracker() {
       </div>
 
       {orderData && (
-        <>
-          <div className="p-6 border-t border-gray-200/50">
-            {/* Order Header */}
-            <div className="bg-blue-50/50 px-6 py-5 rounded-xl">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h2 className="text-xl font-semibold text-gray-900">Order #{invoiceId}</h2>
-                    <div
-                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                        orderData.tracking.currentStatus.toLowerCase() === "delivered"
-                          ? "bg-green-100 text-green-800"
-                          : orderData.tracking.currentStatus.toLowerCase() === "shipped"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-orange-100 text-orange-800"
-                      }`}
-                    >
-                      {orderData.tracking.currentStatus.charAt(0).toUpperCase() +
-                        orderData.tracking.currentStatus.slice(1).toLowerCase()}
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-1">Placed {formatDate(orderData.timestamp)}</p>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    <span>
-                      {orderData.shipping.address.city}, {orderData.shipping.address.country}
-                    </span>
+        <div className="p-6 border-t border-gray-200/50">
+          {/* Order Header */}
+          <div className="bg-blue-50/50 px-6 py-5 rounded-xl">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <h2 className="text-xl font-semibold text-gray-900">Order #{invoiceId}</h2>
+                  <div
+                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                      orderData.tracking.currentStatus.toLowerCase() === "delivered"
+                        ? "bg-green-100 text-green-800"
+                        : orderData.tracking.currentStatus.toLowerCase() === "shipped"
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-orange-100 text-orange-800"
+                    }`}
+                  >
+                    {orderData.tracking.currentStatus.charAt(0).toUpperCase() +
+                      orderData.tracking.currentStatus.slice(1).toLowerCase()}
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="flex items-baseline justify-end">
-                    <span className="text-sm leading-3 font-semibold">$</span>
-                    <span className="text-xl font-bold">{Math.floor(Number(orderData.amount.value))}</span>
-                    <span className="text-sm leading-3 font-semibold">
-                      {(Number(orderData.amount.value) % 1).toFixed(2).substring(1)}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-500">Total</p>
+                <p className="text-sm text-gray-600 mb-1">Placed {formatDate(orderData.timestamp)}</p>
+                <div className="flex items-center text-sm text-gray-500">
+                  <MapPin className="h-4 w-4 mr-1" />
+                  <span>
+                    {orderData.shipping.address.city}, {orderData.shipping.address.country}
+                  </span>
                 </div>
               </div>
+              <div className="text-right">
+                <div className="flex items-baseline justify-end">
+                  <span className="text-sm leading-3 font-semibold">$</span>
+                  <span className="text-xl font-bold">{Math.floor(Number(orderData.amount.value))}</span>
+                  <span className="text-sm leading-3 font-semibold">
+                    {(Number(orderData.amount.value) % 1).toFixed(2).substring(1)}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500">Total</p>
+              </div>
             </div>
+          </div>
 
-            {/* Progress Tracker */}
-            <div className="py-6">
-              <div className="relative max-w-2xl mx-auto">
-                <div className="absolute top-[9px] left-0 w-full h-0.5 bg-gray-200 rounded-full"></div>
-                <div
-                  className="absolute top-3 left-0 h-0.5 bg-blue-500 rounded-full transition-all duration-700"
-                  style={{
-                    width: `${
-                      (statusOptions.indexOf(orderData.tracking.currentStatus.toLowerCase()) /
-                        (statusOptions.length - 1)) *
-                      100
-                    }%`,
-                  }}
-                ></div>
-                <div className="relative flex justify-between">
-                  {statusOptions.map((status, index) => {
-                    const isCompleted = statusOptions.indexOf(orderData.tracking.currentStatus.toLowerCase()) >= index;
-                    const isActive = status === orderData.tracking.currentStatus.toLowerCase();
-                    return (
-                      <div key={status} className="flex flex-col items-center">
-                        <div
-                          className={`rounded-full h-5 w-5 flex items-center justify-center mb-2 transition-all duration-300 ${
-                            isActive
-                              ? "bg-blue-500 ring-4 ring-blue-100 shadow-sm"
-                              : isCompleted
-                              ? "bg-blue-500"
-                              : "bg-gray-200"
-                          }`}
-                        >
-                          {isCompleted && (
-                            <svg
-                              className="w-2.5 h-2.5 text-white"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
+          {/* Progress Tracker */}
+          <div className="py-6">
+            <div className="relative max-w-2xl mx-auto">
+              <div className="absolute top-[9px] left-0 w-full h-0.5 bg-gray-200 rounded-full"></div>
+              <div
+                className="absolute top-3 left-0 h-0.5 bg-blue-500 rounded-full transition-all duration-700"
+                style={{
+                  width: `${
+                    (statusOptions.indexOf(orderData.tracking.currentStatus.toLowerCase()) /
+                      (statusOptions.length - 1)) *
+                    100
+                  }%`,
+                }}
+              ></div>
+              <div className="relative flex justify-between">
+                {statusOptions.map((status, index) => {
+                  const isCompleted = statusOptions.indexOf(orderData.tracking.currentStatus.toLowerCase()) >= index;
+                  const isActive = status === orderData.tracking.currentStatus.toLowerCase();
+                  return (
+                    <div key={status} className="flex flex-col items-center">
+                      <div
+                        className={`rounded-full h-5 w-5 flex items-center justify-center mb-2 transition-all duration-300 ${
+                          isActive
+                            ? "bg-blue-500 ring-4 ring-blue-100 shadow-sm"
+                            : isCompleted
+                            ? "bg-blue-500"
+                            : "bg-gray-200"
+                        }`}
+                      >
+                        {isCompleted && <Check color="#ffffff" size={14} />}
+                      </div>
+                      <div
+                        className={`text-xs font-medium text-center ${isCompleted ? "text-gray-900" : "text-gray-400"}`}
+                      >
+                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Status Message */}
+          <div className="text-center mb-8">
+            <div
+              className={`inline-flex items-center px-4 py-3 rounded-xl text-sm ${
+                orderData.tracking.currentStatus.toLowerCase() === "delivered"
+                  ? "bg-green-50 text-green-800 border border-green-200/50"
+                  : orderData.tracking.currentStatus.toLowerCase() === "shipped"
+                  ? "bg-blue-50 text-blue-800 border border-blue-200/50"
+                  : "bg-gray-50 text-gray-800 border border-gray-200/50"
+              }`}
+            >
+              {orderData.tracking.currentStatus.toLowerCase() === "shipped" ? (
+                <>
+                  <Truck className="h-4 w-4 mr-2" />
+                  Your package is on the way! Expected delivery in 2-3 business days.
+                </>
+              ) : orderData.tracking.currentStatus.toLowerCase() === "delivered" ? (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Your package has been delivered. Thank you for your order!
+                </>
+              ) : (
+                <>
+                  <Package className="h-4 w-4 mr-2" />
+                  We're preparing your order. You'll receive a shipping confirmation soon.
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Timeline */}
+          <div className="mb-8">
+            <h3 className="text-base font-medium text-gray-900 mb-4">Order Timeline</h3>
+            <div className="space-y-4">
+              {orderData.tracking.statusHistory
+                .slice()
+                .reverse()
+                .map((historyItem, index) => (
+                  <div key={index} className="flex gap-3">
+                    <div className="flex-shrink-0 mt-1.5">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-sm font-medium text-gray-900">
+                          {historyItem.status.charAt(0).toUpperCase() + historyItem.status.slice(1).toLowerCase()}
+                        </p>
+                        <time className="text-xs text-gray-500 flex-shrink-0">{formatDate(historyItem.timestamp)}</time>
+                      </div>
+                      <p className="text-sm text-gray-600">{historyItem.message || "Status updated"}</p>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          {/* Order Items */}
+          <div className="space-y-4">
+            <h3 className="text-base font-medium text-gray-900 mb-4">Items Ordered</h3>
+            {orderData.items.map((item, index) => {
+              if (item.type === "product") {
+                // Render product items with CartItemList design
+                const basePrice = Number(item.pricing.basePrice);
+                const salePrice = item.pricing.salePrice ? Number(item.pricing.salePrice) : null;
+                const itemName = item.name || "Product";
+                return (
+                  <div key={index} className="flex gap-3">
+                    <div className="relative flex flex-col min-[580px]:flex-row gap-4 w-full p-5 rounded-lg border border-gray-200/80">
+                      <div className="aspect-square h-[160px] min-[580px]:h-[128px]">
+                        <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
+                          <Image src={item.mainImage} alt={itemName} width={160} height={160} priority />
+                        </div>
+                        <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
+                          <Image src={item.mainImage} alt={itemName} width={128} height={128} priority />
+                        </div>
+                      </div>
+                      <div className="w-full flex flex-col gap-1">
+                        <div className="min-w-full h-5 flex items-center justify-between gap-3">
+                          {item.slug && item.baseProductId ? (
+                            <Link
+                              href={`${item.slug}-${item.baseProductId}`}
+                              target="_blank"
+                              className="text-xs line-clamp-1 min-[580px]:w-[calc(100%-28px)] hover:underline"
                             >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="3"
-                                d="M5 13l4 4L19 7"
-                              ></path>
-                            </svg>
+                              {itemName}
+                            </Link>
+                          ) : (
+                            <h4 className="text-xs line-clamp-1">{itemName}</h4>
                           )}
                         </div>
-                        <div
-                          className={`text-xs font-medium text-center ${
-                            isCompleted ? "text-gray-900" : "text-gray-400"
-                          }`}
-                        >
-                          {status.charAt(0).toUpperCase() + status.slice(1)}
+                        {formatOptions(item.selectedOptions)}
+                        <div className="mt-1 w-max flex items-center justify-center">
+                          {salePrice ? (
+                            <div className="flex items-center gap-[6px]">
+                              <div className="flex items-baseline text-[rgb(168,100,0)]">
+                                <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                                <span className="text-lg font-bold">{Math.floor(salePrice)}</span>
+                                <span className="text-[0.813rem] leading-3 font-semibold">
+                                  {(salePrice % 1).toFixed(2).substring(1)}
+                                </span>
+                              </div>
+                              <span className="text-[0.813rem] leading-3 text-gray line-through">
+                                ${formatThousands(basePrice)}
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex items-baseline">
+                              <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                              <span className="text-lg font-bold">{Math.floor(basePrice)}</span>
+                              <span className="text-[0.813rem] leading-3 font-semibold">
+                                {(basePrice % 1).toFixed(2).substring(1)}
+                              </span>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* Status Message */}
-            <div className="text-center mb-8">
-              <div
-                className={`inline-flex items-center px-4 py-3 rounded-xl text-sm ${
-                  orderData.tracking.currentStatus.toLowerCase() === "delivered"
-                    ? "bg-green-50 text-green-800 border border-green-200/50"
-                    : orderData.tracking.currentStatus.toLowerCase() === "shipped"
-                    ? "bg-blue-50 text-blue-800 border border-blue-200/50"
-                    : "bg-gray-50 text-gray-800 border border-gray-200/50"
-                }`}
-              >
-                {orderData.tracking.currentStatus.toLowerCase() === "shipped" ? (
-                  <>
-                    <Truck className="h-4 w-4 mr-2" />
-                    Your package is on the way! Expected delivery in 2-3 business days.
-                  </>
-                ) : orderData.tracking.currentStatus.toLowerCase() === "delivered" ? (
-                  <>
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Your package has been delivered. Thank you for your order!
-                  </>
-                ) : (
-                  <>
-                    <Package className="h-4 w-4 mr-2" />
-                    We're preparing your order. You'll receive a shipping confirmation soon.
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Timeline */}
-            <div className="mb-8">
-              <h3 className="text-base font-medium text-gray-900 mb-4">Order Timeline</h3>
-              <div className="space-y-4">
-                {orderData.tracking.statusHistory
-                  .slice()
-                  .reverse()
-                  .map((historyItem, index) => (
-                    <div key={index} className="flex gap-3">
-                      <div className="flex-shrink-0 mt-1.5">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <p className="text-sm font-medium text-gray-900">
-                            {historyItem.status.charAt(0).toUpperCase() + historyItem.status.slice(1).toLowerCase()}
-                          </p>
-                          <time className="text-xs text-gray-500 flex-shrink-0">
-                            {formatDate(historyItem.timestamp)}
-                          </time>
-                        </div>
-                        <p className="text-sm text-gray-600">{historyItem.message || "Status updated"}</p>
                       </div>
                     </div>
-                  ))}
-              </div>
-            </div>
-
-            {/* Order Items */}
-            <div className="space-y-4">
-              <h3 className="text-base font-medium text-gray-900 mb-4">Items Ordered</h3>
-              {orderData.items.map((item, index) => {
-                if (item.type === "product") {
-                  // Render product items with CartItemList design
-                  const basePrice = Number(item.pricing.basePrice);
-                  const salePrice = item.pricing.salePrice ? Number(item.pricing.salePrice) : null;
-                  const itemName = item.name || "Product";
-                  return (
-                    <div key={index} className="flex gap-3">
-                      <div className="relative flex flex-col min-[580px]:flex-row gap-4 w-full p-5 rounded-lg border border-gray-200/80">
-                        <div className="aspect-square h-[160px] min-[580px]:h-[128px]">
-                          <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
-                            <Image src={item.mainImage} alt={itemName} width={160} height={160} priority />
-                          </div>
-                          <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
-                            <Image src={item.mainImage} alt={itemName} width={128} height={128} priority />
-                          </div>
-                        </div>
-                        <div className="w-full flex flex-col gap-1">
-                          <div className="min-w-full h-5 flex items-center justify-between gap-3">
-                            {item.slug && item.baseProductId ? (
-                              <Link
-                                href={`${item.slug}-${item.baseProductId}`}
-                                target="_blank"
-                                className="text-xs line-clamp-1 min-[580px]:w-[calc(100%-28px)] hover:underline"
-                              >
-                                {itemName}
-                              </Link>
-                            ) : (
-                              <h4 className="text-xs line-clamp-1">{itemName}</h4>
-                            )}
-                          </div>
-                          {formatOptions(item.selectedOptions)}
-                          <div className="mt-1 w-max flex items-center justify-center">
-                            {salePrice ? (
+                  </div>
+                );
+              } else if (item.type === "upsell") {
+                // Render upsell items with CartItemList design
+                return (
+                  <div key={index} className="flex gap-3">
+                    <div className="relative w-full p-5 rounded-lg bg-blue-50 border border-blue-200/50">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="min-w-full h-5 flex gap-5 items-center justify-center">
+                          <div className="w-max flex items-center justify-center">
+                            {item.pricing.salePrice ? (
                               <div className="flex items-center gap-[6px]">
                                 <div className="flex items-baseline text-[rgb(168,100,0)]">
                                   <span className="text-[0.813rem] leading-3 font-semibold">$</span>
-                                  <span className="text-lg font-bold">{Math.floor(salePrice)}</span>
+                                  <span className="text-lg font-bold">
+                                    {Math.floor(Number(item.pricing.salePrice))}
+                                  </span>
                                   <span className="text-[0.813rem] leading-3 font-semibold">
-                                    {(salePrice % 1).toFixed(2).substring(1)}
+                                    {(Number(item.pricing.salePrice) % 1).toFixed(2).substring(1)}
                                   </span>
                                 </div>
                                 <span className="text-[0.813rem] leading-3 text-gray line-through">
-                                  ${formatThousands(basePrice)}
+                                  ${formatThousands(Number(item.pricing.basePrice))}
                                 </span>
                               </div>
                             ) : (
-                              <div className="flex items-baseline">
+                              <div className="flex items-baseline text-[rgb(168,100,0)]">
                                 <span className="text-[0.813rem] leading-3 font-semibold">$</span>
-                                <span className="text-lg font-bold">{Math.floor(basePrice)}</span>
+                                <span className="text-lg font-bold">{Math.floor(Number(item.pricing.basePrice))}</span>
                                 <span className="text-[0.813rem] leading-3 font-semibold">
-                                  {(basePrice % 1).toFixed(2).substring(1)}
+                                  {(Number(item.pricing.basePrice) % 1).toFixed(2).substring(1)}
                                 </span>
+                                <span className="ml-1 text-[0.813rem] leading-3 font-semibold">today</span>
                               </div>
                             )}
                           </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                } else if (item.type === "upsell") {
-                  // Render upsell items with CartItemList design
-                  return (
-                    <div key={index} className="flex gap-3">
-                      <div className="relative w-full p-5 rounded-lg bg-blue-50 border border-blue-200/50">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="min-w-full h-5 flex gap-5 items-center justify-center">
-                            <div className="w-max flex items-center justify-center">
-                              {item.pricing.salePrice ? (
-                                <div className="flex items-center gap-[6px]">
-                                  <div className="flex items-baseline text-[rgb(168,100,0)]">
-                                    <span className="text-[0.813rem] leading-3 font-semibold">$</span>
-                                    <span className="text-lg font-bold">
-                                      {Math.floor(Number(item.pricing.salePrice))}
-                                    </span>
-                                    <span className="text-[0.813rem] leading-3 font-semibold">
-                                      {(Number(item.pricing.salePrice) % 1).toFixed(2).substring(1)}
-                                    </span>
+                      <div className="space-y-3">
+                        {item.products.map((product, prodIndex) => {
+                          const productName = product.name || "Product";
+                          return (
+                            <div
+                              key={prodIndex}
+                              className="bg-white bg-opacity-80 backdrop-blur-sm rounded-lg p-3 border border-blue-200/50 shadow-sm transition-all duration-200 hover:shadow-md hover:bg-opacity-100"
+                            >
+                              <div className="flex flex-col min-[580px]:flex-row gap-4">
+                                <div className="aspect-square h-[160px] min-[580px]:h-[128px]">
+                                  <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
+                                    <Image
+                                      src={product.mainImage}
+                                      alt={productName}
+                                      width={160}
+                                      height={160}
+                                      priority
+                                    />
                                   </div>
-                                  <span className="text-[0.813rem] leading-3 text-gray line-through">
-                                    ${formatThousands(Number(item.pricing.basePrice))}
-                                  </span>
+                                  <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
+                                    <Image
+                                      src={product.mainImage}
+                                      alt={productName}
+                                      width={128}
+                                      height={128}
+                                      priority
+                                    />
+                                  </div>
                                 </div>
-                              ) : (
-                                <div className="flex items-baseline text-[rgb(168,100,0)]">
-                                  <span className="text-[0.813rem] leading-3 font-semibold">$</span>
-                                  <span className="text-lg font-bold">
-                                    {Math.floor(Number(item.pricing.basePrice))}
-                                  </span>
-                                  <span className="text-[0.813rem] leading-3 font-semibold">
-                                    {(Number(item.pricing.basePrice) % 1).toFixed(2).substring(1)}
-                                  </span>
-                                  <span className="ml-1 text-[0.813rem] leading-3 font-semibold">today</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="space-y-3">
-                          {item.products.map((product, prodIndex) => {
-                            const productName = product.name || "Product";
-                            return (
-                              <div
-                                key={prodIndex}
-                                className="bg-white bg-opacity-80 backdrop-blur-sm rounded-lg p-3 border border-blue-200/50 shadow-sm transition-all duration-200 hover:shadow-md hover:bg-opacity-100"
-                              >
-                                <div className="flex flex-col min-[580px]:flex-row gap-4">
-                                  <div className="aspect-square h-[160px] min-[580px]:h-[128px]">
-                                    <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
-                                      <Image
-                                        src={product.mainImage}
-                                        alt={productName}
-                                        width={160}
-                                        height={160}
-                                        priority
-                                      />
-                                    </div>
-                                    <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
-                                      <Image
-                                        src={product.mainImage}
-                                        alt={productName}
-                                        width={128}
-                                        height={128}
-                                        priority
-                                      />
-                                    </div>
-                                  </div>
-                                  <div className="space-y-3">
-                                    {product.slug && product.id ? (
-                                      <Link
-                                        href={`${product.slug}-${product.id}`}
-                                        target="_blank"
-                                        className="text-xs line-clamp-1 hover:underline"
-                                      >
-                                        {productName}
-                                      </Link>
-                                    ) : (
-                                      <h4 className="text-xs line-clamp-1">{productName}</h4>
-                                    )}
-                                    {formatOptions(product.selectedOptions, "upsell")}
-                                  </div>
+                                <div className="space-y-3">
+                                  {product.slug && product.id ? (
+                                    <Link
+                                      href={`${product.slug}-${product.id}`}
+                                      target="_blank"
+                                      className="text-xs line-clamp-1 hover:underline"
+                                    >
+                                      {productName}
+                                    </Link>
+                                  ) : (
+                                    <h4 className="text-xs line-clamp-1">{productName}</h4>
+                                  )}
+                                  {formatOptions(product.selectedOptions, "upsell")}
                                 </div>
                               </div>
-                            );
-                          })}
-                        </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
-                  );
-                }
-                return null; // Fallback for unexpected item types
-              })}
-            </div>
+                  </div>
+                );
+              }
+              return null;
+            })}
           </div>
-          {/* Support */}
-          <div className="border-t border-gray-200/70 bg-neutral-50 px-6 py-4">
-            <div className="flex items-center gap-3">
-              <Info className="h-4 w-4 text-blue-500 flex-shrink-0" />
-              <p className="text-sm text-gray-600">
-                Need help?{" "}
-                <a href="mailto:support@cherlygood.com" className="text-blue-600 hover:text-blue-700 font-medium">
-                  Contact Support
-                </a>
-              </p>
-            </div>
-          </div>
-        </>
+        </div>
       )}
     </div>
   );
