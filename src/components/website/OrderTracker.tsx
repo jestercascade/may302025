@@ -124,12 +124,12 @@ export default function OrderTracker() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200/80 overflow-hidden">
+    <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200/70 overflow-hidden">
       <div className="p-6">
         <form className="flex flex-col md:flex-row gap-3" onSubmit={handleSubmit}>
           <div className="flex-grow relative">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-gray-400" />
+              <Search className="h-4 w-4 text-gray" />
             </div>
             <input
               type="text"
@@ -153,7 +153,7 @@ export default function OrderTracker() {
       </div>
 
       {orderData && (
-        <div className="p-6 border-t border-gray-200/50">
+        <div className="p-6 border-t border-gray-200/70">
           {/* Order Header */}
           <div className="bg-blue-50/50 px-6 py-5 rounded-xl">
             <div className="flex items-start justify-between">
@@ -173,8 +173,8 @@ export default function OrderTracker() {
                       orderData.tracking.currentStatus.slice(1).toLowerCase()}
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 mb-1">Placed {formatDate(orderData.timestamp)}</p>
-                <div className="flex items-center text-sm text-gray-500">
+                <p className="text-sm text-gray mb-1">Placed {formatDate(orderData.timestamp)}</p>
+                <div className="flex items-center text-sm text-gray">
                   <MapPin className="h-4 w-4 mr-1" />
                   <span>
                     {orderData.shipping.address.city}, {orderData.shipping.address.country}
@@ -189,7 +189,7 @@ export default function OrderTracker() {
                     {(Number(orderData.amount.value) % 1).toFixed(2).substring(1)}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500">Total</p>
+                <p className="text-xs text-gray">Total</p>
               </div>
             </div>
           </div>
@@ -197,15 +197,15 @@ export default function OrderTracker() {
           {/* Progress Tracker */}
           <div className="py-6">
             <div className="relative max-w-2xl mx-auto">
-              <div className="absolute top-[9px] left-0 w-full h-0.5 bg-gray-200 rounded-full"></div>
+              <div className="absolute top-[9px] left-[10px] right-[10px] h-0.5 bg-lightgray-dimmed rounded-full"></div>
               <div
-                className="absolute top-3 left-0 h-0.5 bg-blue-500 rounded-full transition-all duration-700"
+                className="absolute top-3 left-[10px] h-0.5 bg-blue rounded-full transition-all duration-700"
                 style={{
-                  width: `${
+                  width: `calc(${
                     (statusOptions.indexOf(orderData.tracking.currentStatus.toLowerCase()) /
                       (statusOptions.length - 1)) *
                     100
-                  }%`,
+                  }% * (100% - 20px) / 100%)`,
                 }}
               ></div>
               <div className="relative flex justify-between">
@@ -217,10 +217,10 @@ export default function OrderTracker() {
                       <div
                         className={`rounded-full h-5 w-5 flex items-center justify-center mb-2 transition-all duration-300 ${
                           isActive
-                            ? "bg-blue-500 ring-4 ring-blue-100 shadow-sm"
+                            ? "bg-blue ring-4 ring-blue-100 shadow-sm"
                             : isCompleted
-                            ? "bg-blue-500"
-                            : "bg-gray-200"
+                            ? "bg-blue"
+                            : "bg-lightgray-dimmed"
                         }`}
                       >
                         {isCompleted && <Check color="#ffffff" size={14} />}
@@ -284,7 +284,7 @@ export default function OrderTracker() {
                         <p className="text-sm font-medium text-gray-900">
                           {historyItem.status.charAt(0).toUpperCase() + historyItem.status.slice(1).toLowerCase()}
                         </p>
-                        <time className="text-xs text-gray-500 flex-shrink-0">{formatDate(historyItem.timestamp)}</time>
+                        <time className="text-xs text-gray flex-shrink-0">{formatDate(historyItem.timestamp)}</time>
                       </div>
                       <p className="text-sm text-gray-600">{historyItem.message || "Status updated"}</p>
                     </div>
@@ -304,7 +304,7 @@ export default function OrderTracker() {
                 const itemName = item.name || "Product";
                 return (
                   <div key={index} className="flex gap-3">
-                    <div className="relative flex flex-col min-[580px]:flex-row gap-4 w-full p-5 rounded-lg border border-gray-200/80">
+                    <div className="relative flex flex-col min-[580px]:flex-row gap-4 w-full p-5 rounded-lg border border-gray-200/70">
                       <div className="aspect-square h-[160px] min-[580px]:h-[128px]">
                         <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
                           <Image src={item.mainImage} alt={itemName} width={160} height={160} priority />
