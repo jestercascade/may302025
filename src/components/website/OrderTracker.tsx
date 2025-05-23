@@ -9,7 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatThousands } from "@/lib/utils/common";
 
-// 373C572C
+// 134949E5
 
 // Type Definitions (assumed based on usage)
 type SelectedOptionType = {
@@ -98,11 +98,18 @@ export default function OrderTracker() {
 
   const statusOptions = ["pending", "processing", "shipped", "delivered"];
 
-  const formatOptions = (options: Record<string, SelectedOptionType>) => {
+  const formatOptions = (options: Record<string, SelectedOptionType>, type: "product" | "upsell" = "product") => {
     const entries = Object.entries(options || {});
     if (entries.length === 0) return null;
 
     const sortedEntries = entries.sort(([, a], [, b]) => a.groupDisplayOrder - b.groupDisplayOrder);
+
+    const getClassNames = () => {
+      if (type === "upsell") {
+        return "inline-flex text-xs px-1.5 py-0.5 rounded border border-blue-200/70 text-gray bg-blue-50";
+      }
+      return "inline-flex text-xs px-1.5 py-0.5 rounded bg-[#F7F7F7] text-neutral-500";
+    };
 
     return (
       <div className="flex flex-wrap gap-1 mt-1 max-w-72">
@@ -110,7 +117,7 @@ export default function OrderTracker() {
           const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
           const id = `${key}:${option.value}`;
           return (
-            <span key={id} className="inline-flex text-xs px-1.5 py-0.5 rounded bg-[#F7F7F7] text-neutral-500">
+            <span key={id} className={getClassNames()}>
               {formattedKey}: {option.value}
             </span>
           );
@@ -274,7 +281,7 @@ export default function OrderTracker() {
                 ) : (
                   <>
                     <Package className="h-4 w-4 mr-2" />
-                    We’re preparing your order. You’ll receive a shipping confirmation soon.
+                    We're preparing your order. You'll receive a shipping confirmation soon.
                   </>
                 )}
               </div>
@@ -312,63 +319,156 @@ export default function OrderTracker() {
             <div className="space-y-4">
               <h3 className="text-base font-medium text-gray-900 mb-4">Items Ordered</h3>
               {orderData.items.map((item, index) => {
-                const basePrice = Number(item.pricing.basePrice);
-                const salePrice = item.pricing.salePrice ? Number(item.pricing.salePrice) : null;
-                return (
-                  <div
-                    key={index}
-                    className="flex flex-col min-[580px]:flex-row gap-4 w-full p-5 rounded-lg border border-gray-200/80"
-                  >
-                    <div className="aspect-square h-[160px] min-[580px]:h-[128px] flex-shrink-0">
-                      <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
-                        <Image src={item.mainImage} alt={item.name} width={160} height={160} priority />
-                      </div>
-                      <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
-                        <Image src={item.mainImage} alt={item.name} width={128} height={128} priority />
+                if (item.type === "product") {
+                  // Render product items with CartItemList design
+                  const basePrice = Number(item.pricing.basePrice);
+                  const salePrice = item.pricing.salePrice ? Number(item.pricing.salePrice) : null;
+                  const itemName = item.name || "Product";
+                  return (
+                    <div key={index} className="flex gap-3">
+                      <div className="relative flex flex-col min-[580px]:flex-row gap-4 w-full p-5 rounded-lg border border-gray-200/80">
+                        <div className="aspect-square h-[160px] min-[580px]:h-[128px]">
+                          <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
+                            <Image src={item.mainImage} alt={itemName} width={160} height={160} priority />
+                          </div>
+                          <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
+                            <Image src={item.mainImage} alt={itemName} width={128} height={128} priority />
+                          </div>
+                        </div>
+                        <div className="w-full flex flex-col gap-1">
+                          <div className="min-w-full h-5 flex items-center justify-between gap-3">
+                            {item.slug && item.baseProductId ? (
+                              <Link
+                                href={`${item.slug}-${item.baseProductId}`}
+                                target="_blank"
+                                className="text-xs line-clamp-1 min-[580px]:w-[calc(100%-28px)] hover:underline"
+                              >
+                                {itemName}
+                              </Link>
+                            ) : (
+                              <h4 className="text-xs line-clamp-1">{itemName}</h4>
+                            )}
+                          </div>
+                          {formatOptions(item.selectedOptions)}
+                          <div className="mt-1 w-max flex items-center justify-center">
+                            {salePrice ? (
+                              <div className="flex items-center gap-[6px]">
+                                <div className="flex items-baseline text-[rgb(168,100,0)]">
+                                  <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                                  <span className="text-lg font-bold">{Math.floor(salePrice)}</span>
+                                  <span className="text-[0.813rem] leading-3 font-semibold">
+                                    {(salePrice % 1).toFixed(2).substring(1)}
+                                  </span>
+                                </div>
+                                <span className="text-[0.813rem] leading-3 text-gray line-through">
+                                  ${formatThousands(basePrice)}
+                                </span>
+                              </div>
+                            ) : (
+                              <div className="flex items-baseline">
+                                <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                                <span className="text-lg font-bold">{Math.floor(basePrice)}</span>
+                                <span className="text-[0.813rem] leading-3 font-semibold">
+                                  {(basePrice % 1).toFixed(2).substring(1)}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <div className="w-full flex flex-col gap-1">
-                      <div className="min-w-full flex items-center justify-between gap-3">
-                        {item.slug && item.baseProductId ? (
-                          <Link
-                            href={`${item.slug}-${item.baseProductId}`}
-                            target="_blank"
-                            className="text-xs line-clamp-1 min-[580px]:w-[calc(100%-28px)] hover:underline"
-                          >
-                            {item.name}
-                          </Link>
-                        ) : (
-                          <h4 className="text-xs line-clamp-1">{item.name}</h4>
-                        )}
-                      </div>
-                      {formatOptions(item.selectedOptions)}
-                      <div className="mt-1 w-max flex items-center justify-center">
-                        {salePrice ? (
-                          <div className="flex items-center gap-[6px]">
-                            <div className="flex items-baseline text-[rgb(168,100,0)]">
-                              <span className="text-[0.813rem] leading-3 font-semibold">$</span>
-                              <span className="text-lg font-bold">{Math.floor(salePrice)}</span>
-                              <span className="text-[0.813rem] leading-3 font-semibold">
-                                {(salePrice % 1).toFixed(2).substring(1)}
-                              </span>
+                  );
+                } else if (item.type === "upsell") {
+                  // Render upsell items with CartItemList design
+                  return (
+                    <div key={index} className="flex gap-3">
+                      <div className="relative w-full p-5 rounded-lg bg-blue-50 border border-blue-200/50">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="min-w-full h-5 flex gap-5 items-center justify-center">
+                            <div className="w-max flex items-center justify-center">
+                              {item.pricing.salePrice ? (
+                                <div className="flex items-center gap-[6px]">
+                                  <div className="flex items-baseline text-[rgb(168,100,0)]">
+                                    <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                                    <span className="text-lg font-bold">
+                                      {Math.floor(Number(item.pricing.salePrice))}
+                                    </span>
+                                    <span className="text-[0.813rem] leading-3 font-semibold">
+                                      {(Number(item.pricing.salePrice) % 1).toFixed(2).substring(1)}
+                                    </span>
+                                  </div>
+                                  <span className="text-[0.813rem] leading-3 text-gray line-through">
+                                    ${formatThousands(Number(item.pricing.basePrice))}
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="flex items-baseline text-[rgb(168,100,0)]">
+                                  <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                                  <span className="text-lg font-bold">
+                                    {Math.floor(Number(item.pricing.basePrice))}
+                                  </span>
+                                  <span className="text-[0.813rem] leading-3 font-semibold">
+                                    {(Number(item.pricing.basePrice) % 1).toFixed(2).substring(1)}
+                                  </span>
+                                  <span className="ml-1 text-[0.813rem] leading-3 font-semibold">today</span>
+                                </div>
+                              )}
                             </div>
-                            <span className="text-[0.813rem] leading-3 text-gray line-through">
-                              ${formatThousands(basePrice)}
-                            </span>
                           </div>
-                        ) : (
-                          <div className="flex items-baseline">
-                            <span className="text-[0.813rem] leading-3 font-semibold">$</span>
-                            <span className="text-lg font-bold">{Math.floor(basePrice)}</span>
-                            <span className="text-[0.813rem] leading-3 font-semibold">
-                              {(basePrice % 1).toFixed(2).substring(1)}
-                            </span>
-                          </div>
-                        )}
+                        </div>
+                        <div className="space-y-3">
+                          {item.products.map((product, prodIndex) => {
+                            const productName = product.name || "Product";
+                            return (
+                              <div
+                                key={prodIndex}
+                                className="bg-white bg-opacity-80 backdrop-blur-sm rounded-lg p-3 border border-blue-200/50 shadow-sm transition-all duration-200 hover:shadow-md hover:bg-opacity-100"
+                              >
+                                <div className="flex flex-col min-[580px]:flex-row gap-4">
+                                  <div className="aspect-square h-[160px] min-[580px]:h-[128px]">
+                                    <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
+                                      <Image
+                                        src={product.mainImage}
+                                        alt={productName}
+                                        width={160}
+                                        height={160}
+                                        priority
+                                      />
+                                    </div>
+                                    <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
+                                      <Image
+                                        src={product.mainImage}
+                                        alt={productName}
+                                        width={128}
+                                        height={128}
+                                        priority
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="space-y-3">
+                                    {product.slug && product.id ? (
+                                      <Link
+                                        href={`${product.slug}-${product.id}`}
+                                        target="_blank"
+                                        className="text-xs line-clamp-1 hover:underline"
+                                      >
+                                        {productName}
+                                      </Link>
+                                    ) : (
+                                      <h4 className="text-xs line-clamp-1">{productName}</h4>
+                                    )}
+                                    {formatOptions(product.selectedOptions, "upsell")}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
+                  );
+                }
+                return null; // Fallback for unexpected item types
               })}
             </div>
           </div>
