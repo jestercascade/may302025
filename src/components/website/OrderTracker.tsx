@@ -277,7 +277,7 @@ export default function OrderTracker() {
                 .map((historyItem, index) => (
                   <div key={index} className="flex gap-3">
                     <div className="flex-shrink-0 mt-1.5">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <div className="w-2 h-2 bg-blue rounded-full"></div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
@@ -286,7 +286,7 @@ export default function OrderTracker() {
                         </p>
                         <time className="text-xs text-gray flex-shrink-0">{formatDate(historyItem.timestamp)}</time>
                       </div>
-                      <p className="text-sm text-gray-600">{historyItem.message || "Status updated"}</p>
+                      <p className="text-sm text-gray">{historyItem.message || "Status updated"}</p>
                     </div>
                   </div>
                 ))}
@@ -295,7 +295,7 @@ export default function OrderTracker() {
 
           {/* Order Items */}
           <div className="space-y-4">
-            <h3 className="text-base font-medium text-gray-900 mb-4">Items Ordered</h3>
+            <h3 className="text-base font-medium mb-4">Items Ordered</h3>
             {orderData.items.map((item, index) => {
               if (item.type === "product") {
                 // Render product items with CartItemList design
