@@ -199,7 +199,7 @@ export default function OrderTracker() {
             <div className="relative max-w-2xl mx-auto">
               <div className="absolute top-[9px] left-[10px] right-[10px] h-0.5 bg-lightgray-dimmed rounded-full"></div>
               <div
-                className="absolute top-3 left-[10px] h-0.5 bg-blue rounded-full transition-all duration-700"
+                className="absolute top-3 left-[10px] h-0.5 bg-blue-500 rounded-full transition-all duration-700"
                 style={{
                   width: `calc(${
                     (statusOptions.indexOf(orderData.tracking.currentStatus.toLowerCase()) /
@@ -217,9 +217,9 @@ export default function OrderTracker() {
                       <div
                         className={`rounded-full h-5 w-5 flex items-center justify-center mb-2 transition-all duration-300 ${
                           isActive
-                            ? "bg-blue ring-4 ring-blue-100 shadow-sm"
+                            ? "bg-blue-500 ring-4 ring-blue-100 shadow-sm"
                             : isCompleted
-                            ? "bg-blue"
+                            ? "bg-blue-500"
                             : "bg-lightgray-dimmed"
                         }`}
                       >
@@ -277,7 +277,7 @@ export default function OrderTracker() {
                 .map((historyItem, index) => (
                   <div key={index} className="flex gap-3">
                     <div className="flex-shrink-0 mt-1.5">
-                      <div className="w-2 h-2 bg-blue rounded-full"></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
