@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Info, Mail } from "lucide-react";
+import { ChevronDown, ChevronUp, Info } from "lucide-react";
 
 export default function OrderTrackingGuide() {
   const [expandedSection, setExpandedSection] = useState(null);
