@@ -96,7 +96,7 @@ export default function OrderTrackingGuide() {
                           <li className="flex items-start">
                             <span className="text-gray-400 mr-2">•</span>
                             <span>
-                              Look for "Invoice ID" in the transaction details (e.g., "21769B81 — enter at
+                              Look for "Invoice ID" in the transaction details (e.g., "C4O8B1T3 — enter at
                               cherlygood.com/track")
                             </span>
                           </li>
@@ -136,7 +136,7 @@ export default function OrderTrackingGuide() {
                               <li>2. Look for "Cherlygood" payment in your recent activity</li>
                               <li>3. Tap the transaction (shows "Completed" status)</li>
                               <li>4. In payment details, tap "Show payment info" button</li>
-                              <li>5. Find "Merchant order ID" (e.g., "21769B81 — enter at cherlygood.com/track")</li>
+                              <li>5. Find "Merchant order ID" (e.g., "C4O8B1T3 — enter at cherlygood.com/track")</li>
                             </ol>
                           </div>
                           <div className="bg-gray-100 rounded-lg p-3">
@@ -208,7 +208,7 @@ export default function OrderTrackingGuide() {
                     <ul className="space-y-2 text-gray-600 text-sm mb-3">
                       <li className="flex items-start">
                         <span className="text-gray-400 mr-2">•</span>
-                        <span>Enter the complete Invoice ID in the search field (e.g., "21769B81")</span>
+                        <span>Enter the complete Invoice ID in the search field (e.g., "C4O8B1T3")</span>
                       </li>
                       <li className="flex items-start">
                         <span className="text-gray-400 mr-2">•</span>
@@ -217,7 +217,7 @@ export default function OrderTrackingGuide() {
                     </ul>
                     <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                       <p className="text-xs text-yellow-800">
-                        <strong>⚠️ Note:</strong> Enter only the Invoice ID number (like "21769B81"), not the full text
+                        <strong>⚠️ Note:</strong> Enter only the Invoice ID number (like "C4O8B1T3"), not the full text
                         with instructions.
                       </p>
                     </div>
