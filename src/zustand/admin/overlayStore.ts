@@ -110,15 +110,12 @@ const OVERLAY_CONFIG = {
       "orderConfirmedEmailPreview",
       "orderShippedEmailPreview",
       "orderDeliveredEmailPreview",
+      "orderTracking",
     ]),
   },
   newsletter: {
     name: "newsletter",
-    overlays: createOverlays([
-      "sendNewsletter",
-      "createNewsletter",
-      "editNewsletter",
-    ]),
+    overlays: createOverlays(["sendNewsletter", "createNewsletter", "editNewsletter"]),
   },
 } as const;
 
