@@ -490,42 +490,6 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
             </div>
           </div>
         </div>
-
-        {/* Current Status Card */}
-        <div className="bg-gray-50 rounded-lg p-4 mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="flex items-center">
-                <StatusIcon status={order.tracking.currentStatus} />
-                <div>
-                  <div className="font-medium text-gray-900 capitalize">
-                    {getStatusLabel(order.tracking.currentStatus)}
-                  </div>
-                  <div className="text-xs text-gray-500">Current status</div>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              {(order.tracking.trackingNumber || order.tracking.estimatedDeliveryRange) && (
-                <div className="text-right">
-                  {order.tracking.trackingNumber && (
-                    <div className="text-sm font-medium text-gray-900 font-mono">{order.tracking.trackingNumber}</div>
-                  )}
-                  {order.tracking.estimatedDeliveryRange && (
-                    <div className="text-sm text-gray-500">
-                      Delivery:{" "}
-                      <span className="font-medium">{formatDateRange(order.tracking.estimatedDeliveryRange)}</span>
-                    </div>
-                  )}
-                </div>
-              )}
-              <button className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-white rounded-md transition-colors">
-                <Edit3 className="h-3.5 w-3.5" />
-                Edit
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Overlays */}
