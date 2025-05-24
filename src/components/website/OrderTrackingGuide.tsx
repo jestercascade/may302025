@@ -36,8 +36,6 @@ export default function OrderTrackingGuide() {
           <div className="px-5 pt-4 pb-2">
             <h2 className="text-xl text-center font-semibold">How to Track Your Order</h2>
           </div>
-
-          {/* Desktop/Mobile Toggle */}
           <div className="px-5 pb-3">
             <div className="flex items-center justify-center gap-1 bg-gray-100 rounded-lg p-1 w-fit mx-auto">
               <button
@@ -60,7 +58,6 @@ export default function OrderTrackingGuide() {
               </button>
             </div>
           </div>
-
           <div className="px-5 pb-5">
             <p className="text-gray text-sm text-center mb-3">
               Follow these simple steps to track your order status and estimated delivery.
@@ -83,7 +80,6 @@ export default function OrderTrackingGuide() {
                     <ChevronDown size={16} className="text-gray" />
                   )}
                 </button>
-
                 {expandedSection === "step1" && (
                   <div className="pb-4 pl-9 pr-2">
                     <ul className="space-y-2 text-gray-600 text-sm mb-4">
@@ -96,8 +92,6 @@ export default function OrderTrackingGuide() {
                         <span>Look for the "Invoice ID" in transaction details</span>
                       </li>
                     </ul>
-
-                    {/* PayPal Receipt Images */}
                     {viewMode === "desktop" ? (
                       <div className="space-y-3">
                         <div className="bg-gray-200 rounded-lg h-32 flex items-center justify-center text-gray-500 text-sm">
@@ -123,7 +117,6 @@ export default function OrderTrackingGuide() {
                   </div>
                 )}
               </div>
-
               <div>
                 <button
                   onClick={() => toggleSection("step2")}
@@ -141,7 +134,6 @@ export default function OrderTrackingGuide() {
                     <ChevronDown size={16} className="text-gray" />
                   )}
                 </button>
-
                 {expandedSection === "step2" && (
                   <div className="pb-4 pl-9 pr-2">
                     <ul className="space-y-2 text-gray-600 text-sm">
@@ -159,7 +151,6 @@ export default function OrderTrackingGuide() {
                   </div>
                 )}
               </div>
-
               <div>
                 <button
                   onClick={() => toggleSection("step3")}
@@ -177,7 +168,6 @@ export default function OrderTrackingGuide() {
                     <ChevronDown size={16} className="text-gray" />
                   )}
                 </button>
-
                 {expandedSection === "step3" && (
                   <div className="pb-4 pl-9 pr-2">
                     <ul className="space-y-2 text-gray-600 text-sm">
@@ -193,7 +183,6 @@ export default function OrderTrackingGuide() {
                   </div>
                 )}
               </div>
-
               <div>
                 <button
                   onClick={() => toggleSection("step4")}
@@ -211,7 +200,6 @@ export default function OrderTrackingGuide() {
                     <ChevronDown size={16} className="text-gray" />
                   )}
                 </button>
-
                 {expandedSection === "step4" && (
                   <div className="pb-4 pl-9 pr-2">
                     <ul className="space-y-2 text-gray-600 text-sm">
