@@ -7,7 +7,8 @@ import { EmailType } from "@/lib/sharedTypes";
 import { getProducts } from "@/actions/get/products";
 import clsx from "clsx";
 import { OrderTrackingButton, OrderTrackingOverlay } from "@/components/admin/OrderTrackingOverlay";
-import { Package, Truck, CheckCircle, Clock } from "lucide-react";
+import { Package, Truck, CheckCircle, Clock, Check, PackageCheck, Edit3 } from "lucide-react";
+import React from "react";
 
 const PAYPAL_BASE_URL = "https://www.sandbox.paypal.com/unifiedtransactions/details/payment/";
 
@@ -20,8 +21,6 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
     return <div>Order not found</div>;
   }
   const order: OrderType = orders[0];
-
-  await updateUpsellProductNames(order);
 
   function formatOrderPlacedDate(timestamp: string, timeZone = "Europe/Athens"): string {
     const date = new Date(timestamp);
@@ -74,6 +73,23 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
   function getPayPalUrl(transactionId: string) {
     return `${PAYPAL_BASE_URL}${transactionId}`;
   }
+
+  const StatusIcon = ({ status }: { status: string }) => {
+    const statusUpper = status.toUpperCase();
+
+    switch (statusUpper) {
+      case "PENDING":
+        return <Clock className="h-5 w-5 mr-3 text-amber-600" />;
+      case "CONFIRMED":
+        return <CheckCircle className="h-5 w-5 mr-3 text-blue-600" />;
+      case "SHIPPED":
+        return <Truck className="h-5 w-5 mr-3 text-indigo-600" />;
+      case "DELIVERED":
+        return <PackageCheck className="h-5 w-5 mr-3 text-green-600" />;
+      default:
+        return <Clock className="h-5 w-5 mr-3 text-gray-500" />;
+    }
+  };
 
   const orderPlacedDate = formatOrderPlacedDate(order.timestamp);
   const paypalUrl = getPayPalUrl(order.transactionId);
@@ -200,7 +216,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
           </div>
         </div>
 
-        {/* Status Updates Section */}
+        {/* Email Updates Section */}
         <div>
           <div className="mb-6">
             <h2 className="font-semibold text-xl mb-3">Status updates</h2>
@@ -359,11 +375,14 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                   <div className="bg-gray-50 rounded-lg p-4 mb-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
-                        <div>
-                          <div className="font-medium text-gray-900 capitalize">
-                            {getStatusLabel(order.tracking.currentStatus)}
+                        <div className="flex items-center">
+                          <StatusIcon status={order.tracking.currentStatus} />
+                          <div>
+                            <div className="font-medium text-gray-900 capitalize">
+                              {getStatusLabel(order.tracking.currentStatus)}
+                            </div>
+                            <div className="text-xs text-gray-500">Current status</div>
                           </div>
-                          <div className="text-sm text-gray-500">Current status</div>
                         </div>
                       </div>
                       {(order.tracking.trackingNumber || order.tracking.estimatedDeliveryRange) && (
@@ -385,19 +404,18 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                       )}
                     </div>
                   </div>
-
                   {/* Progress Bar */}
-                  <div className="mb-6">
-                    <div className="relative">
-                      <div className="absolute top-2 left-2 right-2 h-0.5 bg-gray-200 rounded-full"></div>
+                  <div className="py-6">
+                    <div className="relative max-w-2xl mx-auto px-[10px]">
+                      <div className="absolute top-[9px] left-[10px] right-[10px] h-0.5 bg-gray-300 rounded-full"></div>
                       <div
-                        className="absolute top-2 left-0 h-0.5 bg-blue-500 rounded-full transition-all duration-1000 ease-out"
+                        className="absolute top-[9px] left-0 h-0.5 bg-blue-500 rounded-full transition-all duration-700"
                         style={{
-                          width: `calc(${
+                          width: `${
                             ((statusOptions.findIndex((opt) => opt.value === order.tracking.currentStatus) + 1) /
                               statusOptions.length) *
                             100
-                          }% - 8px)`,
+                          }%`,
                         }}
                       ></div>
                       <div className="relative flex justify-between">
@@ -407,22 +425,23 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                           );
                           const isCompleted = currentStatusIndex >= index;
                           const isActive = index === currentStatusIndex;
+
                           return (
                             <div key={status.value} className="flex flex-col items-center">
                               <div
-                                className={`rounded-full h-4 w-4 flex items-center justify-center mb-2 transition-all duration-500 ${
+                                className={`rounded-full h-5 w-5 flex items-center justify-center mb-2 transition-all duration-300 ${
                                   isActive
-                                    ? "bg-blue-500 ring-3 ring-blue-100"
+                                    ? "bg-blue-500 ring-4 ring-blue-100 shadow-sm"
                                     : isCompleted
                                     ? "bg-blue-500"
-                                    : "bg-gray-200"
+                                    : "bg-gray-300"
                                 }`}
                               >
-                                {isCompleted && <div className="w-1.5 h-1.5 bg-white rounded-full"></div>}
+                                {isCompleted && <Check color="#ffffff" size={14} />}
                               </div>
                               <div
-                                className={`text-xs font-medium text-center leading-tight ${
-                                  isCompleted ? "text-gray-700" : "text-gray-400"
+                                className={`text-xs font-medium text-center ${
+                                  isCompleted ? "text-gray-900" : "text-gray-400"
                                 }`}
                               >
                                 {status.label}
@@ -435,33 +454,30 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                   </div>
 
                   {/* Timeline Section */}
-                  <div className="border-t border-gray-100 pt-5">
-                    <div className="space-y-3">
-                      {order.tracking.statusHistory
+                  <div className="mb-8">
+                    <h3 className="text-base font-medium text-gray-900 mb-4">Order Timeline</h3>
+                    <div className="space-y-4">
+                      {(order.tracking?.statusHistory || [])
                         .slice()
                         .reverse()
                         .map((historyItem, index) => (
                           <div key={index} className="flex gap-3">
-                            <div className="flex-shrink-0 mt-1.5 relative">
-                              <div
-                                className={`w-2 h-2 rounded-full ${index === 0 ? "bg-blue-500" : "bg-gray-300"}`}
-                              ></div>
-                              {index !== order.tracking.statusHistory.length - 1 && (
-                                <div className="absolute top-3 left-1 w-px h-6 bg-gray-200"></div>
-                              )}
+                            <div className="flex-shrink-0 mt-1.5">
+                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                             </div>
-                            <div className="flex-1 min-w-0 pb-3">
+                            <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between mb-1">
-                                <p className="text-sm font-medium text-gray-900 capitalize">
-                                  {getStatusLabel(historyItem.status)}
+                                <p className="text-sm font-medium text-gray-900">
+                                  {historyItem?.status
+                                    ? historyItem.status.charAt(0).toUpperCase() +
+                                      historyItem.status.slice(1).toLowerCase()
+                                    : "Status Update"}
                                 </p>
-                                <time className="text-xs text-gray-500 flex-shrink-0 font-mono">
+                                <time className="text-xs text-gray flex-shrink-0">
                                   {formatDate(historyItem.timestamp)}
                                 </time>
                               </div>
-                              {historyItem.message && (
-                                <p className="text-sm text-gray-600 leading-relaxed">{historyItem.message}</p>
-                              )}
+                              <p className="text-sm text-gray">{historyItem?.message || "Status updated"}</p>
                             </div>
                           </div>
                         ))}
@@ -474,55 +490,51 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
             </div>
           </div>
         </div>
+
+        {/* Current Status Card */}
+        <div className="bg-gray-50 rounded-lg p-4 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="flex items-center">
+                <StatusIcon status={order.tracking.currentStatus} />
+                <div>
+                  <div className="font-medium text-gray-900 capitalize">
+                    {getStatusLabel(order.tracking.currentStatus)}
+                  </div>
+                  <div className="text-xs text-gray-500">Current status</div>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              {(order.tracking.trackingNumber || order.tracking.estimatedDeliveryRange) && (
+                <div className="text-right">
+                  {order.tracking.trackingNumber && (
+                    <div className="text-sm font-medium text-gray-900 font-mono">{order.tracking.trackingNumber}</div>
+                  )}
+                  {order.tracking.estimatedDeliveryRange && (
+                    <div className="text-sm text-gray-500">
+                      Delivery:{" "}
+                      <span className="font-medium">{formatDateRange(order.tracking.estimatedDeliveryRange)}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+              <button className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-white rounded-md transition-colors">
+                <Edit3 className="h-3.5 w-3.5" />
+                Edit
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Overlays */}
       <EmailPreviewOverlay emailType={EmailType.ORDER_CONFIRMED} email={order.emails.confirmed} orderId={order.id} />
       <EmailPreviewOverlay emailType={EmailType.ORDER_SHIPPED} email={order.emails.shipped} orderId={order.id} />
       <EmailPreviewOverlay emailType={EmailType.ORDER_DELIVERED} email={order.emails.delivered} orderId={order.id} />
-      <OrderTrackingOverlay order={order} />
+      {/* <OrderTrackingOverlay order={order} /> */}
     </>
   );
-}
-
-async function updateUpsellProductNames(order: OrderType) {
-  const upsellProductIds: string[] = [];
-
-  order.items.forEach((item) => {
-    if (item.type === "upsell") {
-      item.products.forEach((product) => {
-        upsellProductIds.push(product.id);
-      });
-    }
-  });
-
-  let upsellProducts;
-  if (upsellProductIds.length > 0) {
-    try {
-      upsellProducts = await getProducts({
-        ids: upsellProductIds,
-        fields: ["name"],
-        visibility: "PUBLISHED",
-      });
-    } catch (error) {
-      console.error("Failed to fetch upsell product names", error);
-      return;
-    }
-  }
-
-  const productNameMap =
-    upsellProducts?.reduce((map, product) => {
-      map[product.id] = product.name;
-      return map;
-    }, {} as { [key: string]: string }) || {};
-
-  order.items.forEach((item) => {
-    if (item.type === "upsell") {
-      item.products.forEach((product) => {
-        product.name = productNameMap[product.id] || product.name;
-      });
-    }
-  });
 }
 
 type OrderType = {
