@@ -1,4 +1,4 @@
-import { adminDb } from "@/lib/firebase/admin";
+import { getOrders } from "@/actions/get/orders";
 import { capitalizeFirstLetter, formatThousands } from "@/lib/utils/common";
 import Image from "next/image";
 import Link from "next/link";
@@ -6,30 +6,24 @@ import { EmailPreviewButton, EmailPreviewOverlay } from "@/components/admin/Orde
 import { EmailType } from "@/lib/sharedTypes";
 import { getProducts } from "@/actions/get/products";
 import clsx from "clsx";
-import { appConfig } from "@/config";
 
 const PAYPAL_BASE_URL = "https://www.sandbox.paypal.com/unifiedtransactions/details/payment/";
 
 export default async function OrderDetails({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const response = await fetch(`${appConfig.BASE_URL}/api/paypal/orders/${id}`, {
-    cache: "no-store",
-  });
 
-  if (!response.ok) {
-    console.error("Failed to fetch order details", response);
-    return <div>Error fetching order details</div>;
+  // Fetch order directly from Firestore using getOrders
+  const orders = await getOrders({ ids: [id] });
+  if (!orders || orders.length === 0) {
+    console.error(`Order with ID ${id} not found`);
+    return <div>Order not found</div>;
   }
-
-  const paypalOrder: OrderDetailsType = await response.json();
-  const order = (await getOrderById(paypalOrder.id)) as PaymentTransaction;
+  const order: OrderType = orders[0];
 
   await updateUpsellProductNames(order);
 
-  function formatOrderPlacedDate(order: OrderDetailsType, timeZone = "Europe/Athens"): string {
-    const createTime = order.purchase_units[0].payments.captures[0].create_time;
-    const date = new Date(createTime);
-
+  function formatOrderPlacedDate(timestamp: string, timeZone = "Europe/Athens"): string {
+    const date = new Date(timestamp);
     return date
       .toLocaleString("en-US", {
         year: "numeric",
@@ -43,13 +37,12 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
       .replace("24:", "00:");
   }
 
-  function getPayPalUrl(captureId: string) {
-    return `${PAYPAL_BASE_URL}${captureId}`;
+  function getPayPalUrl(transactionId: string) {
+    return `${PAYPAL_BASE_URL}${transactionId}`;
   }
 
-  const orderPlacedDate = formatOrderPlacedDate(paypalOrder);
-  const captureId = paypalOrder.purchase_units[0].payments.captures[0].id;
-  const paypalUrl = getPayPalUrl(captureId);
+  const orderPlacedDate = formatOrderPlacedDate(order.timestamp);
+  const paypalUrl = getPayPalUrl(order.transactionId);
 
   const formatOptions = (
     options: Record<string, { value: string; optionDisplayOrder: number; groupDisplayOrder: number }>,
@@ -101,10 +94,10 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                   <div
                     className={clsx(
                       "inline-flex px-3 py-1 rounded-full text-sm font-medium",
-                      paypalOrder.status.toUpperCase() === "COMPLETED" ? "bg-green-100 text-green-700" : "bg-gray-100"
+                      order.status.toUpperCase() === "COMPLETED" ? "bg-green-100 text-green-700" : "bg-gray-100"
                     )}
                   >
-                    {capitalizeFirstLetter(paypalOrder.status)}
+                    {capitalizeFirstLetter(order.status)}
                   </div>
                 </div>
                 <div className="flex gap-5 text-sm">
@@ -113,23 +106,18 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                 </div>
                 <div className="flex gap-5 text-sm">
                   <h3 className="min-w-[78px] max-w-[78px] text-gray">Total</h3>
-                  <span className="w-full font-medium">${paypalOrder.purchase_units[0].amount.value}</span>
+                  <span className="w-full font-medium">${order.amount.value}</span>
                 </div>
               </div>
               <div className="flex flex-col gap-4 py-5 border-b">
                 <div className="flex gap-5 text-sm">
                   <h3 className="min-w-[78px] max-w-[78px] text-gray">Shipping</h3>
                   <div className="flex flex-col gap-1 font-medium">
+                    <span>{order.shipping.address.line1}</span>
                     <span>
-                      {paypalOrder.purchase_units[0].shipping.address.address_line_1},{" "}
-                      {paypalOrder.purchase_units[0].shipping.address.address_line_2}
+                      {order.shipping.address.city}, {order.shipping.address.state} {order.shipping.address.postalCode}
                     </span>
-                    <span>
-                      {paypalOrder.purchase_units[0].shipping.address.admin_area_2},{" "}
-                      {paypalOrder.purchase_units[0].shipping.address.admin_area_1}{" "}
-                      {paypalOrder.purchase_units[0].shipping.address.postal_code}
-                    </span>
-                    <span>{paypalOrder.purchase_units[0].shipping.address.country_code}</span>
+                    <span>{order.shipping.address.country}</span>
                   </div>
                 </div>
               </div>
@@ -137,19 +125,19 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                 <div className="flex gap-5 text-sm">
                   <h3 className="min-w-[78px] max-w-[78px] text-gray">Customer</h3>
                   <span className="w-full font-medium">
-                    {paypalOrder.payer.name.given_name} {paypalOrder.payer.name.surname}
+                    {order.payer.name.firstName} {order.payer.name.lastName}
                   </span>
                 </div>
                 <div className="flex gap-5 text-sm">
                   <h3 className="min-w-[78px] max-w-[78px] text-gray">Email</h3>
-                  <span className="w-full font-medium break-all">{paypalOrder.payer.email_address}</span>
+                  <span className="w-full font-medium break-all">{order.payer.email}</span>
                 </div>
               </div>
               <div className="flex flex-col gap-4 py-5">
                 <div className="flex gap-5 text-sm">
                   <h3 className="min-w-[78px] max-w-[78px] text-gray">ID</h3>
                   <Link href={paypalUrl} target="_blank">
-                    <span className="w-full text-gray text-xs underline">{captureId}</span>
+                    <span className="w-full text-gray text-xs underline">{order.transactionId}</span>
                   </Link>
                 </div>
               </div>
@@ -274,7 +262,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                               </div>
                               <div className="space-y-3">
                                 <Link
-                                  href={`${product.slug}-${product.id}`}
+                                  href={`/${product.slug}-${product.id}`}
                                   target="_blank"
                                   className="text-xs line-clamp-1 hover:underline"
                                 >
@@ -304,32 +292,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
 
 // -- Logic & Utilities --
 
-async function getOrderById(id: string): Promise<OrderType | null> {
-  if (!id) {
-    return null;
-  }
-
-  const docRef = adminDb.collection("orders").doc(id);
-  const snapshot = await docRef.get();
-
-  if (!snapshot.exists) {
-    return null;
-  }
-
-  const data = snapshot.data();
-  if (!data) {
-    return null;
-  }
-
-  const order = {
-    id: snapshot.id,
-    ...data,
-  } as OrderType;
-
-  return order;
-}
-
-async function updateUpsellProductNames(order: PaymentTransaction) {
+async function updateUpsellProductNames(order: OrderType) {
   const upsellProductIds: string[] = [];
 
   order.items.forEach((item) => {
@@ -371,212 +334,12 @@ async function updateUpsellProductNames(order: PaymentTransaction) {
 
 // -- Type Definitions --
 
-type OrderDetailsType = {
+// Assuming OrderType is imported or defined elsewhere as per your provided type
+// Here's a simplified version for completeness, but use your actual OrderType
+type OrderType = {
   id: string;
-  intent: string;
-  status: string;
-  payment_source: {
-    paypal: {
-      email_address: string;
-      account_id: string;
-      account_status: string;
-      name: {
-        given_name: string;
-        surname: string;
-      };
-      phone_number: {
-        national_number: string;
-      };
-      address: {
-        country_code: string;
-      };
-      attributes: {
-        cobranded_cards: Array<{
-          labels: any[];
-          payee: {
-            email_address: string;
-            merchant_id: string;
-          };
-          amount: {
-            currency_code: string;
-            value: string;
-          };
-        }>;
-      };
-    };
-  };
-  purchase_units: Array<{
-    reference_id: string;
-    amount: {
-      currency_code: string;
-      value: string;
-      breakdown: {
-        item_total: {
-          currency_code: string;
-          value: string;
-        };
-        shipping: {
-          currency_code: string;
-          value: string;
-        };
-        handling: {
-          currency_code: string;
-          value: string;
-        };
-        insurance: {
-          currency_code: string;
-          value: string;
-        };
-        shipping_discount: {
-          currency_code: string;
-          value: string;
-        };
-        discount: {
-          currency_code: string;
-          value: string;
-        };
-      };
-    };
-    payee: {
-      email_address: string;
-      merchant_id: string;
-    };
-    description: string;
-    soft_descriptor: string;
-    items: Array<{
-      name: string;
-      unit_amount: {
-        currency_code: string;
-        value: string;
-      };
-      tax: {
-        currency_code: string;
-        value: string;
-      };
-      quantity: string;
-      sku: string;
-    }>;
-    shipping: {
-      name: {
-        full_name: string;
-      };
-      address: {
-        address_line_1: string;
-        address_line_2: string;
-        admin_area_2: string;
-        admin_area_1: string;
-        postal_code: string;
-        country_code: string;
-      };
-    };
-    payments: {
-      captures: Array<{
-        id: string;
-        status: string;
-        amount: {
-          currency_code: string;
-          value: string;
-        };
-        final_capture: boolean;
-        seller_protection: {
-          status: string;
-          dispute_categories: string[];
-        };
-        seller_receivable_breakdown: {
-          gross_amount: {
-            currency_code: string;
-            value: string;
-          };
-          paypal_fee: {
-            currency_code: string;
-            value: string;
-          };
-          net_amount: {
-            currency_code: string;
-            value: string;
-          };
-        };
-        links: Array<{
-          href: string;
-          rel: string;
-          method: string;
-        }>;
-        create_time: string;
-        update_time: string;
-      }>;
-    };
-  }>;
-  payer: {
-    name: {
-      given_name: string;
-      surname: string;
-    };
-    email_address: string;
-    payer_id: string;
-    phone: {
-      phone_number: {
-        national_number: string;
-      };
-    };
-    address: {
-      country_code: string;
-    };
-  };
-  update_time: string;
-  links: Array<{
-    href: string;
-    rel: string;
-    method: string;
-  }>;
-};
-
-type ProductType = {
-  slug: string;
-  type: "product";
-  mainImage: string;
-  pricing: {
-    basePrice: number;
-    salePrice: number;
-    discountPercentage: number;
-  };
-  selectedOptions: Record<string, { value: string; optionDisplayOrder: number; groupDisplayOrder: number }>;
-  index: number;
-  baseProductId: string;
-  variantId: string;
-  name: string;
-};
-
-type UpsellType = {
-  mainImage: string;
-  index: number;
-  pricing: {
-    basePrice: number;
-    salePrice: number;
-    discountPercentage: number;
-  };
-  products: Array<{
-    mainImage: string;
-    index: number;
-    basePrice: number;
-    id: string;
-    slug: string;
-    name: string;
-    selectedOptions: Record<string, { value: string; optionDisplayOrder: number; groupDisplayOrder: number }>;
-  }>;
-  type: "upsell";
-  baseUpsellId: string;
-  variantId: string;
-};
-
-type PaymentTransaction = {
-  id: string;
-  status: string;
-  transactionId: string;
   timestamp: string;
-  amount: {
-    currency: string;
-    value: string;
-  };
+  status: string;
   payer: {
     email: string;
     payerId: string;
@@ -585,17 +348,59 @@ type PaymentTransaction = {
       lastName: string;
     };
   };
+  amount: {
+    value: string;
+    currency: string;
+  };
   shipping: {
     name: string;
     address: {
       line1: string;
-      state: string;
-      country: string;
       city: string;
+      state: string;
       postalCode: string;
+      country: string;
     };
   };
-  items: Array<ProductType | UpsellType>;
+  transactionId: string;
+  items: Array<
+    | {
+        type: "product";
+        baseProductId: string;
+        name: string;
+        slug: string;
+        pricing: {
+          basePrice: number;
+          salePrice: number;
+          discountPercentage: number;
+        };
+        mainImage: string;
+        variantId: string;
+        selectedOptions: Record<string, { value: string; optionDisplayOrder: number; groupDisplayOrder: number }>;
+        index: number;
+      }
+    | {
+        type: "upsell";
+        baseUpsellId: string;
+        variantId: string;
+        index: number;
+        mainImage: string;
+        pricing: {
+          basePrice: number;
+          salePrice: number;
+          discountPercentage: number;
+        };
+        products: Array<{
+          id: string;
+          slug: string;
+          name: string;
+          mainImage: string;
+          basePrice: number;
+          selectedOptions: Record<string, { value: string; optionDisplayOrder: number; groupDisplayOrder: number }>;
+        }>;
+      }
+  >;
+  invoiceId: string;
   emails: {
     confirmed: {
       sentCount: number;
@@ -612,5 +417,16 @@ type PaymentTransaction = {
       maxAllowed: number;
       lastSent: string | null;
     };
+  };
+  tracking: {
+    currentStatus: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "COMPLETED";
+    statusHistory: Array<{
+      status: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "COMPLETED";
+      timestamp: string;
+      message?: string;
+    }>;
+    trackingNumber?: string;
+    estimatedDeliveryDate?: string;
+    lastUpdated: string;
   };
 };
