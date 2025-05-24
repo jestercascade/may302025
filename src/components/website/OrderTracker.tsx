@@ -81,7 +81,6 @@ export default function OrderTracker() {
 
     try {
       const result = await getOrders({ invoiceIds: [invoiceId.trim()] });
-      console.log("Order data:", result);
 
       if (!result || result.length === 0) {
         setOrderData(null);
@@ -144,6 +143,17 @@ export default function OrderTracker() {
     );
   };
 
+  function normalizeInvoiceId(invoiceId: string): string {
+    const id = invoiceId?.trim().split(" ")[0];
+    const idRegex = /^[A-Za-z0-9]{8}$/;
+
+    if (!id || !idRegex.test(id)) {
+      throw new Error(`Invalid invoice ID format: ${id}. Expected 8 alphanumeric characters.`);
+    }
+
+    return id;
+  }
+
   return (
     <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200/70 overflow-hidden">
       <div className="p-6">
@@ -178,7 +188,9 @@ export default function OrderTracker() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <h2 className="text-xl font-semibold text-gray-900">Order #{invoiceId}</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    Order #{normalizeInvoiceId(orderData.invoiceId)}
+                  </h2>
                   <div
                     className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
                       orderData.tracking.currentStatus.toLowerCase() === "delivered"
