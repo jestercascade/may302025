@@ -9,7 +9,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatThousands } from "@/lib/utils/common";
 
-// Type Definitions
 type SelectedOptionType = {
   value: string;
   optionDisplayOrder: number;
@@ -421,7 +420,7 @@ export default function OrderTracker() {
                           return (
                             <div
                               key={prodIndex}
-                              className="bg-white bg-opacity-80 backdrop-blur-sm rounded-lg p-3 border border-blue-200/50 shadow-sm transition-all duration-200 hover:shadow-md hover:bg-opacity-100"
+                              className="bg-white bg-opacity-80 backdrop-blur-sm rounded-lg p-3 border border-blue-200/50 shadow-sm"
                             >
                               <div className="flex flex-col min-[580px]:flex-row gap-4">
                                 <div className="aspect-square h-[160px] min-[580px]:h-[128px]">

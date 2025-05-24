@@ -146,54 +146,32 @@ function filterOrderFields(data: any, fields: string[], id: string): OrderType {
   return filtered as OrderType;
 }
 
-/**
- * Normalize invoice ID to the format stored in Firestore
- * Handles both short format (543B2D3F) and full format (543B2D3F — enter at cherlygood.com/track)
- *
- * @param invoiceId - The invoice ID in either format
- * @returns The normalized invoice ID in full format
- */
 function normalizeInvoiceId(invoiceId: string): string {
   if (!invoiceId || typeof invoiceId !== "string") {
     throw new Error("Invoice ID must be a non-empty string");
   }
 
-  // Remove any whitespace
   const trimmed = invoiceId.trim();
 
-  // Check if it already contains the suffix
   const suffix = " — enter at cherlygood.com/track";
   if (trimmed.includes(" — enter at cherlygood.com/track")) {
-    // Extract just the ID part (before the suffix)
     const idPart = trimmed.split(" — enter at cherlygood.com/track")[0].trim();
 
-    // Validate the extracted ID part
     if (!isValidInvoiceIdFormat(idPart)) {
       throw new Error(`Invalid invoice ID format: ${idPart}. Expected 8 alphanumeric characters.`);
     }
 
-    // Return with properly formatted suffix
     return `${idPart}${suffix}`;
   }
 
-  // Validate the raw ID format
   if (!isValidInvoiceIdFormat(trimmed)) {
     throw new Error(`Invalid invoice ID format: ${trimmed}. Expected 8 alphanumeric characters.`);
   }
 
-  // Add the suffix to create the full format
   return `${trimmed}${suffix}`;
 }
 
-/**
- * Validate that the invoice ID matches the expected format
- * Should be exactly 8 alphanumeric characters
- *
- * @param invoiceId - The raw invoice ID to validate
- * @returns True if valid format, false otherwise
- */
 function isValidInvoiceIdFormat(invoiceId: string): boolean {
-  // Should be exactly 8 characters, alphanumeric only
   const invoiceIdRegex = /^[A-Za-z0-9]{8}$/;
   return invoiceIdRegex.test(invoiceId);
 }
