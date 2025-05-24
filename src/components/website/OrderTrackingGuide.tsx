@@ -24,7 +24,7 @@ export default function OrderTrackingGuide() {
     <div>
       <button
         onClick={toggleGuide}
-        className="flex items-center justify-center gap-1.5 mx-auto text-gray rounded-lg px-3 py-2 transition-all duration-200 text-sm font-medium"
+        className="flex items-center justify-center gap-1.5 mx-auto text-gray-600 rounded-lg px-3 py-2 transition-all duration-200 text-sm font-medium hover:bg-gray-50"
       >
         <Info size={14} />
         {showGuide ? "Hide" : "Need help?"}
@@ -34,7 +34,7 @@ export default function OrderTrackingGuide() {
       {showGuide && (
         <div className="mt-4 bg-white rounded-xl border border-gray-200/70 overflow-hidden transition-all duration-300 max-w-2xl mx-auto">
           <div className="px-5 pt-4 pb-2">
-            <h2 className="text-xl text-center font-semibold">How to Track Your Order</h2>
+            <h2 className="text-xl text-center font-semibold text-gray-900">How to Track Your Order</h2>
           </div>
           <div className="px-5 pb-3">
             <div className="flex items-center justify-center gap-1 bg-gray-100 rounded-lg p-1 w-fit mx-auto">
@@ -59,127 +59,168 @@ export default function OrderTrackingGuide() {
             </div>
           </div>
           <div className="px-5 pb-5">
-            <p className="text-gray text-sm text-center mb-3">
+            <p className="text-gray-600 text-sm text-center mb-3">
               Follow these simple steps to track your order status and estimated delivery.
             </p>
-            <div className="*:py-1 *:border-b *:border-gray-200/70">
-              <div>
+            <div className="space-y-0">
+              <div className="border-b border-gray-200/70">
                 <button
                   onClick={() => toggleSection("step1")}
                   className="w-full flex items-center justify-between py-3 text-left"
                 >
                   <div className="flex items-center">
-                    <div className="flex-shrink-0 bg-gray-100 text-gray rounded-full h-6 w-6 flex items-center justify-center font-medium mr-3 text-xs">
+                    <div className="flex-shrink-0 bg-gray-100 text-gray-700 rounded-full h-6 w-6 flex items-center justify-center font-medium mr-3 text-xs">
                       1
                     </div>
-                    <h3 className="font-medium text-sm">Find Your Invoice ID in PayPal Receipt</h3>
+                    <h3 className="font-medium text-sm text-gray-900">Find Your Invoice ID in PayPal Receipt</h3>
                   </div>
                   {expandedSection === "step1" ? (
-                    <ChevronUp size={16} className="text-gray" />
+                    <ChevronUp size={16} className="text-gray-500" />
                   ) : (
-                    <ChevronDown size={16} className="text-gray" />
+                    <ChevronDown size={16} className="text-gray-500" />
                   )}
                 </button>
                 {expandedSection === "step1" && (
                   <div className="pb-4 pl-9 pr-2">
-                    <ul className="space-y-2 text-gray-600 text-sm mb-4">
-                      <li className="flex items-start">
-                        <span className="text-gray mr-2">•</span>
-                        <span>Check your PayPal receipt email or account</span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-gray mr-2">•</span>
-                        <span>Look for the "Invoice ID" in transaction details</span>
-                      </li>
-                    </ul>
                     {viewMode === "desktop" ? (
-                      <div className="space-y-3">
-                        <div className="bg-gray-200 rounded-lg h-32 flex items-center justify-center text-gray-500 text-sm">
-                          PayPal Activity Page Screenshot
-                        </div>
-                        <div className="bg-gray-200 rounded-lg h-40 flex items-center justify-center text-gray-500 text-sm">
-                          PayPal Transaction Details Screenshot
+                      <div>
+                        <ul className="space-y-2 text-gray-600 text-sm mb-4">
+                          <li className="flex items-start">
+                            <span className="text-gray-400 mr-2">•</span>
+                            <span>Go to PayPal.com and click "Activity" in the top navigation</span>
+                          </li>
+                          <li className="flex items-start">
+                            <span className="text-gray-400 mr-2">•</span>
+                            <span>Find your Cherlygood payment transaction and click on it</span>
+                          </li>
+                          <li className="flex items-start">
+                            <span className="text-gray-400 mr-2">•</span>
+                            <span>
+                              Look for "Invoice ID" in the transaction details (e.g., "21769B81 — enter at
+                              cherlygood.com/track")
+                            </span>
+                          </li>
+                        </ul>
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <p className="text-xs text-blue-800">
+                            <strong>💡 Desktop Tip:</strong> The Invoice ID appears prominently in the transaction
+                            details page, along with instructions to "enter at cherlygood.com/track"
+                          </p>
                         </div>
                       </div>
                     ) : (
-                      <div className="space-y-3">
-                        <div className="bg-gray-200 rounded-lg h-32 flex items-center justify-center text-gray-500 text-sm">
-                          PayPal Mobile Activity Screenshot
-                        </div>
-                        <div className="bg-gray-200 rounded-lg h-40 flex items-center justify-center text-gray-500 text-sm">
-                          PayPal Mobile Transaction Details Screenshot
-                        </div>
-                        <div className="bg-gray-200 rounded-lg h-32 flex items-center justify-center text-gray-500 text-sm">
-                          PayPal Mobile Invoice ID Screenshot
+                      <div>
+                        <ul className="space-y-2 text-gray-600 text-sm mb-4">
+                          <li className="flex items-start">
+                            <span className="text-gray-400 mr-2">•</span>
+                            <span>Open PayPal app and find your Cherlygood transaction</span>
+                          </li>
+                          <li className="flex items-start">
+                            <span className="text-gray-400 mr-2">•</span>
+                            <span>Tap the transaction to open details</span>
+                          </li>
+                          <li className="flex items-start">
+                            <span className="text-gray-400 mr-2">•</span>
+                            <span>Tap the blue "Show payment info" link in the "From" section</span>
+                          </li>
+                          <li className="flex items-start">
+                            <span className="text-gray-400 mr-2">•</span>
+                            <span>Look for "Merchant order ID" - this is your Invoice ID</span>
+                          </li>
+                        </ul>
+                        <div className="space-y-3">
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                            <h4 className="font-medium text-sm text-blue-900 mb-2">Mobile Steps in Detail:</h4>
+                            <ol className="text-xs text-blue-800 space-y-1">
+                              <li>1. Open PayPal mobile app</li>
+                              <li>2. Look for "Cherlygood" payment in your recent activity</li>
+                              <li>3. Tap the transaction (shows "Completed" status)</li>
+                              <li>4. In payment details, tap "Show payment info" button</li>
+                              <li>5. Find "Merchant order ID" (e.g., "21769B81 — enter at cherlygood.com/track")</li>
+                            </ol>
+                          </div>
+                          <div className="bg-gray-100 rounded-lg p-3">
+                            <p className="text-xs text-gray-600">
+                              📱 <strong>Important:</strong> The Invoice ID is labeled as "Merchant order ID" in the
+                              mobile app's payment info modal. It will include instructions to enter it at
+                              cherlygood.com/track
+                            </p>
+                          </div>
                         </div>
                       </div>
                     )}
                   </div>
                 )}
               </div>
-              <div>
+              <div className="border-b border-gray-200/70">
                 <button
                   onClick={() => toggleSection("step2")}
                   className="w-full flex items-center justify-between py-3 text-left"
                 >
                   <div className="flex items-center">
-                    <div className="flex-shrink-0 bg-gray-100 text-gray rounded-full h-6 w-6 flex items-center justify-center font-medium mr-3 text-xs">
+                    <div className="flex-shrink-0 bg-gray-100 text-gray-700 rounded-full h-6 w-6 flex items-center justify-center font-medium mr-3 text-xs">
                       2
                     </div>
-                    <h3 className="font-medium text-sm">Go to Track Order Page</h3>
+                    <h3 className="font-medium text-sm text-gray-900">Go to Track Order Page</h3>
                   </div>
                   {expandedSection === "step2" ? (
-                    <ChevronUp size={16} className="text-gray" />
+                    <ChevronUp size={16} className="text-gray-500" />
                   ) : (
-                    <ChevronDown size={16} className="text-gray" />
+                    <ChevronDown size={16} className="text-gray-500" />
                   )}
                 </button>
                 {expandedSection === "step2" && (
                   <div className="pb-4 pl-9 pr-2">
                     <ul className="space-y-2 text-gray-600 text-sm">
                       <li className="flex items-start">
-                        <span className="text-gray mr-2">•</span>
+                        <span className="text-gray-400 mr-2">•</span>
                         <span>
-                          Visit <span className="font-medium">cherlygood.com/track</span>
+                          Visit <span className="font-medium text-blue-600">cherlygood.com/track</span>
                         </span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-gray mr-2">•</span>
-                        <span>Or click "Track Order" in main navigation</span>
+                        <span className="text-gray-400 mr-2">•</span>
+                        <span>Or click "Track Order" in the main navigation menu</span>
                       </li>
                     </ul>
                   </div>
                 )}
               </div>
-              <div>
+              <div className="border-b border-gray-200/70">
                 <button
                   onClick={() => toggleSection("step3")}
                   className="w-full flex items-center justify-between py-3 text-left"
                 >
                   <div className="flex items-center">
-                    <div className="flex-shrink-0 bg-gray-100 text-gray rounded-full h-6 w-6 flex items-center justify-center font-medium mr-3 text-xs">
+                    <div className="flex-shrink-0 bg-gray-100 text-gray-700 rounded-full h-6 w-6 flex items-center justify-center font-medium mr-3 text-xs">
                       3
                     </div>
-                    <h3 className="font-medium text-sm">Enter Your Invoice ID</h3>
+                    <h3 className="font-medium text-sm text-gray-900">Enter Your Invoice ID</h3>
                   </div>
                   {expandedSection === "step3" ? (
-                    <ChevronUp size={16} className="text-gray" />
+                    <ChevronUp size={16} className="text-gray-500" />
                   ) : (
-                    <ChevronDown size={16} className="text-gray" />
+                    <ChevronDown size={16} className="text-gray-500" />
                   )}
                 </button>
                 {expandedSection === "step3" && (
                   <div className="pb-4 pl-9 pr-2">
-                    <ul className="space-y-2 text-gray-600 text-sm">
+                    <ul className="space-y-2 text-gray-600 text-sm mb-3">
                       <li className="flex items-start">
-                        <span className="text-gray mr-2">•</span>
-                        <span>Enter complete Invoice ID in search field</span>
+                        <span className="text-gray-400 mr-2">•</span>
+                        <span>Enter the complete Invoice ID in the search field (e.g., "21769B81")</span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-gray mr-2">•</span>
-                        <span>Click blue "Track" button to submit</span>
+                        <span className="text-gray-400 mr-2">•</span>
+                        <span>Click the blue "Track" button to submit your request</span>
                       </li>
                     </ul>
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                      <p className="text-xs text-yellow-800">
+                        <strong>⚠️ Note:</strong> Enter only the Invoice ID number (like "21769B81"), not the full text
+                        with instructions.
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -189,27 +230,31 @@ export default function OrderTrackingGuide() {
                   className="w-full flex items-center justify-between py-3 text-left"
                 >
                   <div className="flex items-center">
-                    <div className="flex-shrink-0 bg-gray-100 text-gray rounded-full h-6 w-6 flex items-center justify-center font-medium mr-3 text-xs">
+                    <div className="flex-shrink-0 bg-gray-100 text-gray-700 rounded-full h-6 w-6 flex items-center justify-center font-medium mr-3 text-xs">
                       4
                     </div>
-                    <h3 className="font-medium text-sm">View Your Order Status</h3>
+                    <h3 className="font-medium text-sm text-gray-900">View Your Order Status</h3>
                   </div>
                   {expandedSection === "step4" ? (
-                    <ChevronUp size={16} className="text-gray" />
+                    <ChevronUp size={16} className="text-gray-500" />
                   ) : (
-                    <ChevronDown size={16} className="text-gray" />
+                    <ChevronDown size={16} className="text-gray-500" />
                   )}
                 </button>
                 {expandedSection === "step4" && (
                   <div className="pb-4 pl-9 pr-2">
                     <ul className="space-y-2 text-gray-600 text-sm">
                       <li className="flex items-start">
-                        <span className="text-gray mr-2">•</span>
-                        <span>View current processing status</span>
+                        <span className="text-gray-400 mr-2">•</span>
+                        <span>View your current order processing status</span>
                       </li>
                       <li className="flex items-start">
-                        <span className="text-gray mr-2">•</span>
-                        <span>Get shipping info and delivery updates</span>
+                        <span className="text-gray-400 mr-2">•</span>
+                        <span>Get shipping information and tracking updates</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-gray-400 mr-2">•</span>
+                        <span>Check estimated delivery date for your location</span>
                       </li>
                     </ul>
                   </div>
@@ -217,7 +262,7 @@ export default function OrderTrackingGuide() {
               </div>
             </div>
             <div className="mt-6 text-center">
-              <p className="text-gray text-xs">Need help? Contact support@cherlygood.com</p>
+              <p className="text-gray-500 text-xs">Need help? Contact support@cherlygood.com</p>
             </div>
           </div>
         </div>
