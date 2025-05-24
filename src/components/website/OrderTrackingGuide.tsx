@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Info } from "lucide-react";
+import { ChevronDown, ChevronUp, Info, Monitor, Smartphone } from "lucide-react";
 
 export default function OrderTrackingGuide() {
   const [expandedSection, setExpandedSection] = useState(null);
   const [showGuide, setShowGuide] = useState(false);
+  const [viewMode, setViewMode] = useState("desktop");
 
   const toggleSection = (sectionId: any) => {
     if (expandedSection === sectionId) {
@@ -35,6 +36,31 @@ export default function OrderTrackingGuide() {
           <div className="px-5 pt-4 pb-2">
             <h2 className="text-xl text-center font-semibold">How to Track Your Order</h2>
           </div>
+
+          {/* Desktop/Mobile Toggle */}
+          <div className="px-5 pb-3">
+            <div className="flex items-center justify-center gap-1 bg-gray-100 rounded-lg p-1 w-fit mx-auto">
+              <button
+                onClick={() => setViewMode("desktop")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  viewMode === "desktop" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                <Monitor size={14} />
+                Desktop
+              </button>
+              <button
+                onClick={() => setViewMode("mobile")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                  viewMode === "mobile" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                }`}
+              >
+                <Smartphone size={14} />
+                Mobile
+              </button>
+            </div>
+          </div>
+
           <div className="px-5 pb-5">
             <p className="text-gray text-sm text-center mb-3">
               Follow these simple steps to track your order status and estimated delivery.
@@ -60,29 +86,44 @@ export default function OrderTrackingGuide() {
 
                 {expandedSection === "step1" && (
                   <div className="pb-4 pl-9 pr-2">
-                    <ul className="space-y-2 text-gray-600 text-sm">
+                    <ul className="space-y-2 text-gray-600 text-sm mb-4">
                       <li className="flex items-start">
                         <span className="text-gray mr-2">•</span>
                         <span>Check your PayPal receipt email or account</span>
                       </li>
                       <li className="flex items-start">
                         <span className="text-gray mr-2">•</span>
-                        <span>Look for the "Invoice ID" section in your transaction details</span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-gray mr-2">•</span>
-                        <span>
-                          The Invoice ID format looks like:{" "}
-                          <code className="bg-gray-50 px-1 py-0.5 rounded text-gray-600 font-medium">21769B81</code>
-                        </span>
+                        <span>Look for the "Invoice ID" in transaction details</span>
                       </li>
                     </ul>
-                    <div className="mt-3 bg-blue-50 border-l-2 border-blue-300 p-2 rounded-r-sm text-xs text-blue-700">
-                      Make sure to enter the exact ID as shown in your PayPal receipt.
-                    </div>
+
+                    {/* PayPal Receipt Images */}
+                    {viewMode === "desktop" ? (
+                      <div className="space-y-3">
+                        <div className="bg-gray-200 rounded-lg h-32 flex items-center justify-center text-gray-500 text-sm">
+                          PayPal Activity Page Screenshot
+                        </div>
+                        <div className="bg-gray-200 rounded-lg h-40 flex items-center justify-center text-gray-500 text-sm">
+                          PayPal Transaction Details Screenshot
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <div className="bg-gray-200 rounded-lg h-32 flex items-center justify-center text-gray-500 text-sm">
+                          PayPal Mobile Activity Screenshot
+                        </div>
+                        <div className="bg-gray-200 rounded-lg h-40 flex items-center justify-center text-gray-500 text-sm">
+                          PayPal Mobile Transaction Details Screenshot
+                        </div>
+                        <div className="bg-gray-200 rounded-lg h-32 flex items-center justify-center text-gray-500 text-sm">
+                          PayPal Mobile Invoice ID Screenshot
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
+
               <div>
                 <button
                   onClick={() => toggleSection("step2")}
@@ -92,7 +133,7 @@ export default function OrderTrackingGuide() {
                     <div className="flex-shrink-0 bg-gray-100 text-gray rounded-full h-6 w-6 flex items-center justify-center font-medium mr-3 text-xs">
                       2
                     </div>
-                    <h3 className="font-medium text-sm">Go to the Track Order Page</h3>
+                    <h3 className="font-medium text-sm">Go to Track Order Page</h3>
                   </div>
                   {expandedSection === "step2" ? (
                     <ChevronUp size={16} className="text-gray" />
@@ -107,17 +148,18 @@ export default function OrderTrackingGuide() {
                       <li className="flex items-start">
                         <span className="text-gray mr-2">•</span>
                         <span>
-                          Visit <span className="font-medium">cherlygood.com/track</span> directly
+                          Visit <span className="font-medium">cherlygood.com/track</span>
                         </span>
                       </li>
                       <li className="flex items-start">
                         <span className="text-gray mr-2">•</span>
-                        <span>Or click the "Track Order" link in the website's main navigation</span>
+                        <span>Or click "Track Order" in main navigation</span>
                       </li>
                     </ul>
                   </div>
                 )}
               </div>
+
               <div>
                 <button
                   onClick={() => toggleSection("step3")}
@@ -141,20 +183,17 @@ export default function OrderTrackingGuide() {
                     <ul className="space-y-2 text-gray-600 text-sm">
                       <li className="flex items-start">
                         <span className="text-gray mr-2">•</span>
-                        <span>Type your complete Invoice ID into the search field</span>
+                        <span>Enter complete Invoice ID in search field</span>
                       </li>
                       <li className="flex items-start">
                         <span className="text-gray mr-2">•</span>
-                        <span>Double-check that you've entered it correctly</span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-gray mr-2">•</span>
-                        <span>Click the blue "Track" button to submit</span>
+                        <span>Click blue "Track" button to submit</span>
                       </li>
                     </ul>
                   </div>
                 )}
               </div>
+
               <div>
                 <button
                   onClick={() => toggleSection("step4")}
@@ -178,19 +217,11 @@ export default function OrderTrackingGuide() {
                     <ul className="space-y-2 text-gray-600 text-sm">
                       <li className="flex items-start">
                         <span className="text-gray mr-2">•</span>
-                        <span>You'll see your order's current processing status</span>
+                        <span>View current processing status</span>
                       </li>
                       <li className="flex items-start">
                         <span className="text-gray mr-2">•</span>
-                        <span>Shipping information and carrier details</span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-gray mr-2">•</span>
-                        <span>Estimated delivery date when available</span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="text-gray mr-2">•</span>
-                        <span>Tracking number for shipped orders</span>
+                        <span>Get shipping info and delivery updates</span>
                       </li>
                     </ul>
                   </div>
@@ -198,7 +229,7 @@ export default function OrderTrackingGuide() {
               </div>
             </div>
             <div className="mt-6 text-center">
-              <p className="text-gray text-xs">Need additional help? Contact support@cherlygood.com</p>
+              <p className="text-gray text-xs">Need help? Contact support@cherlygood.com</p>
             </div>
           </div>
         </div>
