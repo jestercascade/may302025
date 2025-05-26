@@ -127,7 +127,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
 
   const hasTrackingDetails =
     order.tracking &&
-    (order.tracking.currentStatus || order.tracking.trackingNumber || order.tracking.estimatedDeliveryRange);
+    (order.tracking.currentStatus || order.tracking.trackingNumber || order.tracking.estimatedDeliveryDate);
 
   const statusOptions = [
     { value: "PENDING", label: "Pending" },
@@ -140,10 +140,6 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
     const option = statusOptions.find((opt) => opt.value === status);
     return option ? option.label : status;
   };
-
-  const currentStatusIndex = statusOptions.findIndex((opt) => opt.value === order.tracking.currentStatus);
-  const progressWidth =
-    currentStatusIndex >= 0 ? `calc(${((currentStatusIndex + 1) / statusOptions.length) * 100}% - 8px)` : "0%";
 
   return (
     <>
@@ -363,8 +359,8 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
           <div className="mb-6">
             <h2 className="font-semibold text-xl mb-3">Order Tracking</h2>
             <p className="text-sm md:max-w-[85%]">
-              Keep track of your order's journey from our warehouse to your doorstep. Update the status as the order
-              progresses.
+              Track the order status from warehouse to delivery. And set the estimated delivery so customers know when
+              to expect it.
             </p>
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative">
@@ -387,18 +383,18 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                           </div>
                         </div>
                       </div>
-                      {(order.tracking.trackingNumber || order.tracking.estimatedDeliveryRange) && (
+                      {(order.tracking.trackingNumber || order.tracking.estimatedDeliveryDate) && (
                         <div className="text-right">
                           {order.tracking.trackingNumber && (
                             <div className="text-sm font-medium text-gray-900 font-mono">
                               {order.tracking.trackingNumber}
                             </div>
                           )}
-                          {order.tracking.estimatedDeliveryRange && (
+                          {order.tracking.estimatedDeliveryDate && (
                             <div className="text-sm text-gray-500">
                               Delivery:{" "}
                               <span className="font-medium">
-                                {formatDateRange(order.tracking.estimatedDeliveryRange)}
+                                {formatDateRange(order.tracking.estimatedDeliveryDate)}
                               </span>
                             </div>
                           )}
@@ -499,108 +495,10 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
       <EmailPreviewOverlay emailType={EmailType.ORDER_CONFIRMED} email={order.emails.confirmed} orderId={order.id} />
       <EmailPreviewOverlay emailType={EmailType.ORDER_SHIPPED} email={order.emails.shipped} orderId={order.id} />
       <EmailPreviewOverlay emailType={EmailType.ORDER_DELIVERED} email={order.emails.delivered} orderId={order.id} />
-      {/* <OrderTrackingOverlay order={order} /> */}
+      <OrderTrackingOverlay order={order} />
     </>
   );
 }
-
-type OrderType = {
-  id: string;
-  timestamp: string;
-  status: string;
-  payer: {
-    email: string;
-    payerId: string;
-    name: {
-      firstName: string;
-      lastName: string;
-    };
-  };
-  amount: {
-    value: string;
-    currency: string;
-  };
-  shipping: {
-    name: string;
-    address: {
-      line1: string;
-      city: string;
-      state: string;
-      postalCode: string;
-      country: string;
-    };
-  };
-  transactionId: string;
-  items: Array<
-    | {
-        type: "product";
-        baseProductId: string;
-        name: string;
-        slug: string;
-        pricing: {
-          basePrice: number;
-          salePrice: number;
-          discountPercentage: number;
-        };
-        mainImage: string;
-        variantId: string;
-        selectedOptions: Record<string, { value: string; optionDisplayOrder: number; groupDisplayOrder: number }>;
-        index: number;
-      }
-    | {
-        type: "upsell";
-        baseUpsellId: string;
-        variantId: string;
-        index: number;
-        mainImage: string;
-        pricing: {
-          basePrice: number;
-          salePrice: number;
-          discountPercentage: number;
-        };
-        products: Array<{
-          id: string;
-          slug: string;
-          name: string;
-          mainImage: string;
-          basePrice: number;
-          selectedOptions: Record<string, { value: string; optionDisplayOrder: number; groupDisplayOrder: number }>;
-        }>;
-      }
-  >;
-  invoiceId: string;
-  emails: {
-    confirmed: {
-      sentCount: number;
-      maxAllowed: number;
-      lastSent: string | null;
-    };
-    shipped: {
-      sentCount: number;
-      maxAllowed: number;
-      lastSent: string | null;
-    };
-    delivered: {
-      sentCount: number;
-      maxAllowed: number;
-      lastSent: string | null;
-    };
-  };
-  tracking: {
-    currentStatus: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "COMPLETED";
-    statusHistory: Array<{
-      status: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "COMPLETED";
-      timestamp: string;
-      message?: string;
-    }>;
-    trackingNumber?: string;
-    estimatedDeliveryRange?: {
-      start: string;
-      end: string;
-    };
-    lastUpdated: string;
-  };
-};
 
 //-----------------------------------------------
 // const AdminOrderTracker = () => {
@@ -620,7 +518,7 @@ type OrderType = {
 //         }
 //       ],
 //       trackingNumber: "1Z999AA1234567890",
-//       estimatedDeliveryRange: {
+//       estimatedDeliveryDate: {
 //         start: "2025-05-30",
 //         end: "2025-06-14"
 //       },
@@ -646,7 +544,7 @@ type OrderType = {
 //   ];
 
 //   const handleEditStart = () => {
-//     const range = order.tracking.estimatedDeliveryRange;
+//     const range = order.tracking.estimatedDeliveryDate;
 //     setEditForm({
 //       status: order.tracking.currentStatus,
 //       trackingNumber: order.tracking.trackingNumber || '',
@@ -695,7 +593,7 @@ type OrderType = {
 //         currentStatus: editForm.status,
 //         statusHistory: newStatusHistory,
 //         trackingNumber: editForm.trackingNumber || null,
-//         estimatedDeliveryRange: deliveryRange,
+//         estimatedDeliveryDate: deliveryRange,
 //         lastUpdated: now
 //       }
 //     }));
@@ -814,16 +712,16 @@ type OrderType = {
 //                       </div>
 //                     </div>
 //                   </div>
-//                   {(order.tracking.trackingNumber || order.tracking.estimatedDeliveryRange) && (
+//                   {(order.tracking.trackingNumber || order.tracking.estimatedDeliveryDate) && (
 //                     <div className="text-right">
 //                       {order.tracking.trackingNumber && (
 //                         <div className="text-sm font-medium text-gray-900 font-mono">
 //                           {order.tracking.trackingNumber}
 //                         </div>
 //                       )}
-//                       {order.tracking.estimatedDeliveryRange && (
+//                       {order.tracking.estimatedDeliveryDate && (
 //                         <div className="text-sm text-gray-500">
-//                           Delivery: <span className="font-medium">{formatDateRange(order.tracking.estimatedDeliveryRange)}</span>
+//                           Delivery: <span className="font-medium">{formatDateRange(order.tracking.estimatedDeliveryDate)}</span>
 //                         </div>
 //                       )}
 //                     </div>

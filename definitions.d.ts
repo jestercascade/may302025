@@ -318,28 +318,43 @@ type OrderType = {
     };
   };
   transactionId: string;
-  items: Array<{
-    baseProductId: string;
-    name: string;
-    slug: string;
-    pricing: {
-      basePrice: number;
-      salePrice: number;
-      discountPercentage: number;
-    };
-    mainImage: string;
-    variantId: string;
-    selectedOptions: Record<
-      string,
-      {
-        value: string;
-        optionDisplayOrder: number;
-        groupDisplayOrder: number;
+  items: Array<
+    | {
+        type: "product";
+        baseProductId: string;
+        name: string;
+        slug: string;
+        pricing: {
+          basePrice: number;
+          salePrice: number;
+          discountPercentage: number;
+        };
+        mainImage: string;
+        variantId: string;
+        selectedOptions: Record<string, { value: string; optionDisplayOrder: number; groupDisplayOrder: number }>;
+        index: number;
       }
-    >;
-    index: number;
-    type: "product";
-  }>;
+    | {
+        type: "upsell";
+        baseUpsellId: string;
+        variantId: string;
+        index: number;
+        mainImage: string;
+        pricing: {
+          basePrice: number;
+          salePrice: number;
+          discountPercentage: number;
+        };
+        products: Array<{
+          id: string;
+          slug: string;
+          name: string;
+          mainImage: string;
+          basePrice: number;
+          selectedOptions: Record<string, { value: string; optionDisplayOrder: number; groupDisplayOrder: number }>;
+        }>;
+      }
+  >;
   invoiceId: string;
   emails: {
     confirmed: {
@@ -366,7 +381,10 @@ type OrderType = {
       message?: string;
     }>;
     trackingNumber?: string;
-    estimatedDeliveryDate?: string;
+    estimatedDeliveryDate?: {
+      start: string;
+      end: string;
+    };
     lastUpdated: string;
   };
 };
