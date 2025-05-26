@@ -4,10 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { EmailPreviewButton, EmailPreviewOverlay } from "@/components/admin/OrderEmailPreviewOverlay";
 import { EmailType } from "@/lib/sharedTypes";
-import { getProducts } from "@/actions/get/products";
 import clsx from "clsx";
 import { OrderTrackingButton, OrderTrackingOverlay } from "@/components/admin/OrderTrackingOverlay";
-import { Package, Truck, CheckCircle, Clock, Check, PackageCheck, Edit3, Trophy } from "lucide-react";
+import { Truck, CheckCircle, Clock, Check, PackageCheck, Trophy } from "lucide-react";
 import React from "react";
 
 const PAYPAL_BASE_URL = "https://www.sandbox.paypal.com/unifiedtransactions/details/payment/";
@@ -17,7 +16,6 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
 
   const orders = await getOrders({ ids: [id] });
   if (!orders || orders.length === 0) {
-    console.error(`Order with ID ${id} not found`);
     return <div>Order not found</div>;
   }
   const order: OrderType = orders[0];
@@ -50,23 +48,35 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
   }
 
   function formatDateRange(range?: { start: string; end: string }): string {
-    if (!range || (!range.start && !range.end)) return "Not set";
-    const formatRangeDate = (dateString: string) => {
-      if (!dateString) return null;
-      return new Date(dateString).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      });
-    };
-    const startFormatted = formatRangeDate(range.start);
-    const endFormatted = formatRangeDate(range.end);
-    if (startFormatted && endFormatted) {
-      return `${startFormatted} - ${endFormatted}`;
-    } else if (startFormatted) {
-      return `From ${startFormatted}`;
-    } else if (endFormatted) {
-      return `By ${endFormatted}`;
+    if (!range || (!range.start && !range.end)) {
+      return "Not set";
     }
+
+    const toDate = (s: string) => (s ? new Date(s) : null);
+    const start = range.start ? toDate(range.start) : null;
+    const end = range.end ? toDate(range.end) : null;
+
+    const fmtMD = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+
+    if (start && end) {
+      const sameMonth = start.getUTCFullYear() === end.getUTCFullYear() && start.getUTCMonth() === end.getUTCMonth();
+
+      if (sameMonth) {
+        const month = start.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" });
+        return `${month} ${start.getUTCDate()}–${end.getUTCDate()}`;
+      } else {
+        return `${fmtMD(start)} – ${fmtMD(end)}`;
+      }
+    }
+
+    if (start) {
+      return `From ${fmtMD(start)}`;
+    }
+
+    if (end) {
+      return `By ${fmtMD(end)}`;
+    }
+
     return "Not set";
   }
 
@@ -382,27 +392,14 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                             <div className="text-lg font-semibold capitalize">
                               {getStatusLabel(order.tracking.currentStatus)}
                             </div>
-                            <div className="text-xs text-gray">Expected delivery: May 12–17</div>
+                            {order.tracking.estimatedDeliveryDate && (
+                              <div className="text-xs text-gray">
+                                Expected delivery: {formatDateRange(order.tracking.estimatedDeliveryDate)}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
-                      {(order.tracking.trackingNumber || order.tracking.estimatedDeliveryDate) && (
-                        <div className="text-right">
-                          {order.tracking.trackingNumber && (
-                            <div className="text-sm font-medium text-gray-900 font-mono">
-                              {order.tracking.trackingNumber}
-                            </div>
-                          )}
-                          {order.tracking.estimatedDeliveryDate && (
-                            <div className="text-sm text-gray-500">
-                              Delivery:{" "}
-                              <span className="font-medium">
-                                {formatDateRange(order.tracking.estimatedDeliveryDate)}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      )}
                     </div>
                   </div>
                   {/* Progress Bar */}

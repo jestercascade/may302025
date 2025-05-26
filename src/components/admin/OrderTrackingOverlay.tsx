@@ -31,10 +31,20 @@ export function OrderTrackingOverlay({ order }: { order: OrderType }) {
   const [loading, setLoading] = useState(false);
   const [orderStatus, setOrderStatus] = useState(order.tracking.currentStatus);
   const [estimatedDeliveryStart, setEstimatedDeliveryStart] = useState<Date | null>(
-    order.tracking.estimatedDeliveryRange?.start ? new Date(order.tracking.estimatedDeliveryRange.start) : null
+    order.tracking.estimatedDeliveryDate?.start
+      ? (() => {
+          const utcDate = new Date(order.tracking.estimatedDeliveryDate.start);
+          return new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate());
+        })()
+      : null
   );
   const [estimatedDeliveryEnd, setEstimatedDeliveryEnd] = useState<Date | null>(
-    order.tracking.estimatedDeliveryRange?.end ? new Date(order.tracking.estimatedDeliveryRange.end) : null
+    order.tracking.estimatedDeliveryDate?.end
+      ? (() => {
+          const utcDate = new Date(order.tracking.estimatedDeliveryDate.end);
+          return new Date(utcDate.getUTCFullYear(), utcDate.getUTCMonth(), utcDate.getUTCDate());
+        })()
+      : null
   );
   const [trackingNumber, setTrackingNumber] = useState(order.tracking.trackingNumber || "");
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
@@ -109,11 +119,23 @@ export function OrderTrackingOverlay({ order }: { order: OrderType }) {
       tracking: {
         currentStatus: orderStatus,
         trackingNumber: trackingNumber || undefined,
-        estimatedDeliveryRange:
+        estimatedDeliveryDate:
           estimatedDeliveryStart && estimatedDeliveryEnd
             ? {
-                start: estimatedDeliveryStart.toISOString(),
-                end: estimatedDeliveryEnd.toISOString(),
+                start: new Date(
+                  Date.UTC(
+                    estimatedDeliveryStart.getFullYear(),
+                    estimatedDeliveryStart.getMonth(),
+                    estimatedDeliveryStart.getDate()
+                  )
+                ).toISOString(),
+                end: new Date(
+                  Date.UTC(
+                    estimatedDeliveryEnd.getFullYear(),
+                    estimatedDeliveryEnd.getMonth(),
+                    estimatedDeliveryEnd.getDate()
+                  )
+                ).toISOString(),
               }
             : undefined,
       },
@@ -320,103 +342,3 @@ export function OrderTrackingOverlay({ order }: { order: OrderType }) {
     </>
   );
 }
-
-// -- Type Definitions --
-
-type OrderType = {
-  id: string;
-  timestamp: string;
-  status: string;
-  payer: {
-    email: string;
-    payerId: string;
-    name: {
-      firstName: string;
-      lastName: string;
-    };
-  };
-  amount: {
-    value: string;
-    currency: string;
-  };
-  shipping: {
-    name: string;
-    address: {
-      line1: string;
-      city: string;
-      state: string;
-      postalCode: string;
-      country: string;
-    };
-  };
-  transactionId: string;
-  items: Array<
-    | {
-        type: "product";
-        baseProductId: string;
-        name: string;
-        slug: string;
-        pricing: {
-          basePrice: number;
-          salePrice: number;
-          discountPercentage: number;
-        };
-        mainImage: string;
-        variantId: string;
-        selectedOptions: Record<string, { value: string; optionDisplayOrder: number; groupDisplayOrder: number }>;
-        index: number;
-      }
-    | {
-        type: "upsell";
-        baseUpsellId: string;
-        variantId: string;
-        index: number;
-        mainImage: string;
-        pricing: {
-          basePrice: number;
-          salePrice: number;
-          discountPercentage: number;
-        };
-        products: Array<{
-          id: string;
-          slug: string;
-          name: string;
-          mainImage: string;
-          basePrice: number;
-          selectedOptions: Record<string, { value: string; optionDisplayOrder: number; groupDisplayOrder: number }>;
-        }>;
-      }
-  >;
-  invoiceId: string;
-  emails: {
-    confirmed: {
-      sentCount: number;
-      maxAllowed: number;
-      lastSent: string | null;
-    };
-    shipped: {
-      sentCount: number;
-      maxAllowed: number;
-      lastSent: string | null;
-    };
-    delivered: {
-      sentCount: number;
-      maxAllowed: number;
-      lastSent: string | null;
-    };
-  };
-  tracking: {
-    currentStatus: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "COMPLETED";
-    statusHistory: Array<{
-      status: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "COMPLETED";
-      timestamp: string;
-      message?: string;
-    }>;
-    trackingNumber?: string;
-    estimatedDeliveryRange?: {
-      start: string;
-      end: string;
-    };
-    lastUpdated: string;
-  };
-};
