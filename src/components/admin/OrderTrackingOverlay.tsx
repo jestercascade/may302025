@@ -9,6 +9,7 @@ import { ShowAlertType } from "@/lib/sharedTypes";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import clsx from "clsx";
 import DatePicker from "react-datepicker";
+import { UpdateOrderTrackingAction } from "@/actions/order-tracking";
 
 export function OrderTrackingButton() {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -119,11 +120,11 @@ export function OrderTrackingOverlay({ order }: { order: OrderType }) {
     };
 
     try {
-      // const result = await UpdateOrderTrackingAction(updatedData);
-      // showAlert({
-      //   message: result.message,
-      //   type: result.type,
-      // });
+      const result = await UpdateOrderTrackingAction(updatedData);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
     } catch (error) {
       console.error("Error updating order tracking:", error);
       showAlert({
@@ -146,7 +147,7 @@ export function OrderTrackingOverlay({ order }: { order: OrderType }) {
             <div className="w-full h-[calc(100vh-188px)] md:h-auto">
               <div className="md:hidden flex items-end justify-center pt-4 pb-2 absolute top-0 left-0 right-0 bg-white">
                 <div className="relative flex justify-center items-center w-full h-7">
-                  <h2 className="font-semibold text-lg">Basic details</h2>
+                  <h2 className="font-semibold text-lg">Order tracking</h2>
                   <button
                     onClick={() => {
                       hideOverlay({ pageName, overlayName });
@@ -167,7 +168,7 @@ export function OrderTrackingOverlay({ order }: { order: OrderType }) {
                   className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                 >
                   <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
-                  <span className="font-semibold text-sm text-blue">Basic details</span>
+                  <span className="font-semibold text-sm text-blue">Order tracking</span>
                 </button>
                 <button
                   onClick={handleSave}
@@ -276,7 +277,7 @@ export function OrderTrackingOverlay({ order }: { order: OrderType }) {
                       placeholder="Enter tracking number"
                       value={trackingNumber}
                       onChange={(e) => setTrackingNumber(e.target.value)}
-                      className="w-full h-9 px-3 rounded-md transition duration-300 ease-in-out border focus:border-neutral-400"
+                      className="w-full h-9 px-3 rounded-md border"
                     />
                   </div>
                 </div>
@@ -287,7 +288,7 @@ export function OrderTrackingOverlay({ order }: { order: OrderType }) {
                 <button
                   onClick={() => hideOverlay({ pageName, overlayName })}
                   type="button"
-                  className="h-12 px-6 rounded-full border border-neutral-300 font-medium text-neutral-700 transition duration-300 ease-in-out active:bg-neutral-50"
+                  className="h-12 px-6 rounded-full border border-neutral-300 font-medium text-neutral-700 transition-colors active:bg-neutral-50"
                 >
                   Cancel
                 </button>
