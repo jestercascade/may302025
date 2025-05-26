@@ -224,12 +224,7 @@ export function OrderTrackingOverlay({ order }: { order: OrderType }) {
                               setOrderStatus(option.value as OrderType["tracking"]["currentStatus"]);
                               setIsStatusDropdownOpen(false);
                             }}
-                            className={clsx(
-                              "w-full px-3 py-2 text-left hover:bg-neutral-50 transition-colors duration-150",
-                              {
-                                "bg-blue-50 text-blue-600": orderStatus === option.value,
-                              }
-                            )}
+                            className="w-full px-3 py-2 text-left transition-colors duration-150 hover:bg-lightgray"
                           >
                             {option.label}
                           </button>
