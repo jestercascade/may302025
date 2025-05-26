@@ -276,7 +276,12 @@ export function NewCollectionOverlay() {
                       className="h-9 w-full px-3 rounded-md flex items-center justify-between transition duration-300 ease-in-out bg-lightgray active:bg-lightgray-dimmed"
                     >
                       <span>{capitalizeFirstLetter(selectedCollectionType.toLowerCase())}</span>
-                      <ChevronDown className="-mr-[4px] stroke-gray" size={20} strokeWidth={2} />
+                      <ChevronDown
+                        size={16}
+                        className={clsx("-mr-[4px] stroke-gray transition-transform duration-200", {
+                          "rotate-180": isCollectionDropdownOpen,
+                        })}
+                      />
                     </button>
                     <div
                       className={clsx("w-full absolute top-10 z-10", {

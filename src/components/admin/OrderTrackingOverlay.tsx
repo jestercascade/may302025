@@ -190,7 +190,7 @@ export function OrderTrackingOverlay({ order }: { order: OrderType }) {
                   )}
                 </button>
               </div>
-              <div className="w-full h-full mt-[52px] md:mt-0 p-5 flex flex-col gap-5 overflow-x-hidden overflow-y-visible invisible-scrollbar">
+              <div className="w-full h-full mt-[52px] md:mt-0 p-5 flex flex-col gap-5">
                 <div className="flex flex-col gap-2">
                   <label htmlFor="orderStatus" className="text-xs text-gray">
                     Order Status
@@ -199,18 +199,23 @@ export function OrderTrackingOverlay({ order }: { order: OrderType }) {
                     <button
                       type="button"
                       onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
-                      className="w-full h-9 px-3 rounded-md border flex items-center justify-between transition duration-300 ease-in-out focus:border-neutral-400 hover:border-neutral-300"
+                      className="h-9 w-full px-3 rounded-md flex items-center justify-between transition duration-300 ease-in-out bg-lightgray active:bg-lightgray-dimmed"
                     >
                       <span className="text-left">{selectedStatusLabel}</span>
                       <ChevronDown
                         size={16}
-                        className={clsx("transition-transform duration-200", {
+                        className={clsx("-mr-[4px] stroke-gray transition-transform duration-200", {
                           "rotate-180": isStatusDropdownOpen,
                         })}
                       />
                     </button>
-                    {isStatusDropdownOpen && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-neutral-200 rounded-md shadow-lg z-50">
+                    <div
+                      className={clsx("w-full absolute top-10 z-10", {
+                        hidden: !isStatusDropdownOpen,
+                        block: isStatusDropdownOpen,
+                      })}
+                    >
+                      <div className="overflow-hidden h-full w-full py-[6px] flex flex-col gap-0 rounded-md shadow-dropdown bg-white">
                         {statusOptions.map((option) => (
                           <button
                             key={option.value}
@@ -230,7 +235,7 @@ export function OrderTrackingOverlay({ order }: { order: OrderType }) {
                           </button>
                         ))}
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
 
