@@ -79,15 +79,15 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
 
     switch (statusUpper) {
       case "PENDING":
-        return <Clock className="h-5 w-5 mr-3 text-amber-600" />;
+        return <Clock className="h-5 w-5 text-amber-600" />;
       case "CONFIRMED":
-        return <CheckCircle className="h-5 w-5 mr-3 text-blue-600" />;
+        return <CheckCircle className="h-5 w-5 text-blue-600" />;
       case "SHIPPED":
-        return <Truck className="h-5 w-5 mr-3 text-indigo-600" />;
+        return <Truck className="h-5 w-5 text-indigo-600" />;
       case "DELIVERED":
-        return <PackageCheck className="h-5 w-5 mr-3 text-green-600" />;
+        return <PackageCheck className="h-5 w-5 text-green-600" />;
       default:
-        return <Clock className="h-5 w-5 mr-3 text-gray-500" />;
+        return <Clock className="h-5 w-5 text-gray-500" />;
     }
   };
 
@@ -367,21 +367,23 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
               progresses.
             </p>
           </div>
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative">
             <div className="px-6 py-5">
               {hasTrackingDetails ? (
                 <>
                   {/* Current Status Card */}
-                  <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                    <div className="flex items-center justify-between">
+                  <div className="mb-6">
+                    <div className="space-y-2">
                       <div className="flex items-center">
-                        <div className="flex items-center">
-                          <StatusIcon status={order.tracking.currentStatus} />
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center justify-center rounded-full h-10 w-10 bg-lightgray">
+                            <StatusIcon status={order.tracking.currentStatus} />
+                          </div>
                           <div>
-                            <div className="font-medium text-gray-900 capitalize">
+                            <div className="text-lg font-semibold capitalize">
                               {getStatusLabel(order.tracking.currentStatus)}
                             </div>
-                            <div className="text-xs text-gray-500">Current status</div>
+                            <div className="text-xs text-gray">Expected delivery: May 12–17</div>
                           </div>
                         </div>
                       </div>
@@ -455,7 +457,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
 
                   {/* Timeline Section */}
                   <div className="mb-8">
-                    <h3 className="text-base font-medium text-gray-900 mb-4">Order Timeline</h3>
+                    <h3 className="text-base font-medium text-gray-900 mb-4">Status Log</h3>
                     <div className="space-y-4">
                       {(order.tracking?.statusHistory || [])
                         .slice()
@@ -463,7 +465,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                         .map((historyItem, index) => (
                           <div key={index} className="flex gap-3">
                             <div className="flex-shrink-0 mt-1.5">
-                              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                              <div className="w-2 h-2 bg-neutral-400/70 rounded-full"></div>
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between mb-1">
@@ -488,6 +490,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                 <span className="text-xs text-gray-500">No tracking details available</span>
               )}
             </div>
+            <OrderTrackingButton />
           </div>
         </div>
       </div>

@@ -5,7 +5,7 @@ import { useOverlayStore } from "@/zustand/admin/overlayStore";
 import { ArrowLeft, X, Edit3, Save, Pencil } from "lucide-react";
 import Overlay from "@/ui/Overlay";
 
-export function OrderTrackingButton({ className }: { className: string }) {
+export function OrderTrackingButton() {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const pageName = useOverlayStore((state) => state.pages.orderDetails.name);
   const overlayName = useOverlayStore((state) => state.pages.orderDetails.overlays.orderTracking.name);
@@ -14,7 +14,7 @@ export function OrderTrackingButton({ className }: { className: string }) {
     <button
       onClick={() => showOverlay({ pageName, overlayName })}
       type="button"
-      className={`w-9 h-9 rounded-full flex items-center justify-center transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray ${className}`}
+      className="w-9 h-9 absolute top-2 right-2 rounded-full flex items-center justify-center transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
     >
       <Pencil size={18} strokeWidth={1.75} />
     </button>
