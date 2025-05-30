@@ -9,7 +9,7 @@ export default function WebsiteLayout({
   return (
     <>
       <NavbarWrapper />
-      <main className="pt-[61px] md:pt-[57px] min-h-[calc(100vh-328px)]">
+      <main className="mb-24 pt-[61px] md:pt-[57px] min-h-[calc(100vh-328px)]">
         {children}
       </main>
       <Footer />
