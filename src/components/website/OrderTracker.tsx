@@ -498,7 +498,7 @@ export default function OrderTracker() {
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h2 className="text-xl font-semibold text-gray-900">
-                    Order #{orderData.invoiceId?.trim()?.split(" ")[0] || "Unknown"}
+                    Invoice #{orderData.invoiceId?.trim()?.split(" ")[0] || "Unknown"}
                   </h2>
                   <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber text-white">
                     {orderData.tracking?.currentStatus
