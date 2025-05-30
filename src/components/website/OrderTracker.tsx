@@ -576,7 +576,6 @@ export default function OrderTracker() {
           </div>
         </form>
       </div>
-
       {orderData && (
         <div className="p-6 border-t border-gray-200/70">
           <div className="bg-blue-50/50 px-6 py-5 rounded-xl">
