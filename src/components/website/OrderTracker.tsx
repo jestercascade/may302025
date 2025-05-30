@@ -3,7 +3,18 @@
 import { getOrders } from "@/actions/get/orders";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { useAlertStore } from "@/zustand/shared/alertStore";
-import { Search, CheckCircle, Truck, Package, MapPin, Check, Clock, PackageCheck, Trophy } from "lucide-react";
+import {
+  Search,
+  CheckCircle,
+  Truck,
+  Package,
+  MapPin,
+  Check,
+  Clock,
+  PackageCheck,
+  Trophy,
+  Calendar,
+} from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -43,20 +54,6 @@ type OrderUpsellItemType = {
     salePrice?: number | string;
   };
   products: UpsellProductType[];
-};
-
-type OrderItemType = OrderProductItemType | OrderUpsellItemType;
-
-type OrderType = {
-  invoiceId: string;
-  timestamp: string;
-  amount: { value: string };
-  shipping: { address: { city: string; country: string } };
-  tracking: {
-    currentStatus: string;
-    statusHistory: Array<{ status: string; timestamp: string; message?: string }>;
-  };
-  items: OrderItemType[];
 };
 
 class ValidationError extends Error {
@@ -189,6 +186,44 @@ export default function OrderTracker() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  function formatDateRange(range?: { start: string; end: string }): string {
+    if (!range || (!range.start && !range.end)) {
+      return "Not set";
+    }
+
+    const toDate = (s: string) => (s ? new Date(s) : null);
+    const start = range.start ? toDate(range.start) : null;
+    const end = range.end ? toDate(range.end) : null;
+
+    const fmtMD = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+
+    if (start && end) {
+      const sameMonth = start.getUTCFullYear() === end.getUTCFullYear() && start.getUTCMonth() === end.getUTCMonth();
+
+      if (sameMonth) {
+        const month = start.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" });
+        return `${month} ${start.getUTCDate()}–${end.getUTCDate()}`;
+      } else {
+        return `${fmtMD(start)} – ${fmtMD(end)}`;
+      }
+    }
+
+    if (start) {
+      return `From ${fmtMD(start)}`;
+    }
+
+    if (end) {
+      return `By ${fmtMD(end)}`;
+    }
+
+    return "Not set";
+  }
+
+  const shouldShowExpectedDelivery = (status: string): boolean => {
+    const normalizedStatus = status.toLowerCase();
+    return normalizedStatus !== "delivered" && normalizedStatus !== "completed";
   };
 
   const statusOptions = ["pending", "confirmed", "shipped", "delivered", "completed"];
@@ -448,7 +483,7 @@ export default function OrderTracker() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full md:w-auto px-6 py-2 rounded-lg font-medium text-white transition-all duration-200 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full md:w-auto px-6 py-2 rounded-lg font-medium text-white transition-all duration-200 bg-blue hover:bg-blue-dimmed disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? "Tracking..." : "Track"}
             </button>
@@ -456,7 +491,6 @@ export default function OrderTracker() {
         </form>
       </div>
 
-      {/*  */}
       {orderData && (
         <div className="p-6 border-t border-gray-200/70">
           <div className="bg-blue-50/50 px-6 py-5 rounded-xl">
@@ -481,6 +515,15 @@ export default function OrderTracker() {
                     {orderData.shipping?.address?.country || "Unknown"}
                   </span>
                 </div>
+                {shouldShowExpectedDelivery(orderData.tracking?.currentStatus || "") &&
+                  orderData.tracking?.estimatedDeliveryDate && (
+                    <div className="flex items-center text-sm text-blue mt-2">
+                      <Calendar className="h-4 w-4 mr-1" />
+                      <span className="font-medium">
+                        Expected delivery: {formatDateRange(orderData.tracking.estimatedDeliveryDate)}
+                      </span>
+                    </div>
+                  )}
               </div>
               <div className="text-right">
                 <div className="flex items-baseline justify-end">
@@ -625,201 +668,6 @@ export default function OrderTracker() {
           </div>
         </div>
       )}
-      {/*  */}
     </div>
   );
 }
-
-// {
-//   orderData && (
-//     <div className="p-6 border-t border-gray-200/70">
-//       <div className="bg-blue-50/50 px-6 py-5 rounded-xl">
-//         <div className="flex items-start justify-between">
-//           <div className="flex-1">
-//             <div className="flex items-center gap-3 mb-2">
-//               <h2 className="text-xl font-semibold text-gray-900">
-//                 Order #{orderData.invoiceId?.trim()?.split(" ")[0] || "Unknown"}
-//               </h2>
-//               <div
-//                 className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-//                   orderData.tracking?.currentStatus?.toLowerCase() === "delivered" ||
-//                   orderData.tracking?.currentStatus?.toLowerCase() === "completed"
-//                     ? "bg-green-100 text-green-800"
-//                     : orderData.tracking?.currentStatus?.toLowerCase() === "shipped"
-//                     ? "bg-blue-100 text-blue-800"
-//                     : orderData.tracking?.currentStatus?.toLowerCase() === "confirmed"
-//                     ? "bg-orange-100 text-orange-800"
-//                     : "bg-gray-100 text-gray-800"
-//                 }`}
-//               >
-//                 {orderData.tracking?.currentStatus
-//                   ? orderData.tracking.currentStatus.charAt(0).toUpperCase() +
-//                     orderData.tracking.currentStatus.slice(1).toLowerCase()
-//                   : "Unknown"}
-//               </div>
-//             </div>
-//             <p className="text-sm text-gray mb-1">Placed {safeFormatDate(orderData.timestamp)}</p>
-//             <div className="flex items-center text-sm text-gray">
-//               <MapPin className="h-4 w-4 mr-1" />
-//               <span>
-//                 {orderData.shipping?.address?.city || "Unknown"}, {orderData.shipping?.address?.country || "Unknown"}
-//               </span>
-//             </div>
-//           </div>
-//           <div className="text-right">
-//             <div className="flex items-baseline justify-end">
-//               <span className="text-sm leading-3 font-semibold">$</span>
-//               <span className="text-xl font-bold">{Math.floor(validateNumericValue(orderData.amount?.value))}</span>
-//               <span className="text-sm leading-3 font-semibold">
-//                 {(validateNumericValue(orderData.amount?.value) % 1).toFixed(2).substring(1)}
-//               </span>
-//             </div>
-//             <p className="text-xs text-gray">Total</p>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Status Progress */}
-//       <div className="py-6">
-//         <div className="relative max-w-2xl mx-auto px-[10px]">
-//           <div className="absolute top-[9px] left-[10px] right-[10px] h-0.5 bg-gray-300 rounded-full"></div>
-//           <div
-//             className="absolute top-[9px] left-0 h-0.5 bg-blue-500 rounded-full transition-all duration-700"
-//             style={{
-//               width: `${
-//                 ((statusOptions.indexOf(orderData.tracking?.currentStatus?.toLowerCase() || "pending") + 1) /
-//                   statusOptions.length) *
-//                 100
-//               }%`,
-//             }}
-//           ></div>
-//           <div className="relative flex justify-between">
-//             {statusOptions.map((status, index) => {
-//               const currentStatusIndex = statusOptions.indexOf(
-//                 orderData.tracking?.currentStatus?.toLowerCase() || "pending"
-//               );
-//               const isCompleted = currentStatusIndex >= index;
-//               const isActive = status === orderData.tracking?.currentStatus?.toLowerCase();
-
-//               return (
-//                 <div key={status} className="flex flex-col items-center">
-//                   <div
-//                     className={`rounded-full h-5 w-5 flex items-center justify-center mb-2 transition-all duration-300 ${
-//                       isActive
-//                         ? "bg-blue-500 ring-4 ring-blue-100 shadow-sm"
-//                         : isCompleted
-//                         ? "bg-blue-500"
-//                         : "bg-gray-300"
-//                     }`}
-//                   >
-//                     {isCompleted && <Check color="#ffffff" size={14} />}
-//                   </div>
-//                   <div className={`text-xs font-medium text-center ${isCompleted ? "text-gray-900" : "text-gray-400"}`}>
-//                     {status.charAt(0).toUpperCase() + status.slice(1)}
-//                   </div>
-//                 </div>
-//               );
-//             })}
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Status Message */}
-//       <div className="text-center mb-8">
-//         <div
-//           className={`inline-flex items-center px-4 py-3 rounded-xl text-sm ${
-//             orderData.tracking?.currentStatus?.toLowerCase() === "delivered" ||
-//             orderData.tracking?.currentStatus?.toLowerCase() === "completed"
-//               ? "bg-green-50 text-green-800 border border-green-200/50"
-//               : orderData.tracking?.currentStatus?.toLowerCase() === "shipped"
-//               ? "bg-blue-50 text-blue-800 border border-blue-200/50"
-//               : orderData.tracking?.currentStatus?.toLowerCase() === "confirmed"
-//               ? "bg-orange-50 text-orange-800 border border-orange-200/50"
-//               : "bg-gray-50 text-gray-800 border border-gray-200/50"
-//           }`}
-//         >
-//           {orderData.tracking?.currentStatus?.toLowerCase() === "pending" ? (
-//             <>
-//               <Clock className="h-4 w-4 mr-2" />
-//               Your order is pending. We will process it soon.
-//             </>
-//           ) : orderData.tracking?.currentStatus?.toLowerCase() === "confirmed" ? (
-//             <>
-//               <CheckCircle className="h-4 w-4 mr-2" />
-//               Your order has been confirmed. We're preparing it for shipment.
-//             </>
-//           ) : orderData.tracking?.currentStatus?.toLowerCase() === "shipped" ? (
-//             <>
-//               <Truck className="h-4 w-4 mr-2" />
-//               Your package is on the way! Expected delivery in 2-3 business days.
-//             </>
-//           ) : orderData.tracking?.currentStatus?.toLowerCase() === "delivered" ? (
-//             <>
-//               <PackageCheck className="h-4 w-4 mr-2" />
-//               Your package has been delivered. Thank you for your order!
-//             </>
-//           ) : orderData.tracking?.currentStatus?.toLowerCase() === "completed" ? (
-//             <>
-//               <Trophy className="h-4 w-4 mr-2" />
-//               Your order is completed. We hope you enjoy your purchase!
-//             </>
-//           ) : (
-//             <>
-//               <Package className="h-4 w-4 mr-2" />
-//               We're preparing your order. You'll receive a confirmation soon.
-//             </>
-//           )}
-//         </div>
-//       </div>
-
-//       {/* Status Log */}
-//       <div className="mb-8">
-//         <h3 className="text-base font-medium text-gray-900 mb-4">Status Log</h3>
-//         <div className="space-y-4">
-//           {(orderData.tracking?.statusHistory || [])
-//             .slice()
-//             .reverse()
-//             .map((historyItem, index) => (
-//               <div key={index} className="flex gap-3">
-//                 <div className="flex-shrink-0 mt-1.5">
-//                   <div className="w-2 h-2 bg-neutral-400/70 rounded-full"></div>
-//                 </div>
-//                 <div className="flex-1 min-w-0">
-//                   <div className="flex items-center justify-between mb-1">
-//                     <p className="text-sm font-medium text-gray-900">
-//                       {historyItem?.status
-//                         ? historyItem.status.charAt(0).toUpperCase() + historyItem.status.slice(1).toLowerCase()
-//                         : "Status Update"}
-//                     </p>
-//                     <time className="text-xs text-gray flex-shrink-0 font-mono">
-//                       {safeFormatDate(historyItem?.timestamp || "")}
-//                     </time>
-//                   </div>
-//                   <p className="text-sm text-gray">{historyItem?.message || "Status updated"}</p>
-//                 </div>
-//               </div>
-//             ))}
-//         </div>
-//       </div>
-
-//       {/* Order Items */}
-//       <div className="space-y-4">
-//         <h3 className="text-base font-medium mb-4">Items Ordered</h3>
-//         {(orderData.items || []).map((item, index) => {
-//           if (item?.type === "product") {
-//             return renderProductItem(item, index);
-//           } else if (item?.type === "upsell") {
-//             return renderUpsellItem(item, index);
-//           }
-//           return (
-//             <div key={index} className="flex gap-3">
-//               <div className="w-full p-5 rounded-lg border border-red-200 bg-red-50">
-//                 <p className="text-sm text-red-600">Unknown item type</p>
-//               </div>
-//             </div>
-//           );
-//         })}
-//       </div>
-//     </div>
-//   );
-// }
