@@ -561,7 +561,7 @@ export default function OrderTracker() {
               placeholder="Enter invoice ID"
               value={invoiceId}
               onChange={(e) => setInvoiceId(e.target.value)}
-              className="block w-full pl-10 pr-4 py-2 bg-white border rounded-lg focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all duration-200"
+              className="block w-full pl-10 pr-4 py-2 bg-white border rounded-lg focus:border-[#caced4] transition-all duration-200"
               disabled={isLoading}
             />
           </div>
@@ -569,7 +569,7 @@ export default function OrderTracker() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full md:w-auto px-6 py-2 rounded-lg font-medium text-white transition-all duration-200 bg-blue hover:bg-blue-dimmed disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full md:w-auto px-6 py-2 rounded-lg font-medium text-white transition-all duration-200 bg-[#404040] hover:bg-[#525252] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? "Tracking..." : "Track"}
             </button>
@@ -629,7 +629,7 @@ export default function OrderTracker() {
             <div className="relative max-w-2xl mx-auto px-[10px]">
               <div className="absolute top-[9px] left-[10px] right-[10px] h-0.5 bg-gray-300 rounded-full"></div>
               <div
-                className="absolute top-[9px] left-0 h-0.5 bg-black rounded-full transition-all duration-700"
+                className="absolute top-[9px] left-0 h-0.5 bg-[#404040] rounded-full transition-all duration-700"
                 style={{
                   width: `${
                     ((statusOptions.indexOf(safeString(orderData.tracking?.currentStatus).toLowerCase() || "pending") +
@@ -651,13 +651,13 @@ export default function OrderTracker() {
                     <div key={status} className="flex flex-col items-center">
                       <div
                         className={`rounded-full h-5 w-5 flex items-center justify-center mb-2 transition-all duration-300 ${
-                          isActive ? "bg-black shadow-sm" : isCompleted ? "bg-black" : "bg-gray-300"
+                          isActive ? "bg-[#404040] shadow-sm" : isCompleted ? "bg-[#404040]" : "bg-gray-300"
                         }`}
                       >
                         {isCompleted && <Check color="#ffffff" size={14} />}
                       </div>
                       <div
-                        className={`text-xs font-medium text-center ${isCompleted ? "text-gray-900" : "text-gray-400"}`}
+                        className={`text-xs font-medium text-center ${isCompleted ? "text-black" : "text-gray-400"}`}
                       >
                         {status.charAt(0).toUpperCase() + status.slice(1)}
                       </div>
