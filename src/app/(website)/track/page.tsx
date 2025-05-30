@@ -1,7 +1,7 @@
 import { NavbarWrapper } from "@/components/website/Navbar/NavbarWrapper";
 import OrderTrackingGuide from "@/components/website/OrderTrackingGuide";
 import OrderTracker from "@/components/website/OrderTracker";
-import Link from "next/link";
+import { Footer } from "@/components/website/Footer";
 
 export default async function TrackOrder() {
   return (
@@ -56,59 +56,5 @@ export default async function TrackOrder() {
       </main>
       <Footer />
     </>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="w-full py-8 border-t bg-neutral-50">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="flex flex-col items-center mb-8">
-          <nav className="flex flex-wrap justify-center mb-10">
-            <Link href="/about" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
-              About Us
-            </Link>
-            <Link href="/contact" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
-              Contact
-            </Link>
-            <Link href="/faq" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
-              FAQs
-            </Link>
-            <Link href="/privacy" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
-              Privacy
-            </Link>
-            <Link href="/terms" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
-              Terms
-            </Link>
-            <Link href="/returns" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
-              Returns
-            </Link>
-            <Link href="/track" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
-              Track Order
-            </Link>
-          </nav>
-          <div className="w-full max-w-md mb-10 rounded-xl p-6 bg-blue-600/5 border border-blue-100/65">
-            <div className="text-center mb-4">
-              <h3 className="font-semibold text-lg mb-1.5">Get the latest releases and special offers</h3>
-              <p className="text-black text-sm">Be first in line for the good stuff</p>
-            </div>
-            <div className="w-full max-w-md flex justify-center">
-              <div className="relative h-11 w-[290px]">
-                <button className="peer w-[104px] h-[40px] absolute left-[184px] top-1/2 -translate-y-1/2 rounded font-semibold text-white">
-                  Subscribe
-                </button>
-                <div className="peer-hover:bg-[#cc8100] peer-hover:[background:linear-gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] peer-active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)] w-full h-full p-[2px] rounded-lg shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear-gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000]">
-                  <input className="w-[180px] h-[40px] px-3 rounded-md" type="text" placeholder="Enter your email" />
-                </div>
-              </div>
-            </div>
-            <div className="mt-2 text-xs text-gray/90 text-center">You can unsubscribe any time</div>
-          </div>
-        </div>
-        <div className="flex justify-center text-xs text-gray">
-          <p>© {new Date().getFullYear()} Cherlygood. All rights reserved.</p>
-        </div>
-      </div>
-    </footer>
   );
 }

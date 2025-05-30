@@ -47,99 +47,56 @@ export function Footer() {
   };
 
   return (
-    <footer className="w-full pt-6 pb-24 mt-14 bg-neutral-100">
-      <div className="md:hidden px-5 mx-auto">
-        <div className="flex flex-col gap-8">
-          <div>
-            <h4 className="block text-sm mb-3">
-              Subscribe to our newsletter <br /> for exclusive deals and updates
-            </h4>
+    <footer className="w-full py-8 border-t bg-neutral-50">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="flex flex-col items-center mb-8">
+          <nav className="flex flex-wrap justify-center mb-10">
+            <Link href="/about" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
+              About Us
+            </Link>
+            <Link href="/contact" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
+              Contact
+            </Link>
+            <Link href="/faq" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
+              FAQs
+            </Link>
+            <Link href="/privacy" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
+              Privacy
+            </Link>
+            <Link href="/terms" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
+              Terms
+            </Link>
+            <Link href="/returns" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
+              Returns
+            </Link>
+            <Link href="/track" className="px-4 py-2 text-sm text-gray hover:text-black transition-colors">
+              Track Order
+            </Link>
+          </nav>
+          <div className="w-full max-w-md mb-10 rounded-xl p-6 bg-blue-600/5 border border-blue-100/65">
+            <div className="text-center mb-4">
+              <h3 className="font-semibold text-lg mb-1.5">Get the latest releases and special offers</h3>
+              <p className="text-black text-sm">Be first in line for the good stuff</p>
+            </div>
             {showSuccess ? (
               <SuccessMessage />
             ) : (
-              <NewsletterForm
-                email={email}
-                isSubmitting={isSubmitting}
-                onSubmit={handleSubmit}
-                onChange={(e) => setEmail(e.target.value)}
-              />
+              <>
+                <div className="w-full max-w-md flex justify-center">
+                  <NewsletterForm
+                    email={email}
+                    isSubmitting={isSubmitting}
+                    onSubmit={handleSubmit}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+                <div className="mt-2 text-xs text-gray/90 text-center">You can unsubscribe any time</div>
+              </>
             )}
-          </div>
-          <div className="grid grid-cols-2">
-            <div>
-              <h3 className="font-semibold mb-4">Company</h3>
-              <Link href="/about-us" className="block w-max text-sm text-gray mb-2 hover:underline">
-                About us
-              </Link>
-              <Link href="/privacy-policy" className="block w-max text-sm text-gray mb-2 hover:underline">
-                Privacy policy
-              </Link>
-              <Link href="/terms-of-use" className="block w-max text-sm text-gray mb-2 hover:underline">
-                Terms of use
-              </Link>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Get Help</h3>
-              <Link href="/contact-us" className="block w-max text-sm text-gray mb-2 hover:underline">
-                Contact us
-              </Link>
-              <Link href="/track" className="block w-max text-sm text-gray mb-2 hover:underline">
-                Track order
-              </Link>
-              <Link href="/returns-and-refunds" className="block w-max text-sm text-gray mb-2 hover:underline">
-                Returns & refunds
-              </Link>
-              <Link href="/faq" className="block w-max text-sm text-gray mb-2 hover:underline">
-                FAQ
-              </Link>
-            </div>
           </div>
         </div>
-      </div>
-      <div className="hidden md:block w-full max-w-[1040px] px-9 mx-auto">
-        <div className="flex gap-10">
-          <div className="w-full">
-            <h3 className="font-semibold mb-4">Company</h3>
-            <Link href="/about-us" className="block w-max text-sm text-gray mb-2 hover:underline">
-              About us
-            </Link>
-            <Link href="/privacy-policy" className="block w-max text-sm text-gray mb-2 hover:underline">
-              Privacy policy
-            </Link>
-            <Link href="/terms-of-use" className="block w-max text-sm text-gray mb-2 hover:underline">
-              Terms of use
-            </Link>
-          </div>
-          <div className="w-full">
-            <h3 className="font-semibold mb-4">Get Help</h3>
-            <Link href="/contact-us" className="block w-max text-sm text-gray mb-2 hover:underline">
-              Contact us
-            </Link>
-            <Link href="/track" className="block w-max text-sm text-gray mb-2 hover:underline">
-              Track order
-            </Link>
-            <Link href="/returns-and-refunds" className="block w-max text-sm text-gray mb-2 hover:underline">
-              Returns & refunds
-            </Link>
-            <Link href="/faq" className="block w-max text-sm text-gray mb-2 hover:underline">
-              FAQ
-            </Link>
-          </div>
-          <div className="min-w-[270px]">
-            <h4 className="block text-sm mb-3">
-              Subscribe to our newsletter <br /> for exclusive deals and updates
-            </h4>
-            {showSuccess ? (
-              <SuccessMessage />
-            ) : (
-              <NewsletterForm
-                email={email}
-                isSubmitting={isSubmitting}
-                onSubmit={handleSubmit}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            )}
-          </div>
+        <div className="flex justify-center text-xs text-gray">
+          <p>© {new Date().getFullYear()} Cherlygood. All rights reserved.</p>
         </div>
       </div>
     </footer>
@@ -148,7 +105,7 @@ export function Footer() {
 
 function SuccessMessage() {
   return (
-    <div className="h-7 w-[270px] flex items-center gap-2 text-sm text-green">
+    <div className="h-7 w-[270px] mx-auto flex items-center justify-center gap-2 text-sm text-green">
       <CheckCircle size={16} />
       <span>Thanks for subscribing!</span>
     </div>
@@ -167,12 +124,12 @@ function NewsletterForm({
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
-    <form onSubmit={onSubmit} className={clsx("relative h-11 w-[270px]", isSubmitting && "opacity-45")}>
+    <form onSubmit={onSubmit} className={clsx("relative h-11 w-[290px]", isSubmitting && "opacity-45")}>
       <button
         type="submit"
         disabled={isSubmitting}
         className={clsx(
-          "peer w-[104px] h-[40px] absolute left-[164px] top-1/2 -translate-y-1/2 rounded font-semibold text-white",
+          "peer w-[104px] h-[40px] absolute left-[184px] top-1/2 -translate-y-1/2 rounded font-semibold text-white",
           isSubmitting && "cursor-not-allowed"
         )}
       >
@@ -180,7 +137,7 @@ function NewsletterForm({
       </button>
       <div className="peer-hover:bg-[#cc8100] peer-hover:[background:linear-gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] peer-active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)] w-full h-full p-[2px] rounded-lg shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear-gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000]">
         <input
-          className="w-40 h-[40px] px-3 rounded-md"
+          className="w-[180px] h-[40px] px-3 rounded-md"
           type="email"
           placeholder="Enter your email"
           value={email}
