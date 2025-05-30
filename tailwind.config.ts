@@ -1,29 +1,29 @@
 import type { Config } from "tailwindcss";
 
 const customColors = {
-  gold: "#af8100",
+  gold: "#AF8100",
   amber: {
     DEFAULT: "#DB8B00",
-    dimmed: "#d38600",
+    dimmed: "#D38600",
   },
   red: {
-    DEFAULT: "#ee3b3b",
-    dimmed: "#ec2323",
+    DEFAULT: "#EE3B3B",
+    dimmed: "#EC2323",
   },
   green: {
     DEFAULT: "#0A8800",
   },
   blue: {
-    DEFAULT: "#0a5ddc",
-    dimmed: "#084db5",
+    DEFAULT: "#0A5AE6",
+    dimmed: "#084DB5",
   },
   gray: {
-    DEFAULT: "#6c6c6c",
+    DEFAULT: "#6C6C6C",
   },
   black: "#262626",
   lightgray: {
-    DEFAULT: "#f0f0f0",
-    dimmed: "#e5e5e5",
+    DEFAULT: "#F0F0F0",
+    dimmed: "#E5E5E5",
   },
   "glass-black": "#00000033", // used by Overlay.tsx
 };
