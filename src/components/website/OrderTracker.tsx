@@ -3,7 +3,7 @@
 import { getOrders } from "@/actions/get/orders";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { useAlertStore } from "@/zustand/shared/alertStore";
-import { Search, CheckCircle, Truck, Package, MapPin, Check } from "lucide-react";
+import { Search, CheckCircle, Truck, Package, MapPin, Check, Clock, PackageCheck, Trophy } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -59,7 +59,6 @@ type OrderType = {
   items: OrderItemType[];
 };
 
-// Early validation utilities
 class ValidationError extends Error {
   constructor(message: string) {
     super(message);
@@ -95,7 +94,6 @@ const validateOrderData = (data: any): OrderType => {
     throw new DataError("No order data received");
   }
 
-  // Validate required fields
   const requiredFields = ["invoiceId", "timestamp", "amount", "shipping", "tracking", "items"];
   for (const field of requiredFields) {
     if (!data[field]) {
@@ -103,7 +101,6 @@ const validateOrderData = (data: any): OrderType => {
     }
   }
 
-  // Validate nested required fields
   if (!data.amount?.value) {
     throw new DataError("Missing order amount");
   }
@@ -158,10 +155,8 @@ export default function OrderTracker() {
     setOrderData(null);
 
     try {
-      // Early validation
       const validatedId = validateInvoiceId(invoiceId);
 
-      // API call with error handling
       const result = await getOrders({ invoiceIds: [validatedId] });
 
       if (!result || result.length === 0) {
@@ -172,7 +167,6 @@ export default function OrderTracker() {
         return;
       }
 
-      // Validate the returned data
       const validatedOrder = validateOrderData(result[0]);
       setOrderData(validatedOrder);
     } catch (error) {
@@ -197,7 +191,7 @@ export default function OrderTracker() {
     }
   };
 
-  const statusOptions = ["pending", "processing", "shipped", "delivered"];
+  const statusOptions = ["pending", "confirmed", "shipped", "delivered", "completed"];
 
   const formatOptions = (options: Record<string, SelectedOptionType>, type: "product" | "upsell" = "product") => {
     try {
@@ -472,11 +466,14 @@ export default function OrderTracker() {
                   </h2>
                   <div
                     className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                      orderData.tracking?.currentStatus?.toLowerCase() === "delivered"
+                      orderData.tracking?.currentStatus?.toLowerCase() === "delivered" ||
+                      orderData.tracking?.currentStatus?.toLowerCase() === "completed"
                         ? "bg-green-100 text-green-800"
                         : orderData.tracking?.currentStatus?.toLowerCase() === "shipped"
                         ? "bg-blue-100 text-blue-800"
-                        : "bg-orange-100 text-orange-800"
+                        : orderData.tracking?.currentStatus?.toLowerCase() === "confirmed"
+                        ? "bg-orange-100 text-orange-800"
+                        : "bg-gray-100 text-gray-800"
                     }`}
                   >
                     {orderData.tracking?.currentStatus
@@ -558,35 +555,53 @@ export default function OrderTracker() {
           <div className="text-center mb-8">
             <div
               className={`inline-flex items-center px-4 py-3 rounded-xl text-sm ${
-                orderData.tracking?.currentStatus?.toLowerCase() === "delivered"
+                orderData.tracking?.currentStatus?.toLowerCase() === "delivered" ||
+                orderData.tracking?.currentStatus?.toLowerCase() === "completed"
                   ? "bg-green-50 text-green-800 border border-green-200/50"
                   : orderData.tracking?.currentStatus?.toLowerCase() === "shipped"
                   ? "bg-blue-50 text-blue-800 border border-blue-200/50"
+                  : orderData.tracking?.currentStatus?.toLowerCase() === "confirmed"
+                  ? "bg-orange-50 text-orange-800 border border-orange-200/50"
                   : "bg-gray-50 text-gray-800 border border-gray-200/50"
               }`}
             >
-              {orderData.tracking?.currentStatus?.toLowerCase() === "shipped" ? (
+              {orderData.tracking?.currentStatus?.toLowerCase() === "pending" ? (
+                <>
+                  <Clock className="h-4 w-4 mr-2" />
+                  Your order is pending. We will process it soon.
+                </>
+              ) : orderData.tracking?.currentStatus?.toLowerCase() === "confirmed" ? (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Your order has been confirmed. We're preparing it for shipment.
+                </>
+              ) : orderData.tracking?.currentStatus?.toLowerCase() === "shipped" ? (
                 <>
                   <Truck className="h-4 w-4 mr-2" />
                   Your package is on the way! Expected delivery in 2-3 business days.
                 </>
               ) : orderData.tracking?.currentStatus?.toLowerCase() === "delivered" ? (
                 <>
-                  <CheckCircle className="h-4 w-4 mr-2" />
+                  <PackageCheck className="h-4 w-4 mr-2" />
                   Your package has been delivered. Thank you for your order!
+                </>
+              ) : orderData.tracking?.currentStatus?.toLowerCase() === "completed" ? (
+                <>
+                  <Trophy className="h-4 w-4 mr-2" />
+                  Your order is completed. We hope you enjoy your purchase!
                 </>
               ) : (
                 <>
                   <Package className="h-4 w-4 mr-2" />
-                  We're preparing your order. You'll receive a shipping confirmation soon.
+                  We're preparing your order. You'll receive a confirmation soon.
                 </>
               )}
             </div>
           </div>
 
-          {/* Order Timeline */}
+          {/* Status Log */}
           <div className="mb-8">
-            <h3 className="text-base font-medium text-gray-900 mb-4">Order Timeline</h3>
+            <h3 className="text-base font-medium text-gray-900 mb-4">Status Log</h3>
             <div className="space-y-4">
               {(orderData.tracking?.statusHistory || [])
                 .slice()

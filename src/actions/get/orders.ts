@@ -34,7 +34,7 @@ const BATCH_SIZE = 10;
 export async function getOrders(options: GetOrdersOptionsType = {}): Promise<OrderType[] | null> {
   const { ids = [], invoiceIds = [], fields = [], payerEmail, transactionId } = options;
 
-  let orders: OrderType[] = [];
+  const orders: OrderType[] = [];
 
   try {
     // Fetch orders by document IDs using getAll
