@@ -609,7 +609,7 @@ export default function OrderTracker() {
                 .map((historyItem, index) => (
                   <div key={index} className="flex gap-3">
                     <div className="flex-shrink-0 mt-1.5">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <div className="w-2 h-2 bg-neutral-400/70 rounded-full"></div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
@@ -618,7 +618,7 @@ export default function OrderTracker() {
                             ? historyItem.status.charAt(0).toUpperCase() + historyItem.status.slice(1).toLowerCase()
                             : "Status Update"}
                         </p>
-                        <time className="text-xs text-gray flex-shrink-0">
+                        <time className="text-xs text-gray flex-shrink-0 font-mono">
                           {safeFormatDate(historyItem?.timestamp || "")}
                         </time>
                       </div>

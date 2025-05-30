@@ -471,7 +471,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                                       historyItem.status.slice(1).toLowerCase()
                                     : "Status Update"}
                                 </p>
-                                <time className="text-xs text-gray flex-shrink-0">
+                                <time className="text-xs text-gray flex-shrink-0 font-mono">
                                   {formatDate(historyItem.timestamp)}
                                 </time>
                               </div>
