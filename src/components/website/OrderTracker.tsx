@@ -14,6 +14,7 @@ import {
   PackageCheck,
   Trophy,
   Calendar,
+  AlertCircle,
 } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
@@ -56,78 +57,108 @@ type OrderUpsellItemType = {
   products: UpsellProductType[];
 };
 
-class ValidationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "ValidationError";
-  }
-}
-
-class DataError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "DataError";
-  }
-}
-
-const validateInvoiceId = (invoiceId: string): string => {
-  const trimmed = invoiceId?.trim();
-  if (!trimmed) {
-    throw new ValidationError("Invoice ID is required");
-  }
-
-  const id = trimmed.split(" ")[0];
-  const idRegex = /^[A-Za-z0-9]{8}$/;
-
-  if (!idRegex.test(id)) {
-    throw new ValidationError("Invoice ID must be 8 alphanumeric characters");
-  }
-
-  return id;
+type OrderType = {
+  invoiceId: string;
+  timestamp: string;
+  amount: { value: number | string };
+  shipping: {
+    address: {
+      city: string;
+      country: string;
+    };
+  };
+  tracking: {
+    currentStatus: string;
+    estimatedDeliveryDate?: { start: string; end: string };
+    statusHistory: Array<{
+      status: string;
+      timestamp: string;
+      message: string;
+    }>;
+  };
+  items: Array<OrderProductItemType | OrderUpsellItemType>;
 };
 
-const validateOrderData = (data: any): OrderType => {
-  if (!data) {
-    throw new DataError("No order data received");
-  }
-
-  const requiredFields = ["invoiceId", "timestamp", "amount", "shipping", "tracking", "items"];
-  for (const field of requiredFields) {
-    if (!data[field]) {
-      throw new DataError(`Missing required field: ${field}`);
+const validateInvoiceId = (invoiceId: string): { isValid: boolean; id?: string; error?: string } => {
+  try {
+    const trimmed = invoiceId?.trim();
+    if (!trimmed) {
+      return { isValid: false, error: "Please enter an invoice ID" };
     }
-  }
 
-  if (!data.amount?.value) {
-    throw new DataError("Missing order amount");
-  }
+    let id = trimmed.split(" ")[0];
+    if (id.startsWith("#")) {
+      id = id.slice(1);
+    }
 
-  if (!data.shipping?.address?.city || !data.shipping?.address?.country) {
-    throw new DataError("Missing shipping address information");
-  }
+    const idRegex = /^[A-Za-z0-9]{8}$/;
+    if (!idRegex.test(id)) {
+      return {
+        isValid: false,
+        error: "Invoice ID must be 8 alphanumeric characters",
+      };
+    }
 
-  if (!data.tracking?.currentStatus || !Array.isArray(data.tracking?.statusHistory)) {
-    throw new DataError("Missing or invalid tracking information");
+    return { isValid: true, id };
+  } catch {
+    return { isValid: false, error: "Invalid invoice ID format" };
   }
-
-  if (!Array.isArray(data.items) || data.items.length === 0) {
-    throw new DataError("Order must contain at least one item");
-  }
-
-  return data as OrderType;
 };
 
-const validateNumericValue = (value: number | string, fallback: number = 0): number => {
-  const num = Number(value);
-  return isNaN(num) ? fallback : num;
+const validateOrderData = (data: any): { isValid: boolean; order?: OrderType; error?: string } => {
+  try {
+    if (!data || typeof data !== "object") {
+      return { isValid: false, error: "Order not found" };
+    }
+
+    // Check required fields with safe access
+    const requiredChecks = [
+      { field: "invoiceId", value: data.invoiceId },
+      { field: "timestamp", value: data.timestamp },
+      { field: "amount", value: data.amount?.value },
+      { field: "shipping", value: data.shipping?.address?.city && data.shipping?.address?.country },
+      { field: "tracking", value: data.tracking?.currentStatus },
+      { field: "items", value: Array.isArray(data.items) && data.items.length > 0 },
+    ];
+
+    for (const check of requiredChecks) {
+      if (!check.value) {
+        return { isValid: false, error: "Order data is incomplete" };
+      }
+    }
+
+    return { isValid: true, order: data as OrderType };
+  } catch {
+    return { isValid: false, error: "Order data is corrupted" };
+  }
+};
+
+const safeNumber = (value: any, fallback: number = 0): number => {
+  try {
+    const num = Number(value);
+    return !isNaN(num) && isFinite(num) ? num : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const safeString = (value: any, fallback: string = ""): string => {
+  try {
+    return value && typeof value === "string" ? value : fallback;
+  } catch {
+    return fallback;
+  }
 };
 
 const safeFormatDate = (dateString: string): string => {
   try {
+    if (!dateString) return "Date not available";
+
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {
-      return "Invalid date";
+      return "Date not available";
     }
+
     return date.toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
@@ -136,8 +167,60 @@ const safeFormatDate = (dateString: string): string => {
       minute: "2-digit",
     });
   } catch {
-    return "Invalid date";
+    return "Date not available";
   }
+};
+
+const SafeImage = ({
+  src,
+  alt,
+  width,
+  height,
+  className,
+  onError,
+}: {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  className?: string;
+  onError?: () => void;
+}) => {
+  const [hasError, setHasError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const handleError = () => {
+    setHasError(true);
+    setIsLoading(false);
+    onError?.();
+  };
+
+  const handleLoad = () => {
+    setIsLoading(false);
+  };
+
+  if (hasError) {
+    return (
+      <div className={`${className} bg-gray-100 flex items-center justify-center`} style={{ width, height }}>
+        <Package className="h-8 w-8 text-gray-400" />
+      </div>
+    );
+  }
+
+  return (
+    <div className={className} style={{ width, height }}>
+      {isLoading && <div className="absolute inset-0 bg-gray-100 animate-pulse rounded-lg" />}
+      <Image
+        src={src || "/placeholder-image.jpg"}
+        alt={alt}
+        width={width}
+        height={height}
+        onError={handleError}
+        onLoad={handleLoad}
+        className={isLoading ? "opacity-0" : "opacity-100 transition-opacity"}
+      />
+    </div>
+  );
 };
 
 export default function OrderTracker() {
@@ -152,9 +235,16 @@ export default function OrderTracker() {
     setOrderData(null);
 
     try {
-      const validatedId = validateInvoiceId(invoiceId);
+      const validation = validateInvoiceId(invoiceId);
+      if (!validation.isValid) {
+        showAlert({
+          message: validation.error || "Please check your invoice ID",
+          type: ShowAlertType.ERROR,
+        });
+        return;
+      }
 
-      const result = await getOrders({ invoiceIds: [validatedId] });
+      const result = await getOrders({ invoiceIds: [validation.id!] });
 
       if (!result || result.length === 0) {
         showAlert({
@@ -164,23 +254,21 @@ export default function OrderTracker() {
         return;
       }
 
-      const validatedOrder = validateOrderData(result[0]);
-      setOrderData(validatedOrder);
+      const orderValidation = validateOrderData(result[0]);
+      if (!orderValidation.isValid) {
+        showAlert({
+          message: orderValidation.error || "Unable to load order details",
+          type: ShowAlertType.ERROR,
+        });
+        return;
+      }
+
+      setOrderData(orderValidation.order!);
     } catch (error) {
       console.error("Order tracking error:", error);
 
-      let errorMessage = "An unexpected error occurred";
-
-      if (error instanceof ValidationError) {
-        errorMessage = error.message;
-      } else if (error instanceof DataError) {
-        errorMessage = `Data error: ${error.message}`;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      }
-
       showAlert({
-        message: errorMessage,
+        message: "We're having trouble finding your order. Please try again in a moment.",
         type: ShowAlertType.ERROR,
       });
     } finally {
@@ -188,52 +276,82 @@ export default function OrderTracker() {
     }
   };
 
-  function formatDateRange(range?: { start: string; end: string }): string {
-    if (!range || (!range.start && !range.end)) {
-      return "Not set";
-    }
-
-    const toDate = (s: string) => (s ? new Date(s) : null);
-    const start = range.start ? toDate(range.start) : null;
-    const end = range.end ? toDate(range.end) : null;
-
-    const fmtMD = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
-
-    if (start && end) {
-      const sameMonth = start.getUTCFullYear() === end.getUTCFullYear() && start.getUTCMonth() === end.getUTCMonth();
-
-      if (sameMonth) {
-        const month = start.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" });
-        return `${month} ${start.getUTCDate()}–${end.getUTCDate()}`;
-      } else {
-        return `${fmtMD(start)} – ${fmtMD(end)}`;
+  const formatDateRange = (range?: { start: string; end: string }): string => {
+    try {
+      if (!range || (!range.start && !range.end)) {
+        return "Date to be confirmed";
       }
-    }
 
-    if (start) {
-      return `From ${fmtMD(start)}`;
-    }
+      const parseDate = (dateStr: string) => {
+        try {
+          return dateStr ? new Date(dateStr) : null;
+        } catch {
+          return null;
+        }
+      };
 
-    if (end) {
-      return `By ${fmtMD(end)}`;
-    }
+      const start = parseDate(range.start);
+      const end = parseDate(range.end);
 
-    return "Not set";
-  }
+      const formatMD = (date: Date) => {
+        try {
+          return date.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            timeZone: "UTC",
+          });
+        } catch {
+          return "Invalid date";
+        }
+      };
+
+      if (start && end) {
+        const sameMonth = start.getUTCFullYear() === end.getUTCFullYear() && start.getUTCMonth() === end.getUTCMonth();
+
+        if (sameMonth) {
+          const month = start.toLocaleDateString("en-US", {
+            month: "short",
+            timeZone: "UTC",
+          });
+          return `${month} ${start.getUTCDate()}–${end.getUTCDate()}`;
+        } else {
+          return `${formatMD(start)} – ${formatMD(end)}`;
+        }
+      }
+
+      if (start) return `From ${formatMD(start)}`;
+      if (end) return `By ${formatMD(end)}`;
+
+      return "Date to be confirmed";
+    } catch {
+      return "Date to be confirmed";
+    }
+  };
 
   const shouldShowExpectedDelivery = (status: string): boolean => {
-    const normalizedStatus = status.toLowerCase();
-    return normalizedStatus !== "delivered" && normalizedStatus !== "completed";
+    try {
+      const normalizedStatus = safeString(status).toLowerCase();
+      return normalizedStatus !== "delivered" && normalizedStatus !== "completed";
+    } catch {
+      return true;
+    }
   };
 
   const statusOptions = ["pending", "confirmed", "shipped", "delivered", "completed"];
 
   const formatOptions = (options: Record<string, SelectedOptionType>, type: "product" | "upsell" = "product") => {
     try {
-      const entries = Object.entries(options || {});
+      if (!options || typeof options !== "object") return null;
+
+      const entries = Object.entries(options).filter(
+        ([, option]) => option && typeof option === "object" && option.value
+      );
+
       if (entries.length === 0) return null;
 
-      const sortedEntries = entries.sort(([, a], [, b]) => (a?.groupDisplayOrder || 0) - (b?.groupDisplayOrder || 0));
+      const sortedEntries = entries.sort(
+        ([, a], [, b]) => safeNumber(a?.groupDisplayOrder) - safeNumber(b?.groupDisplayOrder)
+      );
 
       const getClassNames = () => {
         if (type === "upsell") {
@@ -245,63 +363,44 @@ export default function OrderTracker() {
       return (
         <div className="flex flex-wrap gap-1 mt-1 max-w-72">
           {sortedEntries.map(([key, option]) => {
-            if (!option?.value) return null;
+            const formattedKey = safeString(key).charAt(0).toUpperCase() + safeString(key).slice(1);
+            const value = safeString(option?.value);
+            const id = `${key}:${value}`;
 
-            const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);
-            const id = `${key}:${option.value}`;
             return (
               <span key={id} className={getClassNames()}>
-                {formattedKey}: {option.value}
+                {formattedKey}: {value}
               </span>
             );
           })}
         </div>
       );
-    } catch (error) {
-      console.error("Error formatting options:", error);
+    } catch {
       return null;
     }
   };
 
   const renderProductItem = (item: OrderProductItemType, index: number) => {
     try {
-      const basePrice = validateNumericValue(item.pricing?.basePrice);
-      const salePrice = item.pricing?.salePrice ? validateNumericValue(item.pricing.salePrice) : null;
-      const itemName = item.name || "Product";
-      const imageUrl = item.mainImage || "/placeholder-image.jpg";
+      const basePrice = safeNumber(item?.pricing?.basePrice);
+      const salePrice = item?.pricing?.salePrice ? safeNumber(item.pricing.salePrice) : null;
+      const itemName = safeString(item?.name, "Product");
+      const imageUrl = safeString(item?.mainImage, "/placeholder-image.jpg");
 
       return (
         <div key={index} className="flex gap-3">
           <div className="relative flex flex-col min-[580px]:flex-row gap-4 w-full p-5 rounded-lg border border-gray-200/70">
             <div className="aspect-square h-[160px] min-[580px]:h-[128px]">
               <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
-                <Image
-                  src={imageUrl}
-                  alt={itemName}
-                  width={160}
-                  height={160}
-                  priority
-                  onError={(e) => {
-                    e.currentTarget.src = "/placeholder-image.jpg";
-                  }}
-                />
+                <SafeImage src={imageUrl} alt={itemName} width={160} height={160} className="rounded-lg" />
               </div>
               <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
-                <Image
-                  src={imageUrl}
-                  alt={itemName}
-                  width={128}
-                  height={128}
-                  priority
-                  onError={(e) => {
-                    e.currentTarget.src = "/placeholder-image.jpg";
-                  }}
-                />
+                <SafeImage src={imageUrl} alt={itemName} width={128} height={128} className="rounded-lg" />
               </div>
             </div>
             <div className="w-full flex flex-col gap-1">
               <div className="min-w-full h-5 flex items-center justify-between gap-3">
-                {item.slug && item.baseProductId ? (
+                {item?.slug && item?.baseProductId ? (
                   <Link
                     href={`${item.slug}-${item.baseProductId}`}
                     target="_blank"
@@ -313,7 +412,7 @@ export default function OrderTracker() {
                   <h4 className="text-xs line-clamp-1">{itemName}</h4>
                 )}
               </div>
-              {formatOptions(item.selectedOptions)}
+              {formatOptions(item?.selectedOptions || {})}
               <div className="mt-1 w-max flex items-center justify-center">
                 {salePrice ? (
                   <div className="flex items-center gap-[6px]">
@@ -342,12 +441,14 @@ export default function OrderTracker() {
           </div>
         </div>
       );
-    } catch (error) {
-      console.error("Error rendering product item:", error);
+    } catch {
       return (
         <div key={index} className="flex gap-3">
-          <div className="w-full p-5 rounded-lg border border-red-200 bg-red-50">
-            <p className="text-sm text-red-600">Error displaying product item</p>
+          <div className="w-full p-5 rounded-lg border border-gray-200/70 bg-gray-50">
+            <div className="flex items-center gap-2 text-gray-600">
+              <AlertCircle className="h-4 w-4" />
+              <p className="text-sm">Product information temporarily unavailable</p>
+            </div>
           </div>
         </div>
       );
@@ -356,8 +457,9 @@ export default function OrderTracker() {
 
   const renderUpsellItem = (item: OrderUpsellItemType, index: number) => {
     try {
-      const basePrice = validateNumericValue(item.pricing?.basePrice);
-      const salePrice = item.pricing?.salePrice ? validateNumericValue(item.pricing.salePrice) : null;
+      const basePrice = safeNumber(item?.pricing?.basePrice);
+      const salePrice = item?.pricing?.salePrice ? safeNumber(item.pricing.salePrice) : null;
+      const products = Array.isArray(item?.products) ? item.products : [];
 
       return (
         <div key={index} className="flex gap-3">
@@ -392,9 +494,9 @@ export default function OrderTracker() {
               </div>
             </div>
             <div className="space-y-3">
-              {(item.products || []).map((product, prodIndex) => {
-                const productName = product?.name || "Product";
-                const imageUrl = product?.mainImage || "/placeholder-image.jpg";
+              {products.map((product, prodIndex) => {
+                const productName = safeString(product?.name, "Product");
+                const imageUrl = safeString(product?.mainImage, "/placeholder-image.jpg");
 
                 return (
                   <div
@@ -404,28 +506,10 @@ export default function OrderTracker() {
                     <div className="flex flex-col min-[580px]:flex-row gap-4">
                       <div className="aspect-square h-[160px] min-[580px]:h-[128px]">
                         <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
-                          <Image
-                            src={imageUrl}
-                            alt={productName}
-                            width={160}
-                            height={160}
-                            priority
-                            onError={(e) => {
-                              e.currentTarget.src = "/placeholder-image.jpg";
-                            }}
-                          />
+                          <SafeImage src={imageUrl} alt={productName} width={160} height={160} className="rounded-lg" />
                         </div>
                         <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
-                          <Image
-                            src={imageUrl}
-                            alt={productName}
-                            width={128}
-                            height={128}
-                            priority
-                            onError={(e) => {
-                              e.currentTarget.src = "/placeholder-image.jpg";
-                            }}
-                          />
+                          <SafeImage src={imageUrl} alt={productName} width={128} height={128} className="rounded-lg" />
                         </div>
                       </div>
                       <div className="space-y-3">
@@ -450,12 +534,14 @@ export default function OrderTracker() {
           </div>
         </div>
       );
-    } catch (error) {
-      console.error("Error rendering upsell item:", error);
+    } catch {
       return (
         <div key={index} className="flex gap-3">
-          <div className="w-full p-5 rounded-lg border border-red-200 bg-red-50">
-            <p className="text-sm text-red-600">Error displaying upsell item</p>
+          <div className="w-full p-5 rounded-lg border border-gray-200/70 bg-gray-50">
+            <div className="flex items-center gap-2 text-gray-600">
+              <AlertCircle className="h-4 w-4" />
+              <p className="text-sm">Bundle information temporarily unavailable</p>
+            </div>
           </div>
         </div>
       );
@@ -498,26 +584,26 @@ export default function OrderTracker() {
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h2 className="text-xl font-semibold text-gray-900">
-                    Invoice #{orderData.invoiceId?.trim()?.split(" ")[0] || "Unknown"}
+                    Invoice #{safeString(orderData.invoiceId).trim().split(" ")[0] || "Unknown"}
                   </h2>
                   <div className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber text-white">
-                    {orderData.tracking?.currentStatus
-                      ? orderData.tracking.currentStatus.charAt(0).toUpperCase() +
-                        orderData.tracking.currentStatus.slice(1).toLowerCase()
-                      : "Unknown"}
+                    {safeString(orderData.tracking?.currentStatus)
+                      ? safeString(orderData.tracking.currentStatus).charAt(0).toUpperCase() +
+                        safeString(orderData.tracking.currentStatus).slice(1).toLowerCase()
+                      : "Processing"}
                   </div>
                 </div>
                 <p className="text-sm text-gray mb-1">Placed {safeFormatDate(orderData.timestamp)}</p>
                 <div className="flex items-center text-sm text-gray">
                   <MapPin className="h-4 w-4 mr-1" />
                   <span>
-                    {orderData.shipping?.address?.city || "Unknown"},{" "}
-                    {orderData.shipping?.address?.country || "Unknown"}
+                    {safeString(orderData.shipping?.address?.city, "Unknown City")},{" "}
+                    {safeString(orderData.shipping?.address?.country, "Unknown Country")}
                   </span>
                 </div>
                 {shouldShowExpectedDelivery(orderData.tracking?.currentStatus || "") &&
                   orderData.tracking?.estimatedDeliveryDate && (
-                    <div className="flex items-center text-sm text-blue mt-2">
+                    <div className="flex items-center text-sm text-amber mt-2">
                       <Calendar className="h-4 w-4 mr-1" />
                       <span className="font-medium">
                         Expected delivery: {formatDateRange(orderData.tracking.estimatedDeliveryDate)}
@@ -528,9 +614,9 @@ export default function OrderTracker() {
               <div className="text-right">
                 <div className="flex items-baseline justify-end">
                   <span className="text-sm leading-3 font-semibold">$</span>
-                  <span className="text-xl font-bold">{Math.floor(validateNumericValue(orderData.amount?.value))}</span>
+                  <span className="text-xl font-bold">{Math.floor(safeNumber(orderData.amount?.value))}</span>
                   <span className="text-sm leading-3 font-semibold">
-                    {(validateNumericValue(orderData.amount?.value) % 1).toFixed(2).substring(1)}
+                    {(safeNumber(orderData.amount?.value) % 1).toFixed(2).substring(1)}
                   </span>
                 </div>
                 <p className="text-xs text-gray">Total</p>
@@ -546,7 +632,8 @@ export default function OrderTracker() {
                 className="absolute top-[9px] left-0 h-0.5 bg-black rounded-full transition-all duration-700"
                 style={{
                   width: `${
-                    ((statusOptions.indexOf(orderData.tracking?.currentStatus?.toLowerCase() || "pending") + 1) /
+                    ((statusOptions.indexOf(safeString(orderData.tracking?.currentStatus).toLowerCase() || "pending") +
+                      1) /
                       statusOptions.length) *
                     100
                   }%`,
@@ -555,10 +642,10 @@ export default function OrderTracker() {
               <div className="relative flex justify-between">
                 {statusOptions.map((status, index) => {
                   const currentStatusIndex = statusOptions.indexOf(
-                    orderData.tracking?.currentStatus?.toLowerCase() || "pending"
+                    safeString(orderData.tracking?.currentStatus).toLowerCase() || "pending"
                   );
                   const isCompleted = currentStatusIndex >= index;
-                  const isActive = status === orderData.tracking?.currentStatus?.toLowerCase();
+                  const isActive = status === safeString(orderData.tracking?.currentStatus).toLowerCase();
 
                   return (
                     <div key={status} className="flex flex-col items-center">
@@ -584,27 +671,27 @@ export default function OrderTracker() {
           {/* Status Message */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center px-4 py-3 rounded-xl text-sm bg-neutral-50 text-gray border border-gray-200/50">
-              {orderData.tracking?.currentStatus?.toLowerCase() === "pending" ? (
+              {safeString(orderData.tracking?.currentStatus).toLowerCase() === "pending" ? (
                 <>
                   <Clock className="h-4 w-4 mr-2 text-gray-500" />
                   Your order is pending. We'll start processing it soon.
                 </>
-              ) : orderData.tracking?.currentStatus?.toLowerCase() === "confirmed" ? (
+              ) : safeString(orderData.tracking?.currentStatus).toLowerCase() === "confirmed" ? (
                 <>
                   <CheckCircle className="h-4 w-4 mr-2 text-gray-500" />
                   Your order is confirmed. We're getting it ready.
                 </>
-              ) : orderData.tracking?.currentStatus?.toLowerCase() === "shipped" ? (
+              ) : safeString(orderData.tracking?.currentStatus).toLowerCase() === "shipped" ? (
                 <>
                   <Truck className="h-4 w-4 mr-2 text-gray-500" />
                   Your order has shipped and is in transit.
                 </>
-              ) : orderData.tracking?.currentStatus?.toLowerCase() === "delivered" ? (
+              ) : safeString(orderData.tracking?.currentStatus).toLowerCase() === "delivered" ? (
                 <>
                   <PackageCheck className="h-4 w-4 mr-2 text-gray-500" />
                   Your package has been delivered. Thanks for shopping with us!
                 </>
-              ) : orderData.tracking?.currentStatus?.toLowerCase() === "completed" ? (
+              ) : safeString(orderData.tracking?.currentStatus).toLowerCase() === "completed" ? (
                 <>
                   <Trophy className="h-4 w-4 mr-2 text-gray-500" />
                   Your order is complete. Enjoy!
@@ -612,7 +699,7 @@ export default function OrderTracker() {
               ) : (
                 <>
                   <Package className="h-4 w-4 mr-2 text-gray-500" />
-                  We're preparing your order. You’ll get an update soon.
+                  We're preparing your order. You'll get an update soon.
                 </>
               )}
             </div>
