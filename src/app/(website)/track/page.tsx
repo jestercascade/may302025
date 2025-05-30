@@ -12,8 +12,8 @@ export default async function TrackOrder() {
           <div className="text-center">
             <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4">Track Your Order</h1>
             <p className="text-gray max-w-md mx-auto">
-              Enter your <span className="bg-amber/10 text-amber font-mono px-1 rounded-md">invoice ID</span> to
-              check the current status and estimated delivery date.
+              Enter your <span className="bg-amber/10 text-amber font-mono px-1 rounded-md">invoice ID</span> to check
+              the current status and estimated delivery date
             </p>
           </div>
           <OrderTracker />
