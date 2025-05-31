@@ -11,6 +11,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getDiscoveryProductsSettings } from "@/actions/get/discoveryProducts";
+import { Footer } from "@/components/website/Footer";
 
 export const metadata: Metadata = {
   alternates: {
@@ -115,7 +116,7 @@ export default async function Cart() {
             </Link>
           </div>
         </nav>
-        <div className="min-h-[calc(100vh-385px)] w-full max-w-[580px] lg:max-w-5xl mx-auto flex flex-col gap-10">
+        <div className="mb-20 min-h-[calc(100vh-385px)] w-full max-w-[580px] lg:max-w-5xl mx-auto flex flex-col gap-10">
           <div className="w-full px-5 mx-auto">
             {sortedCartItems.length === 0 && <EmptyCartState />}
             {sortedCartItems.length > 0 && <CartItemList cartItems={sortedCartItems} />}
@@ -265,76 +266,6 @@ function EmptyCartState() {
     <div className="flex justify-center py-16">
       <Image src="/icons/cart-thin.svg" alt="Cart" width={80} height={80} priority />
     </div>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="w-full pt-6 pb-36 lg:pb-24 mt-14 bg-neutral-100">
-      <div className="lg:hidden max-w-[580px] px-5 mx-auto">
-        <div className="grid grid-cols-2">
-          <div>
-            <h3 className="font-semibold mb-4">Company</h3>
-            <Link href="/about-us" className="block w-max text-sm text-gray mb-2 hover:underline">
-              About us
-            </Link>
-            <Link href="/privacy-policy" className="block w-max text-sm text-gray mb-2 hover:underline">
-              Privacy policy
-            </Link>
-            <Link href="/terms-of-use" className="block w-max text-sm text-gray mb-2 hover:underline">
-              Terms of use
-            </Link>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-4">Get Help</h3>
-            <Link href="/contact-us" className="block w-max text-sm text-gray mb-2 hover:underline">
-              Contact us
-            </Link>
-            <Link href="/track" className="block w-max text-sm text-gray mb-2 hover:underline">
-              Track order
-            </Link>
-            <Link href="/returns-and-refunds" className="block w-max text-sm text-gray mb-2 hover:underline">
-              Returns & refunds
-            </Link>
-            <Link href="/faq" className="block w-max text-sm text-gray mb-2 hover:underline">
-              FAQs
-            </Link>
-          </div>
-        </div>
-      </div>
-      <div className="hidden lg:block w-full max-w-5xl px-5 mx-auto">
-        <div className="flex gap-10">
-          <div className="w-full">
-            <h3 className="font-semibold mb-4">Company</h3>
-            <Link href="/about-us" className="block w-max text-sm text-gray mb-2 hover:underline">
-              About us
-            </Link>
-            <Link href="/privacy-policy" className="block w-max text-sm text-gray mb-2 hover:underline">
-              Privacy policy
-            </Link>
-            <Link href="/terms-of-use" className="block w-max text-sm text-gray mb-2 hover:underline">
-              Terms of use
-            </Link>
-          </div>
-          <div className="w-full">
-            <h3 className="font-semibold mb-4">Get Help</h3>
-            <Link href="/contact-us" className="block w-max text-sm text-gray mb-2 hover:underline">
-              Contact us
-            </Link>
-            <Link href="/track" className="block w-max text-sm text-gray mb-2 hover:underline">
-              Track order
-            </Link>
-            <Link href="/returns-and-refunds" className="block w-max text-sm text-gray mb-2 hover:underline">
-              Returns & refunds
-            </Link>
-            <Link href="/faq" className="block w-max text-sm text-gray mb-2 hover:underline">
-              FAQs
-            </Link>
-          </div>
-          <div className="min-w-[270px]"></div>
-        </div>
-      </div>
-    </footer>
   );
 }
 

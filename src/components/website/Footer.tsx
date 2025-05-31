@@ -137,8 +137,11 @@ function NewsletterForm({
       </button>
       <div className="peer-hover:bg-[#cc8100] peer-hover:[background:linear-gradient(to_bottom,_#cc8100_5%,_#e29000_100%)] peer-active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)] w-full h-full p-[2px] rounded-lg shadow-[inset_0px_1px_0px_0px_#ffa405] [background:linear-gradient(to_bottom,_#e29000_5%,_#cc8100_100%)] bg-[#e29000]">
         <input
-          className="w-[180px] h-[40px] px-3 rounded-md"
+          className="w-[180px] h-[40px] px-3 rounded-md bg-white"
           type="email"
+          name="email"
+          id="newsletter-email"
+          autoComplete="email"
           placeholder="Enter your email"
           value={email}
           onChange={onChange}

@@ -16,6 +16,7 @@ import { ProductDetailsOptions } from "@/components/website/Options/ProductDetai
 import { MobileImageCarousel } from "@/components/website/ProductDetails/MobileImageCarousel";
 import { SizeChartOverlay, UpsellReviewOverlay } from "@/components/website/DynamicOverlays";
 import { redirect } from "next/navigation";
+import { Footer } from "@/components/website/Footer";
 
 const getProductIdFromSlug = (slug: string): string => {
   return slug.split("-").pop() as string;
@@ -96,10 +97,11 @@ export default async function ProductDetails({ params }: { params: Promise<{ slu
           upsell: product.upsell,
         }}
       >
-        <main>
+        <main className="mb-20">
           <MobileProductDetails product={product} cart={cart} />
           <DesktopProductDetails product={product} cart={cart} />
         </main>
+        <Footer />
         <SizeChartOverlay
           productInfo={{
             id: product.id,
