@@ -154,6 +154,13 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
     return option ? option.label : status;
   };
 
+  const extractInvoiceId = (input: string): string => {
+    const id = input.trim().split(" ")[0];
+    const idRegex = /^[A-Za-z0-9]{8}$/;
+
+    return idRegex.test(id) ? id : "";
+  };
+
   return (
     <>
       <div className="max-w-[768px] flex flex-col gap-10 px-5">
@@ -166,60 +173,65 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
               details organized neatly, everyone on your team can help customers without confusion.
             </p>
           </div>
-          <div className="relative flex items-center justify-between shadow rounded-xl bg-white">
-            <div className="w-full flex flex-col px-5">
-              <div className="space-y-4 py-5 border-b">
-                <div className="flex gap-5 items-center text-sm">
-                  <h3 className="min-w-[78px] max-w-[78px] text-gray">Transaction</h3>
-                  <div
-                    className={clsx(
-                      "inline-flex px-3 py-1 rounded-full text-sm font-medium",
-                      order.status.toUpperCase() === "COMPLETED" ? "bg-green-100 text-green-700" : "bg-gray-100"
-                    )}
-                  >
-                    {capitalizeFirstLetter(order.status)}
+          <div className="max-w-[618px] p-6 relative shadow rounded-xl bg-white">
+            <div className="flex flex-col">
+              <div className="mb-7 flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="text-xl font-semibold">Invoice #{extractInvoiceId(order.invoiceId)}</h3>
+                    <div
+                      className={clsx(
+                        "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium",
+                        order.status.toUpperCase() === "COMPLETED" ? "bg-green-100 text-green-700" : "bg-gray-100"
+                      )}
+                    >
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      {capitalizeFirstLetter(order.status)}
+                    </div>
                   </div>
+                  <p className="text-xs text-gray">Purchased {orderPlacedDate}</p>
                 </div>
-                <div className="flex gap-5 text-sm">
-                  <h3 className="min-w-[78px] max-w-[78px] text-gray">Purchased</h3>
-                  <span className="w-full font-medium">{orderPlacedDate}</span>
-                </div>
-                <div className="flex gap-5 text-sm">
-                  <h3 className="min-w-[78px] max-w-[78px] text-gray">Total</h3>
-                  <span className="w-full font-medium">${order.amount.value}</span>
-                </div>
-              </div>
-              <div className="flex flex-col gap-4 py-5 border-b">
-                <div className="flex gap-5 text-sm">
-                  <h3 className="min-w-[78px] max-w-[78px] text-gray">Shipping</h3>
-                  <div className="flex flex-col gap-1 font-medium">
-                    <span>{order.shipping.address.line1}</span>
-                    <span>
-                      {order.shipping.address.city}, {order.shipping.address.state} {order.shipping.address.postalCode}
+                <div className="text-right">
+                  <div className="flex items-baseline justify-end">
+                    <span className="text-sm leading-3 font-semibold">$</span>
+                    <span className="text-xl font-bold">{Math.floor(Number(order.amount.value))}</span>
+                    <span className="text-sm leading-3 font-semibold">
+                      {(Number(order.amount.value) % 1).toFixed(2).substring(1)}
                     </span>
-                    <span>{order.shipping.address.country}</span>
+                  </div>
+                  <p className="text-xs text-gray">Total</p>
+                </div>
+              </div>
+              <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="p-4 rounded-lg bg-neutral-50">
+                  <div className="text-xs font-semibold text-gray-400 mb-3">Customer</div>
+                  <div className="space-y-1.5">
+                    <div className="font-semibold">
+                      {order.payer.name.firstName} {order.payer.name.lastName}
+                    </div>
+                    <div className="text-sm text-gray break-all">{order.payer.email}</div>
+                  </div>
+                </div>
+                <div className="p-4 rounded-lg bg-neutral-50">
+                  <div className="text-xs font-semibold text-gray-400 mb-3">Shipping Address</div>
+                  <div className="space-y-1.5">
+                    <div className="font-semibold">{order.shipping.address.line1}</div>
+                    <div className="text-sm text-gray">
+                      {order.shipping.address.city}, {order.shipping.address.state} {order.shipping.address.postalCode},{" "}
+                      {order.shipping.address.country}
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col gap-4 py-5 border-b">
-                <div className="flex gap-5 text-sm">
-                  <h3 className="min-w-[78px] max-w-[78px] text-gray">Customer</h3>
-                  <span className="w-full font-medium">
-                    {order.payer.name.firstName} {order.payer.name.lastName}
+              <div className="flex justify-end">
+                <Link href={paypalUrl} target="_blank">
+                  <span
+                    className="text-blue hover:underline text-xs font-medium transition-colors duration-200 cursor-pointer"
+                    title="View Transaction Details"
+                  >
+                    View on PayPal
                   </span>
-                </div>
-                <div className="flex gap-5 text-sm">
-                  <h3 className="min-w-[78px] max-w-[78px] text-gray">Email</h3>
-                  <span className="w-full font-medium break-all">{order.payer.email}</span>
-                </div>
-              </div>
-              <div className="flex flex-col gap-4 py-5">
-                <div className="flex gap-5 text-sm">
-                  <h3 className="min-w-[78px] max-w-[78px] text-gray">ID</h3>
-                  <Link href={paypalUrl} target="_blank">
-                    <span className="w-full text-gray text-xs underline">{order.transactionId}</span>
-                  </Link>
-                </div>
+                </Link>
               </div>
             </div>
           </div>
@@ -234,7 +246,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
               support queries. It builds trust and makes customers feel valued.
             </p>
           </div>
-          <div className="p-5 pt-4 relative shadow rounded-xl bg-white">
+          <div className="max-w-[618px] p-5 relative flex items-center justify-between shadow rounded-xl bg-white">
             <div className="flex flex-wrap gap-5">
               <EmailPreviewButton emailType={EmailType.ORDER_CONFIRMED} email={order.emails.confirmed} />
               <EmailPreviewButton emailType={EmailType.ORDER_SHIPPED} email={order.emails.shipped} />
@@ -376,12 +388,12 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
               to expect it.
             </p>
           </div>
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative">
-            <div className="px-6 py-5">
+          <div className="max-w-[618px] p-5 relative shadow rounded-xl bg-white">
+            <div className="flex flex-col gap-5">
               {hasTrackingDetails ? (
                 <>
                   {/* Current Status Card */}
-                  <div className="mb-6">
+                  <div>
                     <div className="space-y-2">
                       <div className="flex items-center">
                         <div className="flex items-center gap-3">
@@ -407,7 +419,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                     <div className="relative max-w-2xl mx-auto px-[10px]">
                       <div className="absolute top-[9px] left-[10px] right-[10px] h-0.5 bg-gray-300 rounded-full"></div>
                       <div
-                        className="absolute top-[9px] left-0 h-0.5 bg-blue-500 rounded-full transition-all duration-700"
+                        className="absolute top-[9px] left-0 h-0.5 bg-[#404040] rounded-full transition-all duration-700"
                         style={{
                           width: `${
                             ((statusOptions.findIndex((opt) => opt.value === order.tracking.currentStatus) + 1) /
@@ -428,18 +440,14 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                             <div key={status.value} className="flex flex-col items-center">
                               <div
                                 className={`rounded-full h-5 w-5 flex items-center justify-center mb-2 transition-all duration-300 ${
-                                  isActive
-                                    ? "bg-blue-500 ring-4 ring-blue-100 shadow-sm"
-                                    : isCompleted
-                                    ? "bg-blue-500"
-                                    : "bg-gray-300"
+                                  isActive ? "bg-[#404040] shadow-sm" : isCompleted ? "bg-[#404040]" : "bg-gray-300"
                                 }`}
                               >
                                 {isCompleted && <Check color="#ffffff" size={14} />}
                               </div>
                               <div
                                 className={`text-xs font-medium text-center ${
-                                  isCompleted ? "text-gray-900" : "text-gray-400"
+                                  isCompleted ? "text-black" : "text-gray-400"
                                 }`}
                               >
                                 {status.label}
@@ -452,8 +460,8 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                   </div>
 
                   {/* Timeline Section */}
-                  <div className="mb-8">
-                    <h3 className="text-base font-medium text-gray-900 mb-4">Status Log</h3>
+                  <div>
+                    <h3 className="text-base font-medium mb-4">Status Log</h3>
                     <div className="space-y-4">
                       {(order.tracking?.statusHistory || [])
                         .slice()
@@ -465,7 +473,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between mb-1">
-                                <p className="text-sm font-medium text-gray-900">
+                                <p className="text-sm font-medium">
                                   {historyItem?.status
                                     ? historyItem.status.charAt(0).toUpperCase() +
                                       historyItem.status.slice(1).toLowerCase()

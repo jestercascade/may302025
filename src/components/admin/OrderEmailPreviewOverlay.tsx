@@ -85,10 +85,10 @@ export function EmailPreviewButton({
     <button
       onClick={() => showOverlay({ pageName, overlayName })}
       type="button"
-      className="w-[310px] py-3 px-4 border cursor-pointer rounded-lg flex justify-center gap-2 transition ease-in-out duration-300 hover:bg-lightgray"
+      className="w-[calc(50%-10px)] py-3 px-4 border cursor-pointer rounded-lg flex justify-center gap-2 transition ease-in-out duration-300 hover:bg-lightgray"
     >
       <div>
-        <h2 className="font-semibold text-sm mb-1 flex items-center gap-[2px] w-max mx-auto">
+        <h2 className="font-semibold text-sm mb-0.5 flex items-center gap-[2px] w-max mx-auto">
           <span>{emailLabels[emailType]}</span>
           <ChevronRight color="#6c6c6c" size={16} strokeWidth={2} />
         </h2>
