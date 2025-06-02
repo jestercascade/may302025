@@ -291,42 +291,37 @@ export default function OrderTracker() {
               </div>
             </div>
             <div className="space-y-3">
-              {products.map((product, prodIndex) => {
-                const productName = safeString(product?.name, "Product");
-                const imageUrl = safeString(product?.mainImage, "/placeholder-image.jpg");
-
-                return (
-                  <div
-                    key={prodIndex}
-                    className="bg-white bg-opacity-80 backdrop-blur-sm rounded-lg p-3 border border-blue-200/50 shadow-sm"
-                  >
-                    <div className="flex flex-col min-[580px]:flex-row gap-4">
-                      <div className="aspect-square h-[160px] min-[580px]:h-[128px]">
-                        <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
-                          <Image src={product.mainImage} alt={product.name} width={160} height={160} priority />
-                        </div>
-                        <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
-                          <Image src={product.mainImage} alt={product.name} width={128} height={128} priority />
-                        </div>
+              {products.map((product, prodIndex) => (
+                <div
+                  key={prodIndex}
+                  className="bg-white bg-opacity-80 backdrop-blur-sm rounded-lg p-3 border border-blue-200/50 shadow-sm"
+                >
+                  <div className="flex flex-col min-[580px]:flex-row gap-4">
+                    <div className="aspect-square h-[160px] min-[580px]:h-[128px]">
+                      <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
+                        <Image src={product.mainImage} alt={product.name} width={160} height={160} priority />
                       </div>
-                      <div className="space-y-3">
-                        {product?.slug && product?.id ? (
-                          <Link
-                            href={`${product.slug}-${product.id}`}
-                            target="_blank"
-                            className="text-xs line-clamp-1 hover:underline"
-                          >
-                            {productName}
-                          </Link>
-                        ) : (
-                          <h4 className="text-xs line-clamp-1">{productName}</h4>
-                        )}
-                        {formatOptions(product?.selectedOptions || {}, "upsell")}
+                      <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
+                        <Image src={product.mainImage} alt={product.name} width={128} height={128} priority />
                       </div>
                     </div>
+                    <div className="space-y-3">
+                      {product?.slug && product?.id ? (
+                        <Link
+                          href={`${product.slug}-${product.id}`}
+                          target="_blank"
+                          className="text-xs line-clamp-1 hover:underline"
+                        >
+                          {product?.name}
+                        </Link>
+                      ) : (
+                        <h4 className="text-xs line-clamp-1">{product?.name}</h4>
+                      )}
+                      {formatOptions(product?.selectedOptions || {}, "upsell")}
+                    </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </div>
         </div>
