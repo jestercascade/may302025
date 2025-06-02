@@ -102,7 +102,7 @@ export function StickyBar({
 
       showAlert({
         message: result.message,
-        type: result.type === ShowAlertType.ERROR ? ShowAlertType.ERROR : ShowAlertType.NEUTRAL,
+        type: result.type === ShowAlertType.ERROR ? ShowAlertType.ERROR : ShowAlertType.SUCCESS,
       });
 
       if (result.type === ShowAlertType.SUCCESS) {
@@ -205,7 +205,7 @@ export function StickyBar({
               {shouldShowStickyBar && (
                 <div
                   className={clsx(
-                    "peer-hover:block hidden py-[18px] px-6 rounded-xl shadow-t-dropdown bg-white before:content-[''] before:w-[14px] before:h-[14px] before:bg-white before:rounded-tl-[2px] before:rotate-45 before:origin-top-left before:absolute before:-top-[10px] before:border-l before:border-t before:border-[#d9d9d9] before:right-20 min-[840px]:before:right-24 absolute top-[58px]",
+                    "peer-hover:block hidden py-[18px] px-6 rounded-xl shadow-dropdown bg-white before:content-[''] before:w-[14px] before:h-[14px] before:bg-white before:rounded-tl-[2px] before:rotate-45 before:origin-top-left before:absolute before:-top-[10px] before:border-l before:border-t before:border-[#d9d9d9] before:right-20 min-[840px]:before:right-24 absolute top-[58px]",
                     !isInCart ? "-right-2" : "left-1/2 -translate-x-1/2"
                   )}
                 >

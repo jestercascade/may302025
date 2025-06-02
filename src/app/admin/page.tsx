@@ -89,7 +89,7 @@ class StoreGrowthMetrics {
 
 export default async function Overview() {
   const [orders, products, upsells, carts] = await Promise.all([
-    getOrders() as Promise<PaymentTransaction[]>,
+    getOrders() as Promise<OrderType[] | null>,
     getProducts({ fields: ["visibility", "pricing"] }) as Promise<ProductType[] | null>,
     getUpsells({ fields: ["visibility", "pricing", "products"] }) as Promise<UpsellType[] | null>,
     getCarts(),
@@ -191,10 +191,10 @@ const StoreGrowth = ({ orders }: { orders: OrderType[] | null }) => {
   );
 };
 
-const BestsellingProducts = ({ orders }: { orders: PaymentTransaction[] | null }) => {
+const BestsellingProducts = ({ orders }: { orders: OrderType[] | null }) => {
   const TOP_PRODUCTS_COUNT = 5;
 
-  const calculateBestSellingProducts = (orders: PaymentTransaction[], dateFilter: string | null) => {
+  const calculateBestSellingProducts = (orders: OrderType[], dateFilter: string | null) => {
     const products: Record<
       string,
       {
@@ -646,94 +646,6 @@ const UpsellPerformance = ({ upsells }: { upsells: UpsellType[] | null }) => {
 };
 
 // -- Type Definitions --
-
-type ProductInUpsell = {
-  mainImage: string;
-  index: number;
-  basePrice: number;
-  color: string;
-  id: string;
-  size: string;
-  slug: string;
-  name: string;
-};
-
-type PaymentTransaction = {
-  id: string;
-  status: string;
-  transactionId: string;
-  timestamp: string;
-  amount: {
-    currency: string;
-    value: string;
-  };
-  payer: {
-    email: string;
-    payerId: string;
-    name: {
-      firstName: string;
-      lastName: string;
-    };
-  };
-  shipping: {
-    name: string;
-    address: {
-      line1: string;
-      state: string;
-      country: string;
-      city: string;
-      postalCode: string;
-    };
-  };
-  items: Array<
-    | {
-        slug: string;
-        type: "product";
-        mainImage: string;
-        pricing: {
-          basePrice: number;
-          salePrice: number;
-          discountPercentage: number;
-        };
-        color: string;
-        size: string;
-        index: number;
-        baseProductId: string;
-        variantId: string;
-        name: string;
-      }
-    | {
-        mainImage: string;
-        index: number;
-        pricing: {
-          basePrice: number;
-          salePrice: number;
-          discountPercentage: number;
-        };
-        products: ProductInUpsell[];
-        type: "upsell";
-        baseUpsellId: string;
-        variantId: string;
-      }
-  >;
-  emails: {
-    confirmed: {
-      sentCount: number;
-      maxAllowed: number;
-      lastSent: string | null;
-    };
-    shipped: {
-      sentCount: number;
-      maxAllowed: number;
-      lastSent: string | null;
-    };
-    delivered: {
-      sentCount: number;
-      maxAllowed: number;
-      lastSent: string | null;
-    };
-  };
-};
 
 type SelectedOptionType = {
   value: string;
