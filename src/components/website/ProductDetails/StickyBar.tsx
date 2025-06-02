@@ -29,12 +29,10 @@ export function StickyBar({
   const showAlert = useAlertStore((state) => state.showAlert);
   const shouldShowStickyBar = useScrollStore((state) => state.shouldShowStickyBar);
 
-  // Compute required option groups (those with at least one active value)
   const requiredGroups = productInfo.options.groups.filter((group) => group.values.some((value) => value.isActive));
 
   // Check if the current selection is in the cart
   useEffect(() => {
-    // Compute current selected option values for cart comparison
     const currentSelectedValues: Record<string, string> = {};
     requiredGroups.forEach((group) => {
       const selectedOptionId = selectedOptions[group.id];
@@ -291,7 +289,8 @@ export function StickyBar({
   );
 }
 
-// Type Definitions
+// -- Type Definitions --
+
 type SelectedOptionType = {
   value: string;
   optionDisplayOrder: number;
@@ -325,12 +324,12 @@ type OptionGroupType = {
   }>;
   sizeChart?: {
     centimeters?: {
-      columns: { label: string; order: number }[];
-      rows: { [key: string]: string }[];
+      columns: Array<{ label: string; order: number }>;
+      rows: Array<{ [key: string]: string }>;
     };
     inches?: {
-      columns: { label: string; order: number }[];
-      rows: { [key: string]: string }[];
+      columns: Array<{ label: string; order: number }>;
+      rows: Array<{ [key: string]: string }>;
     };
   };
 };

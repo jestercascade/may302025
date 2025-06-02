@@ -24,10 +24,7 @@ export default function ProductGrid({ products }: { products: ProductType[] }) {
 
   const showAlert = useAlertStore((state) => state.showAlert);
 
-  const copyProductId = (
-    e: React.MouseEvent<HTMLButtonElement>,
-    id: string
-  ) => {
+  const copyProductId = (e: React.MouseEvent<HTMLButtonElement>, id: string) => {
     e.preventDefault();
     e.stopPropagation();
     navigator.clipboard.writeText(id);
@@ -37,14 +34,10 @@ export default function ProductGrid({ products }: { products: ProductType[] }) {
 
   const getFilteredProducts = (filter: string) => {
     if (filter === PUBLISHED) {
-      return products.filter(
-        (product) => product.visibility.toUpperCase() === PUBLISHED
-      );
+      return products.filter((product) => product.visibility.toUpperCase() === PUBLISHED);
     } else if (filter === INACTIVE) {
       return products.filter(
-        (product) =>
-          product.visibility.toUpperCase() === HIDDEN ||
-          product.visibility.toUpperCase() === DRAFT
+        (product) => product.visibility.toUpperCase() === HIDDEN || product.visibility.toUpperCase() === DRAFT
       );
     }
     return products;
@@ -57,9 +50,7 @@ export default function ProductGrid({ products }: { products: ProductType[] }) {
 
     if (newFilteredProducts.length === 0) {
       showAlert({
-        message: `${capitalizeFirstLetter(
-          newFilter.toLowerCase()
-        )} filter has no products`,
+        message: `${capitalizeFirstLetter(newFilter.toLowerCase())} filter has no products`,
       });
     } else {
       setFilter(newFilter);
@@ -69,11 +60,7 @@ export default function ProductGrid({ products }: { products: ProductType[] }) {
     }
   };
 
-  const pagination = (
-    data: ProductType[],
-    currentPage: number,
-    rowsPerPage: number
-  ) => {
+  const pagination = (data: ProductType[], currentPage: number, rowsPerPage: number) => {
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
     const paginatedArray = data.slice(startIndex, endIndex);
@@ -86,11 +73,7 @@ export default function ProductGrid({ products }: { products: ProductType[] }) {
   };
 
   const rowsPerPage = 16;
-  const { paginatedArray: gridData, totalPages } = pagination(
-    filteredProducts,
-    currentPage,
-    rowsPerPage
-  );
+  const { paginatedArray: gridData, totalPages } = pagination(filteredProducts, currentPage, rowsPerPage);
 
   const handlePrevious = () => {
     setCurrentPage((prevPage) => {
@@ -160,34 +143,22 @@ export default function ProductGrid({ products }: { products: ProductType[] }) {
                 <button
                   onClick={() => handleFilterChange(PUBLISHED)}
                   className={`px-3 h-9 hover:bg-[#e4e4e4] rounded-full ${
-                    filter === PUBLISHED
-                      ? "text-blue"
-                      : "text-gray hover:text-black"
+                    filter === PUBLISHED ? "text-blue" : "text-gray hover:text-black"
                   }`}
                 >
-                  Published (
-                  {
-                    products.filter(
-                      (product) =>
-                        product.visibility.toUpperCase() === PUBLISHED
-                    ).length
-                  }
-                  )
+                  Published ({products.filter((product) => product.visibility.toUpperCase() === PUBLISHED).length})
                 </button>
                 <button
                   onClick={() => handleFilterChange(INACTIVE)}
                   className={`px-3 pr-[14px] h-9 hover:bg-[#e4e4e4] rounded-full ${
-                    filter === INACTIVE
-                      ? "text-blue"
-                      : "text-gray hover:text-black"
+                    filter === INACTIVE ? "text-blue" : "text-gray hover:text-black"
                   }`}
                 >
                   Inactive (
                   {
                     products.filter(
                       (product) =>
-                        product.visibility.toUpperCase() === HIDDEN ||
-                        product.visibility.toUpperCase() === DRAFT
+                        product.visibility.toUpperCase() === HIDDEN || product.visibility.toUpperCase() === DRAFT
                     ).length
                   }
                   )
@@ -203,13 +174,7 @@ export default function ProductGrid({ products }: { products: ProductType[] }) {
                   <Link href={`/admin/products/${slug}-${id}`}>
                     <div className="relative">
                       <div className="w-full aspect-square overflow-hidden flex items-center justify-center shadow-[2px_2px_4px_#9E9E9E] bg-white">
-                        <Image
-                          src={images.main}
-                          alt={name}
-                          width={250}
-                          height={250}
-                          priority
-                        />
+                        <Image src={images.main} alt={name} width={250} height={250} priority />
                       </div>
                       <div className="w-full h-full absolute top-0 bottom-0 left-0 right-0 ease-in-out duration-300 transition group-hover:bg-black/20"></div>
                     </div>
@@ -219,16 +184,10 @@ export default function ProductGrid({ products }: { products: ProductType[] }) {
                       {Number(pricing.salePrice) ? (
                         <div className="flex items-center gap-[6px]">
                           <div className="flex items-baseline">
+                            <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                            <span className="text-lg font-bold">{Math.floor(Number(pricing.salePrice))}</span>
                             <span className="text-[0.813rem] leading-3 font-semibold">
-                              $
-                            </span>
-                            <span className="text-lg font-bold">
-                              {Math.floor(Number(pricing.salePrice))}
-                            </span>
-                            <span className="text-[0.813rem] leading-3 font-semibold">
-                              {(Number(pricing.salePrice) % 1)
-                                .toFixed(2)
-                                .substring(1)}
+                              {(Number(pricing.salePrice) % 1).toFixed(2).substring(1)}
                             </span>
                           </div>
                           <span className="text-[0.813rem] leading-3 text-gray line-through">
@@ -237,16 +196,10 @@ export default function ProductGrid({ products }: { products: ProductType[] }) {
                         </div>
                       ) : (
                         <div className="flex items-baseline">
+                          <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                          <span className="text-lg font-bold">{Math.floor(Number(pricing.basePrice))}</span>
                           <span className="text-[0.813rem] leading-3 font-semibold">
-                            $
-                          </span>
-                          <span className="text-lg font-bold">
-                            {Math.floor(Number(pricing.basePrice))}
-                          </span>
-                          <span className="text-[0.813rem] leading-3 font-semibold">
-                            {(Number(pricing.basePrice) % 1)
-                              .toFixed(2)
-                              .substring(1)}
+                            {(Number(pricing.basePrice) % 1).toFixed(2).substring(1)}
                           </span>
                         </div>
                       )}
@@ -288,9 +241,7 @@ export default function ProductGrid({ products }: { products: ProductType[] }) {
                       }
                     )}
                   />
-                  <div className="flex items-center justify-center px-1 cursor-context-menu">
-                    of
-                  </div>
+                  <div className="flex items-center justify-center px-1 cursor-context-menu">of</div>
                   <button
                     onClick={jumpToLastPage}
                     className="w-9 h-9 flex items-center justify-center border rounded-full ease-in-out duration-300 transition bg-white active:bg-lightgray-dimmed lg:hover:bg-lightgray-dimmed"
@@ -312,9 +263,7 @@ export default function ProductGrid({ products }: { products: ProductType[] }) {
         <div className="w-full flex justify-center">
           <div className="text-center">
             <h2 className="font-semibold text-lg mb-2">No products yet</h2>
-            <p className="text-sm mb-4">
-              Click the button below to create your first one
-            </p>
+            <p className="text-sm mb-4">Click the button below to create your first one</p>
             <NewProductEmptyGridButton />
           </div>
         </div>

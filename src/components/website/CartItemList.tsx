@@ -11,59 +11,6 @@ import clsx from "clsx";
 import { Check, Gift } from "lucide-react";
 import { RemoveFromCartButton } from "./RemoveFromCartButton";
 
-// Type Definitions
-type SelectedOptionType = {
-  value: string;
-  optionDisplayOrder: number;
-  groupDisplayOrder: number;
-};
-
-type CartProductItemType = {
-  type: "product";
-  baseProductId: string;
-  name: string;
-  slug: string;
-  pricing: {
-    basePrice: number;
-    salePrice: number;
-    discountPercentage: number;
-  };
-  mainImage: string;
-  variantId: string;
-  selectedOptions: Record<string, SelectedOptionType>;
-  index: number;
-};
-
-type CartUpsellItemType = {
-  type: "upsell";
-  baseUpsellId: string;
-  variantId: string;
-  index: number;
-  mainImage: string;
-  pricing: {
-    basePrice: number;
-    salePrice: number;
-    discountPercentage: number;
-  };
-  products: Array<{
-    id: string;
-    name: string;
-    slug: string;
-    mainImage: string;
-    basePrice: number;
-    selectedOptions: Record<string, SelectedOptionType>;
-  }>;
-};
-
-type CartItemType = CartProductItemType | CartUpsellItemType;
-
-interface OrderSummaryProps {
-  selectedItems: Set<string>;
-  getSelectedCartItems: () => CartItemType[];
-  calculateTotal: () => number;
-  toggleAll: () => void;
-}
-
 export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set(cartItems.map((item) => item.variantId)));
   const [deselectedItems, setDeselectedItems] = useState<Set<string>>(new Set());
@@ -353,7 +300,9 @@ export function CartItemList({ cartItems }: { cartItems: CartItemType[] }) {
   );
 }
 
-function OrderSummary({ selectedItems, getSelectedCartItems, calculateTotal, toggleAll }: OrderSummaryProps) {
+// -- Helper Functions --
+
+function OrderSummary({ selectedItems, getSelectedCartItems, calculateTotal, toggleAll }: OrderSummaryType) {
   const totalPrice = calculateTotal();
 
   return (
@@ -459,7 +408,7 @@ function OrderSummary({ selectedItems, getSelectedCartItems, calculateTotal, tog
   );
 }
 
-function MobileOrderSummary({ selectedItems, getSelectedCartItems, calculateTotal, toggleAll }: OrderSummaryProps) {
+function MobileOrderSummary({ selectedItems, getSelectedCartItems, calculateTotal, toggleAll }: OrderSummaryType) {
   const totalPrice = calculateTotal();
   return (
     <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-md z-50">
@@ -504,3 +453,57 @@ function MobileOrderSummary({ selectedItems, getSelectedCartItems, calculateTota
     </div>
   );
 }
+
+// -- Type Definitions --
+
+type SelectedOptionType = {
+  value: string;
+  optionDisplayOrder: number;
+  groupDisplayOrder: number;
+};
+
+type CartProductItemType = {
+  type: "product";
+  baseProductId: string;
+  name: string;
+  slug: string;
+  pricing: {
+    basePrice: number;
+    salePrice: number;
+    discountPercentage: number;
+  };
+  mainImage: string;
+  variantId: string;
+  selectedOptions: Record<string, SelectedOptionType>;
+  index: number;
+};
+
+type CartUpsellItemType = {
+  type: "upsell";
+  baseUpsellId: string;
+  variantId: string;
+  index: number;
+  mainImage: string;
+  pricing: {
+    basePrice: number;
+    salePrice: number;
+    discountPercentage: number;
+  };
+  products: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    mainImage: string;
+    basePrice: number;
+    selectedOptions: Record<string, SelectedOptionType>;
+  }>;
+};
+
+type CartItemType = CartProductItemType | CartUpsellItemType;
+
+type OrderSummaryType = {
+  selectedItems: Set<string>;
+  getSelectedCartItems: () => CartItemType[];
+  calculateTotal: () => number;
+  toggleAll: () => void;
+};

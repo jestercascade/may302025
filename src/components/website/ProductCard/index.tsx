@@ -22,13 +22,7 @@ export const ProductCard = memo(function ProductCard({
         href={`/${product.slug}-${product.id}`}
         className="w-full aspect-square rounded-xl flex items-center justify-center overflow-hidden bg-white"
       >
-        <Image
-          src={product.images.main}
-          alt={product.name}
-          width={308}
-          height={308}
-          priority={true}
-        />
+        <Image src={product.images.main} alt={product.name} width={308} height={308} priority={true} />
       </Link>
       <div className="pt-2 flex flex-col gap-[6px]">
         <p className="text-xs line-clamp-1">{product.name}</p>
@@ -37,16 +31,10 @@ export const ProductCard = memo(function ProductCard({
             {Number(product.pricing.salePrice) ? (
               <div className="flex items-center gap-[6px]">
                 <div className="flex items-baseline text-[rgb(168,100,0)]">
+                  <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                  <span className="text-lg font-bold">{Math.floor(Number(product.pricing.salePrice))}</span>
                   <span className="text-[0.813rem] leading-3 font-semibold">
-                    $
-                  </span>
-                  <span className="text-lg font-bold">
-                    {Math.floor(Number(product.pricing.salePrice))}
-                  </span>
-                  <span className="text-[0.813rem] leading-3 font-semibold">
-                    {(Number(product.pricing.salePrice) % 1)
-                      .toFixed(2)
-                      .substring(1)}
+                    {(Number(product.pricing.salePrice) % 1).toFixed(2).substring(1)}
                   </span>
                 </div>
                 <span className="text-[0.813rem] leading-3 text-gray line-through">
@@ -55,25 +43,15 @@ export const ProductCard = memo(function ProductCard({
               </div>
             ) : (
               <div className="flex items-baseline">
+                <span className="text-[0.813rem] leading-3 font-semibold">$</span>
+                <span className="text-lg font-bold">{Math.floor(Number(product.pricing.basePrice))}</span>
                 <span className="text-[0.813rem] leading-3 font-semibold">
-                  $
-                </span>
-                <span className="text-lg font-bold">
-                  {Math.floor(Number(product.pricing.basePrice))}
-                </span>
-                <span className="text-[0.813rem] leading-3 font-semibold">
-                  {(Number(product.pricing.basePrice) % 1)
-                    .toFixed(2)
-                    .substring(1)}
+                  {(Number(product.pricing.basePrice) % 1).toFixed(2).substring(1)}
                 </span>
               </div>
             )}
           </div>
-          <QuickviewButton
-            onClick={(event) => event.stopPropagation()}
-            product={product}
-            cart={cart}
-          />
+          <QuickviewButton onClick={(event) => event.stopPropagation()} product={product} cart={cart} />
         </div>
       </div>
     </div>

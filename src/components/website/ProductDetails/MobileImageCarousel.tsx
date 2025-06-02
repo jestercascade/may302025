@@ -5,15 +5,16 @@ import { useState, useEffect, useCallback } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import type { EmblaCarouselType } from "embla-carousel";
 
-type ImageCarouselType = {
+export function MobileImageCarousel({
+  images,
+  productName,
+}: {
   images: {
     main: string;
     gallery: string[];
   };
   productName: string;
-};
-
-export function MobileImageCarousel({ images, productName }: ImageCarouselType) {
+}) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,

@@ -32,9 +32,7 @@ export default async function EditUpsell({ params }: { params: Promise<{ id: str
           <div
             className={clsx(
               "w-full max-w-[400px] relative flex items-center justify-between shadow rounded-xl bg-white",
-              {
-                "p-5 pr-2": !(pricing.basePrice && mainImage),
-              }
+              !(pricing.basePrice && mainImage) && "p-5 pr-2"
             )}
           >
             {pricing.basePrice && mainImage ? (

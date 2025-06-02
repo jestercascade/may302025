@@ -4,17 +4,15 @@ import { useOptionsStore } from "@/zustand/website/optionsStore";
 import { ProductDetailsOptions } from "@/components/website/Options/ProductDetailsOptions";
 import { memo, useEffect } from "react";
 
-type QuickviewOptionsProps = {
-  productId: string;
-  options: ProductOptionsType;
-  isStickyBarInCartIndicator?: boolean;
-};
-
 export const QuickviewOptions = memo(function QuickviewOptions({
   productId,
   options,
   isStickyBarInCartIndicator = false,
-}: QuickviewOptionsProps) {
+}: {
+  productId: string;
+  options: ProductOptionsType;
+  isStickyBarInCartIndicator?: boolean;
+}) {
   const resetOptions = useOptionsStore((state) => state.resetOptions);
 
   useEffect(() => {

@@ -36,9 +36,7 @@ export default function IDCopyButton({ id }: { id: string }) {
       onClick={() => handleCopyId(id)}
     >
       <Copy color="#6c6c6c" size={16} strokeWidth={2} />
-      <span className="text-sm font-semibold text-gray">
-        {isCopied ? "ID Copied!" : "Copy ID to Clipboard"}
-      </span>
+      <span className="text-sm font-semibold text-gray">{isCopied ? "ID Copied!" : "Copy ID to Clipboard"}</span>
     </button>
   );
 }

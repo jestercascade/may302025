@@ -401,6 +401,8 @@ export function UpsellReviewOverlay({ cart }: { cart: CartType | null }) {
   );
 }
 
+// -- Helper Functions --
+
 function UpsellProductSummary({ product, selectedOptions, onSelectOptions }: UpsellProductSummaryProps) {
   const hasActiveOptions = product.options.groups.some((group) => group.values.some((opt) => opt.isActive));
 
@@ -522,8 +524,6 @@ function OptionSelectionModal({
   const chaining = product.options.config?.chaining;
   const isChainingEnabled = chaining?.enabled ?? false;
   const relationships = isChainingEnabled ? chaining.relationships || [] : [];
-
-  // Precompute valid parent and child options
   const validParentOptions = new Map<number, Set<number>>();
   const validChildOptions = new Map<number, Set<number>>();
 
@@ -811,6 +811,8 @@ function OptionSelectionModal({
     </div>
   );
 }
+
+// -- Type Definitions --
 
 type UpsellProductSummaryProps = {
   product: UpsellProductType;

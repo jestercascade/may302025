@@ -164,16 +164,10 @@ function generateCartItems(cart: Cart): CartItem[] {
   }
 
   function formatProductName(item: ProductCartItem): string {
-    // Get base product ID
     const productId = item.baseProductId;
-
-    // Extract all selected options into an array
     const optionValues: string[] = [];
-
-    // Add base product ID as the first element
     optionValues.push(productId);
 
-    // Add all option values in order of their groupDisplayOrder
     if (item.selectedOptions) {
       const sortedOptions = Object.values(item.selectedOptions)
         .sort((a, b) => a.groupDisplayOrder - b.groupDisplayOrder)
@@ -182,7 +176,6 @@ function generateCartItems(cart: Cart): CartItem[] {
       optionValues.push(...sortedOptions);
     }
 
-    // Format as [ID, option1, option2, ...]
     const formattedName = `[${optionValues.join(", ")}]`;
 
     // For PayPal, name must be 127 characters or less
@@ -190,11 +183,9 @@ function generateCartItems(cart: Cart): CartItem[] {
   }
 
   function formatUpsellName(item: UpsellCartItem): string {
-    // For each product in the upsell, create a bracket with product ID and options
     const productDetails = item.products.map((product) => {
       const optionValues: string[] = [product.id];
 
-      // Add option values if they exist
       if (product.selectedOptions) {
         const sortedOptions = Object.values(product.selectedOptions)
           .sort((a, b) => a.groupDisplayOrder - b.groupDisplayOrder)

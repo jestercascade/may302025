@@ -1,16 +1,16 @@
 "use client";
 
 import { ChevronLeftIcon } from "@/icons";
-import { useRouter } from "next/navigation";
+import { useNavigation } from "../shared/NavigationLoadingIndicator";
 
 export function BackButton() {
-  const router = useRouter();
+  const { push, back } = useNavigation();
 
   const handleGoBack = () => {
     if (window.history.length > 2) {
-      router.back();
+      back();
     } else {
-      router.push("/");
+      push("/");
     }
   };
 

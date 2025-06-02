@@ -2,11 +2,7 @@ import { convertContent } from "./utils";
 
 type ContentType = "react" | "html";
 
-export function EmailLogo({
-  contentType = "react",
-}: {
-  contentType?: ContentType;
-}) {
+export function EmailLogo({ contentType = "react" }: { contentType?: ContentType }) {
   const LogoComponent = (
     <div
       style={{

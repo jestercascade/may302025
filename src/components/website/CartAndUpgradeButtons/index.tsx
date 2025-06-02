@@ -15,39 +15,11 @@ import styles from "./styles.module.css";
 import clsx from "clsx";
 import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 
-type SelectedOptionType = {
-  value: string;
-  optionDisplayOrder: number;
-  groupDisplayOrder: number;
-};
-
-type CartProductItemType = {
-  type: "product";
-  baseProductId: string;
-  selectedOptions: Record<string, SelectedOptionType>;
-  variantId: string;
-  index: number;
-};
-
-type CartType = {
-  id: string;
-  device_identifier: string;
-  items: CartProductItemType[];
-  createdAt: string;
-  updatedAt: string;
-};
-
-// This interface tracks what configurations have been added to the cart
-interface CartTrackingItem {
-  productId: string;
-  options: Record<string, string>;
-}
-
 export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithUpsellType; cart: CartType | null }) {
   const [isPending, startTransition] = useTransition();
   const { showAlert } = useAlertStore();
   const { selectedOptions, setIsInCart } = useOptionsStore();
-  const [cartTracking, setCartTracking] = useState<CartTrackingItem[]>([]);
+  const [cartTracking, setCartTracking] = useState<CartTrackingItemType[]>([]);
   const pathname = usePathname();
   const { push } = useNavigation();
   const hideQuickviewOverlay = useQuickviewStore((state) => state.hideOverlay);
@@ -55,7 +27,7 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
 
   useEffect(() => {
     if (cart?.items && product.options?.groups) {
-      const initialTracking: CartTrackingItem[] = [];
+      const initialTracking: CartTrackingItemType[] = [];
 
       cart.items.forEach((item) => {
         if (item.type === "product") {
@@ -260,3 +232,32 @@ export function CartAndUpgradeButtons({ product, cart }: { product: ProductWithU
     </>
   );
 }
+
+// -- Type Definitions --
+
+type SelectedOptionType = {
+  value: string;
+  optionDisplayOrder: number;
+  groupDisplayOrder: number;
+};
+
+type CartProductItemType = {
+  type: "product";
+  baseProductId: string;
+  selectedOptions: Record<string, SelectedOptionType>;
+  variantId: string;
+  index: number;
+};
+
+type CartType = {
+  id: string;
+  device_identifier: string;
+  items: CartProductItemType[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+type CartTrackingItemType = {
+  productId: string;
+  options: Record<string, string>;
+};

@@ -5,120 +5,6 @@ import { useOverlayStore } from "@/zustand/website/overlayStore";
 import { memo } from "react";
 import { clsx } from "clsx";
 
-// Types
-type OptionGroupType = {
-  id: number;
-  name: string;
-  displayOrder: number;
-  values: Array<{
-    id: number;
-    value: string;
-    isActive: boolean;
-  }>;
-  sizeChart?: SizeChartType;
-};
-
-type ProductOptionsType = {
-  groups: Array<OptionGroupType>;
-  config?: {
-    chaining: {
-      enabled: boolean;
-      relationships: Array<{
-        parentGroupId: number;
-        childGroupId: number;
-        constraints: {
-          [parentOptionId: string]: number[];
-        };
-      }>;
-    };
-  };
-};
-
-type SizeChartType = {
-  centimeters?: {
-    columns: Array<{
-      label: string;
-      order: number;
-    }>;
-    rows: Array<{
-      [key: string]: string;
-    }>;
-  };
-  inches?: {
-    columns: Array<{
-      label: string;
-      order: number;
-    }>;
-    rows: Array<{
-      [key: string]: string;
-    }>;
-  };
-};
-
-type SizeChartOverlayProps = {
-  productInfo: {
-    id: string;
-    options: ProductOptionsType;
-  };
-};
-
-// Chart Component
-const Chart = memo(function Chart({ sizeChart, unit }: { sizeChart: SizeChartType; unit: "inches" | "centimeters" }) {
-  const chartData = sizeChart[unit];
-
-  if (!chartData) {
-    return <div className="text-gray-500">No {unit} data available</div>;
-  }
-
-  // Sort columns by order property
-  const sortedColumns = [...chartData.columns].sort((a, b) => a.order - b.order);
-
-  return (
-    <div className="border w-full max-w-[max-content] rounded overflow-y-hidden overflow-x-visible custom-x-scrollbar">
-      <table className="w-max bg-white">
-        <thead className="h-10 border-b">
-          <tr>
-            {sortedColumns.map((column, index) => (
-              <th
-                key={index}
-                className={clsx(
-                  "px-5 text-nowrap text-sm font-normal",
-                  index === sortedColumns.length - 1 ? "" : "border-r",
-                  index === 0 ? "sticky left-0 bg-neutral-100" : ""
-                )}
-              >
-                {column.label}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {chartData.rows.map((row, rowIndex) => (
-            <tr key={rowIndex} className={clsx("h-10", rowIndex === chartData.rows.length - 1 ? "" : "border-b")}>
-              {sortedColumns.map((column, columnIndex) => (
-                <td
-                  key={columnIndex}
-                  className={clsx(
-                    "text-center px-5 w-[118px] text-sm",
-                    columnIndex === 0
-                      ? "sticky left-0 bg-neutral-100 border-r font-semibold"
-                      : columnIndex === sortedColumns.length - 1
-                      ? ""
-                      : "border-r"
-                  )}
-                >
-                  {row[column.label]}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-});
-
-// Main Overlay Component
 export function SizeChartOverlay({ productInfo }: SizeChartOverlayProps) {
   const pageName = useOverlayStore((state) => state.pages.productDetails.name);
   const overlayName = useOverlayStore((state) => state.pages.productDetails.overlays.sizeChart.name);
@@ -174,3 +60,116 @@ export function SizeChartOverlay({ productInfo }: SizeChartOverlayProps) {
     </div>
   );
 }
+
+const Chart = memo(function Chart({ sizeChart, unit }: { sizeChart: SizeChartType; unit: "inches" | "centimeters" }) {
+  const chartData = sizeChart[unit];
+
+  if (!chartData) {
+    return <div className="text-gray-500">No {unit} data available</div>;
+  }
+
+  // Sort columns by order property
+  const sortedColumns = [...chartData.columns].sort((a, b) => a.order - b.order);
+
+  return (
+    <div className="border w-full max-w-[max-content] rounded overflow-y-hidden overflow-x-visible custom-x-scrollbar">
+      <table className="w-max bg-white">
+        <thead className="h-10 border-b">
+          <tr>
+            {sortedColumns.map((column, index) => (
+              <th
+                key={index}
+                className={clsx(
+                  "px-5 text-nowrap text-sm font-normal",
+                  index === sortedColumns.length - 1 ? "" : "border-r",
+                  index === 0 ? "sticky left-0 bg-neutral-100" : ""
+                )}
+              >
+                {column.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {chartData.rows.map((row, rowIndex) => (
+            <tr key={rowIndex} className={clsx("h-10", rowIndex === chartData.rows.length - 1 ? "" : "border-b")}>
+              {sortedColumns.map((column, columnIndex) => (
+                <td
+                  key={columnIndex}
+                  className={clsx(
+                    "text-center px-5 w-[118px] text-sm",
+                    columnIndex === 0
+                      ? "sticky left-0 bg-neutral-100 border-r font-semibold"
+                      : columnIndex === sortedColumns.length - 1
+                      ? ""
+                      : "border-r"
+                  )}
+                >
+                  {row[column.label]}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+});
+
+// -- Type Definitions --
+
+type OptionGroupType = {
+  id: number;
+  name: string;
+  displayOrder: number;
+  values: Array<{
+    id: number;
+    value: string;
+    isActive: boolean;
+  }>;
+  sizeChart?: SizeChartType;
+};
+
+type ProductOptionsType = {
+  groups: Array<OptionGroupType>;
+  config?: {
+    chaining: {
+      enabled: boolean;
+      relationships: Array<{
+        parentGroupId: number;
+        childGroupId: number;
+        constraints: {
+          [parentOptionId: string]: number[];
+        };
+      }>;
+    };
+  };
+};
+
+type SizeChartType = {
+  centimeters?: {
+    columns: Array<{
+      label: string;
+      order: number;
+    }>;
+    rows: Array<{
+      [key: string]: string;
+    }>;
+  };
+  inches?: {
+    columns: Array<{
+      label: string;
+      order: number;
+    }>;
+    rows: Array<{
+      [key: string]: string;
+    }>;
+  };
+};
+
+type SizeChartOverlayProps = {
+  productInfo: {
+    id: string;
+    options: ProductOptionsType;
+  };
+};

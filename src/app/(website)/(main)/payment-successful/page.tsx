@@ -25,11 +25,7 @@ function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-export default async function PaymentSuccessful({
-  searchParams,
-}: {
-  searchParams: Promise<{ email: string }>;
-}) {
+export default async function PaymentSuccessful({ searchParams }: { searchParams: Promise<{ email: string }> }) {
   const { email } = await searchParams;
 
   let normalizedEmail: string;
@@ -55,9 +51,7 @@ export default async function PaymentSuccessful({
     <div>
       <div className="w-max mx-auto">
         <div className="w-max pt-12 text-center">
-          <h1 className="text-2xl font-semibold mb-3">
-            Payment successful, thanks so much!
-          </h1>
+          <h1 className="text-2xl font-semibold mb-3">Payment successful, thanks so much!</h1>
           <p>We're sending confirmation to</p>
           <p className="text-blue font-medium">{normalizedEmail}</p>
         </div>

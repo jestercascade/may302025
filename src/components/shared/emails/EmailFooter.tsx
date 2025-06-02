@@ -18,8 +18,7 @@ export function EmailFooter({
 }) {
   const getUnsubscribeUrl = (email: string) => {
     // Use your actual domain here
-    const baseUrl =
-      "https://literate-space-palm-tree-pj7j5pjvv5g7f75j5-3000.app.github.dev/";
+    const baseUrl = "https://cherlygood.vercel.app/";
     const encodedEmail = encodeURIComponent(email);
     return `${baseUrl}/newsletter-unsubscribe?email=${encodedEmail}`;
   };
@@ -47,10 +46,7 @@ export function EmailFooter({
             }}
           >
             Need help? Contact us at{" "}
-            <a
-              href="mailto:hello@cherlygood.com"
-              style={{ textDecoration: "underline", color: "#333" }}
-            >
+            <a href="mailto:hello@cherlygood.com" style={{ textDecoration: "underline", color: "#333" }}>
               hello@cherlygood.com
             </a>
           </h2>
@@ -63,9 +59,8 @@ export function EmailFooter({
               margin: "0 auto",
             }}
           >
-            We're here to help with anything you need—questions about your
-            order, concerns, or advice on finding the right product. Reach out
-            anytime; we're happy to assist!
+            We're here to help with anything you need—questions about your order, concerns, or advice on finding the
+            right product. Reach out anytime; we're happy to assist!
           </p>
         </div>
         <div>

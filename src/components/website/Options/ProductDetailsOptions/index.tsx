@@ -8,46 +8,6 @@ import styles from "./styles.module.css";
 import { useOverlayStore } from "@/zustand/website/overlayStore";
 import { useScrollStore } from "@/zustand/website/scrollStore";
 
-type OptionType = {
-  id: number;
-  value: string;
-  isActive: boolean;
-};
-
-type OptionGroupType = {
-  id: number;
-  name: string;
-  displayOrder: number;
-  values: OptionType[];
-  sizeChart?: SizeChartType;
-};
-
-type SizeChartType = {
-  centimeters?: { columns: { label: string; order: number }[]; rows: { [key: string]: string }[] };
-  inches?: { columns: { label: string; order: number }[]; rows: { [key: string]: string }[] };
-};
-
-type ProductOptionsType = {
-  groups: OptionGroupType[];
-  config?: {
-    chaining?: {
-      enabled: boolean;
-      relationships?: Array<{
-        parentGroupId: number;
-        childGroupId: number;
-        constraints: { [parentOptionId: string]: number[] };
-      }>;
-    };
-  };
-};
-
-type ProductDetailsOptionsProps = {
-  options: ProductOptionsType;
-  isStickyBarInCartIndicator?: boolean;
-  onSizeChartClick?: () => void;
-  hideDetailedSelections?: boolean;
-};
-
 const sizeLabels = new Set(["XXXS", "XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL", "2XL", "3XL", "4XL", "5XL"]);
 const countryCodes = new Set(["US", "UK", "EU", "FR", "IT", "JP", "AU", "CN"]);
 
@@ -436,3 +396,45 @@ export const ProductDetailsOptions = memo(function ProductDetailsOptions({
     </div>
   );
 });
+
+// -- Type Definitions --
+
+type OptionType = {
+  id: number;
+  value: string;
+  isActive: boolean;
+};
+
+type OptionGroupType = {
+  id: number;
+  name: string;
+  displayOrder: number;
+  values: OptionType[];
+  sizeChart?: SizeChartType;
+};
+
+type SizeChartType = {
+  centimeters?: { columns: { label: string; order: number }[]; rows: { [key: string]: string }[] };
+  inches?: { columns: { label: string; order: number }[]; rows: { [key: string]: string }[] };
+};
+
+type ProductOptionsType = {
+  groups: OptionGroupType[];
+  config?: {
+    chaining?: {
+      enabled: boolean;
+      relationships?: Array<{
+        parentGroupId: number;
+        childGroupId: number;
+        constraints: { [parentOptionId: string]: number[] };
+      }>;
+    };
+  };
+};
+
+type ProductDetailsOptionsProps = {
+  options: ProductOptionsType;
+  isStickyBarInCartIndicator?: boolean;
+  onSizeChartClick?: () => void;
+  hideDetailedSelections?: boolean;
+};

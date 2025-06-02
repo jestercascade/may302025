@@ -155,5 +155,10 @@ export function useNavigation() {
       },
       [context, router, pathname]
     ),
+    back: useCallback(() => {
+      const cleanup = context.triggerLoading();
+      router.back();
+      return cleanup;
+    }, [context, router]),
   };
 }

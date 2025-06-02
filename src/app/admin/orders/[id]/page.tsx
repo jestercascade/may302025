@@ -164,7 +164,6 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
   return (
     <>
       <div className="max-w-[768px] flex flex-col gap-10 px-5">
-        {/* Order Summary Section */}
         <div>
           <div className="mb-6">
             <h2 className="font-semibold text-xl mb-3">Order summary</h2>
@@ -236,8 +235,6 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
             </div>
           </div>
         </div>
-
-        {/* Email Updates Section */}
         <div>
           <div className="mb-6">
             <h2 className="font-semibold text-xl mb-3">Status updates</h2>
@@ -254,8 +251,6 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
             </div>
           </div>
         </div>
-
-        {/* Purchased Items Section */}
         <div>
           <div className="mb-6">
             <h2 className="font-semibold text-xl mb-3">Purchased items</h2>
@@ -378,8 +373,6 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
             </div>
           </div>
         </div>
-
-        {/* Order Tracking Section */}
         <div>
           <div className="mb-6">
             <h2 className="font-semibold text-xl mb-3">Order Tracking</h2>
@@ -392,7 +385,6 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
             <div className="flex flex-col gap-5">
               {hasTrackingDetails ? (
                 <>
-                  {/* Current Status Card */}
                   <div>
                     <div className="space-y-2">
                       <div className="flex items-center">
@@ -414,7 +406,6 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                       </div>
                     </div>
                   </div>
-                  {/* Progress Bar */}
                   <div className="py-6">
                     <div className="relative max-w-2xl mx-auto px-[10px]">
                       <div className="absolute top-[9px] left-[10px] right-[10px] h-0.5 bg-gray-300 rounded-full"></div>
@@ -458,8 +449,6 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                       </div>
                     </div>
                   </div>
-
-                  {/* Timeline Section */}
                   <div>
                     <h3 className="text-base font-medium mb-4">Status Log</h3>
                     <div className="space-y-4">

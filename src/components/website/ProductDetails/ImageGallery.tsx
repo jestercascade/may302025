@@ -4,7 +4,16 @@ import { memo, useEffect, useState, useMemo } from "react";
 import { useProductColorImageStore } from "@/zustand/website/productColorImageStore";
 import Image from "next/image";
 
-export function ImageGallery({ images, productName }: ProductImagesType) {
+export function ImageGallery({
+  images,
+  productName,
+}: {
+  images: {
+    main: string;
+    gallery: string[];
+  };
+  productName: string;
+}) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { selectedColorImage, resetSelectedColorImage } = useProductColorImageStore();
 
@@ -75,11 +84,3 @@ const ThumbnailImage = memo(function ThumbnailImage({
     </button>
   );
 });
-
-type ProductImagesType = {
-  images: {
-    main: string;
-    gallery: string[];
-  };
-  productName: string;
-};

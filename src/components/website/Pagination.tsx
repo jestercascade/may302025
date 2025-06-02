@@ -126,9 +126,7 @@ export function Pagination({ currentPage, totalPages }: { currentPage: number; t
                 />
               )}
             </div>
-
             <div className="flex items-center justify-center px-1">of</div>
-
             <button
               onClick={() => handleNavigation("last")}
               disabled={currentPage === totalPages || isNavigating}
@@ -144,7 +142,6 @@ export function Pagination({ currentPage, totalPages }: { currentPage: number; t
             >
               {isNavigating && navigatingDirection === "last" ? <Spinner /> : totalPages}
             </button>
-
             <button
               onClick={() => handleNavigation("next")}
               disabled={currentPage === totalPages || isNavigating}

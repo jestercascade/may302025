@@ -23,13 +23,11 @@ export default function Navbar({ itemsInCart }: { itemsInCart: number }) {
   const isAlertOverlayVisible = useAlertStore((state) => state.isVisible);
   const isNavigationLoadingIndicatorVisible = useNavigationLoadingIndicatorStore((state) => state.isVisible);
 
-  // Reset navbar visibility on route change
   useEffect(() => {
-    setIsNavigating(true); // Set to true when navigating
+    setIsNavigating(true);
     setShouldHideNavbar(false);
     prevScrollRef.current = window.scrollY;
 
-    // Reset isNavigating after a short delay to ensure the navbar is fully rendered
     const timer = setTimeout(() => {
       setIsNavigating(false);
     }, 50);

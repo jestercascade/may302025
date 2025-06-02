@@ -135,13 +135,7 @@ export const WebsiteGoogleSignInButton = () => {
         isSigningIn ? "opacity-50 cursor-not-allowed" : ""
       }`}
     >
-      {isSigningIn
-        ? "Signing in..."
-        : user
-        ? isAdmin
-          ? "Sign in with Google"
-          : "Signed in"
-        : "Sign in with Google"}
+      {isSigningIn ? "Signing in..." : user ? (isAdmin ? "Sign in with Google" : "Signed in") : "Sign in with Google"}
     </button>
   );
 };

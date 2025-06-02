@@ -30,7 +30,6 @@ export default function OrderTrackingGuide() {
         {showGuide ? "Hide" : "Need help?"}
         {showGuide ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
       </button>
-
       {showGuide && (
         <div className="mt-4 bg-white rounded-xl border border-gray-200/70 overflow-hidden transition-all duration-300 max-w-2xl mx-auto">
           <div className="px-5 pt-4 pb-2">

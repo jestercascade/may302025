@@ -21,208 +21,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatThousands } from "@/lib/utils/common";
 
-type SelectedOptionType = {
-  value: string;
-  optionDisplayOrder: number;
-  groupDisplayOrder: number;
-};
-
-type UpsellProductType = {
-  id: string;
-  name: string;
-  slug: string;
-  mainImage: string;
-  selectedOptions: Record<string, SelectedOptionType>;
-};
-
-type OrderProductItemType = {
-  type: "product";
-  mainImage: string;
-  name: string;
-  slug?: string;
-  baseProductId?: string;
-  selectedOptions: Record<string, SelectedOptionType>;
-  pricing: {
-    basePrice: number | string;
-    salePrice?: number | string;
-  };
-};
-
-type OrderUpsellItemType = {
-  type: "upsell";
-  pricing: {
-    basePrice: number | string;
-    salePrice?: number | string;
-  };
-  products: UpsellProductType[];
-};
-
-type OrderType = {
-  invoiceId: string;
-  timestamp: string;
-  amount: { value: number | string };
-  shipping: {
-    address: {
-      city: string;
-      country: string;
-    };
-  };
-  tracking: {
-    currentStatus: string;
-    estimatedDeliveryDate?: { start: string; end: string };
-    statusHistory: Array<{
-      status: string;
-      timestamp: string;
-      message: string;
-    }>;
-  };
-  items: Array<OrderProductItemType | OrderUpsellItemType>;
-};
-
-const validateInvoiceId = (invoiceId: string): { isValid: boolean; id?: string; error?: string } => {
-  try {
-    const trimmed = invoiceId?.trim();
-    if (!trimmed) {
-      return { isValid: false, error: "Please enter an invoice ID" };
-    }
-
-    let id = trimmed.split(" ")[0];
-    if (id.startsWith("#")) {
-      id = id.slice(1);
-    }
-
-    const idRegex = /^[A-Za-z0-9]{8}$/;
-    if (!idRegex.test(id)) {
-      return {
-        isValid: false,
-        error: "Invoice ID must be 8 alphanumeric characters",
-      };
-    }
-
-    return { isValid: true, id };
-  } catch {
-    return { isValid: false, error: "Invalid invoice ID format" };
-  }
-};
-
-const validateOrderData = (data: any): { isValid: boolean; order?: OrderType; error?: string } => {
-  try {
-    if (!data || typeof data !== "object") {
-      return { isValid: false, error: "Order not found" };
-    }
-
-    // Check required fields with safe access
-    const requiredChecks = [
-      { field: "invoiceId", value: data.invoiceId },
-      { field: "timestamp", value: data.timestamp },
-      { field: "amount", value: data.amount?.value },
-      { field: "shipping", value: data.shipping?.address?.city && data.shipping?.address?.country },
-      { field: "tracking", value: data.tracking?.currentStatus },
-      { field: "items", value: Array.isArray(data.items) && data.items.length > 0 },
-    ];
-
-    for (const check of requiredChecks) {
-      if (!check.value) {
-        return { isValid: false, error: "Order data is incomplete" };
-      }
-    }
-
-    return { isValid: true, order: data as OrderType };
-  } catch {
-    return { isValid: false, error: "Order data is corrupted" };
-  }
-};
-
-const safeNumber = (value: any, fallback: number = 0): number => {
-  try {
-    const num = Number(value);
-    return !isNaN(num) && isFinite(num) ? num : fallback;
-  } catch {
-    return fallback;
-  }
-};
-
-const safeString = (value: any, fallback: string = ""): string => {
-  try {
-    return value && typeof value === "string" ? value : fallback;
-  } catch {
-    return fallback;
-  }
-};
-
-const safeFormatDate = (dateString: string): string => {
-  try {
-    if (!dateString) return "Date not available";
-
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      return "Date not available";
-    }
-
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch {
-    return "Date not available";
-  }
-};
-
-const SafeImage = ({
-  src,
-  alt,
-  width,
-  height,
-  className,
-  onError,
-}: {
-  src: string;
-  alt: string;
-  width: number;
-  height: number;
-  className?: string;
-  onError?: () => void;
-}) => {
-  const [hasError, setHasError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const handleError = () => {
-    setHasError(true);
-    setIsLoading(false);
-    onError?.();
-  };
-
-  const handleLoad = () => {
-    setIsLoading(false);
-  };
-
-  if (hasError) {
-    return (
-      <div className={`${className} bg-gray-100 flex items-center justify-center`} style={{ width, height }}>
-        <Package className="h-8 w-8 text-gray-400" />
-      </div>
-    );
-  }
-
-  return (
-    <div className={className} style={{ width, height }}>
-      {isLoading && <div className="absolute inset-0 bg-gray-100 animate-pulse rounded-lg" />}
-      <Image
-        src={src || "/placeholder-image.jpg"}
-        alt={alt}
-        width={width}
-        height={height}
-        onError={handleError}
-        onLoad={handleLoad}
-        className={isLoading ? "opacity-0" : "opacity-100 transition-opacity"}
-      />
-    </div>
-  );
-};
-
 export default function OrderTracker() {
   const [invoiceId, setInvoiceId] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -385,17 +183,16 @@ export default function OrderTracker() {
       const basePrice = safeNumber(item?.pricing?.basePrice);
       const salePrice = item?.pricing?.salePrice ? safeNumber(item.pricing.salePrice) : null;
       const itemName = safeString(item?.name, "Product");
-      const imageUrl = safeString(item?.mainImage, "/placeholder-image.jpg");
 
       return (
         <div key={index} className="flex gap-3">
           <div className="relative flex flex-col min-[580px]:flex-row gap-4 w-full p-5 rounded-lg border border-gray-200/70">
             <div className="aspect-square h-[160px] min-[580px]:h-[128px]">
               <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
-                <SafeImage src={imageUrl} alt={itemName} width={160} height={160} className="rounded-lg" />
+                <Image src={item.mainImage} alt={item.name} width={160} height={160} priority />
               </div>
               <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
-                <SafeImage src={imageUrl} alt={itemName} width={128} height={128} className="rounded-lg" />
+                <Image src={item.mainImage} alt={item.name} width={128} height={128} priority />
               </div>
             </div>
             <div className="w-full flex flex-col gap-1">
@@ -506,10 +303,10 @@ export default function OrderTracker() {
                     <div className="flex flex-col min-[580px]:flex-row gap-4">
                       <div className="aspect-square h-[160px] min-[580px]:h-[128px]">
                         <div className="min-[580px]:hidden flex items-center justify-center h-full w-max mx-auto overflow-hidden rounded-lg">
-                          <SafeImage src={imageUrl} alt={productName} width={160} height={160} className="rounded-lg" />
+                          <Image src={product.mainImage} alt={product.name} width={160} height={160} priority />
                         </div>
                         <div className="hidden min-[580px]:flex items-center justify-center min-[580px]:min-w-[128px] min-[580px]:max-w-[128px] min-[580px]:min-h-[128px] min-[580px]:max-h-[128px] overflow-hidden rounded-lg">
-                          <SafeImage src={imageUrl} alt={productName} width={128} height={128} className="rounded-lg" />
+                          <Image src={product.mainImage} alt={product.name} width={128} height={128} priority />
                         </div>
                       </div>
                       <div className="space-y-3">
@@ -757,3 +554,156 @@ export default function OrderTracker() {
     </div>
   );
 }
+
+// -- Helper Functions --
+
+const validateInvoiceId = (invoiceId: string): { isValid: boolean; id?: string; error?: string } => {
+  try {
+    const trimmed = invoiceId?.trim();
+    if (!trimmed) {
+      return { isValid: false, error: "Please enter an invoice ID" };
+    }
+
+    let id = trimmed.split(" ")[0];
+    if (id.startsWith("#")) {
+      id = id.slice(1);
+    }
+
+    const idRegex = /^[A-Za-z0-9]{8}$/;
+    if (!idRegex.test(id)) {
+      return {
+        isValid: false,
+        error: "Invoice ID must be 8 alphanumeric characters",
+      };
+    }
+
+    return { isValid: true, id };
+  } catch {
+    return { isValid: false, error: "Invalid invoice ID format" };
+  }
+};
+
+const validateOrderData = (data: any): { isValid: boolean; order?: OrderType; error?: string } => {
+  try {
+    if (!data || typeof data !== "object") {
+      return { isValid: false, error: "Order not found" };
+    }
+
+    const requiredChecks = [
+      { field: "invoiceId", value: data.invoiceId },
+      { field: "timestamp", value: data.timestamp },
+      { field: "amount", value: data.amount?.value },
+      { field: "shipping", value: data.shipping?.address?.city && data.shipping?.address?.country },
+      { field: "tracking", value: data.tracking?.currentStatus },
+      { field: "items", value: Array.isArray(data.items) && data.items.length > 0 },
+    ];
+
+    for (const check of requiredChecks) {
+      if (!check.value) {
+        return { isValid: false, error: "Order data is incomplete" };
+      }
+    }
+
+    return { isValid: true, order: data as OrderType };
+  } catch {
+    return { isValid: false, error: "Order data is corrupted" };
+  }
+};
+
+const safeNumber = (value: any, fallback: number = 0): number => {
+  try {
+    const num = Number(value);
+    return !isNaN(num) && isFinite(num) ? num : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const safeString = (value: any, fallback: string = ""): string => {
+  try {
+    return value && typeof value === "string" ? value : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const safeFormatDate = (dateString: string): string => {
+  try {
+    if (!dateString) return "Date not available";
+
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      return "Date not available";
+    }
+
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return "Date not available";
+  }
+};
+
+// -- Type Definitions --
+
+type SelectedOptionType = {
+  value: string;
+  optionDisplayOrder: number;
+  groupDisplayOrder: number;
+};
+
+type UpsellProductType = {
+  id: string;
+  name: string;
+  slug: string;
+  mainImage: string;
+  selectedOptions: Record<string, SelectedOptionType>;
+};
+
+type OrderProductItemType = {
+  type: "product";
+  mainImage: string;
+  name: string;
+  slug?: string;
+  baseProductId?: string;
+  selectedOptions: Record<string, SelectedOptionType>;
+  pricing: {
+    basePrice: number | string;
+    salePrice?: number | string;
+  };
+};
+
+type OrderUpsellItemType = {
+  type: "upsell";
+  pricing: {
+    basePrice: number | string;
+    salePrice?: number | string;
+  };
+  products: UpsellProductType[];
+};
+
+type OrderType = {
+  invoiceId: string;
+  timestamp: string;
+  amount: { value: number | string };
+  shipping: {
+    address: {
+      city: string;
+      country: string;
+    };
+  };
+  tracking: {
+    currentStatus: string;
+    estimatedDeliveryDate?: { start: string; end: string };
+    statusHistory: Array<{
+      status: string;
+      timestamp: string;
+      message: string;
+    }>;
+  };
+  items: Array<OrderProductItemType | OrderUpsellItemType>;
+};
