@@ -10,7 +10,7 @@ export async function UpdateOrderTrackingAction(data: {
   tracking: {
     currentStatus: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "COMPLETED";
     trackingNumber?: string;
-    estimatedDeliveryRange?: {
+    estimatedDeliveryDate?: {
       start: string;
       end: string;
     };
@@ -55,10 +55,10 @@ export async function UpdateOrderTrackingAction(data: {
       updatedTracking.trackingNumber = data.tracking.trackingNumber || undefined;
     }
 
-    if (data.tracking.estimatedDeliveryRange) {
+    if (data.tracking.estimatedDeliveryDate) {
       updatedTracking.estimatedDeliveryDate = {
-        start: data.tracking.estimatedDeliveryRange.start,
-        end: data.tracking.estimatedDeliveryRange.end,
+        start: data.tracking.estimatedDeliveryDate.start,
+        end: data.tracking.estimatedDeliveryDate.end,
       };
     }
 

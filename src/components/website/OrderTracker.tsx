@@ -330,7 +330,7 @@ export default function OrderTracker() {
 
   const shouldShowExpectedDelivery = (status: string): boolean => {
     try {
-      const normalizedStatus = safeString(status).toLowerCase();
+      const normalizedStatus = (status || "").toString().toLowerCase();
       return normalizedStatus !== "delivered" && normalizedStatus !== "completed";
     } catch {
       return true;
