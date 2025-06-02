@@ -123,7 +123,6 @@ export async function getOrders(options: GetOrdersOptionsType = {}): Promise<Ord
 function filterOrderFields(data: any, fields: string[], id: string): OrderType {
   const filtered: Partial<OrderType> = { id };
 
-  // Always include timestamp if it exists for sorting
   if (data.timestamp !== undefined) filtered.timestamp = data.timestamp;
 
   if (fields.length > 0) {
@@ -137,7 +136,6 @@ function filterOrderFields(data: any, fields: string[], id: string): OrderType {
     // Include all fields
     Object.keys(data).forEach((field) => {
       if (field !== "id") {
-        // id is already included
         filtered[field as keyof OrderType] = data[field];
       }
     });

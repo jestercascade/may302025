@@ -5,11 +5,7 @@ import { revalidatePath } from "next/cache";
 import { adminDb } from "@/lib/firebase/admin";
 import { FieldValue } from "firebase-admin/firestore";
 
-const emailSchema = z
-  .string()
-  .email("Invalid email format")
-  .min(3, "Email is too short")
-  .max(254, "Email is too long");
+const emailSchema = z.string().email("Invalid email format").min(3, "Email is too short").max(254, "Email is too long");
 
 const UNSUBSCRIBED = "UNSUBSCRIBED";
 const ACTIVE = "ACTIVE";
@@ -19,9 +15,7 @@ export type NewsletterResponse = {
   message: string;
 };
 
-export async function subscribeToNewsletter(
-  email: string
-): Promise<NewsletterResponse> {
+export async function subscribeToNewsletter(email: string): Promise<NewsletterResponse> {
   try {
     const validatedEmail = emailSchema.parse(email.toLowerCase().trim());
     const newslettersRef = adminDb.collection("newsletter-subscribers");
@@ -33,8 +27,7 @@ export async function subscribeToNewsletter(
       if (data?.status === ACTIVE) {
         return {
           success: false,
-          message:
-            "You're subscribed! Stay tuned for exclusive deals and updates in your inbox.",
+          message: "You're in! New releases and offers coming to your inbox.",
         };
       }
 
@@ -82,9 +75,7 @@ export async function subscribeToNewsletter(
   }
 }
 
-export async function unsubscribeFromNewsletter(
-  email: string
-): Promise<NewsletterResponse> {
+export async function unsubscribeFromNewsletter(email: string): Promise<NewsletterResponse> {
   try {
     const validatedEmail = emailSchema.parse(email.toLowerCase().trim());
     const newslettersRef = adminDb.collection("newsletter-subscribers");

@@ -8,7 +8,6 @@ import { generateId } from "@/lib/utils/common";
 import { ShowAlertType } from "@/lib/sharedTypes";
 import { FieldValue } from "firebase-admin/firestore";
 
-// Type for selected options with index information
 type SelectedOptionType = {
   value: string;
   optionDisplayOrder: number;

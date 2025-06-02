@@ -12,7 +12,7 @@ import { appConfig } from "@/config";
 
 const resend = new Resend(appConfig.RESEND.API_KEY);
 
-const EMAIL_TEMPLATES: Record<EmailType, EmailTemplateType> = {
+const EMAIL_TEMPLATES: Record<EmailType, () => ReactElement> = {
   [EmailType.ORDER_CONFIRMED]: OrderConfirmedTemplate,
   [EmailType.ORDER_SHIPPED]: OrderShippedTemplate,
   [EmailType.ORDER_DELIVERED]: OrderDeliveredTemplate,
@@ -61,11 +61,7 @@ export async function OrderStatusEmailAction(
       };
     }
 
-    const updateResult = await incrementEmailCount(
-      orderRef,
-      emailKey,
-      orderData
-    );
+    const updateResult = await incrementEmailCount(orderRef, emailKey, orderData);
 
     revalidatePath("/admin/orders/[id]", "page");
 
@@ -140,11 +136,7 @@ async function updateEmailStatus(orderId: string, emailType: EmailType) {
   }
 }
 
-async function incrementEmailCount(
-  orderRef: any,
-  emailKey: string,
-  orderData: any
-) {
+async function incrementEmailCount(orderRef: any, emailKey: string, orderData: any) {
   try {
     const currentEmailStatus = orderData.emails[emailKey];
 
@@ -174,7 +166,3 @@ async function incrementEmailCount(
     };
   }
 }
-
-// -- Type Definitions --
-
-type EmailTemplateType = () => ReactElement;

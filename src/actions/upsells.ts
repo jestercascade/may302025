@@ -52,17 +52,16 @@ export async function UpdateUpsellAction(
 
     await upsellRef.set(updatedUpsell);
 
-    // Revalidate paths to update upsell data
-    revalidatePath(`/admin/upsells/${data.id}`, "page"); // Admin edit upsell page
-    revalidatePath("/admin/upsells"); // Admin upsells page
-    revalidatePath(`/`); // Public main page
-    revalidatePath("/admin"); // Admin overview page
+    revalidatePath(`/admin/upsells/${data.id}`, "page");
+    revalidatePath("/admin/upsells");
+    revalidatePath("/admin");
+    revalidatePath(`/`);
 
-    // Revalidate products related to the updated upsell
     if (currentUpsell.products.length > 0) {
+      // Revalidate products related to the updated upsell
       currentUpsell.products.forEach((product) => {
-        revalidatePath(`/${product.slug}-${product.id}`); // Public product details page
-        revalidatePath(`/admin/products/${product.slug}-${product.id}`); // Admin edit product page
+        revalidatePath(`/${product.slug}-${product.id}`);
+        revalidatePath(`/admin/products/${product.slug}-${product.id}`);
       });
     }
 
@@ -90,9 +89,9 @@ export async function DeleteUpsellAction(data: { id: string }) {
 
     await upsellRef.delete();
 
-    revalidatePath("/admin"); // Admin overview page
-    revalidatePath("/admin/upsells"); // Admin upsells page
-    revalidatePath("/"); // Public main page
+    revalidatePath("/admin");
+    revalidatePath("/admin/upsells");
+    revalidatePath("/");
 
     return {
       type: ShowAlertType.SUCCESS,

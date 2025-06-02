@@ -40,7 +40,6 @@ export async function getDiscoveryProductsSettings(): Promise<DiscoveryProductsS
   return discoveryProductsSettings;
 }
 
-// -- Type Definitions --
 type DiscoveryProductsSettingsType = {
   id: string;
   visibleOnPages: {

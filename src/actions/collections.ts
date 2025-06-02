@@ -8,7 +8,10 @@ import { ShowAlertType } from "@/lib/sharedTypes";
 export async function CreateCollectionAction(data: {
   title: string;
   slug: string;
-  bannerImages?: BannerImagesType;
+  bannerImages?: {
+    desktopImage: string;
+    mobileImage: string;
+  };
   collectionType: string;
   campaignDuration: { startDate: string; endDate: string };
 }) {
@@ -17,13 +20,8 @@ export async function CreateCollectionAction(data: {
     const collectionId = generateId();
     const currentTime = currentTimestamp();
 
-    const maxIndexSnapshot = await collectionsRef
-      .orderBy("index", "desc")
-      .limit(1)
-      .get();
-    const newIndex = maxIndexSnapshot.empty
-      ? 1
-      : maxIndexSnapshot.docs[0].data().index + 1;
+    const maxIndexSnapshot = await collectionsRef.orderBy("index", "desc").limit(1).get();
+    const newIndex = maxIndexSnapshot.empty ? 1 : maxIndexSnapshot.docs[0].data().index + 1;
 
     const newCollection = {
       id: collectionId,
@@ -56,10 +54,7 @@ export async function CreateCollectionAction(data: {
   }
 }
 
-export async function ChangeCollectionIndexAction(data: {
-  id: string;
-  index: number;
-}) {
+export async function ChangeCollectionIndexAction(data: { id: string; index: number }) {
   try {
     const { id, index } = data;
     const collectionsRef = adminDb.collection("collections");
@@ -76,10 +71,7 @@ export async function ChangeCollectionIndexAction(data: {
       return { type: ShowAlertType.ERROR, message: "Invalid index" };
     }
 
-    const targetSnap = await collectionsRef
-      .where("index", "==", index)
-      .limit(1)
-      .get();
+    const targetSnap = await collectionsRef.where("index", "==", index).limit(1).get();
     if (targetSnap.empty) {
       // If no collection exists at the target index, just update the current one
       await collectionRef.update({ index, updatedAt: currentTimestamp() });
@@ -96,13 +88,9 @@ export async function ChangeCollectionIndexAction(data: {
     }
 
     revalidatePath("/admin/storefront");
-    revalidatePath(
-      `/admin/collections/${collectionData?.slug}-${collectionData?.id}`
-    );
+    revalidatePath(`/admin/collections/${collectionData?.slug}-${collectionData?.id}`);
     revalidatePath("/");
-    revalidatePath(
-      `/collections/${collectionData?.slug}-${collectionData?.id}`
-    );
+    revalidatePath(`/collections/${collectionData?.slug}-${collectionData?.id}`);
 
     return {
       type: ShowAlertType.SUCCESS,
@@ -120,7 +108,10 @@ export async function ChangeCollectionIndexAction(data: {
 export async function UpdateCollectionAction(data: {
   id: string;
   campaignDuration?: { startDate: string; endDate: string };
-  bannerImages?: BannerImagesType;
+  bannerImages?: {
+    desktopImage: string;
+    mobileImage: string;
+  };
   title?: string;
   slug?: string;
   visibility?: VisibilityType;
@@ -165,13 +156,7 @@ export async function UpdateCollectionAction(data: {
   }
 }
 
-/**
- * Adds a product to a collection
- */
-export async function AddProductAction(data: {
-  collectionId: string;
-  productId: string;
-}) {
+export async function AddProductAction(data: { collectionId: string; productId: string }) {
   try {
     const { collectionId, productId } = data;
     const collectionRef = adminDb.collection("collections").doc(collectionId);
@@ -201,9 +186,7 @@ export async function AddProductAction(data: {
 
     revalidatePath("/");
     revalidatePath("/admin/storefront");
-    revalidatePath(
-      `/admin/collections/${collectionData?.slug}-${collectionId}`
-    );
+    revalidatePath(`/admin/collections/${collectionData?.slug}-${collectionId}`);
     revalidatePath(`/collections/${collectionData?.slug}-${collectionId}`);
 
     return {
@@ -219,10 +202,7 @@ export async function AddProductAction(data: {
   }
 }
 
-export async function RemoveProductAction(data: {
-  collectionId: string;
-  productId: string;
-}) {
+export async function RemoveProductAction(data: { collectionId: string; productId: string }) {
   try {
     const { collectionId, productId } = data;
     const collectionRef = adminDb.collection("collections").doc(collectionId);
@@ -259,10 +239,7 @@ export async function RemoveProductAction(data: {
   }
 }
 
-export async function ChangeProductIndexAction(data: {
-  collectionId: string;
-  product: { id: string; index: number };
-}) {
+export async function ChangeProductIndexAction(data: { collectionId: string; product: { id: string; index: number } }) {
   try {
     const { collectionId, product } = data;
     const collectionRef = adminDb.collection("collections").doc(collectionId);
@@ -328,7 +305,6 @@ export async function DeleteCollectionAction(data: { id: string }) {
 
     await collectionRef.delete();
 
-    // Revalidate relevant paths
     revalidatePath("/admin/storefront");
     revalidatePath("/");
 
@@ -344,10 +320,3 @@ export async function DeleteCollectionAction(data: { id: string }) {
     };
   }
 }
-
-// Type Definitions
-
-type BannerImagesType = {
-  desktopImage: string;
-  mobileImage: string;
-};

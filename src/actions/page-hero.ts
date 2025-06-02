@@ -16,15 +16,10 @@ export async function UpdatePageHeroAction(data: {
   try {
     const { ...updatedPageHeroData } = data;
 
-    // Using admin SDK to update the document
-    await adminDb
-      .collection("pageHero")
-      .doc("homepageHero")
-      .update(updatedPageHeroData);
+    await adminDb.collection("pageHero").doc("homepageHero").update(updatedPageHeroData);
 
-    // Revalidate paths to update page hero data
-    revalidatePath("/admin/storefront"); // Admin storefront page
-    revalidatePath("/"); // Public main page
+    revalidatePath("/admin/storefront");
+    revalidatePath("/");
 
     return {
       type: ShowAlertType.SUCCESS,

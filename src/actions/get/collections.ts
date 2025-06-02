@@ -254,10 +254,6 @@ function filterCollectionFields(data: FirebaseFirestore.DocumentData, fields: st
   return out as CollectionType;
 }
 
-/**
- * Fetch product (and optional upsell) data in batches.
- * @param onlyPublished if true, skips products not marked "PUBLISHED"
- */
 async function fetchProductsInBatches(
   productIds: string[],
   onlyPublished = true

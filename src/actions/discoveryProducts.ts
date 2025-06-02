@@ -19,10 +19,8 @@ export async function UpdateDiscoveryProductsAction(data: {
   try {
     const { visibleOnPages } = data;
 
-    // Using admin SDK to update the document
     await adminDb.collection("discoveryProducts").doc("default").update({ visibleOnPages });
 
-    // Revalidate paths to update data on relevant pages
     revalidatePath("/admin/storefront");
     revalidatePath("/");
     revalidatePath("/cart");

@@ -5,7 +5,7 @@ import { generateId, currentTimestamp } from "@/lib/utils/common";
 import { revalidatePath } from "next/cache";
 import { ShowAlertType } from "@/lib/sharedTypes";
 
-const BATCH_SIZE = 500; // Firestore batch limit
+const BATCH_SIZE = 500;
 
 export async function CreateProductAction(data: { name: string; slug: string; basePrice: string; mainImage: string }) {
   try {
