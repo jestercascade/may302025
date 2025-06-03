@@ -122,7 +122,7 @@ export function Footer() {
           </nav>
 
           {/* Newsletter Section - Responsive */}
-          <div className="w-full max-w-md mb-10 rounded-xl p-6 bg-blue-600/5 border border-blue-100/65">
+          <div className="w-full max-w-md mb-14 rounded-xl p-6 bg-blue-600/5 border border-blue-100/65">
             <div className="text-center mb-4">
               <h3 className="font-semibold text-lg mb-1.5">Get the latest releases and special offers</h3>
               <p className="text-black text-sm">Be first in line for the good stuff</p>
