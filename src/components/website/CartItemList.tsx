@@ -411,7 +411,7 @@ function OrderSummary({ selectedItems, getSelectedCartItems, calculateTotal, tog
 function MobileOrderSummary({ selectedItems, getSelectedCartItems, calculateTotal, toggleAll }: OrderSummaryType) {
   const totalPrice = calculateTotal();
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-md z-50">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-md z-10">
       <div className="max-w-[499px] mx-auto px-4 pt-3 pb-8 space-y-2">
         {selectedItems.size > 0 ? (
           <>

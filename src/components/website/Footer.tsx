@@ -199,9 +199,9 @@ export function Footer() {
       setIsSubmitting(false);
     }
   };
-
+  
   return (
-    <footer className="w-full py-8 border-t bg-neutral-50">
+    <footer className="w-full pt-8 pb-12 border-t bg-neutral-50">
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex flex-col items-center mb-8">
           {/* Mobile Navigation - Grid Layout */}
