@@ -685,7 +685,7 @@ function OptionSelectionModal({
   const sections: React.ReactNode[] = [];
 
   sections.push(
-    <div key="main-image" className="w-[320px] h-[320px] rounded-lg overflow-hidden">
+    <div key="main-image" className="aspect-square rounded-lg overflow-hidden">
       <Image
         src={product.images.main}
         alt={product.name}
@@ -759,7 +759,7 @@ function OptionSelectionModal({
     sections.push(
       <div key="gallery" className="flex flex-col gap-3">
         {product.images.gallery.map((image, index) => (
-          <div key={index} className="w-full rounded-lg overflow-hidden border border-gray-100">
+          <div key={index} className="aspect-square flex items-center justify-center rounded-lg overflow-hidden border border-gray-100">
             <Image
               src={image}
               alt={`${product.name} - Image ${index + 1}`}

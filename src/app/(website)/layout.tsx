@@ -1,3 +1,4 @@
+import { MobileNavbarOverlay } from "@/components/website/Navbar/MobileNavbarOverlay";
 import { QuickviewOverlay } from "@/components/website/QuickviewOverlay";
 
 export default function WebsiteOverlayLayout({
@@ -9,6 +10,7 @@ export default function WebsiteOverlayLayout({
     <>
       {children}
       <QuickviewOverlay />
+      <MobileNavbarOverlay />
     </>
   );
 }

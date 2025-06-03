@@ -4,7 +4,7 @@ import { CloseIconThin } from "@/icons";
 import { useMobileNavbarStore } from "@/zustand/website/mobileNavbarStore";
 import { HiMiniBars3 } from "react-icons/hi2";
 import { useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useNavigation } from "@/components/shared/NavigationLoadingIndicator";
 import clsx from "clsx";
 
 export function MobileNavbarButton() {
@@ -25,7 +25,7 @@ export function MobileNavbarButton() {
 export function MobileNavbarOverlay() {
   const hideMobileNavbarOverlay = useMobileNavbarStore((state) => state.hideMobileNavbarOverlay);
   const isMobileNavbarOverlayVisible = useMobileNavbarStore((state) => state.isMobileNavbarOverlayVisible);
-  const router = useRouter();
+  const { push } = useNavigation();
   const overlayRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -74,7 +74,7 @@ export function MobileNavbarOverlay() {
   }, [isMobileNavbarOverlayVisible, hideMobileNavbarOverlay]);
 
   const handleNavigation = (path: string) => {
-    router.push(path);
+    push(path);
     hideMobileNavbarOverlay();
   };
 
@@ -91,7 +91,7 @@ export function MobileNavbarOverlay() {
         <div ref={menuRef} className="absolute right-0 bottom-0 top-0 h-full w-3/4 max-w-80 pl-8 pt-10 bg-white">
           <div className="flex flex-col gap-2.5 *:w-max *:text-lg *:font-medium">
             <button onClick={() => handleNavigation("/new-arrivals")}>New Arrivals</button>
-            <button onClick={() => handleNavigation("#")}>Track Order</button>
+            <button onClick={() => handleNavigation("/track")}>Track Order</button>
           </div>
           <button
             onClick={hideMobileNavbarOverlay}
