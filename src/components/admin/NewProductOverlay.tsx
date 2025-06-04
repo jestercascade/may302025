@@ -61,12 +61,10 @@ export function NewProductEmptyGridButton() {
 
 export function NewProductOverlay() {
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    slug: "",
-    basePrice: "",
-    mainImage: "",
-  });
+  const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
+  const [basePrice, setBasePrice] = useState("");
+  const [mainImage, setMainImage] = useState("");
 
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
@@ -91,28 +89,21 @@ export function NewProductOverlay() {
     };
   }, [isOverlayVisible, setPreventBodyOverflowChange]);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    let sanitizedValue = value;
-
-    if (name === "slug") {
-      sanitizedValue = value
-        .toLowerCase()
-        .replace(/\s+/g, "-")
-        .replace(/[^a-z0-9-]+/g, "")
-        .replace(/--+/g, "-")
-        .replace(/^-+/, "")
-        .replace(/-+$/, "");
-    }
-
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: sanitizedValue,
-    }));
+  const handleSlugPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData("text");
+    const sanitizedValue = pastedText
+      .toLowerCase()
+      .replace(/\s+/g, "-") // Replace spaces with hyphens
+      .replace(/[^a-z0-9-]/g, "") // Remove all except letters, numbers, hyphens
+      .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
+      .replace(/^-+/, "") // Remove leading hyphens
+      .replace(/-+$/, ""); // Remove trailing hyphens
+    setSlug(sanitizedValue);
   };
 
   const handleSave = async () => {
-    if (!formData.name.trim() || formData.name.length < 3) {
+    if (!name.trim() || name.length < 3) {
       showAlert({
         message: "Product name must be at least 3 characters long",
         type: ShowAlertType.ERROR,
@@ -120,7 +111,7 @@ export function NewProductOverlay() {
       setPreventBodyOverflowChange(true);
       return;
     }
-    if (!formData.slug.trim() || formData.slug.length < 3) {
+    if (!slug.trim() || slug.length < 3) {
       showAlert({
         message: "Slug must be at least 3 characters long",
         type: ShowAlertType.ERROR,
@@ -128,7 +119,7 @@ export function NewProductOverlay() {
       setPreventBodyOverflowChange(true);
       return;
     }
-    if (!formData.basePrice.trim()) {
+    if (!basePrice.trim()) {
       showAlert({
         message: "Please enter a base price",
         type: ShowAlertType.ERROR,
@@ -136,7 +127,7 @@ export function NewProductOverlay() {
       setPreventBodyOverflowChange(true);
       return;
     }
-    if (!isValidRemoteImage(formData.mainImage)) {
+    if (!isValidRemoteImage(mainImage)) {
       showAlert({
         message: "Invalid main image URL. Try an image from Pinterest or your Firebase Storage.",
         type: ShowAlertType.ERROR,
@@ -148,7 +139,7 @@ export function NewProductOverlay() {
     setLoading(true);
 
     try {
-      const result = await CreateProductAction(formData);
+      const result = await CreateProductAction({ name, slug, basePrice, mainImage });
       showAlert({
         message: result.message,
         type: result.type,
@@ -170,12 +161,10 @@ export function NewProductOverlay() {
   const onHideOverlay = () => {
     setLoading(false);
     hideOverlay({ pageName, overlayName });
-    setFormData({
-      name: "",
-      slug: "",
-      basePrice: "",
-      mainImage: "",
-    });
+    setName("");
+    setSlug("");
+    setBasePrice("");
+    setMainImage("");
   };
 
   return (
@@ -236,8 +225,8 @@ export function NewProductOverlay() {
                       type="text"
                       name="name"
                       placeholder="Denim Mini Skirt"
-                      value={formData.name}
-                      onChange={handleInputChange}
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
                       className="w-full h-9 px-3 rounded-md transition duration-300 ease-in-out border focus:border-neutral-400"
                       required
                     />
@@ -252,8 +241,9 @@ export function NewProductOverlay() {
                       type="text"
                       name="slug"
                       placeholder="denim-mini-skirt"
-                      value={formData.slug}
-                      onChange={handleInputChange}
+                      value={slug}
+                      onChange={(e) => setSlug(e.target.value)}
+                      onPaste={handleSlugPaste}
                       className="w-full h-9 px-3 rounded-md transition duration-300 ease-in-out border focus:border-neutral-400"
                       required
                     />
@@ -268,8 +258,8 @@ export function NewProductOverlay() {
                       type="text"
                       name="basePrice"
                       placeholder="34.99"
-                      value={formData.basePrice}
-                      onChange={handleInputChange}
+                      value={basePrice}
+                      onChange={(e) => setBasePrice(e.target.value)}
                       className="w-full h-9 px-3 rounded-md transition duration-300 ease-in-out border focus:border-neutral-400"
                       required
                     />
@@ -282,14 +272,8 @@ export function NewProductOverlay() {
                   <div>
                     <div className="w-full max-w-[383px] border rounded-md overflow-hidden">
                       <div className="w-full aspect-square flex items-center justify-center overflow-hidden">
-                        {formData.mainImage && isValidRemoteImage(formData.mainImage) && (
-                          <Image
-                            src={formData.mainImage}
-                            alt={formData.name || "mainImage"}
-                            width={383}
-                            height={383}
-                            priority
-                          />
+                        {mainImage && isValidRemoteImage(mainImage) && (
+                          <Image src={mainImage} alt={name || "mainImage"} width={383} height={383} priority />
                         )}
                       </div>
                       <div className="w-full h-9 border-t overflow-hidden">
@@ -297,8 +281,8 @@ export function NewProductOverlay() {
                           type="text"
                           name="mainImage"
                           placeholder="Paste image URL"
-                          value={formData.mainImage}
-                          onChange={handleInputChange}
+                          value={mainImage}
+                          onChange={(e) => setMainImage(e.target.value)}
                           className="h-full w-full px-3 text-sm text-gray"
                         />
                       </div>

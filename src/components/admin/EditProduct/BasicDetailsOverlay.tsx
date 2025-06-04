@@ -116,14 +116,16 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
     }
   };
 
-  const handleSlugChange = (value: string) => {
-    const sanitizedValue = value
+  const handleSlugPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData("text");
+    const sanitizedValue = pastedText
       .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]+/g, "")
-      .replace(/--+/g, "-")
-      .replace(/^-+/, "")
-      .replace(/-+$/, "");
+      .replace(/\s+/g, "-") // Replace spaces with hyphens
+      .replace(/[^a-z0-9-]/g, "") // Remove all except letters, numbers, hyphens
+      .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
+      .replace(/^-+/, "") // Remove leading hyphens
+      .replace(/-+$/, ""); // Remove trailing hyphens
     setSlug(sanitizedValue);
   };
 
@@ -221,7 +223,8 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                       id="slug"
                       placeholder="denim-mini-skirt"
                       value={slug}
-                      onChange={(e) => handleSlugChange(e.target.value)}
+                      onChange={(e) => setSlug(e.target.value)}
+                      onPaste={handleSlugPaste}
                       className="w-full h-9 px-3 rounded-md transition duration-300 ease-in-out border focus:border-neutral-400"
                       required
                     />
