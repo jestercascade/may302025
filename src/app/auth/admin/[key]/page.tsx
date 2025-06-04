@@ -5,7 +5,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Check, Lock } from "lucide-react";
+import { Check } from "lucide-react";
+import { HiLockClosed } from "react-icons/hi";
 
 export default function AdminEntryPage() {
   const { user, loading } = useAuth();
@@ -44,7 +45,7 @@ export default function AdminEntryPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-8 py-10">
             <div className="flex justify-center mb-6">
               <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center shadow-sm">
-                <Lock className="w-6 h-6 text-gray-500" />
+                <HiLockClosed className="w-6 h-6 text-gray-500" />
               </div>
             </div>
             <h1 className="text-2xl font-medium text-gray-900 text-center mb-2">Admin Access</h1>
