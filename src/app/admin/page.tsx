@@ -602,7 +602,7 @@ const UpsellPerformance = ({ upsells }: { upsells: UpsellType[] | null }) => {
         <table className="w-full min-w-[738px] text-sm">
           <thead>
             <tr className="border-b">
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-36">Metric</th>
+              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-48">Metric</th>
               <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-36">Value</th>
               <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">Description</th>
             </tr>
