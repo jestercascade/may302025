@@ -35,8 +35,7 @@ export default async function PaymentSuccessful({ searchParams }: { searchParams
     if (!isValidEmail(normalizedEmail)) {
       redirect(INVALID_PARAMS_REDIRECT_PATH);
     }
-  } catch (error) {
-    console.error("Email decoding error:", error);
+  } catch {
     redirect(INVALID_PARAMS_REDIRECT_PATH);
   }
 
@@ -48,16 +47,16 @@ export default async function PaymentSuccessful({ searchParams }: { searchParams
   }
 
   return (
-    <div>
-      <div className="w-max mx-auto">
-        <div className="w-max pt-12 text-center">
-          <h1 className="text-2xl font-semibold mb-3">Payment successful, thanks so much!</h1>
-          <p>We're sending confirmation to</p>
-          <p className="text-blue font-medium">{normalizedEmail}</p>
+    <div className="px-4 sm:px-6 lg:px-8 min-h-[calc(100vh-137px)] flex items-center justify-center">
+      <div className="text-center -mt-28">
+        <div className="pt-12">
+          <h1 className="text-2xl sm:text-[1.75rem] font-semibold mb-3">Payment successful, thanks so much!</h1>
+          <p className="text-sm sm:text-base">We're sending confirmation to</p>
+          <p className="text-blue font-medium break-all">{normalizedEmail}</p>
         </div>
         <Link
           href="/"
-          className="mt-11 mx-auto w-max px-8 flex items-center justify-center rounded-full cursor-pointer border border-[#c5c3c0] text-sm font-semibold h-[44px] shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,_#faf9f8_5%,_#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear-gradient(to_bottom,_#eae8e6_5%,_#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)] min-[896px]:text-base min-[896px]:h-12"
+          className="mt-11 mx-auto w-max px-8 flex items-center justify-center rounded-full cursor-pointer border border-[#c5c3c0] font-semibold h-12 shadow-[inset_0px_1px_0px_0px_#ffffff] [background:linear-gradient(to_bottom,#faf9f8_5%,#eae8e6_100%)] bg-[#faf9f8] hover:[background:linear-gradient(to_bottom,#eae8e6_5%,#faf9f8_100%)] hover:bg-[#eae8e6] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)]"
         >
           Keep shopping
         </Link>
