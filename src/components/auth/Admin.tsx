@@ -142,7 +142,7 @@ export const AdminGoogleSignInButton = () => {
       }`}
     >
       <SiGoogle className="h-4 w-4" />
-      {isSigningIn ? "Signing in..." : user ? (isAdmin ? "Signed in" : "Sign-in as Admin") : "Sign-in as Admin"}
+      {isSigningIn ? "Signing in..." : user ? (isAdmin ? "Signed in" : "Sign in as Admin") : "Sign in as Admin"}
     </button>
   );
 };

@@ -42,7 +42,7 @@ export default function AdminEntryPage() {
       </div>
       <div className="flex-1 flex items-start justify-center px-8">
         <div className="w-full max-w-sm">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-8 py-10">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-7 py-10">
             <div className="flex justify-center mb-6">
               <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center shadow-sm">
                 <HiLockClosed className="w-6 h-6 text-gray-500" />

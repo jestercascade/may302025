@@ -19,9 +19,7 @@ export async function POST(request: NextRequest) {
     // Verify the ID token
     const decodedToken = await adminAuth.verifyIdToken(body.idToken);
     const isAdminEmail = decodedToken.email === ADMIN_EMAIL;
-    const isAdminEntryPoint = entryPoint.includes(
-      `/auth/admin/${ADMIN_ENTRY_KEY}`
-    );
+    const isAdminEntryPoint = entryPoint.includes(`/auth/admin/${ADMIN_ENTRY_KEY}`);
 
     // INITIAL AUTHENTICATION - Only require entry point during first login
     if (isAdminEmail && isAdminEntryPoint) {
@@ -37,20 +35,14 @@ export async function POST(request: NextRequest) {
         // They're already an admin, so continue
       } else {
         // They're trying to sign in as admin without using the proper entry point
-        return NextResponse.json(
-          { result: "ADMIN_KEY_REQUIRED" },
-          { status: 403 }
-        );
+        return NextResponse.json({ result: "ADMIN_KEY_REQUIRED" }, { status: 403 });
       }
     } else {
-      // Regular user - set customer claims
-      await adminAuth.setCustomUserClaims(decodedToken.uid, {
-        role: "customer",
-        grantedAt: Date.now(),
-      });
+      // NON-ADMIN EMAIL TRYING TO ACCESS ADMIN - REJECT THEM
+      return NextResponse.json({ result: "ACCESS_DENIED" }, { status: 403 });
     }
 
-    // Create session
+    // Only create session for admin users
     const twoWeeksInMilliseconds = 60 * 60 * 24 * 14 * 1000;
     const sessionCookie = await adminAuth.createSessionCookie(body.idToken, {
       expiresIn: twoWeeksInMilliseconds,
