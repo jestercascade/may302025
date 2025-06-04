@@ -99,31 +99,31 @@ export default async function Overview() {
     <div className="max-w-[820px] mx-auto min-[1080px]:mx-0 flex flex-col gap-10 px-5">
       <div>
         <h2 className="font-semibold text-xl mb-6">Store Growth</h2>
-        <div className="w-full p-5 relative shadow rounded-xl bg-white">
+        <div className="w-full p-5 relative border rounded-xl bg-white">
           <StoreGrowth orders={orders} />
         </div>
       </div>
       <div>
         <h2 className="font-semibold text-xl mb-6">Best-Selling Products</h2>
-        <div className="w-full p-5 relative shadow rounded-xl bg-white">
+        <div className="w-full p-5 relative border rounded-xl bg-white">
           <BestsellingProducts orders={orders} />
         </div>
       </div>
       <div>
         <h2 className="font-semibold text-xl mb-6">Product Status</h2>
-        <div className="w-full p-5 relative shadow rounded-xl bg-white">
+        <div className="w-full p-5 relative border rounded-xl bg-white">
           <ProductStatus products={products} />
         </div>
       </div>
       <div>
         <h2 className="font-semibold text-xl mb-6">Cart Status Breakdown</h2>
-        <div className="w-full p-5 relative shadow rounded-xl bg-white">
+        <div className="w-full p-5 relative border rounded-xl bg-white">
           <CartStatusBreakdown carts={carts} products={products} upsells={upsells} />
         </div>
       </div>
       <div>
         <h2 className="font-semibold text-xl mb-6">Upsell Performance</h2>
-        <div className="w-full p-5 relative shadow rounded-xl bg-white">
+        <div className="w-full p-5 relative border rounded-xl bg-white">
           <UpsellPerformance upsells={upsells} />
         </div>
       </div>
@@ -138,55 +138,51 @@ const StoreGrowth = ({ orders }: { orders: OrderType[] | null }) => {
   const metrics = storeGrowthMetrics.getMetrics();
 
   return (
-    <div className="rounded-lg bg-white border overflow-hidden">
-      <div className="overflow-auto custom-x-scrollbar">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b">
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36 md:w-1/4">
-                Metric
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36 md:w-1/4">
-                Today
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36 md:w-1/4">
-                This Month
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36 md:w-1/4">
-                All-Time
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
-              <td className="p-4 font-semibold">Revenue</td>
-              <td className={clsx("p-4", metrics.revenue.today !== 0 && "text-green-700 font-semibold")}>
-                {metrics.revenue.today ? storeGrowthMetrics.formatRevenue(metrics.revenue.today) : "—"}
-              </td>
-              <td className={clsx("p-4 font-semibold", metrics.revenue.today !== 0 && "text-green-700")}>
-                {metrics.revenue.thisMonth ? storeGrowthMetrics.formatRevenue(metrics.revenue.thisMonth) : "—"}
-              </td>
-              <td className="p-4 font-semibold">{storeGrowthMetrics.formatRevenue(metrics.revenue.allTime)}</td>
-            </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
-              <td className="p-4 font-semibold">Orders</td>
-              <td className="p-4">{metrics.orders.today || "—"}</td>
-              <td className="p-4">{metrics.orders.thisMonth || "—"}</td>
-              <td className="p-4">{metrics.orders.allTime || "—"}</td>
-            </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
-              <td className="p-4 font-semibold">AOV</td>
-              <td className="p-4">{metrics.aov.today ? storeGrowthMetrics.formatRevenue(metrics.aov.today) : "—"}</td>
-              <td className="p-4">
-                {metrics.aov.thisMonth ? storeGrowthMetrics.formatRevenue(metrics.aov.thisMonth) : "—"}
-              </td>
-              <td className="p-4">
-                {metrics.aov.allTime ? storeGrowthMetrics.formatRevenue(metrics.aov.allTime) : "—"}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <div className="overflow-x-auto custom-x-scrollbar">
+      <table className="w-full">
+        <thead>
+          <tr>
+            <th className="text-left pb-3 pr-6 text-xs font-medium text-gray uppercase tracking-wider">Metric</th>
+            <th className="text-left pb-3 px-6 text-xs font-medium text-gray uppercase tracking-wider">Today</th>
+            <th className="text-left pb-3 px-6 text-xs font-medium text-gray uppercase tracking-wider">
+              This Month
+            </th>
+            <th className="text-left pb-3 pl-6 text-xs font-medium text-gray uppercase tracking-wider">All-Time</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
+          <tr className="hover:bg-[#ffcc001a] transition-colors duration-150">
+            <td className="py-3 pr-6 text-sm font-medium">Revenue</td>
+            <td className="py-3 px-6 text-sm">
+              {metrics.revenue.today > 0 ? storeGrowthMetrics.formatRevenue(metrics.revenue.today) : "—"}
+            </td>
+            <td className="py-3 px-6 text-sm">
+              {metrics.revenue.thisMonth > 0 ? storeGrowthMetrics.formatRevenue(metrics.revenue.thisMonth) : "—"}
+            </td>
+            <td className="py-3 pl-6 text-sm font-semibold">
+              {storeGrowthMetrics.formatRevenue(metrics.revenue.allTime)}
+            </td>
+          </tr>
+          <tr className="hover:bg-[#ffcc001a] transition-colors duration-150">
+            <td className="py-3 pr-6 text-sm font-medium">Orders</td>
+            <td className="py-3 px-6 text-sm">{metrics.orders.today || "—"}</td>
+            <td className="py-3 px-6 text-sm">{metrics.orders.thisMonth || "—"}</td>
+            <td className="py-3 pl-6 text-sm font-medium">{metrics.orders.allTime || "—"}</td>
+          </tr>
+          <tr className="hover:bg-[#ffcc001a] transition-colors duration-150">
+            <td className="py-3 pr-6 text-sm font-medium">AOV</td>
+            <td className="py-3 px-6 text-sm">
+              {metrics.aov.today > 0 ? storeGrowthMetrics.formatRevenue(metrics.aov.today) : "—"}
+            </td>
+            <td className="py-3 px-6 text-sm">
+              {metrics.aov.thisMonth > 0 ? storeGrowthMetrics.formatRevenue(metrics.aov.thisMonth) : "—"}
+            </td>
+            <td className="py-3 pl-6 text-sm font-medium">
+              {metrics.aov.allTime > 0 ? storeGrowthMetrics.formatRevenue(metrics.aov.allTime) : "—"}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 };
@@ -216,7 +212,6 @@ const BestsellingProducts = ({ orders }: { orders: OrderType[] | null }) => {
       if (dateFilter && !isDateMatch(order.timestamp, dateFilter)) return;
 
       order.items.forEach((item) => {
-        // Handle upsell products
         if (item.type === "upsell") {
           item.products.forEach((product) => {
             const baseProductId = product.id;
@@ -233,7 +228,6 @@ const BestsellingProducts = ({ orders }: { orders: OrderType[] | null }) => {
             products[baseProductId].quantity += 1;
           });
         } else {
-          // Handle regular products
           const baseProductId = item.baseProductId;
           if (!products[baseProductId]) {
             products[baseProductId] = {
@@ -275,69 +269,70 @@ const BestsellingProducts = ({ orders }: { orders: OrderType[] | null }) => {
       monthRevenue: monthData.revenue,
       monthQuantity: monthData.quantity,
     }))
-    .sort((a, b) => b.monthQuantity - a.monthQuantity) // Sort by units sold
+    .sort((a, b) => b.monthQuantity - a.monthQuantity)
     .slice(0, TOP_PRODUCTS_COUNT);
 
   if (!orders || orders.length === 0) {
-    return <div className="text-center py-8 text-gray-500">No sales data available yet</div>;
+    return (
+      <div className="text-center py-12">
+        <div className="w-12 h-12 mx-auto mb-3 bg-gray-100/60 rounded-xl flex items-center justify-center">
+          <svg className="w-6 h-6 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
+          </svg>
+        </div>
+        <p className="text-gray text-sm">No sales data available yet</p>
+      </div>
+    );
   }
 
   return (
-    <div className="rounded-lg bg-white border overflow-hidden">
-      <div className="overflow-auto custom-x-scrollbar">
-        <table className="w-full min-w-[738px] text-sm">
-          <thead>
-            <tr className="border-b">
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-36 md:w-1/4">PRODUCT</th>
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-36 md:w-1/4">
-                <div className="relative">
-                  <span>REVENUE</span>
-                  <span className="absolute left-0 top-full font-normal bg-neutral-100">today</span>
-                </div>
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-36 md:w-1/4">
-                <div className="relative">
-                  <span>REVENUE</span>
-                  <span className="absolute left-0 top-full font-normal bg-neutral-100">this month</span>
-                </div>
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray tracking-wider min-w-36 md:w-1/4">
-                <div className="relative">
-                  <span>UNITS SOLD</span>
-                  <span className="absolute left-0 top-full font-normal bg-neutral-100">this month</span>
-                </div>
-              </th>
+    <div className="overflow-x-auto custom-x-scrollbar">
+      <table className="w-full">
+        <thead>
+          <tr>
+            <th className="text-left pb-3 pr-6 text-xs font-medium text-gray uppercase tracking-wider">Product</th>
+            <th className="text-left pb-3 px-6 text-xs font-medium text-gray uppercase tracking-wider">
+              Today's Revenue
+            </th>
+            <th className="text-left pb-3 px-6 text-xs font-medium text-gray uppercase tracking-wider">
+              Monthly Revenue
+            </th>
+            <th className="text-left pb-3 pl-6 text-xs font-medium text-gray uppercase tracking-wider">
+              Units Sold
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
+          {allProducts.map(({ id, name, slug, todayRevenue, monthRevenue, monthQuantity }) => (
+            <tr key={id} className="hover:bg-[#ffcc001a] transition-colors duration-150">
+              <td className="py-3 pr-6">
+                <Link
+                  href={`/admin/products/${slug}-${id}`}
+                  target="_blank"
+                  className="truncate max-w-60 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-150 block"
+                >
+                  {name}
+                </Link>
+              </td>
+              <td className="py-3 px-6 text-sm">{todayRevenue > 0 ? formatRevenue(todayRevenue) : "—"}</td>
+              <td className="py-3 px-6 text-sm">{formatRevenue(monthRevenue)}</td>
+              <td className="py-3 pl-6 text-sm font-semibold">{monthQuantity}</td>
             </tr>
-          </thead>
-          <tbody>
-            {allProducts.map(({ id, name, slug, todayRevenue, monthRevenue, monthQuantity }) => (
-              <tr key={id} className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
-                <td className="p-4">
-                  <div className="w-full max-w-[112px]">
-                    <Link
-                      href={`/admin/products/${slug}-${id}`}
-                      target="_blank"
-                      className="underline line-clamp-1 min-w-[152px]"
-                    >
-                      {name}
-                    </Link>
-                  </div>
-                </td>
-                <td className="p-4">{todayRevenue > 0 ? formatRevenue(todayRevenue) : "—"}</td>
-                <td className="p-4 font-semibold text-green-700">{formatRevenue(monthRevenue)}</td>
-                <td className="p-4">{monthQuantity}</td>
-              </tr>
-            ))}
-            {allProducts.length === 0 && (
-              <tr>
-                <td colSpan={4} className="text-center py-4 text-gray-500">
-                  No sales yet for this period
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+          ))}
+          {allProducts.length === 0 && (
+            <tr>
+              <td colSpan={4} className="text-center py-8 text-gray text-sm">
+                No sales yet for this period
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };
@@ -351,39 +346,31 @@ const ProductStatus = ({ products }: { products: ProductType[] | null }) => {
   const hiddenProducts = products.filter((p) => p.visibility !== "PUBLISHED");
 
   return (
-    <div className="rounded-lg bg-white border overflow-hidden">
-      <div className="overflow-auto custom-x-scrollbar">
-        <table className="w-full min-w-[738px] text-sm">
-          <thead>
-            <tr className="border-b">
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-[100px]">
-                Status
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-[100px]">
-                Product Count
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">Summary</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
-              <td className="p-4">
-                <span className="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">Active</span>
-              </td>
-              <td className="p-4 font-semibold">{activeProducts.length}</td>
-              <td className="p-4">Currently available for sale.</td>
-            </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
-              <td className="p-4">
-                <span className="inline-block bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs">
-                  Hidden
-                </span>
-              </td>
-              <td className="p-4 font-semibold">{hiddenProducts.length}</td>
-              <td className="p-4">Awaiting restock or clearance.</td>
-            </tr>
-          </tbody>
-        </table>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="bg-neutral-50/60 rounded-lg p-5 border border-gray-100">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+              <h3 className="text-sm font-medium">Active Products</h3>
+            </div>
+            <p className="text-xs text-gray">Currently available for sale</p>
+          </div>
+          <div className="text-xl font-semibold">{activeProducts.length}</div>
+        </div>
+      </div>
+
+      <div className="bg-neutral-50/60 rounded-lg p-5 border border-gray-100">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+              <h3 className="text-sm font-medium">Hidden Products</h3>
+            </div>
+            <p className="text-xs text-gray">Awaiting restock or clearance</p>
+          </div>
+          <div className="text-xl font-semibold">{hiddenProducts.length}</div>
+        </div>
       </div>
     </div>
   );
@@ -439,15 +426,6 @@ const CartStatusBreakdown = ({
     return totalValue;
   };
 
-  const statusCounts = carts.reduce(
-    (acc, cart) => {
-      const status = determineCartStatus(cart.updatedAt);
-      acc[status] = (acc[status] || 0) + 1;
-      return acc;
-    },
-    { Active: 0, Idle: 0, Abandoned: 0, Dead: 0 }
-  );
-
   const statusBreakdown = carts.reduce(
     (acc, cart) => {
       const status = determineCartStatus(cart.updatedAt);
@@ -467,117 +445,64 @@ const CartStatusBreakdown = ({
     }
   );
 
+  const statusConfig = {
+    Active: {
+      description: "< 24 hours",
+      bgColor: "bg-green-100",
+      textColor: "text-green-700",
+    },
+    Idle: {
+      description: "1-7 days",
+      bgColor: "bg-yellow-100",
+      textColor: "text-yellow-700",
+    },
+    Abandoned: {
+      description: "7-30 days",
+      bgColor: "bg-gray-100",
+      textColor: "text-gray-700",
+    },
+    Dead: {
+      description: "> 30 days",
+      bgColor: "bg-red-100",
+      textColor: "text-red-700",
+    },
+  };
+
   return (
-    <div className="rounded-lg bg-white border overflow-hidden">
-      <div className="overflow-auto custom-x-scrollbar">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b">
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36">Status</th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36">
-                Cart Count
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-36">
-                Total Value
-              </th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-64">
-                Description
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
-              <td className="p-4">
-                <span className="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">Active</span>
-              </td>
-              <td
-                className={clsx("p-4", {
-                  "font-semibold": statusCounts.Active !== 0,
-                })}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {Object.entries(statusBreakdown).map(([status, data]) => {
+        const config = statusConfig[status as keyof typeof statusConfig];
+
+        return (
+          <div key={status} className="bg-neutral-50/60 rounded-lg p-5 border border-gray-100">
+            <div className="flex items-center justify-between mb-3">
+              <h3
+                className={clsx(
+                  "text-sm font-medium px-2 py-1 rounded-full",
+                  config?.bgColor,
+                  config?.textColor
+                )}
               >
-                {statusBreakdown.Active.count}
-              </td>
-              <td className={clsx("p-4", statusBreakdown.Active.value && "font-semibold")}>
-                {statusBreakdown.Active.value
-                  ? `$${statusBreakdown.Active.value.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                    })}`
-                  : 0}
-              </td>
-              <td className="p-4">Carts within &lt; 24 hours.</td>
-            </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
-              <td className="p-4">
-                <span className="inline-block bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs">Idle</span>
-              </td>
-              <td
-                className={clsx("p-4", {
-                  "font-semibold": statusCounts.Idle !== 0,
-                })}
-              >
-                {statusBreakdown.Idle.count}
-              </td>
-              <td className={clsx("p-4", statusBreakdown.Idle.value && "font-semibold")}>
-                {statusBreakdown.Idle.value
-                  ? `$${statusBreakdown.Idle.value.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                    })}`
-                  : 0}
-              </td>
-              <td className="p-4">Carts inactive for 1-7 days.</td>
-            </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
-              <td className="p-4">
-                <span className="inline-block bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">Abandoned</span>
-              </td>
-              <td
-                className={clsx("p-4", {
-                  "font-semibold": statusCounts.Abandoned !== 0,
-                })}
-              >
-                {statusBreakdown.Abandoned.count}
-              </td>
-              <td className={clsx("p-4", statusBreakdown.Abandoned.value && "font-semibold")}>
-                {statusBreakdown.Abandoned.value
-                  ? `$${statusBreakdown.Abandoned.value.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                    })}`
-                  : 0}
-              </td>
-              <td className="p-4">Carts abandoned for 7-30 days.</td>
-            </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
-              <td className="p-4">
-                <span className="inline-block bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs">Dead</span>
-              </td>
-              <td
-                className={clsx("p-4", {
-                  "font-semibold": statusCounts.Dead !== 0,
-                })}
-              >
-                {statusBreakdown.Dead.count}
-              </td>
-              <td className={clsx("p-4", statusBreakdown.Dead.value && "text-red-700")}>
-                {statusBreakdown.Dead.value
-                  ? `$${statusBreakdown.Dead.value.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                    })}`
-                  : 0}
-              </td>
-              <td className="p-4">Carts older than 30 days.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                {status}
+              </h3>
+              <div className="text-lg font-semibold">{data.count}</div>
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-gray">{config.description}</p>
+              <p className="text-sm font-medium text-gray-700">
+                {data.value > 0 ? `$${data.value.toLocaleString("en-US", { minimumFractionDigits: 2 })}` : "$0.00"}
+              </p>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };
 
 const UpsellPerformance = ({ upsells }: { upsells: UpsellType[] | null }) => {
-  // Calculate active upsells (PUBLISHED only)
   const activeUpsells = upsells?.filter((u) => u.visibility === "PUBLISHED").length || 0;
 
-  // Calculate total potential revenue and actual revenue with discounts
   const metrics = upsells?.reduce(
     (acc, upsell) => {
       if (upsell.visibility !== "PUBLISHED") return acc;
@@ -593,54 +518,42 @@ const UpsellPerformance = ({ upsells }: { upsells: UpsellType[] | null }) => {
     { totalRevenue: 0, discountLoss: 0 }
   ) || { totalRevenue: 0, discountLoss: 0 };
 
-  // Calculate average customer savings
   const avgSavings = activeUpsells ? metrics.discountLoss / activeUpsells : 0;
 
+  const performanceCards = [
+    {
+      title: "Active Upsells",
+      value: activeUpsells,
+      description: "Test combinations to find the most profitable upsells",
+    },
+    {
+      title: "Revenue from Upsells",
+      value: metrics.totalRevenue !== 0 ? `$${metrics.totalRevenue.toLocaleString()}` : "$0",
+      description: "Compare upsell revenue to single-item sales",
+    },
+    {
+      title: "Revenue Lost via Discounts",
+      value: metrics.discountLoss !== 0 ? `$${metrics.discountLoss.toLocaleString()}` : "$0",
+      description: "Refine discount strategies to minimize revenue loss",
+    },
+    {
+      title: "Avg. Customer Savings",
+      value: avgSavings !== 0 ? `$${Math.round(avgSavings).toLocaleString()}` : "$0",
+      description: "Ensure upsells are sustainably boosting profits",
+    },
+  ];
+
   return (
-    <div className="rounded-lg bg-white border overflow-hidden">
-      <div className="overflow-auto custom-x-scrollbar">
-        <table className="w-full min-w-[738px] text-sm">
-          <thead>
-            <tr className="border-b">
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-48">Metric</th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-36">Value</th>
-              <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
-              <td className="p-4 font-semibold">Active Upsells</td>
-              <td className="p-4 font-semibold">{activeUpsells}</td>
-              <td className="p-4">
-                Test combinations to find the most profitable upsells with the least discount impact.
-              </td>
-            </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
-              <td className="p-4 font-semibold">Revenue from Upsells</td>
-              <td className="p-4 font-semibold">
-                {metrics.totalRevenue !== 0 ? `$${metrics.totalRevenue.toLocaleString()}` : "0"}
-              </td>
-              <td className="p-4">Compare upsell revenue to single-item sales to evaluate the value of upsells.</td>
-            </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
-              <td className="p-4 font-semibold">Revenue Lost via Discounts</td>
-              <td className="p-4 font-semibold">
-                {metrics.discountLoss !== 0 ? `$${metrics.discountLoss.toLocaleString()}` : "0"}
-              </td>
-              <td className="p-4">
-                Refine discount strategies to minimize revenue loss while maintaining customer value.
-              </td>
-            </tr>
-            <tr className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors">
-              <td className="p-4 font-semibold">Avg. Customer Savings</td>
-              <td className="p-4 font-semibold">
-                {avgSavings !== 0 ? `$${Math.round(avgSavings).toLocaleString()}` : "0"}
-              </td>
-              <td className="p-4">Make sure upsells are sustainably boosting profits, not just moving stock.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {performanceCards.map((card, index) => {
+        return (
+          <div key={index} className="bg-neutral-50/60 rounded-lg p-5 border border-gray-100">
+            <h3 className="text-sm font-medium mb-2">{card.title}</h3>
+            <div className="text-xl font-semibold mb-2">{card.value}</div>
+            <p className="text-xs text-gray leading-relaxed">{card.description}</p>
+          </div>
+        );
+      })}
     </div>
   );
 };
