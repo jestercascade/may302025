@@ -137,12 +137,12 @@ export const AdminGoogleSignInButton = () => {
     <button
       onClick={signInWithGoogle}
       disabled={isSigningIn}
-      className={`min-w-[192px] w-max flex items-center justify-center gap-3 rounded-full px-6 py-2.5 text-white text-[15px] font-medium tracking-[-0.005em] transition-all duration-300 ease-out bg-[#404040] hover:bg-[#525252] hover:shadow-lg hover:shadow-black/25 active:scale-[0.98] active:duration-100 ${
+      className={`min-w-[192px] w-max flex items-center justify-center gap-3 rounded-full px-5 py-2.5 text-white text-[15px] font-medium tracking-[-0.005em] transition-all duration-300 ease-out bg-[#404040] hover:bg-[#525252] hover:shadow-lg hover:shadow-black/25 active:scale-[0.98] active:duration-100 ${
         isSigningIn ? "opacity-60 cursor-not-allowed" : ""
       }`}
     >
       <SiGoogle className="h-4 w-4" />
-      {isSigningIn ? "Signing in..." : user ? (isAdmin ? "Signed in" : "Sign in as Admin") : "Sign in as Admin"}
+      {isSigningIn ? "Signing in..." : user ? (isAdmin ? "Signed in" : "Sign-in as Admin") : "Sign-in as Admin"}
     </button>
   );
 };
