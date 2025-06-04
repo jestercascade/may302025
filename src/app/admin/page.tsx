@@ -314,7 +314,7 @@ const BestsellingProducts = ({ orders }: { orders: OrderType[] | null }) => {
                 <Link
                   href={`/admin/products/${slug}-${id}`}
                   target="_blank"
-                  className="truncate max-w-60 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-150 block"
+                  className="truncate w-max max-w-60 text-sm font-medium text-blue hover:text-blue-dimmed transition-colors duration-150 block"
                 >
                   {name}
                 </Link>
