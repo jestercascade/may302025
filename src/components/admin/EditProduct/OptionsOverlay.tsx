@@ -711,19 +711,19 @@ export function OptionsOverlay({
               {/* Main Content */}
               <div className="space-y-2 w-full h-full mt-[52px] md:mt-0 p-5 flex flex-col gap-5 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
                 {/* Add New Option Group */}
-                <div className="space-y-2">
-                  <h2 className="text-sm font-medium">Option Group</h2>
-                  <div className="flex space-x-2">
+                <div className="space-y-3">
+                  <h2 className="text-sm font-medium text-gray-700">Option Group</h2>
+                  <div className="flex space-x-3">
                     <input
                       type="text"
                       value={newGroupName}
                       onChange={(e) => setNewGroupName(e.target.value)}
                       placeholder="Group name (e.g. Size, Color, Material)"
-                      className="flex-1 border rounded-md px-4 py-2 text-sm outline-none"
+                      className="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-100 transition-colors"
                     />
                     <button
                       onClick={addOptionGroup}
-                      className="bg-lightgray hover:bg-lightgray-dimmed px-4 py-2 rounded-md text-sm font-medium"
+                      className="bg-lightgray hover:bg-lightgray-dimmed px-4 py-2.5 rounded-lg text-sm font-medium transition-colors"
                     >
                       <span className="mr-1">Add</span>
                     </button>
@@ -732,11 +732,11 @@ export function OptionsOverlay({
 
                 {/* Chain Option Groups */}
                 {optionGroups.length >= 2 && (
-                  <div className="bg-neutral-50 rounded-lg space-y-4 px-4 py-[14px] border">
+                  <div className="bg-neutral-50 rounded-xl space-y-4 px-4 py-4 border border-neutral-200">
                     <div className="flex items-center justify-between">
-                      <h2 className="text-sm font-medium">Chain Option Groups</h2>
+                      <h2 className="text-sm font-medium text-gray-700">Chain Option Groups</h2>
                       <div className="flex items-center">
-                        <span className="mr-2 text-sm text-gray">
+                        <span className="mr-3 text-sm text-gray-600">
                           {chainingConfig.enabled ? "Enabled" : "Disabled"}
                         </span>
                         <div
@@ -754,10 +754,10 @@ export function OptionsOverlay({
                       </div>
                     </div>
                     {chainingConfig.enabled && (
-                      <div className="p-4 border rounded-md bg-white">
-                        <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 border border-neutral-200 rounded-lg bg-white">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <div className="mb-2 text-sm font-medium">Parent Group:</div>
+                            <div className="mb-2 text-sm font-medium text-gray-700">Parent Group:</div>
                             <select
                               value={chainingConfig.parentGroupId ?? ""}
                               onChange={(e) => {
@@ -769,7 +769,7 @@ export function OptionsOverlay({
                                 }
                                 setParentChildRelationship(value, childId);
                               }}
-                              className="w-full bg-white border rounded px-3 py-2 text-sm focus:outline-none"
+                              className="w-full bg-white border border-neutral-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-100 transition-colors"
                             >
                               {optionGroups.map((group) => (
                                 <option key={group.id} value={group.id}>
@@ -779,7 +779,7 @@ export function OptionsOverlay({
                             </select>
                           </div>
                           <div>
-                            <div className="mb-2 text-sm font-medium">Child Group:</div>
+                            <div className="mb-2 text-sm font-medium text-gray-700">Child Group:</div>
                             <div className="flex items-center">
                               <select
                                 value={chainingConfig.childGroupId ?? ""}
@@ -792,7 +792,7 @@ export function OptionsOverlay({
                                   }
                                   setParentChildRelationship(parentId, value);
                                 }}
-                                className="flex-1 bg-white border rounded px-3 py-2 text-sm focus:outline-none"
+                                className="flex-1 bg-white border border-neutral-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-100 transition-colors"
                               >
                                 {optionGroups.map((group) => (
                                   <option key={group.id} value={group.id}>
@@ -802,14 +802,14 @@ export function OptionsOverlay({
                               </select>
                               <button
                                 onClick={swapParentChild}
-                                className="ml-2 p-2 bg-neutral-100 rounded hover:bg-neutral-200"
+                                className="ml-3 p-2 bg-neutral-100 rounded-lg hover:bg-neutral-200 transition-colors"
                               >
-                                <RefreshCw className="w-4 h-4 text-gray" />
+                                <RefreshCw className="w-4 h-4 text-gray-600" />
                               </button>
                             </div>
                           </div>
                         </div>
-                        <p className="mt-3 text-xs text-gray">
+                        <p className="mt-3 text-xs text-gray-600">
                           Parent options will be disabled if all their linked child options are inactive.
                         </p>
                       </div>
@@ -826,9 +826,9 @@ export function OptionsOverlay({
                   const isLastGroup = groupIndex === optionGroups.length - 1;
 
                   return (
-                    <div key={group.id} className="border rounded-lg mb-4">
+                    <div key={group.id} className="border border-neutral-200 rounded-xl mb-4">
                       <div
-                        className="flex items-center justify-between p-3 pr-4 rounded-t-lg cursor-pointer"
+                        className="flex items-center justify-between p-4 pr-4 rounded-t-xl cursor-pointer hover:bg-gray-50/50 transition-colors"
                         onClick={() =>
                           setCollapsedGroups((prev) => ({
                             ...prev,
@@ -838,9 +838,9 @@ export function OptionsOverlay({
                       >
                         <div className="flex items-center">
                           {isCollapsed ? (
-                            <ChevronRight size={18} className="text-gray mr-2" />
+                            <ChevronRight size={18} className="text-gray-500 mr-3" />
                           ) : (
-                            <ChevronDown size={18} className="text-gray mr-2" />
+                            <ChevronDown size={18} className="text-gray-500 mr-3" />
                           )}
                           <div className="flex items-center">
                             {editingName === group.id ? (
@@ -848,34 +848,36 @@ export function OptionsOverlay({
                                 type="text"
                                 value={editNameValue}
                                 onChange={(e) => setEditNameValue(e.target.value)}
-                                className="px-2 py-1 border rounded text-sm"
+                                className="px-2 py-1 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-100"
                                 autoFocus
                                 onBlur={() => saveEditName(group.id)}
                               />
                             ) : (
                               <>
-                                <span className="font-medium">{group.name}</span>
+                                <span className="font-medium text-gray-800">{group.name}</span>
                                 {isParent && (
-                                  <span className="ml-2 text-xs px-2 py-0.5 bg-lightgray text-gray rounded">
+                                  <span className="ml-3 text-xs px-2 py-1 bg-lightgray text-gray-600 rounded-md">
                                     Parent
                                   </span>
                                 )}
                                 {isChild && (
-                                  <span className="ml-2 text-xs px-2 py-0.5 bg-lightgray text-gray rounded">Child</span>
+                                  <span className="ml-3 text-xs px-2 py-1 bg-lightgray text-gray-600 rounded-md">
+                                    Child
+                                  </span>
                                 )}
                               </>
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="flex space-x-2">
+                        <div className="flex items-center space-x-1">
+                          <div className="flex space-x-1">
                             {!isFirstGroup && (
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   moveGroupUp(groupIndex);
                                 }}
-                                className="p-1 text-gray hover:text-blue transition-colors"
+                                className="p-1.5 text-gray-500 hover:text-blue hover:bg-blue-50 rounded-lg transition-colors"
                               >
                                 <ChevronUp size={18} />
                               </button>
@@ -886,7 +888,7 @@ export function OptionsOverlay({
                                   e.stopPropagation();
                                   moveGroupDown(groupIndex);
                                 }}
-                                className="p-1 text-gray hover:text-blue transition-colors"
+                                className="p-1.5 text-gray-500 hover:text-blue hover:bg-blue-50 rounded-lg transition-colors"
                               >
                                 <ChevronDown size={18} />
                               </button>
@@ -897,7 +899,7 @@ export function OptionsOverlay({
                               e.stopPropagation();
                               deleteOptionGroup(group.id);
                             }}
-                            className="text-gray hover:text-red-700 transition-colors"
+                            className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           >
                             <Trash2 size={18} />
                           </button>
@@ -905,22 +907,22 @@ export function OptionsOverlay({
                       </div>
 
                       {!isCollapsed && (
-                        <div className="border-t rounded-b-lg overflow-hidden">
+                        <div className="border-t border-neutral-200 rounded-b-xl overflow-hidden">
                           <div className="overflow-x-auto custom-x-scrollbar">
                             <table className="w-max min-w-full table-fixed">
                               <thead>
                                 <tr className="bg-gray-50/90 backdrop-blur-md border-b border-gray-200/80">
-                                  <th className="min-w-28 max-w-28 w-28 px-3 py-2.5 text-left text-xs font-semibold text-gray-600 tracking-wide sticky left-0 bg-gray-50/90 backdrop-blur-md z-10 border-r border-gray-200/50">
+                                  <th className="min-w-28 max-w-28 w-28 px-3 py-3 text-left text-xs font-semibold text-gray-600 tracking-wide sticky left-0 bg-gray-50/90 backdrop-blur-md z-10 border-r border-gray-200/50">
                                     Actions
                                   </th>
-                                  <th className="min-w-36 w-36 px-3 py-2.5 text-left text-xs font-semibold text-gray-600 tracking-wide">
+                                  <th className="min-w-36 w-36 px-3 py-3 text-left text-xs font-semibold text-gray-600 tracking-wide">
                                     Option Value
                                   </th>
-                                  <th className="min-w-28 px-3 py-2.5 text-left text-xs font-semibold text-gray-600 tracking-wide">
+                                  <th className="min-w-28 px-3 py-3 text-left text-xs font-semibold text-gray-600 tracking-wide">
                                     Status
                                   </th>
                                   {isParent && chainingConfig.childGroupId !== null && (
-                                    <th className="min-w-0 px-3 py-2.5 text-left text-xs font-semibold text-gray-600 tracking-wide">
+                                    <th className="min-w-0 px-3 py-3 text-left text-xs font-semibold text-gray-600 tracking-wide">
                                       Available Options
                                     </th>
                                   )}
@@ -929,7 +931,7 @@ export function OptionsOverlay({
                               <tbody className="divide-y divide-gray-100/70 bg-white">
                                 {group.options.map((option) => (
                                   <tr key={option.id} className="hover:bg-gray-50/60 transition-colors duration-200">
-                                    <td className="min-w-28 max-w-28 w-28 px-3 py-2 sticky left-0 bg-white hover:bg-gray-50/60 transition-colors duration-200 z-10 border-r border-gray-100/80">
+                                    <td className="min-w-28 max-w-28 w-28 px-3 py-3 sticky left-0 bg-white hover:bg-gray-50/60 transition-colors duration-200 z-10 border-r border-gray-100/80">
                                       <button
                                         onClick={() => deleteOption(group.id, option.id)}
                                         className="inline-flex items-center justify-center w-6 h-6 text-gray-400 hover:text-red-500 hover:bg-red-50/80 rounded-full transition-all duration-200 hover:scale-105"
@@ -938,15 +940,15 @@ export function OptionsOverlay({
                                         <X size={12} />
                                       </button>
                                     </td>
-                                    <td className="min-w-36 w-36 px-3 py-2 text-sm font-medium text-gray-800">
+                                    <td className="min-w-36 w-36 px-3 py-3 text-sm font-medium text-gray-800">
                                       <div className="truncate" title={option.value}>
                                         {option.value}
                                       </div>
                                     </td>
-                                    <td className="min-w-28 px-3 py-2">
+                                    <td className="min-w-28 px-3 py-3">
                                       <button
                                         onClick={() => toggleOptionActive(group.id, option.id)}
-                                        className={`px-2 py-0.5 inline-flex text-xs font-medium rounded-full transition-all duration-200 border ${
+                                        className={`px-2.5 py-1 inline-flex text-xs font-medium rounded-full transition-all duration-200 border ${
                                           isParent
                                             ? getParentOptionStatusClass(option)
                                             : option.isActive
@@ -962,12 +964,12 @@ export function OptionsOverlay({
                                       </button>
                                     </td>
                                     {isParent && chainingConfig.childGroupId !== null && (
-                                      <td className="min-w-0 px-3 py-2">
+                                      <td className="min-w-0 px-3 py-3">
                                         <div className="flex gap-3 flex-nowrap">
                                           {findGroup(chainingConfig.childGroupId)?.options.map((child) => (
                                             <label
                                               key={child.id}
-                                              className={`flex items-center text-xs rounded-lg px-2 py-1 transition-all duration-200 whitespace-nowrap ${
+                                              className={`flex items-center text-xs rounded-lg px-2.5 py-1.5 transition-all duration-200 whitespace-nowrap ${
                                                 !child.isActive
                                                   ? "opacity-40 cursor-not-allowed"
                                                   : "cursor-pointer hover:bg-blue-50/80 hover:scale-[1.02]"
@@ -977,7 +979,7 @@ export function OptionsOverlay({
                                                 type="checkbox"
                                                 checked={availabilityMatrix[option.id]?.includes(child.id)}
                                                 onChange={() => toggleAvailability(option.id, child.id)}
-                                                className="h-3 w-3 text-blue-600 bg-white border-gray-300/80 rounded focus:ring-blue-500/40 focus:ring-2 mr-2"
+                                                className="h-3.5 w-3.5 text-blue-600 bg-white border-gray-300/80 rounded focus:ring-blue-500/40 focus:ring-2 mr-2"
                                                 disabled={!child.isActive}
                                               />
                                               <span className="text-gray-700 font-medium">{child.value}</span>
@@ -992,7 +994,7 @@ export function OptionsOverlay({
                             </table>
                           </div>
 
-                          <div className="px-4 py-3 bg-white border-t flex">
+                          <div className="px-4 py-4 bg-white border-t border-neutral-200 flex">
                             <input
                               type="text"
                               value={newOptionValues[group.id] || ""}
@@ -1003,11 +1005,11 @@ export function OptionsOverlay({
                                 })
                               }
                               placeholder="Add new option value"
-                              className="flex-1 border rounded-md px-4 py-2 text-sm outline-none"
+                              className="flex-1 border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-blue-300 focus:ring-1 focus:ring-blue-100 transition-colors"
                             />
                             <button
                               onClick={() => addOption(group.id)}
-                              className="ml-2 text-gray hover:text-blue transition-colors"
+                              className="ml-3 text-gray-500 hover:text-blue hover:bg-blue-50 rounded-lg p-1.5 transition-colors"
                               aria-label="Add option"
                             >
                               <PlusCircle size={20} />
@@ -1016,14 +1018,14 @@ export function OptionsOverlay({
 
                           {/* Size Chart Section for "Size" Group */}
                           {group.name.toLowerCase() === "size" && (
-                            <div className="mb-4 pt-4 border-t">
-                              <div className="w-[calc(100%-32px)] mx-auto flex items-center justify-between bg-neutral-50 p-4 rounded-md">
+                            <div className="mb-4 pt-4 border-t border-neutral-200">
+                              <div className="w-[calc(100%-32px)] mx-auto flex items-center justify-between bg-neutral-50 p-4 rounded-lg">
                                 <div className="flex items-center">
-                                  <Table size={20} className="text-gray mr-3" />
-                                  <span className="font-medium text-gray">Size Chart</span>
+                                  <Table size={20} className="text-gray-600 mr-3" />
+                                  <span className="font-medium text-gray-700">Size Chart</span>
                                 </div>
                                 <div className="flex items-center">
-                                  <span className="mr-2 text-sm text-gray">
+                                  <span className="mr-3 text-sm text-gray-600">
                                     {sizeChartEnabled ? "Enabled" : "Disabled"}
                                   </span>
                                   <div
@@ -1042,7 +1044,7 @@ export function OptionsOverlay({
                               </div>
 
                               {sizeChartEnabled && (
-                                <div className="mt-3">
+                                <div className="mt-4">
                                   <div className="w-[calc(100%-32px)] mx-auto mb-3">
                                     <button
                                       onClick={toggleSizeChart}
@@ -1062,26 +1064,26 @@ export function OptionsOverlay({
                                     </button>
                                   </div>
                                   {showSizeChart && sizeChartGroupId === group.id && (
-                                    <div className="p-4 border-t">
+                                    <div className="p-4 border-t border-neutral-200">
                                       <div className="space-y-2 mb-6">
-                                        <p className="text-xs text-gray">Unit</p>
+                                        <p className="text-xs text-gray-600">Unit</p>
                                         <div className="inline-flex p-1 bg-lightgray rounded-lg">
                                           <button
                                             onClick={() => setActiveTab("inches")}
-                                            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                            className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
                                               activeTab === "inches"
                                                 ? "bg-white shadow-sm"
-                                                : "text-gray hover:text-black"
+                                                : "text-gray-600 hover:text-black"
                                             }`}
                                           >
                                             Inches
                                           </button>
                                           <button
                                             onClick={() => setActiveTab("centimeters")}
-                                            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                            className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
                                               activeTab === "centimeters"
                                                 ? "bg-white shadow-sm"
-                                                : "text-gray hover:text-black"
+                                                : "text-gray-600 hover:text-black"
                                             }`}
                                           >
                                             Centimeters
@@ -1089,34 +1091,34 @@ export function OptionsOverlay({
                                         </div>
                                       </div>
                                       <div className="space-y-2 mb-5">
-                                        <p className="text-xs text-gray">Grid Size</p>
-                                        <div className="inline-flex items-center bg-lightgray p-1 rounded-md">
+                                        <p className="text-xs text-gray-600">Grid Size</p>
+                                        <div className="inline-flex items-center bg-lightgray p-1 rounded-lg">
                                           <button
                                             onClick={removeRow}
-                                            className="w-7 h-7 flex items-center justify-center text-gray hover:bg-white hover:shadow-sm rounded"
+                                            className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-white hover:shadow-sm rounded-md transition-colors"
                                           >
                                             <ArrowUp size={14} />
                                           </button>
                                           <button
                                             onClick={addRow}
-                                            className="w-7 h-7 flex items-center justify-center text-gray hover:bg-white hover:shadow-sm rounded"
+                                            className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-white hover:shadow-sm rounded-md transition-colors"
                                           >
                                             <ArrowDown size={14} />
                                           </button>
-                                          <div className="w-px h-5 bg-neutral-300 mx-1"></div>
-                                          <span className="text-sm font-medium px-2">
+                                          <div className="w-px h-5 bg-neutral-300 mx-2"></div>
+                                          <span className="text-sm font-medium px-2 text-gray-700">
                                             {rowsCount}×{columnsCount}
                                           </span>
-                                          <div className="w-px h-5 bg-neutral-300 mx-1"></div>
+                                          <div className="w-px h-5 bg-neutral-300 mx-2"></div>
                                           <button
                                             onClick={removeColumn}
-                                            className="w-7 h-7 flex items-center justify-center text-gray hover:bg-white hover:shadow-sm rounded"
+                                            className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-white hover:shadow-sm rounded-md transition-colors"
                                           >
                                             <ArrowLeftIcon size={14} />
                                           </button>
                                           <button
                                             onClick={addColumn}
-                                            className="w-7 h-7 flex items-center justify-center text-gray hover:bg-white hover:shadow-sm rounded"
+                                            className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-white hover:shadow-sm rounded-md transition-colors"
                                           >
                                             <ArrowRight size={14} />
                                           </button>
