@@ -242,47 +242,51 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
     <>
       {isOverlayVisible && (
         <Overlay>
-          <div className="md:mx-auto md:mt-20 md:mb-[50vh] md:px-5 lg:p-0">
-            <div className="absolute bottom-0 left-0 right-0 w-full h-[calc(100%-60px)] mx-auto ease-in-out duration-300 transition overflow-hidden md:overflow-visible rounded-t-3xl bg-white md:w-full md:max-w-[800px] md:rounded-2xl md:shadow md:h-max md:relative md:bottom-auto md:left-auto md:right-auto md:top-auto md:-translate-x-0">
+          <div className="md:mx-auto md:mt-16 md:mb-[50vh] md:px-6 lg:p-0">
+            <div className="absolute bottom-0 left-0 right-0 w-full h-[calc(100%-60px)] mx-auto ease-in-out duration-500 transition-all overflow-hidden rounded-t-[20px] bg-white/95 backdrop-blur-xl border-t border-gray-200/50 md:overflow-visible md:w-full md:max-w-[900px] md:rounded-[16px] md:shadow-2xl md:shadow-black/10 md:h-max md:relative md:bottom-auto md:left-auto md:right-auto md:top-auto md:-translate-x-0 md:border md:border-gray-300/60">
               <div className="w-full h-full flex flex-col">
-                <div className="md:hidden flex items-end justify-center pt-4 pb-2 flex-shrink-0 bg-white">
-                  <div className="relative flex justify-center items-center w-full h-7">
-                    <h2 className="font-semibold text-lg">Products</h2>
+                <div className="md:hidden flex items-end justify-center pt-5 pb-3 flex-shrink-0 bg-white/80 backdrop-blur-xl border-b border-gray-200">
+                  <div className="relative flex justify-center items-center w-full h-8">
+                    <h2 className="font-semibold text-[17px] text-gray-900 tracking-[-0.022em]">Products</h2>
                     <button
                       onClick={onHideOverlay}
                       type="button"
-                      className="w-7 h-7 rounded-full flex items-center justify-center absolute right-4 transition duration-300 ease-in-out bg-lightgray active:bg-lightgray-dimmed"
+                      className="w-8 h-8 rounded-full flex items-center justify-center absolute right-4 transition-all duration-200 ease-out bg-gray-200 hover:bg-gray-300 active:scale-95"
                     >
-                      <X color="#6c6c6c" size={18} strokeWidth={2} />
+                      <X color="#4b5563" size={16} strokeWidth={2.5} />
                     </button>
                   </div>
                 </div>
-                <div className="hidden md:flex md:items-center md:justify-between py-2 pr-4 pl-2 flex-shrink-0">
+                <div className="hidden md:flex md:items-center md:justify-between py-4 pr-5 pl-4 flex-shrink-0 border-b border-gray-200">
                   <button
                     onClick={onHideOverlay}
                     type="button"
-                    className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
+                    className="h-10 px-4 rounded-[10px] flex items-center gap-2 transition-all duration-200 ease-out hover:bg-gray-100 active:scale-98"
                   >
-                    <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
-                    <span className="font-semibold text-sm text-blue">Products</span>
+                    <ArrowLeft size={18} strokeWidth={2.5} className="stroke-blue-600" />
+                    <span className="font-medium text-[15px] text-blue-600 tracking-[-0.011em]">Products</span>
                   </button>
                 </div>
                 {tableData.length > 0 ? (
-                  <div className="flex-1 min-h-0 p-5 flex flex-col gap-2 overflow-y-auto invisible-scrollbar md:overflow-hidden">
-                    <div className="w-full flex flex-col min-[588px]:flex-row gap-2 items-center justify-between flex-shrink-0">
-                      <div className="max-w-full flex flex-nowrap rounded-full bg-lightgray overflow-x-visible overflow-y-hidden invisible-scrollbar *:min-w-max *:h-9 *:rounded-full *:flex *:items-center *:justify-center *:font-semibold *:text-sm *:ease-in-out *:duration-300 *:transition">
+                  <div className="flex-1 min-h-0 p-6 flex flex-col gap-5 overflow-y-auto md:overflow-hidden">
+                    <div className="w-full flex flex-col min-[588px]:flex-row gap-4 items-center justify-between flex-shrink-0">
+                      <div className="max-w-full flex flex-nowrap rounded-[12px] bg-gray-200 p-1 overflow-x-visible overflow-y-hidden invisible-scrollbar">
                         <button
                           onClick={() => handleFilterChange(ALL)}
-                          className={`px-3 pl-[14px] h-9 hover:bg-lightgray-dimmed rounded-full ${
-                            filter === ALL ? "text-blue" : "text-gray hover:text-black"
+                          className={`px-4 h-8 rounded-[8px] flex items-center justify-center font-medium text-[14px] ease-out duration-200 transition-all tracking-[-0.006em] whitespace-nowrap ${
+                            filter === ALL
+                              ? "bg-white text-gray-900 shadow-sm"
+                              : "text-gray-700 hover:text-gray-900 hover:bg-white/70"
                           }`}
                         >
                           View all ({data.products.length})
                         </button>
                         <button
                           onClick={() => handleFilterChange(PUBLISHED)}
-                          className={`px-3 h-9 hover:bg-lightgray-dimmed rounded-full ${
-                            filter === PUBLISHED ? "text-blue" : "text-gray hover:text-black"
+                          className={`px-4 h-8 rounded-[8px] flex items-center justify-center font-medium text-[14px] ease-out duration-200 transition-all tracking-[-0.006em] whitespace-nowrap ${
+                            filter === PUBLISHED
+                              ? "bg-white text-gray-900 shadow-sm"
+                              : "text-gray-700 hover:text-gray-900 hover:bg-white/70"
                           }`}
                         >
                           Published (
@@ -290,8 +294,10 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                         </button>
                         <button
                           onClick={() => handleFilterChange(INACTIVE)}
-                          className={`px-3 pr-[14px] h-9 hover:bg-lightgray-dimmed rounded-full ${
-                            filter === INACTIVE ? "text-blue" : "text-gray hover:text-black"
+                          className={`px-4 h-8 rounded-[8px] flex items-center justify-center font-medium text-[14px] ease-out duration-200 transition-all tracking-[-0.006em] whitespace-nowrap ${
+                            filter === INACTIVE
+                              ? "bg-white text-gray-900 shadow-sm"
+                              : "text-gray-700 hover:text-gray-900 hover:bg-white/70"
                           }`}
                         >
                           Inactive (
@@ -305,94 +311,109 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                           )
                         </button>
                       </div>
-                      <div className="w-full min-[588px]:w-56 h-9 rounded-full overflow-hidden flex items-center border">
+                      <div className="w-full min-[588px]:w-64 h-10 rounded-[10px] overflow-hidden flex items-center border border-gray-300 bg-white hover:border-gray-400 focus-within:border-blue-500 transition-all duration-200">
                         <input
                           type="text"
                           value={productId}
                           onChange={handleInputChange}
                           onKeyDown={handleKeyDown}
                           placeholder="Paste ID (#12345)"
-                          className="h-full w-full pl-4 bg-transparent"
+                          className="h-full w-full pl-4 bg-transparent text-[15px] placeholder-gray-500 outline-none tracking-[-0.011em]"
                         />
-                        <div className="h-full flex items-center justify-center">
+                        <div className="h-full flex items-center justify-center pr-1">
                           <button
                             onClick={addProduct}
                             disabled={loading}
                             className={clsx(
-                              "w-11 h-9 rounded-full flex items-center justify-center transition duration-300 ease-in-out",
+                              "w-8 h-8 rounded-[8px] flex items-center justify-center transition-all duration-200 ease-out",
                               {
-                                "active:bg-lightgray lg:hover:bg-lightgray": !loading,
+                                "hover:bg-gray-100 active:scale-95": !loading,
                               }
                             )}
                           >
-                            {loading ? <Spinner color="gray" /> : <Plus strokeWidth={1.75} />}
+                            {loading ? (
+                              <Spinner color="gray" />
+                            ) : (
+                              <Plus strokeWidth={2} size={18} className="text-gray-600" />
+                            )}
                           </button>
                         </div>
                       </div>
                     </div>
                     {tableData.length > 0 && (
-                      <div className="rounded-xl bg-white border overflow-hidden flex-shrink-0">
+                      <div className="rounded-[14px] bg-white/90 backdrop-blur-sm border border-gray-200/40 overflow-hidden flex-shrink-0 shadow-sm">
                         <div className="overflow-x-auto custom-x-scrollbar">
-                          <table className="w-full text-sm min-w-[600px]">
+                          <table className="w-full text-sm min-w-[600px] relative">
                             <thead>
-                              <tr className="border-b">
-                                <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider">
+                              <tr className="border-b border-gray-100/80 bg-gray-50/60">
+                                <th className="p-4 text-left text-[13px] font-semibold text-gray-700 uppercase tracking-[0.5px]">
                                   #
                                 </th>
-                                <th className="p-2 text-left text-xs font-medium text-gray uppercase tracking-wider">
+                                <th className="p-3 text-left text-[13px] font-semibold text-gray-700 uppercase tracking-[0.5px] sticky left-0 bg-gray-50/90 backdrop-blur-sm z-10 border-r border-gray-100/80">
                                   Main image
                                 </th>
-                                <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-40">
+                                <th className="p-4 text-left text-[13px] font-semibold text-gray-700 uppercase tracking-[0.5px] w-40">
                                   Name
                                 </th>
-                                <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-32">
+                                <th className="p-4 text-left text-[13px] font-semibold text-gray-700 uppercase tracking-[0.5px] w-32">
                                   Price
                                 </th>
-                                <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-32">
+                                <th className="p-4 text-left text-[13px] font-semibold text-gray-700 uppercase tracking-[0.5px] w-32">
                                   Visibility
                                 </th>
-                                <th className="p-4 text-left text-xs font-medium text-gray uppercase tracking-wider"></th>
+                                <th className="p-4 text-left text-[13px] font-semibold text-gray-700 uppercase tracking-[0.5px]"></th>
                               </tr>
                             </thead>
                             <tbody>
                               {tableData.map(({ id, index, slug, images, name, pricing, visibility }) => (
                                 <tr
                                   key={id}
-                                  className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors"
+                                  className="group border-b border-gray-50/80 last:border-b-0 hover:bg-blue-50/30 transition-all duration-200 ease-out"
                                 >
-                                  <td className="p-4 pr-0 font-medium">{index}</td>
-                                  <td className="p-2">
-                                    <div className="h-[120px] w-[120px] overflow-hidden flex items-center justify-center">
-                                      <Image src={images.main} alt={name} width={120} height={120} priority />
+                                  <td className="p-4 pr-0 font-semibold text-gray-800 text-[15px] tracking-[-0.011em]">
+                                    {index}
+                                  </td>
+                                  <td className="p-3 sticky left-0 bg-white/95 backdrop-blur-sm z-10 border-r border-gray-50/80 group-hover:bg-blue-50/40">
+                                    <div className="h-[100px] w-[100px] overflow-hidden flex items-center justify-center rounded-[12px] bg-gray-50/80 border border-gray-100/60">
+                                      <Image
+                                        src={images.main}
+                                        alt={name}
+                                        width={100}
+                                        height={100}
+                                        priority
+                                        className="object-cover"
+                                      />
                                     </div>
                                   </td>
                                   <td className="p-4">
-                                    <p className="font-medium line-clamp-2">{name}</p>
+                                    <p className="font-medium line-clamp-2 text-gray-900 text-[15px] tracking-[-0.011em] leading-5">
+                                      {name}
+                                    </p>
                                   </td>
                                   <td className="p-4">
                                     <div className="w-max flex items-center justify-center">
                                       {Number(pricing.salePrice) ? (
-                                        <div className="flex items-center gap-[6px]">
+                                        <div className="flex items-center gap-2">
                                           <div className="flex items-baseline">
-                                            <span className="text-[0.813rem] leading-3 font-semibold">$</span>
-                                            <span className="text-lg font-bold">
+                                            <span className="text-[13px] leading-3 font-semibold text-gray-900">$</span>
+                                            <span className="text-[17px] font-bold text-gray-900 tracking-[-0.022em]">
                                               {Math.floor(Number(pricing.salePrice))}
                                             </span>
-                                            <span className="text-[0.813rem] leading-3 font-semibold">
+                                            <span className="text-[13px] leading-3 font-semibold text-gray-900">
                                               {(Number(pricing.salePrice) % 1).toFixed(2).substring(1)}
                                             </span>
                                           </div>
-                                          <span className="text-[0.813rem] leading-3 text-gray line-through">
+                                          <span className="text-[13px] leading-3 text-gray-500 line-through">
                                             ${formatThousands(Number(pricing.basePrice))}
                                           </span>
                                         </div>
                                       ) : (
                                         <div className="flex items-baseline">
-                                          <span className="text-[0.813rem] leading-3 font-semibold">$</span>
-                                          <span className="text-lg font-bold">
+                                          <span className="text-[13px] leading-3 font-semibold text-gray-900">$</span>
+                                          <span className="text-[17px] font-bold text-gray-900 tracking-[-0.022em]">
                                             {Math.floor(Number(pricing.basePrice))}
                                           </span>
-                                          <span className="text-[0.813rem] leading-3 font-semibold">
+                                          <span className="text-[13px] leading-3 font-semibold text-gray-900">
                                             {(Number(pricing.basePrice) % 1).toFixed(2).substring(1)}
                                           </span>
                                         </div>
@@ -402,21 +423,23 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                                   <td className="p-4">
                                     <span
                                       className={clsx(
-                                        "inline-flex px-3 py-1 rounded-full text-sm font-medium",
-                                        visibility === "PUBLISHED" ? "bg-emerald-50 text-emerald-700" : "bg-gray-100"
+                                        "inline-flex px-3 py-1.5 rounded-[8px] text-[13px] font-semibold tracking-[-0.006em]",
+                                        visibility === "PUBLISHED"
+                                          ? "bg-green-100/80 text-green-800 border border-green-200/60"
+                                          : "bg-gray-100/80 text-gray-700 border border-gray-200/60"
                                       )}
                                     >
                                       {capitalizeFirstLetter(visibility.toLowerCase())}
                                     </span>
                                   </td>
                                   <td className="p-4">
-                                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 ease-out">
                                       <Link
                                         href={`/admin/products/${slug}-${id}`}
                                         target="_blank"
-                                        className="h-9 w-9 rounded-full flex items-center justify-center"
+                                        className="h-8 w-8 rounded-[8px] flex items-center justify-center hover:bg-gray-100/70 transition-all duration-200 ease-out active:scale-95"
                                       >
-                                        <Pencil size={18} strokeWidth={1.75} />
+                                        <Pencil size={16} strokeWidth={2} className="text-gray-600" />
                                       </Link>
                                       <ChangeProductIndexButton
                                         collectionId={data.id}
@@ -437,13 +460,13 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                       </div>
                     )}
                     {filteredProducts.length > rowsPerPage && (
-                      <div className="mt-2 flex-shrink-0">
-                        <div className="w-max mx-auto flex gap-1 h-9">
+                      <div className="mt-3 flex-shrink-0">
+                        <div className="w-max mx-auto flex gap-2 h-10">
                           <button
                             onClick={handlePrevious}
-                            className="w-9 h-9 flex items-center justify-center rounded-full ease-in-out duration-300 transition active:bg-lightgray lg:hover:bg-lightgray"
+                            className="w-10 h-10 flex items-center justify-center rounded-[10px] ease-out duration-200 transition-all hover:bg-gray-100/70 active:scale-95 border border-gray-200/60"
                           >
-                            <ChevronLeft strokeWidth={1.5} className="mr-[2px]" />
+                            <ChevronLeft strokeWidth={2} size={18} className="mr-[1px] text-gray-600" />
                           </button>
                           <input
                             value={pageJumpValue}
@@ -451,56 +474,67 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                             onKeyDown={pageJumpEnterKey}
                             type="text"
                             className={clsx(
-                              "min-w-[36px] max-w-[36px] h-9 px-1 text-center border cursor-text outline-none rounded-full bg-white",
+                              "min-w-[40px] max-w-[40px] h-10 px-2 text-center border cursor-text outline-none rounded-[10px] bg-white/80 backdrop-blur-sm text-[15px] font-medium tracking-[-0.011em] transition-all duration-200",
                               {
-                                "border-red": !isPageInRange,
+                                "border-red-400 focus:border-red-500": !isPageInRange,
+                                "border-gray-200/60 focus:border-blue-500": isPageInRange,
                               }
                             )}
                           />
-                          <div className="flex items-center justify-center px-1 cursor-context-menu">of</div>
+                          <div className="flex items-center justify-center px-2 cursor-context-menu text-[14px] text-gray-600 font-medium">
+                            of
+                          </div>
                           <button
                             onClick={jumpToLastPage}
-                            className="w-9 h-9 flex items-center justify-center border rounded-full ease-in-out duration-300 transition active:bg-lightgray lg:hover:bg-lightgray"
+                            className="w-10 h-10 flex items-center justify-center border border-gray-200/60 rounded-[10px] ease-out duration-200 transition-all hover:bg-gray-100/70 active:scale-95 text-[15px] font-medium text-gray-700 tracking-[-0.011em]"
                           >
                             {totalPages}
                           </button>
                           <button
                             onClick={handleNext}
-                            className="w-9 h-9 flex items-center justify-center rounded-full ease-in-out duration-300 transition bg-white active:bg-lightgray lg:hover:bg-lightgray "
+                            className="w-10 h-10 flex items-center justify-center rounded-[10px] ease-out duration-200 transition-all bg-white/80 backdrop-blur-sm hover:bg-gray-100/70 active:scale-95 border border-gray-200/60"
                           >
-                            <ChevronRight strokeWidth={1.5} className="ml-[2px]" />
+                            <ChevronRight strokeWidth={2} size={18} className="ml-[1px] text-gray-600" />
                           </button>
                         </div>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div className="flex-1 min-h-0 w-full flex flex-col gap-4 items-center px-5 pt-5 pb-28 md:pb-[90px] overflow-y-auto invisible-scrollbar">
-                    <div className="flex flex-col gap-2 items-center">
-                      <h2 className="font-semibold text-lg">Collection is empty</h2>
-                      <p className="text-sm text-center">Enter ID below for your first product</p>
+                  <div className="flex-1 min-h-0 w-full flex flex-col gap-6 items-center px-6 pt-8 pb-32 md:pb-[120px] overflow-y-auto invisible-scrollbar">
+                    <div className="flex flex-col gap-3 items-center max-w-sm text-center">
+                      <h2 className="font-semibold text-[20px] text-gray-900 tracking-[-0.022em]">
+                        Collection is empty
+                      </h2>
+                      <p className="text-[15px] text-gray-600 tracking-[-0.011em] leading-5">
+                        Enter a product ID below to add your first item to this collection
+                      </p>
                     </div>
-                    <div className="w-full min-[588px]:w-56 h-9 rounded-full overflow-hidden flex items-center border shadow-sm">
+                    <div className="w-full min-[588px]:w-72 h-12 rounded-[12px] overflow-hidden flex items-center border border-gray-200/60 shadow-sm bg-white/80 backdrop-blur-sm hover:border-gray-300/80 focus-within:border-blue-500 transition-all duration-200">
                       <input
                         type="text"
                         value={productId}
                         onChange={handleInputChange}
                         onKeyDown={handleKeyDown}
                         placeholder="Paste ID"
-                        className="h-full w-full pl-4 bg-transparent"
+                        className="h-full w-full pl-5 bg-transparent text-[16px] placeholder-gray-500 outline-none tracking-[-0.011em]"
                       />
-                      <div className="h-full flex items-center justify-center">
+                      <div className="h-full flex items-center justify-center pr-2">
                         <button
                           onClick={addProduct}
                           disabled={loading}
                           className={clsx(
-                            "w-11 h-9 rounded-full flex items-center justify-center transition duration-300 ease-in-out",
+                            "w-10 h-10 rounded-[10px] flex items-center justify-center transition-all duration-200 ease-out",
                             {
-                              "active:bg-lightgray lg:hover:bg-lightgray": !loading,
+                              "hover:bg-gray-100/70 active:scale-95": !loading,
                             }
                           )}
                         >
-                          {loading ? <Spinner color="gray" /> : <Plus strokeWidth={1.75} />}
+                          {loading ? (
+                            <Spinner color="gray" />
+                          ) : (
+                            <Plus strokeWidth={2} size={20} className="text-gray-600" />
+                          )}
                         </button>
                       </div>
                     </div>
