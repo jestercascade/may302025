@@ -13,9 +13,7 @@ import { ShowAlertType } from "@/lib/sharedTypes";
 export function BasicDetailsButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const pageName = useOverlayStore((state) => state.pages.editCollection.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.editCollection.overlays.basicDetails.name
-  );
+  const overlayName = useOverlayStore((state) => state.pages.editCollection.overlays.basicDetails.name);
 
   return (
     <button
@@ -45,12 +43,8 @@ export function BasicDetailsOverlay({
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editCollection.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.editCollection.overlays.basicDetails.name
-  );
-  const isOverlayVisible = useOverlayStore(
-    (state) => state.pages.editCollection.overlays.basicDetails.isVisible
-  );
+  const overlayName = useOverlayStore((state) => state.pages.editCollection.overlays.basicDetails.name);
+  const isOverlayVisible = useOverlayStore((state) => state.pages.editCollection.overlays.basicDetails.isVisible);
 
   useEffect(() => {
     if (isOverlayVisible) {
@@ -132,14 +126,8 @@ export function BasicDetailsOverlay({
                   type="button"
                   className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                 >
-                  <ArrowLeft
-                    size={20}
-                    strokeWidth={2}
-                    className="-ml-1 stroke-blue"
-                  />
-                  <span className="font-semibold text-sm text-blue">
-                    Basic details
-                  </span>
+                  <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
+                  <span className="font-semibold text-sm text-blue">Basic details</span>
                 </button>
                 <button
                   onClick={handleSave}

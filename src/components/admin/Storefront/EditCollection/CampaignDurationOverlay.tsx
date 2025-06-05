@@ -17,9 +17,7 @@ import { useBodyOverflowStore } from "@/zustand/shared/bodyOverflowStore";
 export function CampaignDurationButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const pageName = useOverlayStore((state) => state.pages.editCollection.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.editCollection.overlays.campaignDuration.name
-  );
+  const overlayName = useOverlayStore((state) => state.pages.editCollection.overlays.campaignDuration.name);
 
   return (
     <button
@@ -41,23 +39,15 @@ export function CampaignDurationOverlay({
   };
 }) {
   const [loading, setLoading] = useState<boolean>(false);
-  const [launchDate, setLaunchDate] = useState<Date | null>(
-    new Date(data.campaignDuration.startDate)
-  );
+  const [launchDate, setLaunchDate] = useState<Date | null>(new Date(data.campaignDuration.startDate));
   const [endDate, setEndDate] = useState<Date | null>(new Date(data.campaignDuration.endDate));
 
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editCollection.name);
-  const overlayName = useOverlayStore(
-    (state) => state.pages.editCollection.overlays.campaignDuration.name
-  );
-  const isOverlayVisible = useOverlayStore(
-    (state) => state.pages.editCollection.overlays.campaignDuration.isVisible
-  );
-  const setPreventBodyOverflowChange = useBodyOverflowStore(
-    (state) => state.setPreventBodyOverflowChange
-  );
+  const overlayName = useOverlayStore((state) => state.pages.editCollection.overlays.campaignDuration.name);
+  const isOverlayVisible = useOverlayStore((state) => state.pages.editCollection.overlays.campaignDuration.isVisible);
+  const setPreventBodyOverflowChange = useBodyOverflowStore((state) => state.setPreventBodyOverflowChange);
 
   useEffect(() => {
     if (isOverlayVisible) {
@@ -82,9 +72,7 @@ export function CampaignDurationOverlay({
   };
 
   const isValidDateRange =
-    launchDate &&
-    endDate &&
-    launchDate.toISOString().split("T")[0] < endDate.toISOString().split("T")[0];
+    launchDate && endDate && launchDate.toISOString().split("T")[0] < endDate.toISOString().split("T")[0];
 
   const handleSave = async () => {
     if (!isValidDateRange) {
@@ -126,7 +114,7 @@ export function CampaignDurationOverlay({
     <>
       {isOverlayVisible && (
         <Overlay>
-          <div className="absolute bottom-0 left-0 right-0 w-full h-[calc(100%-60px)] rounded-t-[20px] bg-white md:w-[400px] md:rounded-2xl md:shadow-lg md:h-max md:mx-auto md:mt-20 md:mb-[50vh] md:relative md:bottom-auto md:left-auto md:right-auto md:top-auto md:-translate-x-0">
+          <div className="absolute bottom-0 left-0 right-0 w-full h-[calc(100%-60px)] rounded-t-[20px] overflow-hidden bg-white md:w-[500px] md:rounded-2xl md:shadow-lg md:h-max md:mx-auto md:mt-20 md:mb-[50vh] md:relative md:bottom-auto md:left-auto md:right-auto md:top-auto md:-translate-x-0">
             <div className="w-full h-[calc(100vh-188px)] md:h-auto">
               <div className="md:hidden flex items-end justify-center pt-4 pb-2 absolute top-0 left-0 right-0 bg-white">
                 <div className="relative flex justify-center items-center w-full h-7">

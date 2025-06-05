@@ -246,7 +246,7 @@ export default async function EditCollection({ params }: { params: Promise<{ slu
                   <Link
                     key={id}
                     href={`/admin/products/${slug}-${id}`}
-                    className="group aspect-square w-[calc(33.33%-14px)] select-none"
+                    className="group aspect-square w-[calc(50%-10px)] sm:w-[calc(33.33%-14px)] select-none"
                   >
                     <div className="relative">
                       <div className="w-full aspect-square overflow-hidden flex items-center justify-center shadow-[2px_2px_4px_#9E9E9E] bg-white">
