@@ -826,9 +826,9 @@ export function OptionsOverlay({
                   const isLastGroup = groupIndex === optionGroups.length - 1;
 
                   return (
-                    <div key={group.id} className="border rounded-lg overflow-hidden mb-4">
+                    <div key={group.id} className="border rounded-lg mb-4">
                       <div
-                        className="flex items-center justify-between p-3 pr-4 bg-white cursor-pointer"
+                        className="flex items-center justify-between p-3 pr-4 rounded-t-lg cursor-pointer"
                         onClick={() =>
                           setCollapsedGroups((prev) => ({
                             ...prev,
@@ -905,54 +905,53 @@ export function OptionsOverlay({
                       </div>
 
                       {!isCollapsed && (
-                        <div className="border-t">
+                        <div className="border-t rounded-b-lg overflow-hidden">
                           <div className="overflow-x-auto custom-x-scrollbar">
-                            <table className="w-full table-fixed divide-y divide-neutral-200">
-                              <thead className="bg-neutral-50">
-                                <tr>
-                                  <th
-                                    className="px-4 py-2 text-left text-xs font-medium text-gray uppercase tracking-wider"
-                                    style={{
-                                      width: isParent ? "128px" : "40%",
-                                    }}
-                                  >
+                            <table className="w-max min-w-full table-fixed">
+                              <thead>
+                                <tr className="bg-gray-50/90 backdrop-blur-md border-b border-gray-200/80">
+                                  <th className="min-w-28 max-w-28 w-28 px-3 py-2.5 text-left text-xs font-semibold text-gray-600 tracking-wide sticky left-0 bg-gray-50/90 backdrop-blur-md z-10 border-r border-gray-200/50">
+                                    Actions
+                                  </th>
+                                  <th className="min-w-36 w-36 px-3 py-2.5 text-left text-xs font-semibold text-gray-600 tracking-wide">
                                     Option Value
                                   </th>
-                                  <th
-                                    className="px-4 py-2 text-left text-xs font-medium text-gray uppercase tracking-wider"
-                                    style={{ width: "20%" }}
-                                  >
+                                  <th className="min-w-28 px-3 py-2.5 text-left text-xs font-semibold text-gray-600 tracking-wide">
                                     Status
                                   </th>
                                   {isParent && chainingConfig.childGroupId !== null && (
-                                    <th
-                                      className="px-4 py-2 text-left text-xs font-medium text-gray uppercase tracking-wider"
-                                      style={{ width: "60%" }}
-                                    >
+                                    <th className="min-w-0 px-3 py-2.5 text-left text-xs font-semibold text-gray-600 tracking-wide">
                                       Available Options
                                     </th>
                                   )}
-                                  <th
-                                    className="px-4 py-2 text-right text-xs font-medium text-gray uppercase tracking-wider"
-                                    style={{ width: "15%", minWidth: "80px" }}
-                                  >
-                                    Actions
-                                  </th>
                                 </tr>
                               </thead>
-                              <tbody className="bg-white divide-y divide-neutral-200">
+                              <tbody className="divide-y divide-gray-100/70 bg-white">
                                 {group.options.map((option) => (
-                                  <tr key={option.id}>
-                                    <td className="px-4 py-3 text-sm font-medium truncate">{option.value}</td>
-                                    <td className="px-4 py-3">
+                                  <tr key={option.id} className="hover:bg-gray-50/60 transition-colors duration-200">
+                                    <td className="min-w-28 max-w-28 w-28 px-3 py-2 sticky left-0 bg-white hover:bg-gray-50/60 transition-colors duration-200 z-10 border-r border-gray-100/80">
+                                      <button
+                                        onClick={() => deleteOption(group.id, option.id)}
+                                        className="inline-flex items-center justify-center w-6 h-6 text-gray-400 hover:text-red-500 hover:bg-red-50/80 rounded-full transition-all duration-200 hover:scale-105"
+                                        aria-label="Delete option"
+                                      >
+                                        <X size={12} />
+                                      </button>
+                                    </td>
+                                    <td className="min-w-36 w-36 px-3 py-2 text-sm font-medium text-gray-800">
+                                      <div className="truncate" title={option.value}>
+                                        {option.value}
+                                      </div>
+                                    </td>
+                                    <td className="min-w-28 px-3 py-2">
                                       <button
                                         onClick={() => toggleOptionActive(group.id, option.id)}
-                                        className={`px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full ${
+                                        className={`px-2 py-0.5 inline-flex text-xs font-medium rounded-full transition-all duration-200 border ${
                                           isParent
                                             ? getParentOptionStatusClass(option)
                                             : option.isActive
-                                            ? "bg-green-100 text-green-700"
-                                            : "bg-neutral-100"
+                                            ? "bg-green-50/90 text-green-700 border-green-200/80 hover:bg-green-100/90 hover:border-green-300/80"
+                                            : "bg-gray-50/90 text-gray-600 border-gray-200/80 hover:bg-gray-100/90 hover:border-gray-300/80"
                                         }`}
                                       >
                                         {isParent
@@ -963,40 +962,36 @@ export function OptionsOverlay({
                                       </button>
                                     </td>
                                     {isParent && chainingConfig.childGroupId !== null && (
-                                      <td className="px-4 py-3">
-                                        <div className="grid grid-cols-3 gap-x-4 gap-y-2">
+                                      <td className="min-w-0 px-3 py-2">
+                                        <div className="flex gap-3 flex-nowrap">
                                           {findGroup(chainingConfig.childGroupId)?.options.map((child) => (
                                             <label
                                               key={child.id}
-                                              className={`flex items-center ${!child.isActive ? "opacity-50" : ""}`}
+                                              className={`flex items-center text-xs rounded-lg px-2 py-1 transition-all duration-200 whitespace-nowrap ${
+                                                !child.isActive
+                                                  ? "opacity-40 cursor-not-allowed"
+                                                  : "cursor-pointer hover:bg-blue-50/80 hover:scale-[1.02]"
+                                              }`}
                                             >
                                               <input
                                                 type="checkbox"
                                                 checked={availabilityMatrix[option.id]?.includes(child.id)}
                                                 onChange={() => toggleAvailability(option.id, child.id)}
-                                                className="h-3 w-3 text-blue rounded"
+                                                className="h-3 w-3 text-blue-600 bg-white border-gray-300/80 rounded focus:ring-blue-500/40 focus:ring-2 mr-2"
                                                 disabled={!child.isActive}
                                               />
-                                              <span className="ml-1 text-xs text-gray truncate">{child.value}</span>
+                                              <span className="text-gray-700 font-medium">{child.value}</span>
                                             </label>
                                           ))}
                                         </div>
                                       </td>
                                     )}
-                                    <td className="px-4 py-3 text-right">
-                                      <button
-                                        onClick={() => deleteOption(group.id, option.id)}
-                                        className="text-gray hover:text-red-700 transition-colors"
-                                        aria-label="Delete option"
-                                      >
-                                        <X size={16} />
-                                      </button>
-                                    </td>
                                   </tr>
                                 ))}
                               </tbody>
                             </table>
                           </div>
+
                           <div className="px-4 py-3 bg-white border-t flex">
                             <input
                               type="text"
@@ -1022,7 +1017,7 @@ export function OptionsOverlay({
                           {/* Size Chart Section for "Size" Group */}
                           {group.name.toLowerCase() === "size" && (
                             <div className="mb-4 pt-4 border-t">
-                              <div className="w paz-[calc(100%-32px)] mx-auto flex items-center justify-between bg-neutral-50 p-4 rounded-md">
+                              <div className="w-[calc(100%-32px)] mx-auto flex items-center justify-between bg-neutral-50 p-4 rounded-md">
                                 <div className="flex items-center">
                                   <Table size={20} className="text-gray mr-3" />
                                   <span className="font-medium text-gray">Size Chart</span>
