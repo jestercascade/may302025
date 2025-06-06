@@ -305,7 +305,7 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                           )
                         </button>
                       </div>
-                      <div className="w-full min-[588px]:w-[190px] h-9 rounded-full overflow-hidden flex items-center border">
+                      <div className="w-full min-[588px]:w-[190px] h-10 rounded-full overflow-hidden flex items-center border">
                         <input
                           type="text"
                           value={productId}
