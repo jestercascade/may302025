@@ -270,19 +270,19 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                 {tableData.length > 0 ? (
                   <div className="flex-1 min-h-0 p-6 flex flex-col gap-5 overflow-y-auto md:overflow-hidden custom-scrollbar">
                     <div className="w-full flex flex-col min-[588px]:flex-row gap-4 items-center justify-between flex-shrink-0">
-                      <div className="max-w-full flex flex-nowrap rounded-full bg-lightgray overflow-x-visible overflow-y-hidden invisible-scrollbar *:min-w-max *:h-9 *:rounded-full *:flex *:items-center *:justify-center *:font-semibold *:text-sm *:ease-in-out *:duration-300 *:transition">
+                      <div className="max-w-full flex flex-nowrap rounded-full bg-lightgray p-1 overflow-x-visible overflow-y-hidden invisible-scrollbar">
                         <button
                           onClick={() => handleFilterChange(ALL)}
-                          className={`px-3 pl-[14px] h-9 hover:bg-lightgray-dimmed rounded-full ${
-                            filter === ALL ? "text-blue" : "text-gray hover:text-black"
+                          className={`px-3 pl-[14px] h-8 rounded-full text-sm font-semibold transition-colors ${
+                            filter === ALL ? "bg-[#404040] text-white" : "text-gray hover:text-black"
                           }`}
                         >
                           View all ({data.products.length})
                         </button>
                         <button
                           onClick={() => handleFilterChange(PUBLISHED)}
-                          className={`px-3 h-9 hover:bg-lightgray-dimmed rounded-full ${
-                            filter === PUBLISHED ? "text-blue" : "text-gray hover:text-black"
+                          className={`px-3 h-8 rounded-full text-sm font-semibold transition-colors ${
+                            filter === PUBLISHED ? "bg-[#404040] text-white" : "text-gray hover:text-black"
                           }`}
                         >
                           Published (
@@ -290,8 +290,8 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                         </button>
                         <button
                           onClick={() => handleFilterChange(INACTIVE)}
-                          className={`px-3 pr-[14px] h-9 hover:bg-lightgray-dimmed rounded-full ${
-                            filter === INACTIVE ? "text-blue" : "text-gray hover:text-black"
+                          className={`px-3 pr-[14px] h-8 rounded-full text-sm font-semibold transition-colors ${
+                            filter === INACTIVE ? "bg-[#404040] text-white" : "text-gray hover:text-black"
                           }`}
                         >
                           Inactive (
@@ -366,7 +366,7 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                                 >
                                   <td className="p-4 pr-0 font-semibold text-sm">{index}</td>
                                   <td className="p-3 sticky left-0 bg-white z-10 group-hover:bg-[#fffae5] transition-colors">
-                                    <div className="h-[100px] w-[100px] overflow-hidden flex items-center justify-center rounded-[12px] bg-gray-50/80 border border-gray-100/60">
+                                    <div className="h-[100px] w-[100px] overflow-hidden flex items-center justify-center rounded-lg bg-gray-50/80 border border-gray-100/80">
                                       <Image src={images.main} alt={name} width={100} height={100} priority />
                                     </div>
                                   </td>
