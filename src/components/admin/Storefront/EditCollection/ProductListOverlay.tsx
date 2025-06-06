@@ -366,7 +366,7 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                                 >
                                   <td className="p-4 pr-0 font-semibold text-sm">{index}</td>
                                   <td className="p-3 sticky left-0 bg-white z-10 group-hover:bg-[#fffae5] transition-colors">
-                                    <div className="h-[100px] w-[100px] overflow-hidden flex items-center justify-center rounded-lg bg-gray-50/80 border border-gray-100/80">
+                                    <div className="h-[100px] w-[100px] overflow-hidden flex items-center justify-center rounded-lg bg-gray-50/80 border border-gray-100">
                                       <Image src={images.main} alt={name} width={100} height={100} priority />
                                     </div>
                                   </td>
