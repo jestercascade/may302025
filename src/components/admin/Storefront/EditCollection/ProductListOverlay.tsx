@@ -40,8 +40,7 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
   const HIDDEN = "HIDDEN";
   const INACTIVE = "INACTIVE";
   const ALL = "ALL";
-  // const rowsPerPage = 12;
-  const rowsPerPage = 2;
+  const rowsPerPage = 12;
 
   const [loading, setLoading] = useState<boolean>(false);
   const [productId, setProductId] = useState("");
@@ -244,10 +243,9 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
       {isOverlayVisible && (
         <Overlay>
           <div className="md:mx-auto md:mt-16 md:mb-[50vh] md:px-6 lg:p-0">
-            {/* <div className="absolute bottom-0 left-0 right-0 w-full h-[calc(100%-60px)] mx-auto ease-in-out duration-500 transition-all overflow-hidden rounded-t-[20px] bg-white backdrop-blur-xl border-t border-gray-200/50 md:overflow-visible md:w-full md:max-w-[900px] md:rounded-[16px] md:shadow-2xl md:shadow-black/10 md:h-max md:relative md:bottom-auto md:left-auto md:right-auto md:top-auto md:-translate-x-0 md:border md:border-gray-300/60"> */}
             <div className="absolute bottom-0 left-0 right-0 w-full h-[calc(100%-60px)] mx-auto ease-in-out duration-300 transition overflow-hidden md:overflow-visible rounded-t-3xl bg-white md:w-full md:max-w-[800px] md:rounded-2xl md:shadow md:h-max md:relative md:bottom-auto md:left-auto md:right-auto md:top-auto md:-translate-x-0">
               <div className="w-full h-full flex flex-col">
-                <div className="md:hidden flex items-end justify-center pt-4 pb-2 absolute top-0 left-0 right-0 bg-white">
+                <div className="md:hidden flex items-end justify-center py-3 flex-shrink-0 border-b">
                   <div className="relative flex justify-center items-center w-full h-7">
                     <h2 className="font-semibold text-lg">Products</h2>
                     <button
@@ -270,7 +268,7 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                   </button>
                 </div>
                 {tableData.length > 0 ? (
-                  <div className="flex-1 min-h-0 p-6 flex flex-col gap-5 overflow-y-auto md:overflow-hidden">
+                  <div className="flex-1 min-h-0 p-6 flex flex-col gap-5 overflow-y-auto md:overflow-hidden custom-scrollbar">
                     <div className="w-full flex flex-col min-[588px]:flex-row gap-4 items-center justify-between flex-shrink-0">
                       <div className="max-w-full flex flex-nowrap rounded-full bg-lightgray overflow-x-visible overflow-y-hidden invisible-scrollbar *:min-w-max *:h-9 *:rounded-full *:flex *:items-center *:justify-center *:font-semibold *:text-sm *:ease-in-out *:duration-300 *:transition">
                         <button
@@ -307,13 +305,13 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                           )
                         </button>
                       </div>
-                      <div className="w-full min-[588px]:w-56 h-9 rounded-full overflow-hidden flex items-center border">
+                      <div className="w-full min-[588px]:w-[190px] h-9 rounded-full overflow-hidden flex items-center border">
                         <input
                           type="text"
                           value={productId}
                           onChange={handleInputChange}
                           onKeyDown={handleKeyDown}
-                          placeholder="Paste ID (#12345)"
+                          placeholder="Paste ID"
                           className="h-full w-full pl-4 bg-transparent"
                         />
                         <div className="h-full flex items-center justify-center">
@@ -337,7 +335,7 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                       </div>
                     </div>
                     {tableData.length > 0 && (
-                      <div className="rounded-xl bg-white/90 backdrop-blur-sm border overflow-hidden flex-shrink-0 shadow-sm">
+                      <div className="rounded-lg border overflow-hidden flex-shrink-0">
                         <div className="overflow-x-auto custom-x-scrollbar">
                           <table className="w-full text-sm min-w-[600px] relative">
                             <thead>
@@ -345,16 +343,16 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                                 <th className="h-11 px-4 text-left text-xs font-medium text-gray uppercase tracking-wider">
                                   #
                                 </th>
-                                <th className="h-11 px-4 text-left text-xs font-medium text-gray uppercase tracking-wider sticky left-0 z-10 border-b">
+                                <th className="h-11 px-4 text-left text-xs font-medium text-gray uppercase tracking-wider bg-white sticky left-0 z-10 border-b">
                                   Main image
                                 </th>
-                                <th className="h-11 px-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-40">
+                                <th className="h-11 px-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-40 w-40">
                                   Name
                                 </th>
-                                <th className="h-11 px-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-32">
+                                <th className="h-11 px-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-32 w-32">
                                   Price
                                 </th>
-                                <th className="h-11 px-4 text-left text-xs font-medium text-gray uppercase tracking-wider w-32">
+                                <th className="h-11 px-4 text-left text-xs font-medium text-gray uppercase tracking-wider min-w-32 w-32">
                                   Visibility
                                 </th>
                                 <th className="h-11 px-4 text-left text-xs font-medium text-gray uppercase tracking-wider"></th>
@@ -364,10 +362,10 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                               {tableData.map(({ id, index, slug, images, name, pricing, visibility }) => (
                                 <tr
                                   key={id}
-                                  className="group border-b last:border-b-0 hover:bg-[#ffcc001a] transition-colors"
+                                  className="group border-b last:border-b-0 hover:bg-[#fffae5]  transition-colors"
                                 >
                                   <td className="p-4 pr-0 font-semibold text-sm">{index}</td>
-                                  <td className="p-3 sticky left-0 bg-white z-10 group-hover:bg-transparent transition-colors">
+                                  <td className="p-3 sticky left-0 bg-white z-10 group-hover:bg-[#fffae5] transition-colors">
                                     <div className="h-[100px] w-[100px] overflow-hidden flex items-center justify-center rounded-[12px] bg-gray-50/80 border border-gray-100/60">
                                       <Image src={images.main} alt={name} width={100} height={100} priority />
                                     </div>
