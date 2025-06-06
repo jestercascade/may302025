@@ -314,14 +314,14 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                           placeholder="Paste ID"
                           className="h-full w-full pl-4 bg-transparent"
                         />
-                        <div className="h-full flex items-center justify-center">
+                        <div className="h-full pr-1 flex items-center justify-center">
                           <button
                             onClick={addProduct}
                             disabled={loading}
                             className={clsx(
-                              "w-11 h-9 rounded-full flex items-center justify-center transition duration-300 ease-in-out",
+                              "w-8 h-8 rounded-full flex items-center justify-center transition-colors bg-lightgray",
                               {
-                                "active:bg-lightgray lg:hover:bg-lightgray": !loading,
+                                "active:bg-lightgray-dimmed lg:hover:bg-lightgray-dimmed": !loading,
                               }
                             )}
                           >
