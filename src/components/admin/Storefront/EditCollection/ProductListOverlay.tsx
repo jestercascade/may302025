@@ -270,7 +270,7 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                 {tableData.length > 0 ? (
                   <div className="flex-1 min-h-0 p-6 flex flex-col gap-5 overflow-y-auto md:overflow-hidden custom-scrollbar">
                     <div className="w-full flex flex-col min-[588px]:flex-row gap-4 items-center justify-between flex-shrink-0">
-                      <div className="max-w-full flex flex-nowrap rounded-full bg-lightgray p-1 overflow-x-visible overflow-y-hidden invisible-scrollbar">
+                      <div className="max-w-full flex flex-nowrap rounded-full bg-lightgray p-1 overflow-x-auto overflow-y-hidden invisible-scrollbar *:min-w-max *:h-8 *:rounded-full *:flex *:items-center *:justify-center *:font-semibold *:text-sm *:transition-colors">
                         <button
                           onClick={() => handleFilterChange(ALL)}
                           className={`px-3 pl-[14px] h-8 rounded-full text-sm font-semibold transition-colors ${
