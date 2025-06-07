@@ -1165,7 +1165,7 @@ export function OptionsOverlay({
             </div>
 
             {/* Mobile Save Button */}
-            <div className="md:hidden w-full pb-5 pt-2 px-5 absolute bottom-0 bg-white">
+            <div className="md:hidden w-full pb-5 pt-2 px-5 absolute bottom-0 z-20 bg-white">
               <button
                 onClick={handleSave}
                 disabled={loading}

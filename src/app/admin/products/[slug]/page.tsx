@@ -1,4 +1,8 @@
-import { BasicDetailsOverlay, BasicDetailsButton } from "@/components/admin/EditProduct/BasicDetailsOverlay";
+import {
+  BasicDetailsOverlay,
+  BasicDetailsButton,
+  CopyToClipboardButton,
+} from "@/components/admin/EditProduct/BasicDetailsOverlay";
 import { capitalizeFirstLetter, formatThousands, isValidRemoteImage } from "@/lib/utils/common";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -15,6 +19,8 @@ import { HighlightsButton, HighlightsOverlay } from "@/components/admin/EditProd
 import clsx from "clsx";
 import { RemoveUpsellButton, UpsellButton, UpsellOverlay } from "@/components/admin/EditProduct/UpsellOverlay ";
 import { getProducts } from "@/actions/get/products";
+import { Copy } from "lucide-react";
+import { appConfig } from "@/config";
 
 export default async function EditProduct({ params }: { params: Promise<{ slug: string }> }) {
   const paramSlug = (await params).slug;
@@ -108,16 +114,18 @@ export default async function EditProduct({ params }: { params: Promise<{ slug: 
           >
             {hasBasicDetails ? (
               <>
-                <div className="w-[calc(100%-60px)]">
+                <div className="w-full">
                   <div className="p-5">
                     <h3 className="text-xs text-gray mb-4">Main</h3>
-                    <div className="flex items-center flex-col gap-[6px] w-max">
-                      <div className="w-full max-w-[280px] rounded-xl aspect-square flex items-center justify-center overflow-hidden bg-lightgray">
+                    <div className="space-y-[6px]">
+                      <div className="minw-full max-w-[280px] rounded-xl aspect-square flex items-center justify-center overflow-hidden bg-lightgray">
                         {images.main && isValidRemoteImage(images.main) && (
                           <Image src={images.main} alt={name} width={280} height={280} priority />
                         )}
                       </div>
-                      <MainImageButton />
+                      <div className="max-w-[280px] flex justify-center">
+                        <MainImageButton />
+                      </div>
                     </div>
                   </div>
                   <div className="p-5">
@@ -152,10 +160,15 @@ export default async function EditProduct({ params }: { params: Promise<{ slug: 
                     </div>
                   </div>
                   <div className="p-5">
-                    <h3 className="text-xs text-gray mb-2">Slug</h3>
-                    <p className="font-medium">
-                      {slug}-{id}
-                    </p>
+                    <h3 className="text-xs text-gray mb-3">Slug</h3>
+                    <div className="w-full max-w-96 h-11 flex items-center gap-2 bg-neutral-50/80 pl-3 pr-2 rounded-md border border-gray-200/40">
+                      <div className="overflow-x-auto invisible-scrollbar flex-1">
+                        <p className="font-medium whitespace-nowrap text-sm tracking-tight">
+                          {slug}-{id}
+                        </p>
+                      </div>
+                      <CopyToClipboardButton text={`${appConfig.BASE_URL}/${slug}-${id}`} />
+                    </div>
                   </div>
                 </div>
               </>

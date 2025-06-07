@@ -3,7 +3,7 @@
 import { FormEvent, useState, useEffect, ChangeEvent, useCallback } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
-import { ArrowLeft, X, Pencil } from "lucide-react";
+import { ArrowLeft, X, Pencil, Copy, Check } from "lucide-react";
 import Overlay from "@/ui/Overlay";
 import { UpdateProductAction } from "@/actions/products";
 import { ShowAlertType } from "@/lib/sharedTypes";
@@ -22,6 +22,28 @@ export function BasicDetailsButton({ className }: { className: string }) {
       className={`w-9 h-9 rounded-full flex items-center justify-center transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray ${className}`}
     >
       <Pencil size={18} strokeWidth={1.75} />
+    </button>
+  );
+}
+
+export function CopyToClipboardButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      type="button"
+      className="aspect-square w-7 flex items-center justify-center rounded-md hover:bg-lightgray transition-all duration-200 ease-out active:scale-95"
+      title={copied ? "Copied!" : "Copy to clipboard"}
+      aria-label="Copy to clipboard"
+    >
+      {copied ? <Check size={16} className="text-green-500" /> : <Copy size={14} className="text-gray" />}
     </button>
   );
 }

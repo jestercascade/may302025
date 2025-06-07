@@ -213,7 +213,7 @@ export default function ProductGrid({ products }: { products: ProductType[] }) {
                       {copiedId === id ? (
                         <Check size={16} className="text-green-500" />
                       ) : (
-                        <Copy size={16} className="text-gray-600" />
+                        <Copy size={16} className="text-gray" />
                       )}
                     </button>
                   </div>
