@@ -131,27 +131,27 @@ export default function ProductGrid({ products }: { products: ProductType[] }) {
         <>
           <div className="w-full flex flex-col gap-3">
             <div className="w-full flex flex-col min-[588px]:flex-row gap-2 items-center justify-between">
-              <div className="max-w-full flex flex-nowrap rounded-full bg-[#efefef] overflow-x-visible overflow-y-hidden invisible-scrollbar *:min-w-max *:h-9 *:rounded-full *:flex *:items-center *:justify-center *:font-semibold *:text-sm *:ease-in-out *:duration-300 *:transition">
+              <div className="max-w-full flex flex-nowrap rounded-full bg-lightgray p-1 overflow-x-auto overflow-y-hidden invisible-scrollbar *:min-w-max *:h-8 *:rounded-full *:flex *:items-center *:justify-center *:font-semibold *:text-sm *:transition-colors">
                 <button
                   onClick={() => handleFilterChange(ALL)}
-                  className={`px-3 pl-[14px] h-9 hover:bg-[#e4e4e4] rounded-full ${
-                    filter === ALL ? "text-blue" : "text-gray hover:text-black"
+                  className={`px-3 pl-[14px] h-8 rounded-full text-sm font-semibold transition-colors ${
+                    filter === ALL ? "bg-[#D6DEE4] text-black" : "text-gray hover:text-black"
                   }`}
                 >
                   View all ({products.length})
                 </button>
                 <button
                   onClick={() => handleFilterChange(PUBLISHED)}
-                  className={`px-3 h-9 hover:bg-[#e4e4e4] rounded-full ${
-                    filter === PUBLISHED ? "text-blue" : "text-gray hover:text-black"
+                  className={`px-3 h-8 rounded-full text-sm font-semibold transition-colors ${
+                    filter === PUBLISHED ? "bg-[#D6DEE4] text-black" : "text-gray hover:text-black"
                   }`}
                 >
                   Published ({products.filter((product) => product.visibility.toUpperCase() === PUBLISHED).length})
                 </button>
                 <button
                   onClick={() => handleFilterChange(INACTIVE)}
-                  className={`px-3 pr-[14px] h-9 hover:bg-[#e4e4e4] rounded-full ${
-                    filter === INACTIVE ? "text-blue" : "text-gray hover:text-black"
+                  className={`px-3 pr-[14px] h-8 rounded-full text-sm font-semibold transition-colors ${
+                    filter === INACTIVE ? "bg-[#D6DEE4] text-black" : "text-gray hover:text-black"
                   }`}
                 >
                   Inactive (

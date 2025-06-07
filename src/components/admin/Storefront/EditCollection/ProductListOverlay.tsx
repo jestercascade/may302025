@@ -416,7 +416,7 @@ export function ProductListOverlay({ data }: { data: { id: string; products: Pro
                                     </span>
                                   </td>
                                   <td className="p-4">
-                                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 ease-out">
+                                    <div className="flex items-center justify-end gap-1 md:opacity-0 md:group-hover:opacity-100 transition-all duration-200 ease-out">
                                       <Link
                                         href={`/admin/products/${slug}-${id}`}
                                         target="_blank"
