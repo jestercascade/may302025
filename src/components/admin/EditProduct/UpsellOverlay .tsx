@@ -3,13 +3,15 @@
 import { useState, useEffect } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
-import { ArrowLeft, X, Minus, Plus, Pencil } from "lucide-react";
+import { ArrowLeft, X, Plus, Pencil } from "lucide-react";
 import clsx from "clsx";
 import Overlay from "@/ui/Overlay";
 import Image from "next/image";
 import { RemoveUpsellAction, SetUpsellAction } from "@/actions/products";
 import { useAlertStore } from "@/zustand/shared/alertStore";
 import { ShowAlertType } from "@/lib/sharedTypes";
+import Link from "next/link";
+import { isValidRemoteImage } from "@/lib/utils/common";
 
 export function UpsellButton({ className }: { className: string }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
@@ -27,7 +29,6 @@ export function UpsellButton({ className }: { className: string }) {
   );
 }
 
-// Add this component at the bottom of UpsellOverlay.tsx
 export function RemoveUpsellButton({ productId }: { productId: string }) {
   const [loading, setLoading] = useState(false);
   const showAlert = useAlertStore((state) => state.showAlert);
@@ -56,7 +57,7 @@ export function RemoveUpsellButton({ productId }: { productId: string }) {
       onClick={handleRemove}
       disabled={loading}
       className={clsx(
-        "relative h-9 w-max mx-auto px-4  rounded-full bg-red-100 text-red transition-colors disabled:opacity-50",
+        "relative h-9 w-max mx-auto px-4 rounded-full bg-red-100 text-red transition-colors disabled:opacity-50",
         !loading && "hover:bg-red/20"
       )}
     >
@@ -179,9 +180,7 @@ export function UpsellOverlay({ data }: { data: DataType }) {
                 <div className="relative flex justify-center items-center w-full h-7">
                   <h2 className="font-semibold text-lg">Upsell</h2>
                   <button
-                    onClick={() => {
-                      hideOverlay({ pageName, overlayName });
-                    }}
+                    onClick={() => hideOverlay({ pageName, overlayName })}
                     type="button"
                     className="w-7 h-7 rounded-full flex items-center justify-center absolute right-4 transition duration-300 ease-in-out bg-lightgray active:bg-lightgray-dimmed"
                   >
@@ -191,9 +190,7 @@ export function UpsellOverlay({ data }: { data: DataType }) {
               </div>
               <div className="hidden md:flex md:items-center md:justify-start py-2 pr-4 pl-2">
                 <button
-                  onClick={() => {
-                    hideOverlay({ pageName, overlayName });
-                  }}
+                  onClick={() => hideOverlay({ pageName, overlayName })}
                   type="button"
                   className="h-9 px-3 rounded-full flex items-center gap-1 transition duration-300 ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                 >
@@ -202,29 +199,50 @@ export function UpsellOverlay({ data }: { data: DataType }) {
                 </button>
               </div>
               <div className="w-full h-full mt-[52px] md:mt-0 px-5 pb-8 flex flex-col gap-5 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
-                {upsell && upsellDetails ? (
-                  <div className="mx-auto w-max max-w-full rounded-xl overflow-hidden border border-[#FFD69D] bg-[#FEF0B8]">
-                    <div className="rounded-xl p-2 pb-0">
-                      <div className="relative">
-                        <div className="w-60 select-none">
-                          <div className="w-full aspect-square rounded-lg overflow-hidden flex items-center justify-center bg-white">
+                {upsell ? (
+                  <div className="w-max max-w-full mx-auto rounded-xl overflow-hidden bg-gradient-to-br from-orange-100/80 via-amber-50/60 to-yellow-50/40 shadow-lg shadow-orange-200/30 border border-orange-200/50 backdrop-blur-sm">
+                    <div className="p-3 relative">
+                      <Link
+                        href={`/admin/upsells/${upsell.id}`}
+                        target="_blank"
+                        className="group relative block w-60 rounded-lg overflow-hidden select-none"
+                      >
+                        <div className="w-full aspect-square flex items-center justify-center bg-white">
+                          {isValidRemoteImage(upsell.mainImage) && (
                             <Image src={upsell.mainImage} alt="Upsell" width={240} height={240} priority />
-                          </div>
+                          )}
                         </div>
-                        <button
-                          onClick={handleRemoveUpsell}
-                          className="h-8 w-8 rounded-full flex items-center justify-center absolute top-2 right-2 transition duration-300 ease-in-out backdrop-blur border border-red bg-red/70 active:bg-red"
-                        >
-                          {loading ? <Spinner color="white" /> : <Minus color="#ffffff" strokeWidth={1.75} />}
-                        </button>
+                        <div className="absolute inset-0 group-hover:bg-slate-700/10 transition-all duration-300 ease-out"></div>
+                      </Link>
+                      <button
+                        onClick={handleRemoveUpsell}
+                        className="h-7 w-7 rounded-full flex items-center justify-center absolute top-1 right-1 bg-red-500 hover:bg-red-600 active:bg-red-700 shadow-lg shadow-red-500/25 border border-white/40 transition-all duration-200 ease-out hover:scale-105 active:scale-95"
+                      >
+                        {loading ? (
+                          <Spinner color="white" size={16} />
+                        ) : (
+                          <X color="#ffffff" strokeWidth={2} size={16} />
+                        )}
+                      </button>
+                    </div>
+                    {upsellDetails ? (
+                      <div className="px-4 pb-4 pt-1">
+                        <div className="flex items-baseline gap-3 mb-1">
+                          <p className="text-2xl font-bold text-orange-900 tracking-tight">
+                            ${upsellDetails.upsellPrice}
+                          </p>
+                          {upsellDetails.percentageIncrease <= 200 && (
+                            <span className="text-xs font-semibold text-orange-700 bg-orange-100/60 px-2.5 py-1 rounded-full">
+                              +{upsellDetails.percentageIncrease}%
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-orange-800/75 font-medium">
+                          Customer spends{" "}
+                          <span className="text-amber-800 font-bold">${upsellDetails.additionalSpend}</span> more
+                        </p>
                       </div>
-                    </div>
-                    <div className="p-5 pt-4 pr-12">
-                      <p className="mb-1 font-bold text-[#C45500]">
-                        ${upsell.pricing.salePrice || upsell.pricing.basePrice} ({upsellDetails.percentageIncrease}%)
-                      </p>
-                      <p className="text-xs text-[#C45500]/85">Customer spends ${upsellDetails.additionalSpend} more</p>
-                    </div>
+                    ) : null}
                   </div>
                 ) : (
                   <div className="w-full flex flex-col gap-4 items-center mt-[52px] md:mt-0 p-5 md:pb-[70px]">
@@ -297,6 +315,8 @@ type DataType = {
   } | null;
   upsellDetails: {
     additionalSpend: string;
-    percentageIncrease: string;
+    percentageIncrease: number;
+    originalPrice: string;
+    upsellPrice: string;
   } | null;
 };

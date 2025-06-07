@@ -77,8 +77,10 @@ export default async function EditProduct({ params }: { params: Promise<{ slug: 
     const percentageIncrease = (additionalSpend / originalPrice) * 100;
 
     return {
-      additionalSpend: Math.round(additionalSpend).toFixed(2),
-      percentageIncrease: percentageIncrease.toFixed(0),
+      additionalSpend: additionalSpend.toFixed(2), // Fixed: was Math.round(additionalSpend).toFixed(2)
+      percentageIncrease: Math.round(percentageIncrease), // Changed: was percentageIncrease.toFixed(0)
+      originalPrice: originalPrice.toFixed(2),
+      upsellPrice: upsellPrice.toFixed(2),
     };
   }
 
@@ -442,12 +444,12 @@ export default async function EditProduct({ params }: { params: Promise<{ slug: 
               Boost sales by showing customers items that go well with what they're buying.
             </p>
           </div>
-          <div className="w-full max-w-[400px] relative p-5 pr-2 flex items-center justify-between shadow rounded-xl bg-white">
+          <div className="w-full max-w-[400px] relative p-4 pr-2 flex items-center justify-between shadow rounded-xl bg-white">
             {upsell ? (
               upsell.mainImage && upsell.pricing ? (
                 <>
-                  <div className="w-max max-w-full rounded-xl overflow-hidden border border-[#FFD69D] bg-[#FEF0B8]">
-                    <div className="rounded-xl p-2 pb-0">
+                  <div className="w-max max-w-full rounded-xl overflow-hidden bg-gradient-to-br from-orange-100/80 via-amber-50/60 to-yellow-50/40 shadow-lg shadow-orange-200/30 border border-orange-200/50 backdrop-blur-sm">
+                    <div className="p-3">
                       <Link
                         href={`/admin/shop/upsells/${upsell.id}`}
                         target="_blank"
@@ -458,16 +460,24 @@ export default async function EditProduct({ params }: { params: Promise<{ slug: 
                             <Image src={upsell.mainImage} alt="Upsell" width={240} height={240} priority />
                           )}
                         </div>
-                        <div className="absolute top-0 bottom-0 left-0 right-0 group-hover:bg-black/20 transition-colors duration-200"></div>
+                        <div className="absolute inset-0 group-hover:bg-slate-700/10 transition-all duration-300 ease-out"></div>
                       </Link>
                     </div>
                     {upsellDetails ? (
-                      <div className="p-5 pt-4 pr-12">
-                        <p className="mb-1 font-bold text-[#C45500]">
-                          ${upsell.pricing.salePrice || upsell.pricing.basePrice} ({upsellDetails.percentageIncrease}%)
-                        </p>
-                        <p className="text-xs text-[#C45500]/85">
-                          Customer spends ${upsellDetails.additionalSpend} more
+                      <div className="px-4 pb-4 pt-1">
+                        <div className="flex items-baseline gap-3 mb-1">
+                          <p className="text-2xl font-bold text-orange-900 tracking-tight">
+                            ${upsellDetails.upsellPrice}
+                          </p>
+                          {upsellDetails.percentageIncrease <= 200 && (
+                            <span className="text-xs font-semibold text-orange-700 bg-orange-100/60 px-2.5 py-1 rounded-full">
+                              +{upsellDetails.percentageIncrease}%
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-orange-800/75 font-medium">
+                          Customer spends{" "}
+                          <span className="text-amber-800 font-bold">${upsellDetails.additionalSpend}</span> more
                         </p>
                       </div>
                     ) : null}
@@ -518,7 +528,13 @@ export default async function EditProduct({ params }: { params: Promise<{ slug: 
       <DescriptionOverlay data={{ id, description }} />
       <HighlightsOverlay data={{ id, highlights }} />
       <VisibilityOverlay data={{ id, visibility }} />
-      <UpsellOverlay data={{ id, upsell, upsellDetails }} />
+      <UpsellOverlay
+        data={{
+          id,
+          upsell,
+          upsellDetails,
+        }}
+      />
     </>
   );
 }
