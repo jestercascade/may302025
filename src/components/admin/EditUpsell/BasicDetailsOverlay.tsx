@@ -47,12 +47,8 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
   const pageName = useOverlayStore((state) => state.pages.editUpsell.name);
   const overlayName = useOverlayStore((state) => state.pages.editUpsell.overlays.basicDetails.name);
-  const isOverlayVisible = useOverlayStore(
-    (state) => state.pages.editUpsell.overlays.basicDetails.isVisible
-  );
-  const setPreventBodyOverflowChange = useBodyOverflowStore(
-    (state) => state.setPreventBodyOverflowChange
-  );
+  const isOverlayVisible = useOverlayStore((state) => state.pages.editUpsell.overlays.basicDetails.isVisible);
+  const setPreventBodyOverflowChange = useBodyOverflowStore((state) => state.setPreventBodyOverflowChange);
 
   useEffect(() => {
     if (isOverlayVisible) {
@@ -72,8 +68,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
 
   useEffect(() => {
     const totalBasePrice = products.reduce((total, product) => {
-      const price =
-        typeof product.basePrice === "number" ? product.basePrice : parseFloat(product.basePrice);
+      const price = typeof product.basePrice === "number" ? product.basePrice : parseFloat(product.basePrice);
       return isNaN(price) ? total : total + price;
     }, 0);
 
@@ -306,15 +301,10 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
     });
   };
 
-  const handleProductNameChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    productId: string
-  ) => {
+  const handleProductNameChange = (event: React.ChangeEvent<HTMLInputElement>, productId: string) => {
     const newName = event.target.value;
     setProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === productId ? { ...product, name: newName } : product
-      )
+      prevProducts.map((product) => (product.id === productId ? { ...product, name: newName } : product))
     );
   };
 
@@ -380,27 +370,31 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
               <div className="w-full h-full mt-[52px] md:mt-0 p-5 flex flex-col gap-8 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
                 <div className="flex flex-col gap-3">
                   <h2 className="text-xs text-gray">Products</h2>
-                  <div className="w-full min-[588px]:w-56 h-9 mb-1 rounded-full overflow-hidden flex items-center border">
+                  <div className="w-48 h-10 rounded-full overflow-hidden flex items-center border">
                     <input
                       type="text"
                       value={productId}
                       onChange={handleProductIdInputChange}
                       onKeyDown={handleKeyDown}
-                      placeholder="Paste ID (#12345)"
+                      placeholder="Paste ID"
                       className="h-full w-full pl-4 bg-transparent"
                     />
-                    <div className="h-full flex items-center justify-center">
+                    <div className="h-full pr-1 flex items-center justify-center">
                       <button
                         onClick={handleButtonClick}
                         disabled={loadingProduct}
                         className={clsx(
-                          "w-11 h-9 rounded-full flex items-center justify-center transition duration-300 ease-in-out",
+                          "w-8 h-8 rounded-full flex items-center justify-center transition-colors bg-lightgray",
                           {
-                            "active:bg-lightgray lg:hover:bg-lightgray": !loadingProduct,
+                            "active:bg-lightgray-dimmed lg:hover:bg-lightgray-dimmed": !loadingProduct,
                           }
                         )}
                       >
-                        {loadingProduct ? <Spinner color="gray" /> : <Plus strokeWidth={1.75} />}
+                        {loadingProduct ? (
+                          <Spinner color="gray" />
+                        ) : (
+                          <Plus strokeWidth={1.75} size={22} className="text-gray" />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -419,20 +413,14 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                               <div className="w-full aspect-square relative">
                                 <div className="w-full h-full flex items-center justify-center overflow-hidden">
                                   {images && isValidRemoteImage(images.main) && (
-                                    <Image
-                                      src={images.main}
-                                      alt="Upsell"
-                                      width={200}
-                                      height={200}
-                                      priority
-                                    />
+                                    <Image src={images.main} alt="Upsell" width={200} height={200} priority />
                                   )}
                                 </div>
                                 <button
                                   onClick={() => removeProduct(id)}
-                                  className="h-8 w-8 rounded-full flex items-center justify-center absolute top-2 right-2 transition duration-300 ease-in-out backdrop-blur border border-red bg-red/70 active:bg-red"
+                                  className="h-7 w-7 rounded-full flex items-center justify-center absolute top-1 right-1 bg-red-500 hover:bg-red-600 active:bg-red-700 shadow-lg shadow-red-500/25 border border-white/40 transition-all duration-200 ease-out hover:scale-105 active:scale-95"
                                 >
-                                  <Minus color="#ffffff" strokeWidth={1.75} />
+                                  <X color="#ffffff" strokeWidth={2} size={16} />
                                 </button>
                               </div>
                               <div className="w-full h-9 border-t overflow-hidden">
@@ -446,9 +434,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                               </div>
                             </div>
                             <div className="mt-[6px] flex items-center justify-center w-full">
-                              <span className="font-semibold text-sm">
-                                ${formatThousands(basePrice)}
-                              </span>
+                              <span className="font-semibold text-sm">${formatThousands(basePrice)}</span>
                             </div>
                           </div>
                         ))}
@@ -464,9 +450,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                     </div>
                     <div>
                       <h2 className="mb-2 text-xs text-gray">Sale price</h2>
-                      <div className="font-medium">
-                        {salePrice > 0 ? `$${salePrice.toFixed(2)}` : "--"}
-                      </div>
+                      <div className="font-medium">{salePrice > 0 ? `$${salePrice.toFixed(2)}` : "--"}</div>
                     </div>
                   </div>
                   <div className="flex flex-col gap-2">
