@@ -5,7 +5,7 @@ import { formatThousands, isValidRemoteImage } from "@/lib/utils/common";
 import { useState, useEffect, useCallback } from "react";
 import { Spinner } from "@/ui/Spinners/Default";
 import { useOverlayStore } from "@/zustand/admin/overlayStore";
-import { ArrowLeft, X, Pencil, Minus, Plus } from "lucide-react";
+import { ArrowLeft, X, Pencil, Plus } from "lucide-react";
 import clsx from "clsx";
 import Image from "next/image";
 import Overlay from "@/ui/Overlay";

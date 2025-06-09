@@ -19,7 +19,6 @@ import { HighlightsButton, HighlightsOverlay } from "@/components/admin/EditProd
 import clsx from "clsx";
 import { RemoveUpsellButton, UpsellButton, UpsellOverlay } from "@/components/admin/EditProduct/UpsellOverlay ";
 import { getProducts } from "@/actions/get/products";
-import { Copy } from "lucide-react";
 import { appConfig } from "@/config";
 
 export default async function EditProduct({ params }: { params: Promise<{ slug: string }> }) {
