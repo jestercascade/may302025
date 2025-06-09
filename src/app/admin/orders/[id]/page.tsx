@@ -438,8 +438,6 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                       </div>
                     </div>
                   </div>
-
-                  {/* Desktop: Horizontal progress bar */}
                   <div className="hidden sm:block py-6">
                     <div className="relative max-w-2xl mx-auto px-[10px]">
                       <div className="absolute top-[9px] left-[10px] right-[10px] h-0.5 bg-gray-300 rounded-full"></div>
@@ -483,8 +481,6 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                       </div>
                     </div>
                   </div>
-
-                  {/* Mobile: Vertical timeline (iOS-style) */}
                   <div className="sm:hidden py-4">
                     <div className="space-y-0">
                       {statusOptions.map((status, index) => {
@@ -496,40 +492,28 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                         const isLast = index === statusOptions.length - 1;
 
                         return (
-                          <div key={status.value} className="relative flex items-start gap-3 pb-6 last:pb-0">
-                            {/* Connecting line */}
-                            {!isLast && <div className="absolute left-2.5 top-6 w-0.5 h-6 bg-gray-200"></div>}
+                          <div key={status.value} className="relative flex items-start gap-3 pb-5 last:pb-0">
+                            {!isLast && <div className="absolute left-2.5 top-5 w-px h-4 bg-gray-200"></div>}
 
-                            {/* Status circle */}
                             <div
-                              className={`flex-shrink-0 rounded-full h-5 w-5 flex items-center justify-center mt-0.5 transition-all duration-300 z-10 ${
-                                isActive ? "bg-[#404040]" : isCompleted ? "bg-[#404040]" : "bg-gray-300"
+                              className={`flex-shrink-0 rounded-full w-5 h-5 flex items-center justify-center ${
+                                isActive || isCompleted ? "bg-[#404040]" : "bg-gray-200"
                               }`}
                             >
-                              {isCompleted && <Check color="#ffffff" size={12} />}
+                              {isCompleted && <Check color="#ffffff" size={14} />}
                             </div>
 
-                            {/* Status content */}
-                            <div className="flex-1 min-w-0 pt-0.5">
-                              <div
-                                className={`text-sm font-medium ${
-                                  isActive ? "text-black" : isCompleted ? "text-black" : "text-gray-400"
-                                }`}
-                              >
+                            <div className="flex-1 min-w-0">
+                              <div className={`text-sm font-medium ${isCompleted ? "text-black" : "text-gray"}`}>
                                 {status.label}
                               </div>
-                              {isActive && <div className="text-xs text-blue-600 mt-0.5">Current status</div>}
-                              {isCompleted && !isActive && (
-                                <div className="text-xs text-green-600 mt-0.5">Completed</div>
-                              )}
+                              {isActive && <div className="text-xs text-blue">Current status</div>}
                             </div>
                           </div>
                         );
                       })}
                     </div>
                   </div>
-
-                  {/* Status Log */}
                   <div>
                     <h3 className="text-base font-medium mb-4">Status Log</h3>
                     <div className="space-y-4">
@@ -559,7 +543,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                   </div>
                 </>
               ) : (
-                <span className="text-xs text-gray-500">No tracking details available</span>
+                <span className="text-sm text-gray-400">No tracking details available</span>
               )}
             </div>
             <OrderTrackingButton />
