@@ -306,35 +306,26 @@ export function OrderTrackingOverlay({ order }: { order: OrderType }) {
               </div>
             </div>
             <div className="md:hidden w-full pb-5 pt-2 px-5 absolute bottom-0 bg-white">
-              <div className="flex gap-3">
-                <button
-                  onClick={() => hideOverlay({ pageName, overlayName })}
-                  type="button"
-                  className="h-12 px-6 rounded-full border border-neutral-300 font-medium text-neutral-700 transition-colors active:bg-neutral-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={loading}
-                  className={clsx(
-                    "relative h-12 flex-1 rounded-full overflow-hidden transition-colors text-white bg-blue",
-                    {
-                      "bg-opacity-50": loading,
-                      "hover:bg-blue-600 active:bg-blue-700": !loading,
-                    }
-                  )}
-                >
-                  {loading ? (
-                    <div className="flex gap-1 items-center justify-center w-full h-full">
-                      <Spinner color="white" />
-                      <span className="text-white">Updating</span>
-                    </div>
-                  ) : (
-                    <span className="text-white">Update</span>
-                  )}
-                </button>
-              </div>
+              <button
+                onClick={handleSave}
+                disabled={loading}
+                className={clsx(
+                  "relative h-12 w-full rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
+                  {
+                    "bg-opacity-50": loading,
+                    "hover:bg-neutral-600 active:bg-neutral-800": !loading,
+                  }
+                )}
+              >
+                {loading ? (
+                  <div className="flex gap-1 items-center justify-center w-full h-full">
+                    <Spinner color="white" />
+                    <span className="text-white">Saving</span>
+                  </div>
+                ) : (
+                  <span className="text-white">Save</span>
+                )}
+              </button>
             </div>
           </div>
         </Overlay>
