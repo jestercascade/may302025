@@ -323,7 +323,7 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
     <>
       {isOverlayVisible && (
         <Overlay>
-          <div className="absolute bottom-0 left-0 right-0 w-full h-[calc(100%-60px)] rounded-t-[20px] overflow-hidden bg-white md:w-[500px] md:rounded-2xl md:shadow-lg md:h-max md:mx-auto md:mt-20 md:mb-[50vh] md:relative md:bottom-auto md:left-auto md:right-auto md:top-auto md:-translate-x-0">
+          <div className="absolute bottom-0 left-0 right-0 w-full h-[calc(100%-60px)] rounded-t-[20px] overflow-hidden bg-white md:w-[480px] md:rounded-2xl md:shadow-lg md:h-max md:mx-auto md:mt-16 md:mb-[50vh] md:relative md:bottom-auto md:left-auto md:right-auto md:top-auto md:-translate-x-0">
             <div className="w-full h-[calc(100vh-188px)] md:h-auto">
               <div className="md:hidden flex items-end justify-center pt-4 pb-2 absolute top-0 left-0 right-0 bg-white">
                 <div className="relative flex justify-center items-center w-full h-7">
@@ -367,74 +367,87 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                   )}
                 </button>
               </div>
-              <div className="w-full h-full mt-[52px] md:mt-0 p-5 flex flex-col gap-8 overflow-x-hidden overflow-y-visible invisible-scrollbar md:overflow-hidden">
-                <div className="flex flex-col gap-3">
-                  <h2 className="text-xs text-gray">Products</h2>
-                  <div className="w-48 h-10 rounded-full overflow-hidden flex items-center border">
-                    <input
-                      type="text"
-                      value={productId}
-                      onChange={handleProductIdInputChange}
-                      onKeyDown={handleKeyDown}
-                      placeholder="Paste ID"
-                      className="h-full w-full pl-4 bg-transparent"
-                    />
-                    <div className="h-full pr-1 flex items-center justify-center">
-                      <button
-                        onClick={handleButtonClick}
-                        disabled={loadingProduct}
-                        className={clsx(
-                          "w-8 h-8 rounded-full flex items-center justify-center transition-colors bg-lightgray",
-                          {
-                            "active:bg-lightgray-dimmed lg:hover:bg-lightgray-dimmed": !loadingProduct,
-                          }
-                        )}
-                      >
-                        {loadingProduct ? (
-                          <Spinner color="gray" />
-                        ) : (
-                          <Plus strokeWidth={1.75} size={22} className="text-gray" />
-                        )}
-                      </button>
+              <div className="w-full h-full mt-[60px] md:mt-0 p-5 flex flex-col gap-6 overflow-x-hidden overflow-y-auto invisible-scrollbar md:overflow-hidden">
+                {/* Products Section */}
+                <div className="flex flex-col gap-3.5">
+                  <h3 className="text-xs font-semibold uppercase text-gray">Products ({products.length})</h3>
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex-1 max-w-56 h-9 rounded-full overflow-hidden flex items-center bg-neutral-50 border border-gray-200/60 focus-within:border-gray-300 focus-within:bg-white/90 transition-all duration-150">
+                      <input
+                        type="text"
+                        value={productId}
+                        onChange={handleProductIdInputChange}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Paste ID"
+                        className="h-full w-full pl-4 pr-1.5 text-sm bg-transparent"
+                      />
+                      <div className="h-full pr-1.5 flex items-center justify-center">
+                        <button
+                          onClick={handleButtonClick}
+                          disabled={loadingProduct}
+                          className={clsx(
+                            "w-6 h-6 rounded-full flex items-center justify-center transition-all duration-150 ease-out",
+                            {
+                              "bg-[#404040] hover:bg-[#525252] active:scale-95 shadow-sm": !loadingProduct,
+                              "bg-gray-300/80 cursor-not-allowed": loadingProduct,
+                            }
+                          )}
+                        >
+                          {loadingProduct ? (
+                            <Spinner color="white" />
+                          ) : (
+                            <Plus strokeWidth={2} size={18} className="text-white" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <div className="w-full max-w-[383px] overflow-hidden">
+
+                  {/* Products Grid */}
+                  <div className="w-full overflow-hidden">
                     {products.length > 0 && (
                       <ReactSortable
                         list={products}
                         setList={setProducts}
-                        className="border rounded-md p-5 pb-4 flex gap-5 flex-wrap justify-start"
-                        animation={150}
-                        ghostClass="opacity-50"
+                        className="rounded-lg p-4 flex gap-3 flex-wrap justify-start border border-gray-200/50"
+                        animation={200}
+                        ghostClass="opacity-30"
                       >
                         {products.map(({ id, images, name, basePrice }) => (
-                          <div key={id} className="w-[calc(50%-10px)] cursor-move">
-                            <div className="w-full border rounded-md overflow-hidden">
-                              <div className="w-full aspect-square relative">
+                          <div key={id} className="w-[calc(50%-6px)] cursor-move">
+                            <div className="w-full rounded-lg overflow-hidden shadow-sm border border-gray-200/40 hover:shadow-md transition-all duration-150">
+                              <div className="w-full aspect-square relative bg-neutral-50/80">
                                 <div className="w-full h-full flex items-center justify-center overflow-hidden">
                                   {images && isValidRemoteImage(images.main) && (
-                                    <Image src={images.main} alt="Upsell" width={200} height={200} priority />
+                                    <Image
+                                      src={images.main}
+                                      alt="Product"
+                                      width={200}
+                                      height={200}
+                                      priority
+                                      className="object-cover w-full h-full"
+                                    />
                                   )}
                                 </div>
                                 <button
                                   onClick={() => removeProduct(id)}
-                                  className="h-7 w-7 rounded-full flex items-center justify-center absolute top-1 right-1 bg-red-500 hover:bg-red-600 active:bg-red-700 shadow-lg shadow-red-500/25 border border-white/40 transition-all duration-200 ease-out hover:scale-105 active:scale-95"
+                                  className="h-6 w-6 rounded-full flex items-center justify-center absolute top-1.5 right-1.5 bg-red-500/90 hover:bg-red-600 active:scale-95 shadow-sm transition-all duration-150 ease-out backdrop-blur-sm"
                                 >
-                                  <X color="#ffffff" strokeWidth={2} size={16} />
+                                  <X color="#ffffff" strokeWidth={2} size={12} />
                                 </button>
                               </div>
-                              <div className="w-full h-9 border-t overflow-hidden">
+                              <div className="w-full h-9 border-t border-gray-100 overflow-hidden">
                                 <input
                                   type="text"
-                                  placeholder="Custom name"
+                                  placeholder="Product name"
                                   value={name}
                                   onChange={(event) => handleProductNameChange(event, id)}
-                                  className="h-full w-full px-3 text-sm text-gray"
+                                  className="h-full w-full px-2.5 text-sm bg-white"
                                 />
                               </div>
                             </div>
-                            <div className="mt-[6px] flex items-center justify-center w-full">
-                              <span className="font-semibold text-sm">${formatThousands(basePrice)}</span>
+                            <div className="mt-1.5 flex items-center justify-center w-full">
+                              <span className="font-semibold text-sm text-gray-900">${formatThousands(basePrice)}</span>
                             </div>
                           </div>
                         ))}
@@ -442,48 +455,87 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                     )}
                   </div>
                 </div>
+
+                {/* Pricing Section */}
                 <div className="flex flex-col gap-4">
-                  <div className="flex gap-5">
-                    <div>
-                      <h2 className="mb-2 text-xs text-gray">Base price</h2>
-                      <div className="font-medium">{basePrice > 0 ? `$${basePrice}` : "--"}</div>
+                  <h3 className="text-xs font-semibold uppercase text-gray">Pricing</h3>
+
+                  <div className="bg-neutral-50 rounded-lg p-4 border border-gray-200/50 backdrop-blur-sm">
+                    <div className="grid grid-cols-2 gap-5 mb-4">
+                      <div>
+                        <label className="text-xs text-gray mb-1.5 block">Base Price</label>
+                        <div className="text-lg font-bold text-gray-900 -tracking-[0.02em]">
+                          {basePrice > 0 ? `$${basePrice}` : "—"}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray mb-1.5 block">Sale Price</label>
+                        <div className="text-lg font-bold text-green-600 -tracking-[0.02em]">
+                          {salePrice > 0 ? `$${salePrice.toFixed(2)}` : "—"}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <h2 className="mb-2 text-xs text-gray">Sale price</h2>
-                      <div className="font-medium">{salePrice > 0 ? `$${salePrice.toFixed(2)}` : "--"}</div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <h2 className="text-xs text-gray">Discount percentage</h2>
-                    <div className="w-full h-9 relative">
-                      <input
-                        type="text"
-                        name="discountPercentage"
-                        placeholder="0"
-                        value={discountPercentage}
-                        onChange={handleDiscountPercentageChange}
-                        className="w-full h-9 px-3 rounded-md transition duration-300 ease-in-out border"
-                      />
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs text-gray">Discount Percentage</label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          name="discountPercentage"
+                          placeholder="0"
+                          value={discountPercentage}
+                          onChange={handleDiscountPercentageChange}
+                          className="w-full h-9 px-3 pr-7 rounded-lg transition-all duration-150 ease-out border border-gray-200/60 bg-white/90 focus:border-gray-300 text-sm"
+                        />
+                        <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-gray-500">%</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <div className="flex flex-col gap-4">
-                  <h2 className="text-xs text-gray">Main image</h2>
-                  <div>
-                    <div className="w-full max-w-[383px] border rounded-md overflow-hidden">
-                      <div className="w-full aspect-square flex items-center justify-center overflow-hidden">
-                        {mainImage && isValidRemoteImage(mainImage) && (
-                          <Image src={mainImage} alt="Upsell" width={383} height={383} priority />
+
+                {/* Main Image Section */}
+                <div className="flex flex-col gap-3.5">
+                  <h3 className="text-xs font-semibold uppercase text-gray">Main image</h3>
+                  <div className="w-full max-w-sm">
+                    <div className="w-full bg-white/90 rounded-lg overflow-hidden shadow-sm border border-gray-200/40 backdrop-blur-sm">
+                      <div
+                        className={clsx("w-full aspect-square flex items-center justify-center overflow-hidden", {
+                          "bg-white": mainImage && isValidRemoteImage(mainImage),
+                        })}
+                      >
+                        {mainImage && isValidRemoteImage(mainImage) ? (
+                          <Image src={mainImage} alt="Main upsell image" width={400} height={400} priority />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center">
+                            <div className="w-10 h-10 rounded-full bg-lightgray text-gray/80 flex items-center justify-center mb-1.5">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                                <circle cx="9" cy="9" r="2" />
+                                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                              </svg>
+                            </div>
+                            <span className="text-xs text-gray">No image</span>
+                          </div>
                         )}
                       </div>
-                      <div className="w-full h-9 border-t overflow-hidden">
+                      <div className="w-full h-9 border-t border-gray-100 overflow-hidden">
                         <input
                           type="text"
                           name="mainImage"
                           placeholder="Paste image URL"
                           value={mainImage}
                           onChange={(e) => setMainImage(e.target.value)}
-                          className="h-full w-full px-3 text-sm text-gray"
+                          className="h-full w-full px-3 text-sm text-gray-700 placeholder-gray-400 focus:outline-none bg-transparent -tracking-[0.01em]"
                         />
                       </div>
                     </div>
@@ -491,28 +543,30 @@ export function BasicDetailsOverlay({ data }: { data: DataType }) {
                 </div>
               </div>
             </div>
-          </div>
-          <div className="md:hidden w-full pb-5 pt-2 px-5 absolute bottom-0 bg-white">
-            <button
-              onClick={handleSave}
-              disabled={loadingSave}
-              className={clsx(
-                "relative h-12 w-full rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
-                {
-                  "bg-opacity-50": loadingSave,
-                  "hover:bg-neutral-600 active:bg-neutral-800": !loadingSave,
-                }
-              )}
-            >
-              {loadingSave ? (
-                <div className="flex gap-1 items-center justify-center w-full h-full">
-                  <Spinner color="white" />
-                  <span className="text-white">Saving</span>
-                </div>
-              ) : (
-                <span className="text-white">Save</span>
-              )}
-            </button>
+
+            {/* Mobile Save Button */}
+            <div className="md:hidden w-full pb-5 pt-2 px-5 absolute bottom-0 bg-white">
+              <button
+                onClick={handleSave}
+                disabled={loadingSave}
+                className={clsx(
+                  "relative h-12 w-full rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
+                  {
+                    "bg-opacity-50": loadingSave,
+                    "hover:bg-neutral-600 active:bg-neutral-800": !loadingSave,
+                  }
+                )}
+              >
+                {loadingSave ? (
+                  <div className="flex gap-1 items-center justify-center w-full h-full">
+                    <Spinner color="white" />
+                    <span className="text-white">Saving</span>
+                  </div>
+                ) : (
+                  <span className="text-white font-medium">Save</span>
+                )}
+              </button>
+            </div>
           </div>
         </Overlay>
       )}
