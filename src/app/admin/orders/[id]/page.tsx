@@ -174,10 +174,23 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
           </div>
           <div className="max-w-[618px] p-6 relative shadow rounded-xl bg-white">
             <div className="flex flex-col">
-              <div className="mb-7 flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-semibold">Invoice #{extractInvoiceId(order.invoiceId)}</h3>
+              <div className="mb-7">
+                {/* Mobile Layout - Stacked */}
+                <div className="flex flex-col gap-3 sm:hidden">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Invoice #{extractInvoiceId(order.invoiceId)}</h3>
+                    <div className="text-right">
+                      <div className="flex items-baseline justify-end">
+                        <span className="text-sm leading-3 font-semibold">$</span>
+                        <span className="text-xl font-bold">{Math.floor(Number(order.amount.value))}</span>
+                        <span className="text-sm leading-3 font-semibold">
+                          {(Number(order.amount.value) % 1).toFixed(2).substring(1)}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray">Total</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
                     <div
                       className={clsx(
                         "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium",
@@ -187,18 +200,37 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                       <CheckCircle className="h-3 w-3 mr-1" />
                       {capitalizeFirstLetter(order.status)}
                     </div>
+                    <p className="text-xs text-gray">Purchased {orderPlacedDate}</p>
                   </div>
-                  <p className="text-xs text-gray">Purchased {orderPlacedDate}</p>
                 </div>
-                <div className="text-right">
-                  <div className="flex items-baseline justify-end">
-                    <span className="text-sm leading-3 font-semibold">$</span>
-                    <span className="text-xl font-bold">{Math.floor(Number(order.amount.value))}</span>
-                    <span className="text-sm leading-3 font-semibold">
-                      {(Number(order.amount.value) % 1).toFixed(2).substring(1)}
-                    </span>
+
+                {/* Desktop Layout - Original */}
+                <div className="hidden sm:flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-xl font-semibold">Invoice #{extractInvoiceId(order.invoiceId)}</h3>
+                      <div
+                        className={clsx(
+                          "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium",
+                          order.status.toUpperCase() === "COMPLETED" ? "bg-green-100 text-green-700" : "bg-gray-100"
+                        )}
+                      >
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        {capitalizeFirstLetter(order.status)}
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray">Purchased {orderPlacedDate}</p>
                   </div>
-                  <p className="text-xs text-gray">Total</p>
+                  <div className="text-right">
+                    <div className="flex items-baseline justify-end">
+                      <span className="text-sm leading-3 font-semibold">$</span>
+                      <span className="text-xl font-bold">{Math.floor(Number(order.amount.value))}</span>
+                      <span className="text-sm leading-3 font-semibold">
+                        {(Number(order.amount.value) % 1).toFixed(2).substring(1)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray">Total</p>
+                  </div>
                 </div>
               </div>
               <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -243,8 +275,8 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
               support queries. It builds trust and makes customers feel valued.
             </p>
           </div>
-          <div className="max-w-[618px] p-5 relative flex items-center justify-between shadow rounded-xl bg-white">
-            <div className="flex flex-wrap gap-5">
+          <div className="max-w-[618px] p-5 relative shadow rounded-xl bg-white">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-5">
               <EmailPreviewButton emailType={EmailType.ORDER_CONFIRMED} email={order.emails.confirmed} />
               <EmailPreviewButton emailType={EmailType.ORDER_SHIPPED} email={order.emails.shipped} />
               <EmailPreviewButton emailType={EmailType.ORDER_DELIVERED} email={order.emails.delivered} />
@@ -381,7 +413,7 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
               to expect it.
             </p>
           </div>
-          <div className="max-w-[618px] p-5 relative shadow rounded-xl bg-white">
+          {/* <div className="max-w-[618px] p-5 relative shadow rounded-xl bg-white">
             <div className="flex flex-col gap-5">
               {hasTrackingDetails ? (
                 <>
@@ -471,6 +503,157 @@ export default async function OrderDetails({ params }: { params: Promise<{ id: s
                                 <time className="text-xs text-gray flex-shrink-0 font-mono">
                                   {formatDate(historyItem.timestamp)}
                                 </time>
+                              </div>
+                              <p className="text-sm text-gray">{historyItem?.message || "Status updated"}</p>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <span className="text-xs text-gray-500">No tracking details available</span>
+              )}
+            </div>
+            <OrderTrackingButton />
+          </div> */}
+          <div className="max-w-[618px] p-5 relative shadow rounded-xl bg-white">
+            <div className="flex flex-col gap-5">
+              {hasTrackingDetails ? (
+                <>
+                  <div>
+                    <div className="space-y-2">
+                      <div className="flex items-center">
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center justify-center rounded-full h-10 w-10 bg-lightgray">
+                            <StatusIcon status={order.tracking.currentStatus} />
+                          </div>
+                          <div>
+                            <div className="text-lg font-semibold capitalize">
+                              {getStatusLabel(order.tracking.currentStatus)}
+                            </div>
+                            {order.tracking.estimatedDeliveryDate && (
+                              <div className="text-xs text-gray">
+                                Expected delivery: {formatDateRange(order.tracking.estimatedDeliveryDate)}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Desktop: Horizontal progress bar */}
+                  <div className="hidden sm:block py-6">
+                    <div className="relative max-w-2xl mx-auto px-[10px]">
+                      <div className="absolute top-[9px] left-[10px] right-[10px] h-0.5 bg-gray-300 rounded-full"></div>
+                      <div
+                        className="absolute top-[9px] left-0 h-0.5 bg-[#404040] rounded-full transition-all duration-700"
+                        style={{
+                          width: `${
+                            ((statusOptions.findIndex((opt) => opt.value === order.tracking.currentStatus) + 1) /
+                              statusOptions.length) *
+                            100
+                          }%`,
+                        }}
+                      ></div>
+                      <div className="relative flex justify-between">
+                        {statusOptions.map((status, index) => {
+                          const currentStatusIndex = statusOptions.findIndex(
+                            (opt) => opt.value === order.tracking.currentStatus
+                          );
+                          const isCompleted = currentStatusIndex >= index;
+                          const isActive = index === currentStatusIndex;
+
+                          return (
+                            <div key={status.value} className="flex flex-col items-center">
+                              <div
+                                className={`rounded-full h-5 w-5 flex items-center justify-center mb-2 transition-all duration-300 ${
+                                  isActive ? "bg-[#404040] shadow-sm" : isCompleted ? "bg-[#404040]" : "bg-gray-300"
+                                }`}
+                              >
+                                {isCompleted && <Check color="#ffffff" size={14} />}
+                              </div>
+                              <div
+                                className={`text-xs font-medium text-center ${
+                                  isCompleted ? "text-black" : "text-gray-400"
+                                }`}
+                              >
+                                {status.label}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Mobile: Vertical timeline (iOS-style) */}
+                  <div className="sm:hidden py-4">
+                    <div className="space-y-0">
+                      {statusOptions.map((status, index) => {
+                        const currentStatusIndex = statusOptions.findIndex(
+                          (opt) => opt.value === order.tracking.currentStatus
+                        );
+                        const isCompleted = currentStatusIndex >= index;
+                        const isActive = index === currentStatusIndex;
+                        const isLast = index === statusOptions.length - 1;
+
+                        return (
+                          <div key={status.value} className="relative flex items-start gap-3 pb-6 last:pb-0">
+                            {/* Connecting line */}
+                            {!isLast && <div className="absolute left-2.5 top-6 w-0.5 h-6 bg-gray-200"></div>}
+
+                            {/* Status circle */}
+                            <div
+                              className={`flex-shrink-0 rounded-full h-5 w-5 flex items-center justify-center mt-0.5 transition-all duration-300 z-10 ${
+                                isActive ? "bg-[#404040]" : isCompleted ? "bg-[#404040]" : "bg-gray-300"
+                              }`}
+                            >
+                              {isCompleted && <Check color="#ffffff" size={12} />}
+                            </div>
+
+                            {/* Status content */}
+                            <div className="flex-1 min-w-0 pt-0.5">
+                              <div
+                                className={`text-sm font-medium ${
+                                  isActive ? "text-black" : isCompleted ? "text-black" : "text-gray-400"
+                                }`}
+                              >
+                                {status.label}
+                              </div>
+                              {isActive && <div className="text-xs text-blue-600 mt-0.5">Current status</div>}
+                              {isCompleted && !isActive && (
+                                <div className="text-xs text-green-600 mt-0.5">Completed</div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Status Log */}
+                  <div>
+                    <h3 className="text-base font-medium mb-4">Status Log</h3>
+                    <div className="space-y-4">
+                      {(order.tracking?.statusHistory || [])
+                        .slice()
+                        .reverse()
+                        .map((historyItem, index) => (
+                          <div key={index} className="flex gap-3">
+                            <div className="flex-shrink-0 mt-1.5">
+                              <div className="w-2 h-2 bg-neutral-400/70 rounded-full"></div>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1 gap-1 sm:gap-0">
+                                <p className="text-sm font-medium">
+                                  {historyItem?.status
+                                    ? historyItem.status.charAt(0).toUpperCase() +
+                                      historyItem.status.slice(1).toLowerCase()
+                                    : "Status Update"}
+                                </p>
+                                <time className="text-xs text-gray font-mono">{formatDate(historyItem.timestamp)}</time>
                               </div>
                               <p className="text-sm text-gray">{historyItem?.message || "Status updated"}</p>
                             </div>

@@ -50,18 +50,13 @@ export function EmailPreviewButton({
 }) {
   const showOverlay = useOverlayStore((state) => state.showOverlay);
   const pageName = useOverlayStore((state) => state.pages.orderDetails.name);
-  const overlayName = useOverlayStore(
-    (state) =>
-      state.pages.orderDetails.overlays[overlayNameKeys[emailType]].name
-  );
+  const overlayName = useOverlayStore((state) => state.pages.orderDetails.overlays[overlayNameKeys[emailType]].name);
 
   const getLastSentText = () => {
     if (!email.lastSent || email.sentCount === 0) {
       // Optional: Log a warning if there's inconsistency
       if (email.lastSent && email.sentCount === 0) {
-        console.warn(
-          `Inconsistent data: lastSent is set but sentCount is 0 for emailType ${emailType}`
-        );
+        console.warn(`Inconsistent data: lastSent is set but sentCount is 0 for emailType ${emailType}`);
       }
       return null;
     }
@@ -85,31 +80,31 @@ export function EmailPreviewButton({
     <button
       onClick={() => showOverlay({ pageName, overlayName })}
       type="button"
-      className="w-[calc(50%-10px)] py-3 px-4 border cursor-pointer rounded-lg flex justify-center gap-2 transition ease-in-out duration-300 hover:bg-lightgray"
+      className="w-full sm:w-[calc(50%-10px)] py-3 px-4 border cursor-pointer rounded-lg flex justify-center gap-2 transition ease-in-out duration-300 hover:bg-lightgray"
     >
-      <div>
+      <div className="text-center">
         <h2 className="font-semibold text-sm mb-0.5 flex items-center gap-[2px] w-max mx-auto">
           <span>{emailLabels[emailType]}</span>
           <ChevronRight color="#6c6c6c" size={16} strokeWidth={2} />
         </h2>
-        {email.sentCount === 0 ? (
-          <span className="text-xs text-gray">Not sent yet</span>
-        ) : email.lastSent ? (
-          <span className="text-xs text-green-700">{getLastSentText()}</span>
-        ) : (
-          <span className="text-xs text-gray">Not sent yet</span>
-        )}
-        <span className="text-xs text-gray">
-          {" "}
-          •{" "}
-          {isMaxReached ? (
-            <span className="text-red-700">Max sends reached</span>
-          ) : email.sentCount === 0 ? (
-            `${remainingSends} send${remainingSends > 1 ? "s" : ""} remaining`
+        <div className="space-y-0.5">
+          {email.sentCount === 0 ? (
+            <div className="text-xs text-gray">Not sent yet</div>
+          ) : email.lastSent ? (
+            <div className="text-xs text-green-700">{getLastSentText()}</div>
           ) : (
-            getRemainingSendsText()
+            <div className="text-xs text-gray">Not sent yet</div>
           )}
-        </span>
+          <div className="text-xs text-gray">
+            {isMaxReached ? (
+              <span className="text-red-700">Max sends reached</span>
+            ) : email.sentCount === 0 ? (
+              `${remainingSends} send${remainingSends > 1 ? "s" : ""} remaining`
+            ) : (
+              getRemainingSendsText()
+            )}
+          </div>
+        </div>
       </div>
     </button>
   );
@@ -133,12 +128,9 @@ export function EmailPreviewOverlay({
   const overlayStore = useOverlayStore((state) => state);
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = overlayStore.hideOverlay;
-  const isOverlayVisible =
-    overlayStore.pages.orderDetails.overlays[overlayNameKeys[emailType]]
-      .isVisible;
+  const isOverlayVisible = overlayStore.pages.orderDetails.overlays[overlayNameKeys[emailType]].isVisible;
   const pageName = overlayStore.pages.orderDetails.name;
-  const overlayName =
-    overlayStore.pages.orderDetails.overlays[overlayNameKeys[emailType]].name;
+  const overlayName = overlayStore.pages.orderDetails.overlays[overlayNameKeys[emailType]].name;
 
   useEffect(() => {
     document.body.style.overflow = isOverlayVisible ? "hidden" : "visible";
@@ -155,12 +147,7 @@ export function EmailPreviewOverlay({
       const customerEmailAddress = "khanofemperia@gmail.com"; // tests only
       const emailSubject = emailSubjects[emailType];
 
-      const result = await OrderStatusEmailAction(
-        orderId,
-        customerEmailAddress,
-        emailSubject,
-        emailType
-      );
+      const result = await OrderStatusEmailAction(orderId, customerEmailAddress, emailSubject, emailType);
 
       showAlert({
         message: result.message,
@@ -207,15 +194,12 @@ export function EmailPreviewOverlay({
         <button
           onClick={handleSendEmail}
           disabled={isLoading}
-          className={clsx(
-            "relative w-max px-4 text-white bg-neutral-700 transition-colors",
-            {
-              "h-9 rounded-full": !isMobile,
-              "h-12 w-full rounded-full": isMobile,
-              "bg-opacity-50": isLoading,
-              "hover:bg-neutral-600 active:bg-neutral-800": !isLoading,
-            }
-          )}
+          className={clsx("relative w-max px-4 text-white bg-neutral-700 transition-colors", {
+            "h-9 rounded-full": !isMobile,
+            "h-12 w-full rounded-full": isMobile,
+            "bg-opacity-50": isLoading,
+            "hover:bg-neutral-600 active:bg-neutral-800": !isLoading,
+          })}
         >
           {isLoading ? (
             <div className="flex items-center gap-1 justify-center w-full h-full">
@@ -245,9 +229,7 @@ export function EmailPreviewOverlay({
             <div className="w-full h-[calc(100vh-188px)] md:h-auto">
               <div className="md:hidden flex items-end justify-center pt-4 pb-2 absolute top-0 left-0 right-0 bg-white">
                 <div className="relative flex justify-center items-center w-full h-7">
-                  <h2 className="font-semibold text-lg">
-                    {overlayTitles[emailType]}
-                  </h2>
+                  <h2 className="font-semibold text-lg">{overlayTitles[emailType]}</h2>
                   <button
                     onClick={() => {
                       hideOverlay({ pageName, overlayName });
@@ -265,14 +247,8 @@ export function EmailPreviewOverlay({
                   type="button"
                   className="h-9 px-3 rounded-full flex items-center gap-1 transition ease-in-out active:bg-lightgray lg:hover:bg-lightgray"
                 >
-                  <ArrowLeft
-                    size={20}
-                    strokeWidth={2}
-                    className="-ml-1 stroke-blue"
-                  />
-                  <span className="font-semibold text-sm text-blue">
-                    {overlayTitles[emailType]}
-                  </span>
+                  <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
+                  <span className="font-semibold text-sm text-blue">{overlayTitles[emailType]}</span>
                 </button>
                 {renderSendButton()}
               </div>
@@ -280,9 +256,7 @@ export function EmailPreviewOverlay({
                 {renderEmailTemplate()}
               </div>
             </div>
-            <div className="md:hidden w-full h-[92px] pt-2 px-5 absolute bottom-0">
-              {renderSendButton()}
-            </div>
+            <div className="md:hidden w-full h-[92px] pt-2 px-5 absolute bottom-0">{renderSendButton()}</div>
           </div>
         </Overlay>
       )}
