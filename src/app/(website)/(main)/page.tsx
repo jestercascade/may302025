@@ -13,21 +13,12 @@ import { Suspense } from "react";
 import { ProductsProvider } from "@/contexts/ProductsContext";
 import { Metadata } from "next";
 import { CatalogEmptyState } from "@/components/website/CatalogEmptyState";
-import {
-  Users,
-  Truck,
-  RotateCcw,
-  Shield,
-  TrendingUp,
-  Clock,
-  Globe,
-  Award,
-  CheckCircle,
-  Zap,
-  Package,
-  MapPin,
-  Calendar,
-} from "lucide-react";
+import { Oswald } from "next/font/google";
+
+const oswald = Oswald({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+});
 
 export const metadata: Metadata = {
   alternates: {
@@ -124,18 +115,26 @@ export default async function Home() {
 const HeroSection = () => (
   <div className="relative bg-blue-500 mb-8">
     {/* Content area that ends where strip begins */}
-    <div className="h-[400px] pb-20">
+    <div className="h-[480px] pb-20">
       <div className="h-full flex items-center justify-center">
         <div className="text-center text-white">
-          <h1 className="text-5xl font-light mb-4">Your Brand</h1>
-          <p className="text-lg opacity-90">Experience the future of delivery with our premium service</p>
+          {/* Overline */}
+          <div className="text-lg italic font-medium tracking-widest mb-2.5">WHEN YOUR MOTHER-IN-LAW VISITS...</div>
+
+          {/* Hook - Large headline */}
+          <h1 className={`text-7xl font-bold leading-none mb-6 tracking-tight ${oswald.className}`}>PROVE YOURSELF</h1>
+
+          {/* Sell - Supporting copy */}
+          <p className="text-xl leading-8 font-medium max-w-lg mx-auto">
+            She Raised the Man You Love. Now Show Her He Chose Wisely. Turn Her Doubt into Respect.
+          </p>
         </div>
       </div>
     </div>
 
     {/* Clean glassmorphism stats bar - 3 elements: Customers, Delivery, Returns */}
     <div className="absolute bottom-0 left-0 right-0 bg-white/10 backdrop-blur-sm border-t border-white/20">
-      <div className="max-w-5xl mx-auto px-6 py-5">
+      <div className="max-w-5xl mx-auto px-6 pt-3 pb-4">
         <div className="flex items-center justify-center space-x-16">
           <div className="text-center">
             <div className="font-semibold text-xl text-white">128K+</div>
