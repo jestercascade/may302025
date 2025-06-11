@@ -13,6 +13,21 @@ import { Suspense } from "react";
 import { ProductsProvider } from "@/contexts/ProductsContext";
 import { Metadata } from "next";
 import { CatalogEmptyState } from "@/components/website/CatalogEmptyState";
+import {
+  Users,
+  Truck,
+  RotateCcw,
+  Shield,
+  TrendingUp,
+  Clock,
+  Globe,
+  Award,
+  CheckCircle,
+  Zap,
+  Package,
+  MapPin,
+  Calendar,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   alternates: {
@@ -80,7 +95,9 @@ export default async function Home() {
 
   return (
     <>
-      {heroContent}
+      <Strip3 />
+
+      {/* {heroContent} */}
       <div className="mt-8 max-w-5xl mx-auto flex flex-col gap-8">
         {combinedCollections
           .map((collection) => renderCollection(collection, cart))
@@ -103,6 +120,46 @@ export default async function Home() {
 }
 
 // -- UI Components --
+
+const Strip3 = () => (
+  <div className="relative bg-blue-500">
+    {/* Content area that ends where strip begins */}
+    <div className="h-[400px] pb-20">
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center text-white">
+          <h1 className="text-5xl font-light mb-4">Your Brand</h1>
+          <p className="text-lg opacity-90">Experience the future of delivery with our premium service</p>
+        </div>
+      </div>
+    </div>
+
+    {/* Clean glassmorphism stats bar */}
+    <div className="absolute bottom-0 left-0 right-0 bg-white/10 backdrop-blur-sm border-t border-white/20">
+      <div className="max-w-5xl mx-auto px-6 py-5">
+        <div className="flex items-center justify-center space-x-14">
+          <div className="text-center">
+            <div className="font-semibold text-xl text-white">25K+</div>
+            <div className="text-xs text-white/80 uppercase tracking-wide">Orders delivered</div>
+          </div>
+
+          <div className="w-px h-6 bg-white/30"></div>
+
+          <div className="text-center">
+            <div className="font-semibold text-xl text-white">50+</div>
+            <div className="text-xs text-white/80 uppercase tracking-wide">Countries served</div>
+          </div>
+
+          <div className="w-px h-6 bg-white/30"></div>
+
+          <div className="text-center">
+            <div className="font-semibold text-xl text-white">Free</div>
+            <div className="text-xs text-white/80 uppercase tracking-wide">Worldwide shipping</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 function renderHero(pageHero: any) {
   if (pageHero?.visibility !== "VISIBLE" || !pageHero.images?.desktop || !pageHero.images?.mobile) {
