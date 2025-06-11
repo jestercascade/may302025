@@ -114,31 +114,32 @@ export default async function Home() {
 
 const HeroSection = () => (
   <div className="relative bg-blue-500 mb-8">
-    {/* Content area that ends where strip begins */}
-    <div className="h-[480px] pb-20">
+    <div className="h-[500px] pb-20">
       <div className="h-full flex items-center justify-center gap-12">
         <div className="text-center text-white">
           {/* Overline */}
           <div className="text-lg italic font-medium tracking-widest mb-1.5">WHEN YOUR MOTHER-IN-LAW VISITS...</div>
 
-          {/* Hook - Large headline */}
+          {/* Hook */}
           <h1 className={`text-6xl font-bold leading-tight mb-6 tracking-tight ${oswald.className}`}>PROVE YOURSELF</h1>
 
-          {/* Sell - Supporting copy */}
-          <p className="text-xl leading-relaxed font-medium max-w-lg mx-auto">
+          {/* Sell */}
+          <p className="text-xl leading-relaxed font-medium max-w-lg mx-auto mb-8">
             She raised the man you love. Now show her he chose wisely. Turn her doubt into respect.
           </p>
+
+          {/* CTA */}
+          <button className="flex items-center justify-center w-64 rounded-full cursor-pointer border border-[#c59158] text-black font-semibold h-12 shadow-[inset_0px_1px_0px_0px_#f0d085] [background:linear-gradient(to_bottom,_#e6c875_5%,_#d4b560_100%)] bg-[#e6c875] hover:bg-[#d4b560] hover:[background:linear-gradient(to_bottom,_#d4b560_5%,_#e6c875_100%)] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.14)] text-lg mx-auto">
+            GET YOURS
+          </button>
         </div>
-        {/* Center: Visual Placeholder */}
         <div>
-          <div className="w-72 aspect-square bg-white rounded-2xl shadow-xl ring-1 ring-white/25 flex items-center justify-center overflow-hidden">
-            <Image src="/testing/1.webp" alt="Promo" width={288} height={288} priority />
+          <div className="w-80 aspect-square bg-white rounded-2xl shadow-xl ring-1 ring-white/25 flex items-center justify-center overflow-hidden">
+            <Image src="/testing/1.webp" alt="Promo" width={320} height={320} priority />
           </div>
         </div>
       </div>
     </div>
-
-    {/* Clean glassmorphism stats bar - 3 elements: Customers, Delivery, Returns */}
     <div className="absolute bottom-0 left-0 right-0 bg-white/10 backdrop-blur-sm border-t border-white/20">
       <div className="max-w-5xl mx-auto px-6 pt-3 pb-4">
         <div className="flex items-center justify-center space-x-16">
@@ -146,16 +147,12 @@ const HeroSection = () => (
             <div className="font-semibold text-xl text-white">128K+</div>
             <div className="text-xs text-white/80 uppercase tracking-wide">Happy Customers</div>
           </div>
-
           <div className="w-px h-6 bg-white/30"></div>
-
           <div className="text-center">
             <div className="font-semibold text-xl text-white">Free</div>
             <div className="text-xs text-white/80 uppercase tracking-wide">Worldwide Delivery</div>
           </div>
-
           <div className="w-px h-6 bg-white/30"></div>
-
           <div className="text-center">
             <div className="font-semibold text-xl text-white">30-Day</div>
             <div className="text-xs text-white/80 uppercase tracking-wide">No-Questions Returns</div>
