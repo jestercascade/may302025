@@ -95,7 +95,7 @@ export default async function Home() {
 
   return (
     <>
-      <Strip3 />
+      <HeroSection />
 
       {/* {heroContent} */}
       <div className="mt-8 max-w-5xl mx-auto flex flex-col gap-8">
@@ -121,8 +121,8 @@ export default async function Home() {
 
 // -- UI Components --
 
-const Strip3 = () => (
-  <div className="relative bg-blue-500">
+const HeroSection = () => (
+  <div className="relative bg-blue-500 mb-8">
     {/* Content area that ends where strip begins */}
     <div className="h-[400px] pb-20">
       <div className="h-full flex items-center justify-center">
@@ -133,27 +133,27 @@ const Strip3 = () => (
       </div>
     </div>
 
-    {/* Clean glassmorphism stats bar */}
+    {/* Clean glassmorphism stats bar - 3 elements: Customers, Delivery, Returns */}
     <div className="absolute bottom-0 left-0 right-0 bg-white/10 backdrop-blur-sm border-t border-white/20">
       <div className="max-w-5xl mx-auto px-6 py-5">
-        <div className="flex items-center justify-center space-x-14">
+        <div className="flex items-center justify-center space-x-16">
           <div className="text-center">
-            <div className="font-semibold text-xl text-white">25K+</div>
-            <div className="text-xs text-white/80 uppercase tracking-wide">Orders delivered</div>
-          </div>
-
-          <div className="w-px h-6 bg-white/30"></div>
-
-          <div className="text-center">
-            <div className="font-semibold text-xl text-white">50+</div>
-            <div className="text-xs text-white/80 uppercase tracking-wide">Countries served</div>
+            <div className="font-semibold text-xl text-white">128K+</div>
+            <div className="text-xs text-white/80 uppercase tracking-wide">Happy Customers</div>
           </div>
 
           <div className="w-px h-6 bg-white/30"></div>
 
           <div className="text-center">
             <div className="font-semibold text-xl text-white">Free</div>
-            <div className="text-xs text-white/80 uppercase tracking-wide">Worldwide shipping</div>
+            <div className="text-xs text-white/80 uppercase tracking-wide">Worldwide Delivery</div>
+          </div>
+
+          <div className="w-px h-6 bg-white/30"></div>
+
+          <div className="text-center">
+            <div className="font-semibold text-xl text-white">30-Day</div>
+            <div className="text-xs text-white/80 uppercase tracking-wide">No-Questions Returns</div>
           </div>
         </div>
       </div>
