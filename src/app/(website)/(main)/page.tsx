@@ -113,7 +113,7 @@ export default async function Home() {
 // -- UI Components --
 
 const HeroSection = () => (
-  <div className="relative bg-blue-500 mb-8">
+  <div className="relative bg-[#0070b0] mb-8">
     <div className="h-[500px] pb-20">
       <div className="h-full flex items-center justify-center gap-12">
         <div className="text-center text-white">
