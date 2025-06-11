@@ -126,7 +126,7 @@ const HeroSection = () => (
 
           {/* Sell - Supporting copy */}
           <p className="text-xl leading-relaxed font-medium max-w-lg mx-auto">
-            She Raised the Man You Love. Now Show Her He Chose Wisely. Turn Her Doubt into Respect.
+            She raised the man you love. Now show her he chose wisely. Turn her doubt into respect.
           </p>
         </div>
       </div>
