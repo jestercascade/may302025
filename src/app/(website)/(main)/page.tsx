@@ -116,7 +116,7 @@ const HeroSection = () => (
   <div className="relative bg-blue-500 mb-8">
     {/* Content area that ends where strip begins */}
     <div className="h-[480px] pb-20">
-      <div className="h-full flex items-center justify-center">
+      <div className="h-full flex items-center justify-center gap-12">
         <div className="text-center text-white">
           {/* Overline */}
           <div className="text-lg italic font-medium tracking-widest mb-1.5">WHEN YOUR MOTHER-IN-LAW VISITS...</div>
@@ -128,6 +128,12 @@ const HeroSection = () => (
           <p className="text-xl leading-relaxed font-medium max-w-lg mx-auto">
             She raised the man you love. Now show her he chose wisely. Turn her doubt into respect.
           </p>
+        </div>
+        {/* Center: Visual Placeholder */}
+        <div>
+          <div className="w-72 aspect-square bg-white rounded-2xl shadow-xl ring-1 ring-white/25 flex items-center justify-center overflow-hidden">
+            <Image src="/testing/1.webp" alt="Promo" width={288} height={288} priority />
+          </div>
         </div>
       </div>
     </div>
