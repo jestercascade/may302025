@@ -119,13 +119,13 @@ const HeroSection = () => (
       <div className="h-full flex items-center justify-center">
         <div className="text-center text-white">
           {/* Overline */}
-          <div className="text-lg italic font-medium tracking-widest mb-2.5">WHEN YOUR MOTHER-IN-LAW VISITS...</div>
+          <div className="text-lg italic font-medium tracking-widest mb-1.5">WHEN YOUR MOTHER-IN-LAW VISITS...</div>
 
           {/* Hook - Large headline */}
-          <h1 className={`text-7xl font-bold leading-none mb-6 tracking-tight ${oswald.className}`}>PROVE YOURSELF</h1>
+          <h1 className={`text-6xl font-bold leading-tight mb-6 tracking-tight ${oswald.className}`}>PROVE YOURSELF</h1>
 
           {/* Sell - Supporting copy */}
-          <p className="text-xl leading-8 font-medium max-w-lg mx-auto">
+          <p className="text-xl leading-relaxed font-medium max-w-lg mx-auto">
             She Raised the Man You Love. Now Show Her He Chose Wisely. Turn Her Doubt into Respect.
           </p>
         </div>
