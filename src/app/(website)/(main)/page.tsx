@@ -129,7 +129,7 @@ const HeroSection = () => (
           </p>
 
           {/* CTA */}
-          <button className="flex items-center justify-center w-64 rounded-full cursor-pointer border border-[#bf935f] text-black font-semibold h-12 shadow-[inset_0px_1px_0px_0px_#f3db9f] [background:linear-gradient(to_bottom,_#ebcd83_5%,_#d7b565_100%)] bg-[#ebcd83] hover:bg-[#d7b565] hover:[background:linear-gradient(to_bottom,_#d7b565_5%,_#ebcd83_100%)] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.13)] active:scale-[0.98] transition-all duration-150 text-lg mx-auto">
+          <button className="tracking-tight flex items-center justify-center w-64 rounded-full cursor-pointer border border-[#bf935f] text-black font-bold h-12 shadow-[inset_0px_1px_0px_0px_#f3db9f] [background:linear-gradient(to_bottom,_#ebcd83_5%,_#d7b565_100%)] bg-[#ebcd83] hover:bg-[#d7b565] hover:[background:linear-gradient(to_bottom,_#d7b565_5%,_#ebcd83_100%)] active:shadow-[inset_0_3px_8px_rgba(0,0,0,0.13)] active:scale-[0.98] transition-all duration-150 text-lg mx-auto">
             GET YOURS
           </button>
         </div>
