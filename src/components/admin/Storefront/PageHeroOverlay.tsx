@@ -123,6 +123,8 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
   const [backgroundColor, setBackgroundColor] = useState<string>(pageHero.background_color || "#1e88e5");
   const [textColor, setTextColor] = useState<string>(pageHero.text_color || "#ffffff");
   const [visibility, setVisibility] = useState<string>(pageHero.visibility?.toUpperCase() || HIDDEN);
+  const [saveLoading, setSaveLoading] = useState<boolean>(false);
+  const [clearLoading, setClearLoading] = useState<boolean>(false);
 
   const showAlert = useAlertStore((state) => state.showAlert);
   const hideOverlay = useOverlayStore((state) => state.hideOverlay);
@@ -130,8 +132,6 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
   const overlayName = useOverlayStore((state) => state.pages.storefront.overlays.editPageHero.name);
   const isOverlayVisible = useOverlayStore((state) => state.pages.storefront.overlays.editPageHero.isVisible);
   const setPreventBodyOverflowChange = useBodyOverflowStore((state) => state.setPreventBodyOverflowChange);
-  const [saveLoading, setSaveLoading] = useState<boolean>(false);
-  const [clearLoading, setClearLoading] = useState<boolean>(false);
 
   const isLoading = saveLoading || clearLoading;
 
@@ -158,7 +158,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
   }, [isOverlayVisible, setPreventBodyOverflowChange]);
 
   const handleSave = async () => {
-    setLoading(true);
+    setSaveLoading(true);
 
     try {
       if (visibility === VISIBLE) {
@@ -214,7 +214,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
         type: ShowAlertType.ERROR,
       });
     } finally {
-      setLoading(false);
+      setSaveLoading(false);
       setPreventBodyOverflowChange(true);
     }
   };
