@@ -637,7 +637,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
 
               {/* Form Content */}
               <div className="w-full h-full mt-0 p-5 flex flex-col gap-6 overflow-x-hidden overflow-y-auto">
-                <div className="bg-neutral-50 border border-gray-200/50 rounded-lg p-4">
+                <div className="bg-neutral-50 border border-gray-200/65 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                       {visibility === VISIBLE ? (
@@ -684,7 +684,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
                       placeholder="WHEN YOUR MOTHER-IN-LAW VISITS..."
                       value={overline}
                       onChange={(e) => setOverline(e.target.value)}
-                      className="w-full h-10 px-3 rounded-lg border bg-white text-sm focus:border-gray-300 transition-all duration-200"
+                      className="w-full h-10 px-3 rounded-lg border bg-white text-sm focus:border-gray-400/60 transition-all duration-200"
                     />
                   </div>
 
@@ -696,7 +696,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
                       placeholder="PROVE YOURSELF"
                       value={hook}
                       onChange={(e) => setHook(e.target.value)}
-                      className="w-full h-10 px-3 rounded-lg border bg-white text-sm focus:border-gray-300 transition-all duration-200"
+                      className="w-full h-10 px-3 rounded-lg border bg-white text-sm focus:border-gray-400/60 transition-all duration-200"
                       required
                     />
                   </div>
@@ -708,7 +708,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
                       placeholder="She raised the man you love. Now show her he chose wisely. Turn her doubt into respect."
                       value={sell}
                       onChange={(e) => setSell(e.target.value)}
-                      className="w-full h-20 px-3 py-2 rounded-lg border bg-white text-sm focus:border-gray-300 transition-all duration-200 resize-none"
+                      className="w-full h-20 px-3 py-2 rounded-lg border bg-white text-sm focus:border-gray-400/60 transition-all duration-200 resize-none"
                     />
                   </div>
                 </div>
@@ -717,41 +717,39 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
                 <div className="space-y-4">
                   <h3 className="text-xs font-semibold uppercase text-gray">Hero Image</h3>
 
-                  <div className="bg-neutral-50 border border-gray-200/50 rounded-lg p-4 space-y-4">
-                    <div className="w-full border border-gray-200 rounded-lg overflow-hidden bg-white">
-                      <div className="w-full aspect-[2/1] flex items-center justify-center bg-gray-50">
+                  <div className="bg-neutral-50 border border-gray-200/65 rounded-lg p-4 space-y-4">
+                    <div className="w-full border border-gray-200/60 rounded-lg overflow-hidden bg-white">
+                      <div className="w-full aspect-square flex items-center justify-center bg-white">
                         {mainImageUrl && isValidRemoteImage(mainImageUrl) ? (
                           isGifImage(mainImageUrl) ? (
                             <Image
                               src={mainImageUrl}
                               alt={mainImageAlt || hook}
                               width={400}
-                              height={200}
+                              height={400}
                               priority={true}
                               unoptimized={true}
-                              className="object-cover w-full h-full"
                             />
                           ) : (
                             <Image
                               src={mainImageUrl}
                               alt={mainImageAlt || hook}
                               width={400}
-                              height={200}
+                              height={400}
                               priority={true}
-                              className="object-cover w-full h-full"
                             />
                           )
                         ) : (
                           <ImageIcon size={32} className="text-gray-300" strokeWidth={1.5} />
                         )}
                       </div>
-                      <div className="border-t border-gray-200">
+                      <div className="border-t border-gray-100">
                         <input
                           type="text"
                           placeholder="Paste image URL"
                           value={mainImageUrl}
                           onChange={(e) => setMainImageUrl(e.target.value)}
-                          className="h-10 w-full px-3 text-sm text-gray-600 placeholder-gray-400 bg-transparent border-0 focus:outline-none"
+                          className="h-10 w-full px-3 text-sm text-gray-600"
                         />
                       </div>
                     </div>
@@ -763,7 +761,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
                         placeholder="Professional stainless steel cooking pot with beef stew"
                         value={mainImageAlt}
                         onChange={(e) => setMainImageAlt(e.target.value)}
-                        className="w-full h-10 px-3 rounded-lg border bg-white text-sm focus:border-gray-300 transition-all duration-200"
+                        className="w-full h-10 px-3 rounded-lg border border-gray-200/60 bg-white text-sm focus:border-gray-400/60 transition-all duration-200"
                         required
                       />
                     </div>
@@ -816,7 +814,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
                         placeholder="premium-cooking-pot-001"
                         value={productId}
                         onChange={(e) => setProductId(e.target.value)}
-                        className="w-full h-10 px-3 rounded-lg border bg-white text-sm focus:border-gray-300 transition-all duration-200"
+                        className="w-full h-10 px-3 rounded-lg border border-gray-200 bg-white text-sm focus:border-gray-400/60 transition-all duration-200"
                         required
                       />
                     </div>
@@ -828,7 +826,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
                         placeholder="https://cherlygood.com/collections/summer-cooling-gadgets"
                         value={linkUrl}
                         onChange={(e) => setLinkUrl(e.target.value)}
-                        className="w-full h-10 px-3 rounded-lg border bg-white text-sm focus:border-gray-300 transition-all duration-200"
+                        className="w-full h-10 px-3 rounded-lg border border-gray-200 bg-white text-sm focus:border-gray-400/60 transition-all duration-200"
                         required
                       />
                     </div>
@@ -840,7 +838,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
                     <select
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value as "GET YOURS" | "SHOP NOW" | "CLAIM NOW")}
-                      className="w-full h-10 px-3 rounded-lg border bg-white text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200"
+                      className="w-full h-10 px-3 rounded-lg border border-gray-200 bg-white text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200"
                     >
                       <option value="GET YOURS">GET YOURS</option>
                       <option value="SHOP NOW">SHOP NOW</option>
