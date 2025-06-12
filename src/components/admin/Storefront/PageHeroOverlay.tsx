@@ -24,7 +24,7 @@
 //   return (
 //     <button
 //       onClick={() => showOverlay({ pageName, overlayName })}
-//       className="flex flex-col items-start w-full min-[560px]:w-[calc(100%/2-4px)] min-[824px]:w-64 rounded-xl p-5 relative cursor-pointer border transition bg-white active:border-[#b9bfc9] lg:hover:border-[#b9bfc9]"
+//       className="flex flex-col items-start w-full min-[560px]:w-[calc(100%/2-4px)] min-[824px]:w-64 rounded-lg p-5 relative cursor-pointer border transition bg-white active:border-[#b9bfc9] lg:hover:border-[#b9bfc9]"
 //     >
 //       <div className="w-full mb-4 flex items-center justify-between relative">
 //         <h2 className="text-left font-semibold text-sm">Page hero</h2>
@@ -146,7 +146,7 @@
 //     <>
 //       {isOverlayVisible && (
 //         <Overlay>
-//           <div className="absolute bottom-0 left-0 right-0 w-full h-[calc(100%-60px)] rounded-t-[20px] overflow-hidden bg-white md:w-[500px] md:rounded-2xl md:shadow-lg md:h-max md:mx-auto md:mt-20 md:mb-[50vh] md:relative md:bottom-auto md:left-auto md:right-auto md:top-auto md:-translate-x-0">
+//           <div className="absolute bottom-0 left-0 right-0 w-full h-[calc(100%-60px)] rounded-t-[20px] overflow-hidden bg-white md:w-[500px] md:rounded-lg md:shadow-lg md:h-max md:mx-auto md:mt-20 md:mb-[50vh] md:relative md:bottom-auto md:left-auto md:right-auto md:top-auto md:-translate-x-0">
 //             <div className="w-full h-[calc(100vh-188px)] md:h-auto">
 //               <div className="md:hidden flex items-end justify-center pt-4 pb-2 absolute top-0 left-0 right-0 bg-white">
 //                 <div className="relative flex justify-center items-center w-full h-7">
@@ -437,33 +437,29 @@ export function PageHeroButton({ visibility }: { visibility: string }) {
   return (
     <button
       onClick={() => showOverlay({ pageName, overlayName })}
-      className="group flex flex-col w-full min-[560px]:w-[calc(100%/2-4px)] min-[824px]:w-64 rounded-2xl p-4 relative cursor-pointer bg-white/80 backdrop-blur-sm border border-gray-200/60 shadow-sm transition-all duration-200 hover:shadow-lg hover:bg-white hover:border-gray-300/80 active:scale-[0.98]"
+      className="flex flex-col items-start w-full min-[560px]:w-[calc(100%/2-4px)] min-[824px]:w-64 rounded-lg p-5 relative cursor-pointer border transition bg-white active:border-[#b9bfc9] lg:hover:border-[#b9bfc9]"
     >
-      <div className="w-full mb-3 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {visibility === VISIBLE ? (
-            <Eye size={14} className="text-blue-500" />
-          ) : (
-            <EyeOff size={14} className="text-gray-400" />
-          )}
-          <h2 className="text-left font-medium text-sm">Page Hero</h2>
-        </div>
+      <div className="w-full mb-4 flex items-center justify-between relative">
+        <h2 className="text-left font-semibold text-sm">Page hero</h2>
         <div
-          className={clsx("w-8 h-[18px] rounded-full relative transition-all duration-300", {
-            "bg-gray-200": visibility === HIDDEN,
-            "bg-blue-500": visibility === VISIBLE,
-          })}
+          className={clsx(
+            "w-9 h-5 rounded-full relative transition-colors duration-200 ease-out",
+            visibility === VISIBLE ? "bg-blue" : "bg-neutral-300"
+          )}
         >
           <div
-            className={clsx("w-[14px] h-[14px] rounded-full transition-all duration-300 absolute top-[2px] shadow-sm", {
-              "left-[2px] bg-white": visibility === HIDDEN,
-              "left-[18px] bg-white": visibility === VISIBLE,
-            })}
-          />
+            className={clsx(
+              "w-3 h-3 rounded-full bg-white absolute [top:50%] [transform:translateY(-50%)] transition-all duration-200 ease-out shadow-sm",
+              {
+                "left-[4px]": visibility === HIDDEN,
+                "left-[20px]": visibility === VISIBLE,
+              }
+            )}
+          ></div>
         </div>
       </div>
-      <p className="text-left text-gray-500 text-xs leading-relaxed">
-        Create compelling hero sections with overlines, hooks, and powerful calls-to-action.
+      <p className="w-52 text-left text-gray text-xs leading-[18px]">
+        The first thing visitors notice. Use visuals that make a strong first impression.
       </p>
     </button>
   );
@@ -641,7 +637,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
 
               {/* Form Content */}
               <div className="w-full h-full mt-0 p-5 flex flex-col gap-6 overflow-x-hidden overflow-y-auto">
-                <div className="bg-neutral-50 rounded-2xl p-4">
+                <div className="bg-neutral-50 border border-gray-200/50 rounded-lg p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                       {visibility === VISIBLE ? (
@@ -678,51 +674,51 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
 
                 {/* Content Section */}
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-sm mb-3">Content</h3>
+                  <h3 className="text-xs font-semibold uppercase text-gray">Content</h3>
 
                   {/* Overline */}
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Overline</label>
+                    <label className="text-xs text-gray">Overline</label>
                     <input
                       type="text"
                       placeholder="WHEN YOUR MOTHER-IN-LAW VISITS..."
                       value={overline}
                       onChange={(e) => setOverline(e.target.value)}
-                      className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200"
+                      className="w-full h-10 px-3 rounded-lg border bg-white text-sm focus:border-gray-300 transition-all duration-200"
                     />
                   </div>
 
                   {/* Hook */}
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Main Headline *</label>
+                    <label className="text-xs text-gray">Main Headline *</label>
                     <input
                       type="text"
                       placeholder="PROVE YOURSELF"
                       value={hook}
                       onChange={(e) => setHook(e.target.value)}
-                      className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200"
+                      className="w-full h-10 px-3 rounded-lg border bg-white text-sm focus:border-gray-300 transition-all duration-200"
                       required
                     />
                   </div>
 
                   {/* Sell */}
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Supporting Text</label>
+                    <label className="text-xs text-gray">Supporting Text</label>
                     <textarea
                       placeholder="She raised the man you love. Now show her he chose wisely. Turn her doubt into respect."
                       value={sell}
                       onChange={(e) => setSell(e.target.value)}
-                      className="w-full h-20 px-3 py-2 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 resize-none"
+                      className="w-full h-20 px-3 py-2 rounded-lg border bg-white text-sm focus:border-gray-300 transition-all duration-200 resize-none"
                     />
                   </div>
                 </div>
 
                 {/* Image Section */}
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-sm">Hero Image</h3>
+                  <h3 className="text-xs font-semibold uppercase text-gray">Hero Image</h3>
 
-                  <div className="bg-gray-50/80 backdrop-blur-sm rounded-2xl p-4 space-y-4">
-                    <div className="w-full border border-gray-200 rounded-xl overflow-hidden bg-white">
+                  <div className="bg-neutral-50 border border-gray-200/50 rounded-lg p-4 space-y-4">
+                    <div className="w-full border border-gray-200 rounded-lg overflow-hidden bg-white">
                       <div className="w-full aspect-[2/1] flex items-center justify-center bg-gray-50">
                         {mainImageUrl && isValidRemoteImage(mainImageUrl) ? (
                           isGifImage(mainImageUrl) ? (
@@ -761,13 +757,13 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Alt Text *</label>
+                      <label className="text-xs text-gray">Alt Text *</label>
                       <input
                         type="text"
                         placeholder="Professional stainless steel cooking pot with beef stew"
                         value={mainImageAlt}
                         onChange={(e) => setMainImageAlt(e.target.value)}
-                        className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200"
+                        className="w-full h-10 px-3 rounded-lg border bg-white text-sm focus:border-gray-300 transition-all duration-200"
                         required
                       />
                     </div>
@@ -776,17 +772,17 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
 
                 {/* Action Configuration */}
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-sm">Call to Action</h3>
+                  <h3 className="text-xs font-semibold uppercase text-gray">Call to Action</h3>
 
                   {/* Item Type */}
                   <div className="space-y-3">
-                    <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Action Type</label>
+                    <label className="text-xs text-gray">Action Type</label>
                     <div className="flex gap-2">
                       <button
                         type="button"
                         onClick={() => setItemType("PRODUCT")}
                         className={clsx(
-                          "flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
+                          "flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
                           {
                             "bg-blue-500 text-white shadow-lg shadow-blue-500/25": itemType === "PRODUCT",
                             "bg-gray-100 text-gray-600 hover:bg-gray-200": itemType !== "PRODUCT",
@@ -799,7 +795,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
                         type="button"
                         onClick={() => setItemType("LINK")}
                         className={clsx(
-                          "flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
+                          "flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
                           {
                             "bg-blue-500 text-white shadow-lg shadow-blue-500/25": itemType === "LINK",
                             "bg-gray-100 text-gray-600 hover:bg-gray-200": itemType !== "LINK",
@@ -814,25 +810,25 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
                   {/* Dynamic Field */}
                   {itemType === "PRODUCT" ? (
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Product ID *</label>
+                      <label className="text-xs text-gray">Product ID *</label>
                       <input
                         type="text"
                         placeholder="premium-cooking-pot-001"
                         value={productId}
                         onChange={(e) => setProductId(e.target.value)}
-                        className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200"
+                        className="w-full h-10 px-3 rounded-lg border bg-white text-sm focus:border-gray-300 transition-all duration-200"
                         required
                       />
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Link URL *</label>
+                      <label className="text-xs text-gray">Link URL *</label>
                       <input
                         type="url"
                         placeholder="https://cherlygood.com/collections/summer-cooling-gadgets"
                         value={linkUrl}
                         onChange={(e) => setLinkUrl(e.target.value)}
-                        className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm text-sm placeholder-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200"
+                        className="w-full h-10 px-3 rounded-lg border bg-white text-sm focus:border-gray-300 transition-all duration-200"
                         required
                       />
                     </div>
@@ -840,11 +836,11 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
 
                   {/* CTA Text */}
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Button Text</label>
+                    <label className="text-xs text-gray">Button Text</label>
                     <select
                       value={ctaText}
                       onChange={(e) => setCtaText(e.target.value as "GET YOURS" | "SHOP NOW" | "CLAIM NOW")}
-                      className="w-full h-10 px-3 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200"
+                      className="w-full h-10 px-3 rounded-lg border bg-white text-sm focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200"
                     >
                       <option value="GET YOURS">GET YOURS</option>
                       <option value="SHOP NOW">SHOP NOW</option>
@@ -855,17 +851,17 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
 
                 {/* Styling */}
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-sm">Design</h3>
+                  <h3 className="text-xs font-semibold uppercase text-gray">Design</h3>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Background</label>
+                      <label className="text-xs text-gray">Background</label>
                       <div className="relative">
                         <input
                           type="color"
                           value={backgroundColor}
                           onChange={(e) => setBackgroundColor(e.target.value)}
-                          className="w-full h-10 rounded-xl border border-gray-200 bg-white cursor-pointer"
+                          className="w-full h-10 rounded-lg border border-gray-200 bg-white cursor-pointer"
                         />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 pointer-events-none">
                           {backgroundColor}
@@ -874,13 +870,13 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">Text Color</label>
+                      <label className="text-xs text-gray">Text Color</label>
                       <div className="relative">
                         <input
                           type="color"
                           value={textColor}
                           onChange={(e) => setTextColor(e.target.value)}
-                          className="w-full h-10 rounded-xl border border-gray-200 bg-white cursor-pointer"
+                          className="w-full h-10 rounded-lg border border-gray-200 bg-white cursor-pointer"
                         />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 pointer-events-none">
                           {textColor}
@@ -897,7 +893,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
               <button
                 onClick={handleSave}
                 disabled={loading}
-                className={clsx("relative h-12 w-full rounded-2xl font-medium transition-all duration-200 shadow-lg", {
+                className={clsx("relative h-12 w-full rounded-lg font-medium transition-all duration-200 shadow-lg", {
                   "bg-gray-300 text-gray-500": loading,
                   "bg-blue-500 text-white hover:bg-blue-600 active:scale-[0.98] shadow-blue-500/25": !loading,
                 })}
