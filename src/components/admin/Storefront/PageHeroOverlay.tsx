@@ -641,35 +641,37 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
 
               {/* Form Content */}
               <div className="w-full h-full mt-0 p-5 flex flex-col gap-6 overflow-x-hidden overflow-y-auto">
-                {/* Visibility Toggle */}
                 <div className="bg-neutral-50 rounded-2xl p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                       {visibility === VISIBLE ? (
-                        <Eye size={18} className="text-blue" />
+                        <Eye size={16} className="text-blue" />
                       ) : (
-                        <EyeOff size={18} className="text-neutral-400" />
+                        <EyeOff size={16} className="text-gray-400" />
                       )}
-                      <span className="text-sm font-medium">
+                      <span
+                        className={clsx("text-sm font-medium", visibility === VISIBLE ? "text-gray-900" : "text-gray")}
+                      >
                         {visibility === VISIBLE ? "Hero section is visible" : "Hero section is hidden"}
                       </span>
                     </div>
                     <button
-                      onClick={() => setVisibility((prevVisibility) => (prevVisibility === VISIBLE ? HIDDEN : VISIBLE))}
+                      onClick={() => setVisibility((prev) => (prev === VISIBLE ? HIDDEN : VISIBLE))}
+                      aria-label="Toggle hero section visibility"
                       className={clsx(
-                        "w-10 h-5 rounded-full relative transition-colors duration-200",
+                        "w-9 h-5 rounded-full relative transition-colors duration-200 ease-out",
                         visibility === VISIBLE ? "bg-blue" : "bg-neutral-300"
                       )}
                     >
                       <div
                         className={clsx(
-                          "w-[10px] h-[10px] rounded-full bg-white ease-in-out duration-300 absolute [top:50%] [transform:translateY(-50%)]",
+                          "w-3 h-3 rounded-full bg-white absolute [top:50%] [transform:translateY(-50%)] transition-all duration-200 ease-out shadow-sm",
                           {
-                            "left-[5px]": visibility === HIDDEN,
-                            "left-[23px]": visibility === VISIBLE,
+                            "left-[4px]": visibility === HIDDEN,
+                            "left-[18px]": visibility === VISIBLE,
                           }
                         )}
-                      ></div>
+                      />
                     </button>
                   </div>
                 </div>
