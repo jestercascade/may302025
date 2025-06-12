@@ -78,7 +78,7 @@ export function PageHeroButton({ visibility }: { visibility: string }) {
   return (
     <button
       onClick={() => showOverlay({ pageName, overlayName })}
-      className="flex flex-col items-start w-full min-[560px]:w-[calc(100%/2-4px)] min-[824px]:w-64 rounded-lg p-5 relative cursor-pointer border transition bg-white active:border-[#b9bfc9] lg:hover:border-[#b9bfc9]"
+      className="flex flex-col items-start w-full min-[560px]:w-[calc(100%/2-4px)] min-[824px]:w-64 rounded-xl p-5 relative cursor-pointer border transition bg-white active:border-[#b9bfc9] lg:hover:border-[#b9bfc9]"
     >
       <div className="w-full mb-4 flex items-center justify-between relative">
         <h2 className="text-left font-semibold text-sm">Page hero</h2>
@@ -130,6 +130,10 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
   const overlayName = useOverlayStore((state) => state.pages.storefront.overlays.editPageHero.name);
   const isOverlayVisible = useOverlayStore((state) => state.pages.storefront.overlays.editPageHero.isVisible);
   const setPreventBodyOverflowChange = useBodyOverflowStore((state) => state.setPreventBodyOverflowChange);
+  const [saveLoading, setSaveLoading] = useState<boolean>(false);
+  const [clearLoading, setClearLoading] = useState<boolean>(false);
+
+  const isLoading = saveLoading || clearLoading;
 
   const options: { value: CtaText; label: string; description: string }[] = [
     { value: "GET YOURS", label: "GET YOURS", description: "Direct and personal" },
@@ -215,6 +219,10 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
     }
   };
 
+  const handleClear = () => {
+    //...
+  };
+
   const onHideOverlay = () => {
     setLoading(false);
     hideOverlay({ pageName, overlayName });
@@ -260,26 +268,44 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
                   <ArrowLeft size={20} strokeWidth={2} className="-ml-1 stroke-blue" />
                   <span className="font-semibold text-sm text-blue">Edit page hero</span>
                 </button>
-                <button
-                  onClick={handleSave}
-                  disabled={loading}
-                  className={clsx(
-                    "relative h-9 w-max px-4 rounded-full overflow-hidden transition-colors text-white bg-neutral-700",
-                    {
-                      "bg-opacity-50": loading,
-                      "hover:bg-neutral-600 active:bg-neutral-800": !loading,
-                    }
-                  )}
-                >
-                  {loading ? (
-                    <div className="flex gap-1 items-center justify-center w-full h-full">
-                      <Spinner color="white" />
-                      <span className="text-white">Saving</span>
-                    </div>
-                  ) : (
-                    <span className="text-white">Save</span>
-                  )}
-                </button>
+                <div className="flex gap-2.5">
+                  <button
+                    onClick={handleClear}
+                    type="button"
+                    disabled={isLoading}
+                    className="h-9 px-4 rounded-full bg-gray-100 text-gray-700 font-semibold text-sm transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-200 active:bg-gray-250 active:scale-95 border border-gray-200"
+                  >
+                    {clearLoading ? (
+                      <div className="flex gap-1.5 items-center justify-center">
+                        <Spinner />
+                        <span>Clearing...</span>
+                      </div>
+                    ) : (
+                      <span>Clear</span>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={handleSave}
+                    type="button"
+                    disabled={isLoading}
+                    className={clsx(
+                      "h-9 px-4 rounded-full font-semibold text-sm transition-all duration-200 text-white bg-gray-700 disabled:opacity-30 disabled:cursor-not-allowed border border-gray-700",
+                      {
+                        "hover:bg-gray-600 active:bg-gray-800 active:scale-95": !isLoading,
+                      }
+                    )}
+                  >
+                    {saveLoading ? (
+                      <div className="flex gap-1.5 items-center justify-center">
+                        <Spinner color="white" />
+                        <span>Saving...</span>
+                      </div>
+                    ) : (
+                      <span>Save</span>
+                    )}
+                  </button>
+                </div>
               </div>
               <div className="w-full h-full mt-0 p-5 flex flex-col gap-6 overflow-x-hidden overflow-y-auto">
                 <div className="bg-neutral-50 border border-gray-200/65 rounded-lg p-4">
@@ -481,18 +507,14 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
                             <div>
                               <div
                                 className={`text-sm font-medium ${
-                                  ctaText === option.value ? "text-blue-dimmed" : "text-black"
+                                  ctaText === option.value ? "text-blue" : "text-black"
                                 }`}
                               >
                                 {option.label}
                               </div>
-                              <div
-                                className={`text-xs ${ctaText === option.value ? "text-blue/85 italic" : "text-gray"}`}
-                              >
-                                {option.description}
-                              </div>
+                              <div className="text-xs text-gray">{option.description}</div>
                             </div>
-                            {ctaText === option.value && <Check size={16} className="text-blue-500" />}
+                            {ctaText === option.value && <Check size={16} className="text-blue" />}
                           </div>
                         </button>
                       ))}
