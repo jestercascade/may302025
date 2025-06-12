@@ -284,7 +284,6 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
                       <span>Clear</span>
                     )}
                   </button>
-
                   <button
                     onClick={handleSave}
                     type="button"
