@@ -203,11 +203,11 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
         visibility: visibility as "VISIBLE" | "HIDDEN",
       };
 
-      // const result = await UpdatePageHeroAction(heroData);
-      // showAlert({
-      //   message: result.message,
-      //   type: result.type,
-      // });
+      const result = await UpdatePageHeroAction(heroData);
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
     } catch {
       showAlert({
         message: "Failed to update page hero",
