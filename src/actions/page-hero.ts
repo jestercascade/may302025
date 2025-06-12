@@ -40,7 +40,11 @@ export async function UpdatePageHeroAction(data: UpdateHeroData) {
     };
 
     // Remove undefined fields to prevent Firestore update errors
-    Object.keys(updateData).forEach((key) => updateData[key] === undefined && delete updateData[key]);
+    Object.keys(updateData).forEach((key) => {
+      if (updateData[key] === undefined) {
+        updateData[key] = admin.firestore.FieldValue.delete();
+      }
+    });
 
     // Ensure only relevant field is kept based on item_type
     if (data.item_type === "PRODUCT") {

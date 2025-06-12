@@ -223,7 +223,6 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
     setClearLoading(true);
 
     try {
-      // Create empty hero data payload
       const clearedHeroData: Partial<HeroSection> = {
         overline: undefined,
         hook: "",
@@ -238,10 +237,8 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
         visibility: "HIDDEN",
       };
 
-      // Call API to clear hero section in backend
       const result = await UpdatePageHeroAction(clearedHeroData);
 
-      // Update UI state to match cleared state
       setOverline("");
       setHook("");
       setSell("");
@@ -255,7 +252,6 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
       setTextColor("#ffffff");
       setVisibility("HIDDEN");
 
-      // Show success message
       showAlert({
         message: result.message,
         type: result.type,
