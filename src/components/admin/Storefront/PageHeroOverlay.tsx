@@ -120,7 +120,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
   const [productId, setProductId] = useState<string>(pageHero.product_id || "");
   const [linkUrl, setLinkUrl] = useState<string>(pageHero.link_url || "");
   const [ctaText, setCtaText] = useState<"GET YOURS" | "SHOP NOW" | "CLAIM NOW">(pageHero.cta_text || "GET YOURS");
-  const [backgroundColor, setBackgroundColor] = useState<string>(pageHero.background_color || "#1e88e5");
+  const [backgroundColor, setBackgroundColor] = useState<string>(pageHero.background_color || "#0070b0");
   const [textColor, setTextColor] = useState<string>(pageHero.text_color || "#ffffff");
   const [visibility, setVisibility] = useState<string>(pageHero.visibility?.toUpperCase() || HIDDEN);
   const [saveLoading, setSaveLoading] = useState<boolean>(false);
@@ -219,8 +219,55 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
     }
   };
 
-  const handleClear = () => {
-    //...
+  const handleClear = async () => {
+    setClearLoading(true);
+
+    try {
+      // Create empty hero data payload
+      const clearedHeroData: Partial<HeroSection> = {
+        overline: undefined,
+        hook: "",
+        sell: undefined,
+        mainImage: { url: "", alt: "" },
+        item_type: "PRODUCT",
+        product_id: undefined,
+        link_url: undefined,
+        cta_text: "GET YOURS",
+        background_color: "#0070b0",
+        text_color: "#ffffff",
+        visibility: "HIDDEN",
+      };
+
+      // Call API to clear hero section in backend
+      const result = await UpdatePageHeroAction(clearedHeroData);
+
+      // Update UI state to match cleared state
+      setOverline("");
+      setHook("");
+      setSell("");
+      setMainImageUrl("");
+      setMainImageAlt("");
+      setItemType("PRODUCT");
+      setProductId("");
+      setLinkUrl("");
+      setCtaText("GET YOURS");
+      setBackgroundColor("#0070b0");
+      setTextColor("#ffffff");
+      setVisibility("HIDDEN");
+
+      // Show success message
+      showAlert({
+        message: result.message,
+        type: result.type,
+      });
+    } catch {
+      showAlert({
+        message: "Failed to clear page hero",
+        type: ShowAlertType.ERROR,
+      });
+    } finally {
+      setClearLoading(false);
+    }
   };
 
   const onHideOverlay = () => {
@@ -236,7 +283,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
     setProductId(pageHero.product_id || "");
     setLinkUrl(pageHero.link_url || "");
     setCtaText(pageHero.cta_text || "GET YOURS");
-    setBackgroundColor(pageHero.background_color || "#1e88e5");
+    setBackgroundColor(pageHero.background_color || "#0070b0");
     setTextColor(pageHero.text_color || "#ffffff");
     setVisibility(pageHero.visibility?.toUpperCase() || HIDDEN);
   };
