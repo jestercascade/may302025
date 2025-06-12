@@ -668,7 +668,7 @@ export function PageHeroOverlay({ pageHero }: { pageHero: Partial<HeroSection> }
                           "w-3 h-3 rounded-full bg-white absolute [top:50%] [transform:translateY(-50%)] transition-all duration-200 ease-out shadow-sm",
                           {
                             "left-[4px]": visibility === HIDDEN,
-                            "left-[18px]": visibility === VISIBLE,
+                            "left-[20px]": visibility === VISIBLE,
                           }
                         )}
                       />
